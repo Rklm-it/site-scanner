@@ -1,7 +1,7 @@
 # site-scanner
 
-Бот для поиска потенциальных клиентов веб-студии. Идёт по **поисковой
-выдаче** для заданных категорий/городов, сканирует найденные сайты,
+Бот для поиска потенциальных клиентов веб-студии. Идёт по **выдаче Яндекса
+и Google** для заданных категорий/городов, сканирует найденные сайты,
 оценивает «устаревание» дизайна по набору эвристик, вытаскивает контакты и
 выгружает **ранжированный список лидов** (CSV + JSON).
 
@@ -51,6 +51,10 @@ pip install -r requirements.txt
 
 ## Запуск
 
+> Поиск идёт через официальные API Яндекса и Google — для них нужны ключи
+> (см. раздел «Поисковые провайдеры» ниже). Без ключей бот подскажет, что
+> задать, и вернёт пустой список.
+
 По одному запросу:
 
 ```bash
@@ -82,7 +86,7 @@ UTF-8 BOM) и `out/leads.json`. Лиды отсортированы по `outdat
 | `-q, --query` | поисковый запрос (можно несколько раз) |
 | `--queries-file` | файл со списком запросов |
 | `--category` / `--city` | генерируют запросы «категория город» |
-| `--provider` | `duckduckgo` (по умолчанию), `google`, `serpapi` |
+| `--provider` | движок поиска, можно несколько раз: `yandex`, `google`, `serpapi_google`, `serpapi_yandex`, `duckduckgo` (по умолчанию `yandex` + `google`) |
 | `--max-per-query` | сколько результатов брать на запрос (по умолчанию 20) |
 | `--concurrency` | параллельных сканов (по умолчанию 8) |
 | `--min-score` | не включать сайты с баллом ниже порога |
@@ -91,11 +95,52 @@ UTF-8 BOM) и `out/leads.json`. Лиды отсортированы по `outdat
 
 ## Поисковые провайдеры
 
-- **DuckDuckGo** — по умолчанию, без ключа. Хорош для старта, но может
-  ограничивать частоту запросов.
-- **Google Custom Search** — стабильнее и точнее. Задай переменные
-  окружения `GOOGLE_API_KEY` и `GOOGLE_CSE_CX`, запусти с `--provider google`.
-- **SerpAPI** — задай `SERPAPI_KEY`, запусти с `--provider serpapi`.
+По умолчанию бот опрашивает **Яндекс и Google** и объединяет их выдачу
+(round-robin, дубли доменов убираются). Прямой скрапинг выдачи не
+используется — оба движка быстро отдают капчу и банят по IP, поэтому только
+официальные API.
+
+### Google — Custom Search JSON API
+
+1. Создай API-ключ: <https://developers.google.com/custom-search/v1/overview>
+2. Создай Programmable Search Engine и включи «Search the entire web»:
+   <https://programmablesearchengine.google.com/> — получишь `cx`.
+3. Задай переменные окружения:
+   ```bash
+   export GOOGLE_API_KEY=...      # ключ
+   export GOOGLE_CSE_CX=...       # id поисковой системы (cx)
+   ```
+   Бесплатно — 100 запросов/день.
+
+### Яндекс — Search API / XML
+
+Вариант А (Yandex Cloud, актуальный): <https://yandex.cloud/ru/docs/search-api/>
+```bash
+export YANDEX_API_KEY=...         # API-ключ сервисного аккаунта
+export YANDEX_FOLDER_ID=...       # id каталога в облаке
+```
+Вариант Б (классический Яндекс.XML): <https://yandex.ru/dev/xml/>
+```bash
+export YANDEX_XML_USER=...        # логин
+export YANDEX_XML_KEY=...         # ключ
+```
+
+### SerpAPI — турнкей на оба движка
+
+Если не хочешь возиться с двумя API — SerpAPI умеет и Google, и Яндекс:
+```bash
+export SERPAPI_KEY=...
+python -m scanner --provider serpapi_yandex --provider serpapi_google -q "..."
+```
+
+### Выбор провайдеров вручную
+
+```bash
+# только Яндекс
+python -m scanner --provider yandex -q "стоматология Казань"
+# Яндекс + Google (то же, что по умолчанию)
+python -m scanner --provider yandex --provider google -q "стоматология Казань"
+```
 
 ## Тесты
 

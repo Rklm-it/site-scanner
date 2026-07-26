@@ -31,14 +31,19 @@ def registered_domain(url: str) -> str:
 def collect_urls(
     queries: list[str],
     *,
-    provider: str = "duckduckgo",
+    providers: list[str] | None = None,
     max_per_query: int = 20,
 ) -> list[tuple[str, str]]:
-    """Собирает уникальные (url, query) по всем запросам, убирая агрегаторы."""
+    """Собирает уникальные (url, query) по всем запросам, убирая агрегаторы.
+
+    Выдача каждого запроса объединяется по всем ``providers`` (Яндекс,
+    Google и т.д.), дубли доменов убираются между запросами тоже.
+    """
+    providers = providers or search_mod.DEFAULT_PROVIDERS
     seen: set[str] = set()
     out: list[tuple[str, str]] = []
     for query in queries:
-        for url in search_mod.search(query, provider=provider, max_results=max_per_query):
+        for url in search_mod.search_many(query, providers=providers, max_results=max_per_query):
             domain = registered_domain(url)
             if not domain or domain in SKIP_DOMAINS:
                 continue
@@ -79,14 +84,14 @@ def scan_one(url: str, source_query: str | None = None) -> Lead:
 def run(
     queries: list[str],
     *,
-    provider: str = "duckduckgo",
+    providers: list[str] | None = None,
     max_per_query: int = 20,
     concurrency: int = 8,
     min_score: int = 0,
     progress=None,
 ) -> list[Lead]:
     """Полный прогон. ``progress`` — опциональный колбэк progress(done, total)."""
-    targets = collect_urls(queries, provider=provider, max_per_query=max_per_query)
+    targets = collect_urls(queries, providers=providers, max_per_query=max_per_query)
     total = len(targets)
     leads: list[Lead] = []
 

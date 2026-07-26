@@ -47,9 +47,9 @@ def main(argv: list[str] | None = None) -> int:
     src.add_argument("--city", action="append", help="город (комбинируется с каждой категорией)")
 
     scan = parser.add_argument_group("параметры скана")
-    scan.add_argument("--provider", default="duckduckgo",
-                      choices=["duckduckgo", "google", "serpapi"],
-                      help="поисковый провайдер (по умолчанию duckduckgo)")
+    scan.add_argument("--provider", action="append",
+                      choices=["yandex", "google", "serpapi_google", "serpapi_yandex", "duckduckgo"],
+                      help="поисковый провайдер (можно несколько раз; по умолчанию yandex + google)")
     scan.add_argument("--max-per-query", type=int, default=20, help="сколько результатов брать на запрос")
     scan.add_argument("--concurrency", type=int, default=8, help="сколько сайтов сканировать параллельно")
     scan.add_argument("--min-score", type=int, default=0, help="минимальный балл устаревания для попадания в список")
@@ -64,10 +64,11 @@ def main(argv: list[str] | None = None) -> int:
     if not queries:
         parser.error("не задано ни одного запроса. Используй --query / --queries-file / --category")
 
-    print(f"Запросов: {len(queries)} | провайдер: {args.provider}", file=sys.stderr)
+    providers = args.provider or ["yandex", "google"]
+    print(f"Запросов: {len(queries)} | провайдеры: {', '.join(providers)}", file=sys.stderr)
     leads = run(
         queries,
-        provider=args.provider,
+        providers=providers,
         max_per_query=args.max_per_query,
         concurrency=args.concurrency,
         min_score=args.min_score,
