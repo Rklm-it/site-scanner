@@ -1,0 +1,43 @@
+# Пример конфига. Запуск: python -m scanner --config config.example.yaml
+# Любой ключ можно переопределить флагом командной строки.
+
+# --- что искать ---
+# Готовые запросы:
+queries:
+  - стоматология Казань
+  - автосервис Казань
+# ...или генерация «категория × город» (перемножаются):
+categories:
+  - натяжные потолки
+  - доставка воды
+  - ветклиника
+cities:
+  - Казань
+  - Набережные Челны
+
+# --- поиск ---
+providers: [yandex, google]   # yandex, google, serpapi_google, serpapi_yandex, duckduckgo
+max_per_query: 20
+
+# --- скан ---
+concurrency: 8
+min_score: 30                 # не включать сайты со «свежим» дизайном
+timeout: 12
+follow_contact_page: true     # доходить до /контакты за телефонами и ИНН
+
+# --- вежливость ---
+respect_robots: true
+per_host_delay: 1.0           # секунд между запросами к одному домену
+
+# --- обогащение по ИНН (нужен DADATA_TOKEN) ---
+enrich: false                 # оборот, статус, руководитель по ИНН
+
+# --- кэш ---
+cache_path: cache.sqlite      # null — выключить кэш
+cache_pages: false            # кэшировать HTML страниц (может разрастись)
+skip_seen: false              # пропускать домены из прошлых прогонов
+search_ttl: 86400             # сколько секунд хранить выдачу поиска
+
+# --- вывод ---
+out: out/leads                # создаст out/leads.csv и out/leads.json
+top: 15                       # показать топ в консоли

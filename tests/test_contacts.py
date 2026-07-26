@@ -1,4 +1,4 @@
-from scanner.contacts import extract, _clean_phone
+from scanner.contacts import extract, _clean_phone, _deobfuscate
 
 PAGE = """<html><head>
 <title>ООО Ромашка — доставка воды | Казань</title>
@@ -7,11 +7,11 @@ PAGE = """<html><head>
 <a href="mailto:info@romashka.ru">почта</a>
 Пишите на sales@romashka.ru
 <a href="tel:+78435551234">Позвонить</a>
-Телефон: 8 (843) 555-77-88
+Телефон: 8 (843) 555-77-88, а также 8-800-555-35-35
 <a href="https://vk.com/romashka">ВК</a>
 <a href="https://t.me/romashka_bot">Telegram</a>
 <a href="/contacts">Контакты</a>
-ИНН 1655123456 ОГРН 1021602812345
+ИНН 7707083893 ОГРН 1027700132195
 </body></html>"""
 
 
@@ -24,16 +24,30 @@ def test_emails_extracted():
 def test_phones_normalized():
     c = extract(PAGE, base_url="https://romashka.ru")
     assert any(p.startswith("+7 843") for p in c.phones)
+    assert any("800" in p for p in c.phones)  # 8-800 тоже пойман
 
 
-def test_socials_and_requisites():
+def test_socials_and_valid_requisites():
     c = extract(PAGE, base_url="https://romashka.ru", title="ООО Ромашка")
     assert any("vk.com" in s for s in c.socials)
     assert any("t.me" in s for s in c.socials)
-    assert c.inn == "1655123456"
-    assert c.ogrn == "1021602812345"
+    assert c.inn == "7707083893"        # прошёл контрольную сумму
+    assert c.ogrn == "1027700132195"
     assert c.company == "Ромашка"
     assert c.contact_page and c.contact_page.endswith("/contacts")
+
+
+def test_invalid_inn_rejected():
+    page = "<html><body>ИНН 1234567890 текст</body></html>"
+    c = extract(page, base_url="https://x.ru")
+    assert c.inn is None  # контрольная сумма не сходится — не берём
+
+
+def test_email_deobfuscation():
+    assert _deobfuscate("info (at) romashka точка ru") == "info@romashka.ru"
+    page = "<html><body>Почта: info (at) romashka точка ru</body></html>"
+    c = extract(page, base_url="https://romashka.ru")
+    assert "info@romashka.ru" in c.emails
 
 
 def test_clean_phone():

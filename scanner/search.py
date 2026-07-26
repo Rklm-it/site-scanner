@@ -32,11 +32,34 @@ DDG_HTML = "https://html.duckduckgo.com/html/"
 
 _warned: set[str] = set()
 
+_RETRY_STATUS = {429, 500, 502, 503, 504}
+
 
 def _warn_once(key: str, message: str) -> None:
     if key not in _warned:
         _warned.add(key)
         print(f"[search] {message}", file=sys.stderr)
+
+
+def _http(method: str, url: str, *, retries: int = 2, backoff: float = 1.5, **kw):
+    """HTTP-запрос с повторами на сетевых ошибках и кодах 429/5xx.
+
+    Обращается к ``requests.get``/``requests.post`` по имени, чтобы их можно
+    было замокать в тестах.
+    """
+    fn = requests.get if method == "get" else requests.post
+    for attempt in range(retries + 1):
+        try:
+            resp = fn(url, **kw)
+        except requests.RequestException:
+            if attempt < retries:
+                time.sleep(backoff ** attempt)
+                continue
+            raise
+        if getattr(resp, "status_code", 200) in _RETRY_STATUS and attempt < retries:
+            time.sleep(backoff ** attempt)
+            continue
+        return resp
 
 
 # --------------------------------------------------------------------------- #
@@ -56,8 +79,8 @@ def search_google_cse(query: str, *, max_results: int = 20) -> list[str]:
     urls: list[str] = []
     for start in range(1, min(max_results, 100) + 1, 10):
         try:
-            resp = requests.get(
-                GOOGLE_CSE,
+            resp = _http(
+                "get", GOOGLE_CSE,
                 params={"key": key, "cx": cx, "q": query, "start": start, "num": 10, "hl": "ru"},
                 timeout=15,
             )
@@ -107,7 +130,7 @@ def search_yandex_xml(query: str, *, max_results: int = 20) -> list[str]:
     for page in range(0, 11):  # Яндекс отдаёт не больше ~1000 результатов
         params = {**auth, "query": query, "l10n": "ru", "groupby": groupby, "page": page}
         try:
-            resp = requests.get(YANDEX_XML, params=params, headers=DEFAULT_HEADERS, timeout=20)
+            resp = _http("get", YANDEX_XML, params=params, headers=DEFAULT_HEADERS, timeout=20)
             resp.raise_for_status()
             root = ET.fromstring(resp.content)
         except (requests.RequestException, ET.ParseError) as exc:
@@ -141,7 +164,7 @@ def _serpapi(query: str, engine: str, max_results: int) -> list[str]:
     if engine == "yandex":
         params.update({"text": query, "yandex_domain": "yandex.ru"})
     try:
-        resp = requests.get(SERPAPI, params=params, timeout=25)
+        resp = _http("get", SERPAPI, params=params, timeout=25)
         resp.raise_for_status()
     except requests.RequestException as exc:
         _warn_once("serpapi_err", f"ошибка SerpAPI ({engine}): {exc}")
@@ -206,21 +229,31 @@ PROVIDERS = {
 DEFAULT_PROVIDERS = ["yandex", "google"]
 
 
-def search(query: str, *, provider: str = "yandex", max_results: int = 20) -> list[str]:
-    """URL по одному запросу через один провайдер."""
+def search(query: str, *, provider: str = "yandex", max_results: int = 20, cache=None) -> list[str]:
+    """URL по одному запросу через один провайдер (с опциональным кэшем)."""
     fn = PROVIDERS.get(provider)
     if fn is None:
         raise ValueError(f"Неизвестный провайдер поиска: {provider}")
-    return fn(query, max_results=max_results)
+
+    if cache is not None:
+        cached = cache.get_search(query, provider)
+        if cached is not None:
+            return cached[:max_results]
+
+    urls = fn(query, max_results=max_results)
+
+    if cache is not None and urls:
+        cache.set_search(query, provider, urls)
+    return urls
 
 
-def search_many(query: str, *, providers: list[str], max_results: int = 20) -> list[str]:
+def search_many(query: str, *, providers: list[str], max_results: int = 20, cache=None) -> list[str]:
     """URL по одному запросу через несколько провайдеров с объединением.
 
     Результаты чередуются по провайдерам (round-robin), чтобы верхние
     позиции разных движков попадали в начало списка, а дубли убираются.
     """
-    per_provider = [search(query, provider=p, max_results=max_results) for p in providers]
+    per_provider = [search(query, provider=p, max_results=max_results, cache=cache) for p in providers]
     merged: list[str] = []
     seen: set[str] = set()
     for i in range(max(len(lst) for lst in per_provider) if per_provider else 0):

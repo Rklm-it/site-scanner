@@ -58,7 +58,7 @@ def test_yandex_api_error(monkeypatch):
 
 
 def test_search_many_round_robin_dedupe(monkeypatch):
-    def fake_search(query, *, provider, max_results=20):
+    def fake_search(query, *, provider, max_results=20, cache=None):
         data = {
             "yandex": ["https://a.ru", "https://b.ru", "https://c.ru"],
             "google": ["https://b.ru", "https://d.ru"],  # b.ru — дубль

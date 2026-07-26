@@ -12,3 +12,8 @@ leads.json
 out/
 *.local.yaml
 .env
+
+# Кэш и БД
+cache.sqlite
+*.sqlite
+*.sqlite-journal

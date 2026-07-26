@@ -1,15 +1,21 @@
-"""HTTP-загрузка страниц с таймаутами и мягкими повторами."""
+"""HTTP-загрузка страниц: детект кодировки, обработка битого SSL, повторы."""
 
 from __future__ import annotations
 
+import re
 import time
 from dataclasses import dataclass
 
 import requests
 
+try:  # charset-normalizer идёт в зависимостях requests
+    from charset_normalizer import from_bytes as _cn_from_bytes
+except Exception:  # pragma: no cover
+    _cn_from_bytes = None
+
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 site-scanner/0.1"
+    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36 site-scanner/0.2"
 )
 
 DEFAULT_HEADERS = {
@@ -17,6 +23,9 @@ DEFAULT_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ru,en;q=0.8",
 }
+
+_CHARSET_HDR = re.compile(r"charset=[\"']?([\w\-]+)", re.I)
+_META_CHARSET = re.compile(rb"""<meta[^>]+charset=["']?([\w\-]+)""", re.I)
 
 
 @dataclass
@@ -28,6 +37,7 @@ class FetchResult:
     html: str = ""
     load_ms: int | None = None
     https: bool = False
+    tls_error: bool = False
     error: str | None = None
 
     @property
@@ -42,6 +52,40 @@ def _normalize(url: str) -> str:
     return url
 
 
+def detect_encoding(raw: bytes, headers: dict[str, str]) -> str:
+    """Определяет кодировку: заголовок → <meta charset> → авто-детект.
+
+    Критично для рунета: старые сайты нередко отдают windows-1251 без
+    корректного HTTP-заголовка, и без этого текст читается как мусор.
+    """
+    ctype = headers.get("content-type", "")
+    m = _CHARSET_HDR.search(ctype)
+    if m:
+        return m.group(1)
+
+    m2 = _META_CHARSET.search(raw[:4096])
+    if m2:
+        try:
+            return m2.group(1).decode("ascii")
+        except UnicodeDecodeError:
+            pass
+
+    if _cn_from_bytes is not None:
+        best = _cn_from_bytes(raw[:200_000]).best()
+        if best and best.encoding:
+            return best.encoding
+
+    return "utf-8"
+
+
+def _decode(raw: bytes, headers: dict[str, str]) -> str:
+    enc = detect_encoding(raw, headers)
+    try:
+        return raw.decode(enc, errors="replace")
+    except (LookupError, TypeError):
+        return raw.decode("utf-8", errors="replace")
+
+
 def fetch(
     url: str,
     *,
@@ -51,8 +95,8 @@ def fetch(
 ) -> FetchResult:
     """Скачивает HTML страницы.
 
-    Пробует https, при неудаче — http. Возвращает FetchResult с сырым
-    HTML (обрезанным до ``max_bytes``) и метаданными ответа.
+    Пробует https, при ошибке TLS/соединения — http, и фиксирует факт
+    битого сертификата (``tls_error``) — это отдельный сигнал заброшенности.
     """
     sess = session or requests.Session()
     target = _normalize(url)
@@ -61,6 +105,8 @@ def fetch(
         candidates.append("http://" + target[len("https://"):])
 
     last_error: str | None = None
+    tls_error = False
+
     for candidate in candidates:
         started = time.perf_counter()
         try:
@@ -71,27 +117,27 @@ def fetch(
                 allow_redirects=True,
                 stream=True,
             )
-            content = resp.raw.read(max_bytes, decode_content=True) or b""
+            raw = resp.raw.read(max_bytes, decode_content=True) or b""
             resp.close()
             elapsed = int((time.perf_counter() - started) * 1000)
-
-            encoding = resp.encoding or resp.apparent_encoding or "utf-8"
-            try:
-                html = content.decode(encoding, errors="replace")
-            except (LookupError, TypeError):
-                html = content.decode("utf-8", errors="replace")
+            headers = {k.lower(): v for k, v in resp.headers.items()}
 
             return FetchResult(
                 url=url,
                 final_url=resp.url,
                 status=resp.status_code,
-                headers={k.lower(): v for k, v in resp.headers.items()},
-                html=html,
+                headers=headers,
+                html=_decode(raw, headers),
                 load_ms=elapsed,
                 https=resp.url.startswith("https://"),
+                tls_error=tls_error,
             )
+        except requests.exceptions.SSLError as exc:
+            tls_error = True
+            last_error = f"SSLError: {exc}"
+            continue
         except requests.RequestException as exc:
             last_error = f"{type(exc).__name__}: {exc}"
             continue
 
-    return FetchResult(url=url, error=last_error or "unknown fetch error")
+    return FetchResult(url=url, error=last_error or "unknown fetch error", tls_error=tls_error)
