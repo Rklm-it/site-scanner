@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Выгрузки лидов и локальные конфиги
+leads.csv
+leads.json
+out/
+*.local.yaml
+.env
