@@ -25,12 +25,20 @@ SOCIAL_HOSTS = (
     "wa.me", "api.whatsapp.com", "ok.ru", "wa.clck.bar", "dzen.ru",
 )
 
-JUNK_EMAIL_HINTS = ("example.com", "sentry.io", "wixpress.com", "@2x", ".png", ".jpg", ".webp", ".gif")
+JUNK_EMAIL_HINTS = (
+    "example.com", "sentry.io", "wixpress.com", "@2x", ".png", ".jpg", ".webp",
+    ".gif", ".svg", ".woff", ".ttf", ".js", ".css", ".ico",
+)
 
-# Деобфускация email вида "info (at) site точка ru"
+# Деобфускация email вида "info (at) site точка ru".
+# ВАЖНО: срабатывает ТОЛЬКО на явных разделителях — скобках [( )] или пробелах
+# вокруг «at»/«собака»/«точка». Иначе «at»/«dot» ловились бы внутри слов
+# (loc**at**ion → loc@ion, **lat**in → l@in) и порождали мусорные адреса из JS.
 _DEOBFUSCATE = [
-    (re.compile(r"\s*[\[(]?\s*(?:at|@|собака|дог)\s*[\])]?\s*", re.I), "@"),
-    (re.compile(r"\s*[\[(]?\s*(?:dot|точка|тчк)\s*[\])]?\s*", re.I), "."),
+    (re.compile(r"\s*[\[(]\s*(?:at|собака)\s*[\])]\s*", re.I), "@"),   # (at) [собака]
+    (re.compile(r"\s+(?:собака)\s+", re.I), "@"),                       #  собака
+    (re.compile(r"\s*[\[(]\s*(?:dot|точка)\s*[\])]\s*", re.I), "."),   # (dot) [точка]
+    (re.compile(r"\s+(?:точка)\s+", re.I), "."),                        #  точка
 ]
 
 

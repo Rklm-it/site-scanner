@@ -26,11 +26,17 @@ log = logging.getLogger("scanner")
 # Домены-агрегаторы/каталоги — это не «сайт клиента», пропускаем.
 SKIP_DOMAINS = {
     "yandex.ru", "yandex.com", "ya.ru", "google.com", "google.ru", "2gis.ru", "2gis.com",
-    "avito.ru", "wikipedia.org", "youtube.com", "vk.com", "ok.ru", "instagram.com",
-    "facebook.com", "t.me", "zoon.ru", "yell.ru", "flamp.ru", "otzovik.com",
-    "prodoctorov.ru", "hh.ru", "rusprofile.ru", "list-org.com", "wildberries.ru",
-    "ozon.ru", "dzen.ru", "pikabu.ru", "vc.ru", "habr.com", "tripadvisor.ru",
-    "market.yandex.ru", "maps.yandex.ru", "blizko.ru", "spr.ru", "orgpage.ru",
+    "avito.ru", "wikipedia.org", "youtube.com", "vk.com", "vk.ru", "vkontakte.ru",
+    "ok.ru", "instagram.com", "facebook.com", "t.me", "telegram.org", "wa.me",
+    "whatsapp.com", "twitter.com", "x.com", "rutube.ru", "livejournal.com",
+    "zoon.ru", "yell.ru", "flamp.ru", "otzovik.com", "irecommend.ru", "otzyvru.com",
+    "prodoctorov.ru", "docdoc.ru", "napopravku.ru", "sberhealth.ru",
+    "hh.ru", "rabota.ru", "superjob.ru", "avito.ru", "youla.ru",
+    "rusprofile.ru", "list-org.com", "sbis.ru", "checko.ru", "audit-it.ru",
+    "wildberries.ru", "ozon.ru", "aliexpress.ru", "market.yandex.ru", "megamarket.ru",
+    "dzen.ru", "zen.yandex.ru", "pikabu.ru", "vc.ru", "habr.com", "tripadvisor.ru",
+    "maps.yandex.ru", "blizko.ru", "spr.ru", "orgpage.ru", "yandex.by", "mail.ru",
+    "tiu.ru", "pulscen.ru", "regmarkets.ru", "satom.ru", "flampp.ru", "zoon.com",
 }
 
 TLS_SIGNAL_POINTS = 18

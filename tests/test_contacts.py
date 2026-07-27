@@ -50,6 +50,15 @@ def test_email_deobfuscation():
     assert "info@romashka.ru" in c.emails
 
 
+def test_deobfuscation_does_not_touch_words():
+    # «at»/«dot» внутри слов не должны становиться @/. (регресс на мусор из JS)
+    assert _deobfuscate("window.location.replace") == "window.location.replace"
+    js = ("<html><body><script>window.location.replace('/x');"
+          "var f='vksansdisplaylightlatin.v320.woff';</script></body></html>")
+    c = extract(js, base_url="https://site.ru")
+    assert c.emails == []
+
+
 def test_clean_phone():
     assert _clean_phone("8 (843) 555-77-88") == "+7 843 555-77-88"
     assert _clean_phone("+7 843 555 12 34") == "+7 843 555-12-34"
