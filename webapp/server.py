@@ -171,6 +171,8 @@ def _run_job(job: Job, settings: Settings) -> None:
             row["note"] = st.get("note", "")
             rows.append(row)
         job.leads = rows
+        if STORE:
+            STORE.upsert_leads(rows)      # копим в базу просканированных
         job.summary = analytics.summarize(leads)
         job.status = "done"
     except Exception as exc:  # noqa: BLE001
@@ -243,6 +245,12 @@ class LeadStateUpdate(BaseModel):
     domain: str
     status: str | None = None
     note: str | None = None
+
+
+@app.get("/api/base")
+def leads_base() -> dict:
+    leads = STORE.all_leads() if STORE else []
+    return {"count": len(leads), "leads": leads}
 
 
 @app.get("/api/leads/state")

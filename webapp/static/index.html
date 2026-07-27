@@ -118,6 +118,12 @@
   .modal-box input, .modal-box textarea { width: 100%; background: var(--bg); color: var(--ink);
     border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 4px; }
   .modal-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+
+  /* Вкладки Скан / База */
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted);
+    padding: 8px 12px; cursor: pointer; font: inherit; }
+  .tab.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -180,6 +186,10 @@
   </aside>
 
   <main class="main">
+    <div id="tabs" class="tabs">
+      <button class="tab active" data-v="scan">Результаты скана</button>
+      <button class="tab" data-v="base">База просканированных</button>
+    </div>
     <div id="status"></div>
     <div id="summary"></div>
     <div class="toolbar" id="toolbar" style="display:none">
@@ -226,6 +236,7 @@ const KEY_LABELS = {
   serpapi_key: "SerpAPI: key", dadata_token: "DaData: token",
 };
 let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outreach_score", SORT_DIR = -1, ROWS = [];
+let VIEW = "scan", LAST_JOB = null, BASE = [];
 const SELCATS = new Set();
 
 async function init() {
@@ -262,6 +273,18 @@ async function init() {
   // модалка письма
   $("m-close").onclick = () => $("modal").style.display = "none";
   $("modal").onclick = e => { if (e.target.id === "modal") $("modal").style.display = "none"; };
+  // вкладки Скан / База
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchView(t.dataset.v));
+}
+
+function setActiveTab() {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.v === VIEW));
+}
+
+async function switchView(v) {
+  VIEW = v; setActiveTab();
+  if (v === "base") { BASE = ((await (await fetch("/api/base")).json()).leads) || []; }
+  render();
 }
 
 function renderKeys(secrets) {
@@ -297,6 +320,7 @@ $("run").onclick = async () => {
   if (!res.ok) { $("status").innerHTML = `<div class="warn bad">${(await res.json()).detail}</div>`; return; }
   const {job_id, warnings} = await res.json();
   CURRENT_JOB = job_id;
+  VIEW = "scan"; setActiveTab();
   $("run").disabled = true; $("toolbar").style.display = "none";
   $("results").innerHTML = ""; $("summary").innerHTML = "";
   renderWarnings(warnings);
@@ -331,6 +355,32 @@ async function poll() {
 }
 
 function showResults(job) {
+  LAST_JOB = job;
+  VIEW = "scan"; setActiveTab();
+  render();
+}
+
+function render() {
+  if (VIEW === "base") {
+    ROWS = BASE;
+    $("summary").innerHTML = "";
+    $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
+    $("toolbar").style.display = "flex";
+    $("count").textContent = `В базе: ${ROWS.length}`;
+    $("elapsed").textContent = "";
+    $("csv").style.display = "none"; $("json").style.display = "none";
+    if (!ROWS.length) { $("results").innerHTML = `<div class="empty">База пуста — запустите скан, найденные лиды накопятся здесь.</div>`; return; }
+    renderTable();
+    return;
+  }
+  const job = LAST_JOB;
+  $("csv").style.display = ""; $("json").style.display = "";
+  if (!job) {
+    ROWS = [];
+    $("summary").innerHTML = ""; $("toolbar").style.display = "none";
+    $("results").innerHTML = `<div class="empty">Настройте параметры слева и запустите скан — результаты появятся здесь.</div>`;
+    return;
+  }
   ROWS = job.leads;
   renderSummary(job.summary || {});
   $("toolbar").style.display = ROWS.length ? "flex" : "none";

@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 import threading
 import time
@@ -20,6 +21,11 @@ class LeadStore:
             self._conn.execute(
                 "CREATE TABLE IF NOT EXISTS lead_state("
                 "domain TEXT PRIMARY KEY, status TEXT, note TEXT, updated REAL)"
+            )
+            self._conn.execute(
+                "CREATE TABLE IF NOT EXISTS leads("
+                "domain TEXT PRIMARY KEY, data TEXT, outreach_score INTEGER, "
+                "first_seen REAL, last_seen REAL)"
             )
 
     def all(self) -> dict[str, dict]:
@@ -44,6 +50,43 @@ class LeadStore:
                 (domain, new_status, new_note, time.time()),
             )
         return {"status": new_status, "note": new_note}
+
+    # --- накопительная база просканированных лидов ---
+    def upsert_leads(self, rows: list[dict]) -> None:
+        """Складывает лиды в базу (дедуп по домену; first_seen сохраняется)."""
+        now = time.time()
+        with self._lock, self._conn:
+            for r in rows:
+                dom = r.get("domain")
+                if not dom:
+                    continue
+                prev = self._conn.execute(
+                    "SELECT first_seen FROM leads WHERE domain=?", (dom,)
+                ).fetchone()
+                first = prev[0] if prev else now
+                self._conn.execute(
+                    "INSERT OR REPLACE INTO leads(domain, data, outreach_score, first_seen, last_seen)"
+                    " VALUES(?,?,?,?,?)",
+                    (dom, json.dumps(r, ensure_ascii=False), int(r.get("outreach_score") or 0), first, now),
+                )
+
+    def all_leads(self) -> list[dict]:
+        """Все накопленные лиды, отсортированные по приоритету, со свежим статусом."""
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT data, first_seen, last_seen FROM leads ORDER BY outreach_score DESC"
+            ).fetchall()
+        states = self.all()
+        out: list[dict] = []
+        for data, first, last in rows:
+            r = json.loads(data)
+            st = states.get(r.get("domain"), {})
+            r["status"] = st.get("status", "")
+            r["note"] = st.get("note", "")
+            r["first_seen"] = first
+            r["last_seen"] = last
+            out.append(r)
+        return out
 
     def close(self) -> None:
         with self._lock:

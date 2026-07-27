@@ -102,6 +102,39 @@ def test_lead_state_rejects_bad_status(client):
     assert c.post("/api/leads/state", json={"domain": "x.ru", "status": "чепуха"}).status_code == 400
 
 
+def test_base_accumulates_scanned_leads(client, monkeypatch):
+    c, server = client
+    assert c.get("/api/base").json()["count"] == 0
+
+    def fake_run(settings, *, dadata_token=None, progress=None):
+        if progress:
+            progress(1, 1)
+        return [Lead(url="https://old.ru", domain="old.ru", outdated_score=80, outreach_score=70,
+                     signals=["нет HTTPS"], contacts=Contacts(emails=["a@old.ru"]))]
+
+    monkeypatch.setattr(server.pipeline, "run", fake_run)
+
+    def run_scan():
+        jid = c.post("/api/scan", json={"categories": "стоматология", "cities": "Казань"}).json()["job_id"]
+        for _ in range(50):
+            if c.get(f"/api/scan/{jid}").json()["status"] in ("done", "error"):
+                break
+            time.sleep(0.05)
+
+    run_scan()
+    base = c.get("/api/base").json()
+    assert base["count"] == 1
+    assert base["leads"][0]["domain"] == "old.ru"
+    assert base["leads"][0]["pitch_body"]  # письмо сохранено в базе
+
+    # статус, выставленный отдельно, виден в базе; повторный скан не плодит дубль
+    c.post("/api/leads/state", json={"domain": "old.ru", "status": "написал"})
+    run_scan()
+    base = c.get("/api/base").json()
+    assert base["count"] == 1                       # дедуп по домену
+    assert base["leads"][0]["status"] == "написал"  # статус подтянулся
+
+
 def test_index_served(client):
     c, _ = client
     html = c.get("/").text
