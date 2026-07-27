@@ -17,3 +17,7 @@ out/
 cache.sqlite
 *.sqlite
 *.sqlite-journal
+
+# Веб-интерфейс: секреты и данные прогонов
+secrets.local.json
+webapp_data/

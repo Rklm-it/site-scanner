@@ -22,7 +22,22 @@
                                  └─ сортируем ─▶ leads.csv / leads.json
 ```
 
-## Быстрый старт
+## Веб-интерфейс (без командной строки)
+
+Чтобы не возиться с флагами и `export`, есть браузерный интерфейс: форма
+настроек, панель API-ключей (вводятся один раз и сохраняются), запуск скана
+кнопкой, живой прогресс и таблица лидов с сортировкой и выгрузкой в CSV/JSON.
+
+```bash
+pip install -r requirements.txt -r requirements-web.txt
+./run_web.sh                      # → http://127.0.0.1:8600
+```
+
+Ключи вводятся в панели «API-ключи» и сохраняются в `secrets.local.json`
+(в `.gitignore`) — при следующем запуске подхватываются автоматически.
+Результаты каждого прогона лежат в `webapp_data/jobs/<id>/`.
+
+## Быстрый старт (командная строка)
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
@@ -191,6 +206,11 @@ scanner/
   pipeline.py    оркестрация
   report.py      выгрузка CSV / JSON
   models.py      модели данных
+webapp/
+  server.py      FastAPI: эндпоинты, фоновые задачи скана
+  secrets_store.py  хранение API-ключей (secrets.local.json → env)
+  static/index.html UI (форма, прогресс, таблица; без сборки)
+  __main__.py    запуск: python -m webapp
 tests/           pytest
 ```
 

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>site-scanner — поиск клиентов</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --panel: #fff; --ink: #1c2430; --muted: #6b7683;
+    --line: #e2e6ea; --accent: #2f6df6; --accent-ink: #fff;
+    --ok: #1f9d55; --warn: #b7791f; --bad: #d64545; --chip: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10141a; --panel: #171d26; --ink: #e6eaf0; --muted: #909bab;
+      --line: #262f3b; --accent: #4f86ff; --accent-ink: #fff;
+      --ok: #35c37a; --warn: #e0a94a; --bad: #f16d6d; --chip: #212a36;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  header { padding: 18px 22px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 12px; }
+  header h1 { font-size: 19px; margin: 0; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  .wrap { display: grid; grid-template-columns: 360px 1fr; gap: 0; min-height: calc(100vh - 61px); }
+  @media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+  .side { padding: 20px; border-right: 1px solid var(--line); }
+  .main { padding: 20px; overflow-x: auto; }
+  .panel { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .panel h2 { font-size: 14px; margin: 0 0 12px; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--muted); }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  input[type=text], input[type=number], input[type=password], textarea, select {
+    width: 100%; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: inherit; }
+  textarea { resize: vertical; min-height: 60px; }
+  .row { display: flex; gap: 10px; }
+  .row > div { flex: 1; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 6px; }
+  .checks label { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--ink); }
+  .checks input { width: auto; }
+  button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--ink); padding: 9px 14px; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+    width: 100%; font-weight: 600; padding: 12px; }
+  button:disabled { opacity: .5; cursor: default; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .dot.on { background: var(--ok); } .dot.off { background: var(--line); }
+  .keyrow { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; }
+  .keyrow .name { flex: 0 0 130px; color: var(--muted); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .progress { height: 8px; background: var(--chip); border-radius: 6px; overflow: hidden; margin: 8px 0; }
+  .progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+  .warn { color: var(--warn); font-size: 13px; margin: 4px 0; }
+  .bad { color: var(--bad); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--panel); cursor: pointer; white-space: nowrap; }
+  th:hover { color: var(--accent); }
+  td.score { font-weight: 700; }
+  .chip { display: inline-block; background: var(--chip); border-radius: 5px; padding: 1px 6px;
+    font-size: 11px; margin: 1px 2px 1px 0; color: var(--muted); }
+  a { color: var(--accent); }
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .muted { color: var(--muted); }
+  .empty { color: var(--muted); padding: 40px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>site-scanner</h1>
+  <span class="sub">поиск клиентов по устаревшему дизайну сайтов</span>
+</header>
+
+<div class="wrap">
+  <aside class="side">
+    <div class="panel">
+      <h2>Что искать</h2>
+      <label>Категории (по одной на строку)</label>
+      <textarea id="categories" placeholder="стоматология&#10;автосервис&#10;натяжные потолки"></textarea>
+      <label>Города</label>
+      <textarea id="cities" placeholder="Казань&#10;Набережные Челны"></textarea>
+      <details>
+        <summary>Либо готовые запросы целиком</summary>
+        <textarea id="queries" placeholder="стоматология Казань"></textarea>
+      </details>
+    </div>
+
+    <div class="panel">
+      <h2>Параметры</h2>
+      <label>Поисковики</label>
+      <div class="checks" id="providers"></div>
+      <div class="row">
+        <div><label>Результатов на запрос</label><input type="number" id="max_per_query" value="20"></div>
+        <div><label>Мин. балл</label><input type="number" id="min_score" value="30"></div>
+      </div>
+      <div class="row">
+        <div><label>Потоков</label><input type="number" id="concurrency" value="8"></div>
+        <div><label>Пауза на домен, с</label><input type="number" step="0.5" id="per_host_delay" value="1"></div>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="enrich"> обогащать по ИНН</label>
+        <label><input type="checkbox" id="respect_robots" checked> robots.txt</label>
+        <label><input type="checkbox" id="follow_contact_page" checked> заходить в контакты</label>
+        <label><input type="checkbox" id="skip_seen"> пропускать виденные</label>
+        <label><input type="checkbox" id="use_cache" checked> кэш</label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>API-ключи</h2>
+      <div id="keystatus"></div>
+      <details>
+        <summary>Ввести / изменить ключи</summary>
+        <div id="keyinputs"></div>
+        <button id="savekeys" style="margin-top:10px">Сохранить ключи</button>
+        <div class="hint">Хранятся локально в secrets.local.json (в .gitignore).</div>
+      </details>
+    </div>
+
+    <button class="primary" id="run">Запустить скан</button>
+  </aside>
+
+  <main class="main">
+    <div id="status"></div>
+    <div class="toolbar" id="toolbar" style="display:none">
+      <strong id="count"></strong>
+      <span class="muted" id="elapsed"></span>
+      <span style="flex:1"></span>
+      <button id="csv">Скачать CSV</button>
+      <button id="json">Скачать JSON</button>
+    </div>
+    <div id="results"><div class="empty">Настройте параметры слева и запустите скан — результаты появятся здесь.</div></div>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const KEY_LABELS = {
+  yandex_xml_user: "Яндекс XML: логин", yandex_xml_key: "Яндекс XML: ключ",
+  yandex_api_key: "Яндекс Cloud: apikey", yandex_folder_id: "Яндекс Cloud: folder",
+  google_api_key: "Google: API key", google_cse_cx: "Google: cx",
+  serpapi_key: "SerpAPI: key", dadata_token: "DaData: token",
+};
+let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outdated_score", SORT_DIR = -1, ROWS = [];
+
+async function init() {
+  const cfg = await (await fetch("/api/config")).json();
+  // провайдеры
+  const wrap = $("providers"); wrap.innerHTML = "";
+  cfg.providers.forEach(p => {
+    const on = ["yandex", "google"].includes(p);
+    wrap.insertAdjacentHTML("beforeend",
+      `<label><input type="checkbox" class="prov" value="${p}" ${on ? "checked" : ""}> ${p}</label>`);
+  });
+  renderKeys(cfg.secrets);
+}
+
+function renderKeys(secrets) {
+  $("keystatus").innerHTML = Object.entries(secrets).map(([k, v]) =>
+    `<div class="keyrow"><span class="dot ${v ? "on" : "off"}"></span>${KEY_LABELS[k] || k}</div>`).join("");
+  $("keyinputs").innerHTML = Object.keys(secrets).map(k =>
+    `<div class="keyrow"><span class="name">${KEY_LABELS[k] || k}</span>
+     <input type="password" data-key="${k}" placeholder="${secrets[k] ? "•••• (задан)" : "не задан"}"></div>`).join("");
+}
+
+$("savekeys").onclick = async () => {
+  const vals = {};
+  document.querySelectorAll("#keyinputs input").forEach(i => { if (i.value.trim()) vals[i.dataset.key] = i.value.trim(); });
+  const r = await (await fetch("/api/secrets", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(vals)})).json();
+  renderKeys(r.secrets);
+  document.querySelectorAll("#keyinputs input").forEach(i => i.value = "");
+};
+
+$("run").onclick = async () => {
+  const body = {
+    categories: $("categories").value, cities: $("cities").value, queries: $("queries").value,
+    providers: [...document.querySelectorAll(".prov:checked")].map(i => i.value),
+    max_per_query: +$("max_per_query").value, min_score: +$("min_score").value,
+    concurrency: +$("concurrency").value, per_host_delay: +$("per_host_delay").value,
+    enrich: $("enrich").checked, respect_robots: $("respect_robots").checked,
+    follow_contact_page: $("follow_contact_page").checked, skip_seen: $("skip_seen").checked,
+    use_cache: $("use_cache").checked,
+  };
+  const res = await fetch("/api/scan", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body)});
+  if (!res.ok) { $("status").innerHTML = `<div class="warn bad">${(await res.json()).detail}</div>`; return; }
+  const {job_id, warnings} = await res.json();
+  CURRENT_JOB = job_id;
+  $("run").disabled = true; $("toolbar").style.display = "none";
+  $("results").innerHTML = "";
+  renderWarnings(warnings);
+  poll();
+};
+
+function renderWarnings(warns) {
+  const w = (warns || []).map(x => `<div class="warn">⚠ ${x}</div>`).join("");
+  $("status").insertAdjacentHTML("afterbegin", w);
+}
+
+async function poll() {
+  clearTimeout(TIMER);
+  const job = await (await fetch(`/api/scan/${CURRENT_JOB}`)).json();
+  const pct = job.total ? Math.round(job.done / job.total * 100) : 0;
+  let head = "";
+  if (job.status === "running" || job.status === "queued") {
+    head = `<div class="panel"><strong>Сканирую…</strong> ${job.total ? job.done + "/" + job.total : "собираю выдачу"}
+      <div class="progress"><i style="width:${pct}%"></i></div></div>`;
+  } else if (job.status === "error") {
+    head = `<div class="warn bad">Ошибка: ${job.error}</div>`;
+  }
+  $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
+  $("status").insertAdjacentHTML("beforeend", head);
+
+  if (job.status === "done" || job.status === "error") {
+    $("run").disabled = false;
+    if (job.status === "done") showResults(job);
+    return;
+  }
+  TIMER = setTimeout(poll, 1000);
+}
+
+function showResults(job) {
+  ROWS = job.leads;
+  $("toolbar").style.display = ROWS.length ? "flex" : "none";
+  $("count").textContent = `Лидов: ${job.count}`;
+  $("elapsed").textContent = `· ${job.elapsed}s`;
+  $("csv").onclick = () => location.href = `/api/scan/${CURRENT_JOB}/export.csv`;
+  $("json").onclick = () => location.href = `/api/scan/${CURRENT_JOB}/export.json`;
+  if (!ROWS.length) { $("results").innerHTML = `<div class="empty">Ничего не найдено. Проверьте ключи поисковиков и порог балла.</div>`; return; }
+  renderTable();
+}
+
+const COLS = [
+  ["outdated_score", "Балл"], ["domain", "Домен"], ["company", "Компания"],
+  ["revenue", "Оборот"], ["phones", "Телефоны"], ["emails", "Email"],
+  ["cms", "CMS"], ["mobile_friendly", "Адапт."], ["signals", "Сигналы"],
+];
+
+function renderTable() {
+  const sorted = [...ROWS].sort((a, b) => {
+    let x = a[SORT_KEY], y = b[SORT_KEY];
+    if (SORT_KEY === "outdated_score" || SORT_KEY === "revenue") { x = +x || 0; y = +y || 0; }
+    return (x < y ? -1 : x > y ? 1 : 0) * SORT_DIR;
+  });
+  const head = COLS.map(([k, t]) =>
+    `<th data-k="${k}">${t}${SORT_KEY === k ? (SORT_DIR < 0 ? " ▾" : " ▴") : ""}</th>`).join("");
+  const rows = sorted.map(r => `<tr>
+    <td class="score">${r.outdated_score}</td>
+    <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
+    <td>${esc(r.company)}</td>
+    <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
+    <td>${esc(r.phones)}</td>
+    <td>${esc(r.emails)}</td>
+    <td>${esc(r.cms)}</td>
+    <td>${r.mobile_friendly === "да" ? "✓" : "—"}</td>
+    <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
+  </tr>`).join("");
+  $("results").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+  document.querySelectorAll("th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    if (SORT_KEY === k) SORT_DIR *= -1; else { SORT_KEY = k; SORT_DIR = (k === "domain" || k === "company") ? 1 : -1; }
+    renderTable();
+  });
+}
+
+const esc = s => (s == null ? "" : String(s)).replace(/[&<>]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;"}[c]));
+init();
+</script>
+</body>
+</html>
