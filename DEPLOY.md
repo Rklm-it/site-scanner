@@ -27,10 +27,29 @@ curl -fsSL https://get.docker.com | sh
 
 ## 3. Код
 
+На VPS нужен только Docker — Python и зависимости ставить не надо, их
+соберёт образ.
+
+**Вариант А — приватный репозиторий, копируем папку** (без git на сервере).
+С локальной машины:
+```bash
+rsync -av \
+  --exclude='.git' --exclude='.venv' --exclude='webapp_data' \
+  --exclude='*.sqlite' --exclude='secrets.local.json' \
+  --exclude='__pycache__' --exclude='ui-*.png' --exclude='scanner.env' \
+  ./site-scanner/  root@IP_СЕРВЕРА:/opt/site-scanner/
+```
+Затем на сервере: `cd /opt/site-scanner`.
+
+**Вариант Б — публичный репозиторий, клонируем:**
 ```bash
 git clone https://github.com/Rklm-it/site-scanner.git
 cd site-scanner
 ```
+
+Обновление потом: повторить `rsync` (или `git pull`) и пересобрать
+(шаг 5). Данные лежат на docker-томе `scanner-data`, перезапись папки их
+не затрагивает.
 
 ## 4. Настройка (scanner.env)
 
