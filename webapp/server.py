@@ -15,7 +15,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-from scanner import pipeline
+from scanner import analytics, pipeline
+from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
 
@@ -48,6 +49,7 @@ class Job:
     error: str | None = None
     warnings: list[str] = field(default_factory=list)
     leads: list[dict] = field(default_factory=list)
+    summary: dict = field(default_factory=dict)
     started: float = field(default_factory=time.time)
     finished: float | None = None
 
@@ -61,6 +63,7 @@ class Job:
             "warnings": self.warnings,
             "count": len(self.leads),
             "leads": self.leads,
+            "summary": self.summary,
             "elapsed": round((self.finished or time.time()) - self.started, 1),
         }
 
@@ -144,10 +147,12 @@ def _run_job(job: Job, settings: Settings) -> None:
 
     try:
         leads = pipeline.run(settings, progress=progress)
+        analytics.annotate(leads)  # идемпотентно; гарантирует поля приоритета
         Path(settings.out).parent.mkdir(parents=True, exist_ok=True)
         write_csv(leads, settings.out + ".csv")
         write_json(leads, settings.out + ".json")
         job.leads = [l.to_row() for l in leads]
+        job.summary = analytics.summarize(leads)
         job.status = "done"
     except Exception as exc:  # noqa: BLE001
         job.status = "error"
@@ -169,6 +174,7 @@ def get_config() -> dict:
     return {
         "secrets": secrets_store.status(),
         "providers": ["yandex", "google", "serpapi_google", "serpapi_yandex", "duckduckgo"],
+        "categories_catalog": CATALOG,
         "defaults": ScanRequest().model_dump(),
     }
 

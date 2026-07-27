@@ -28,6 +28,8 @@ def test_config_endpoint(client):
     assert "yandex" in cfg["providers"] and "google" in cfg["providers"]
     assert cfg["secrets"]["google_api_key"] is False
     assert "defaults" in cfg
+    assert "Авто" in cfg["categories_catalog"]
+    assert "автосервис" in cfg["categories_catalog"]["Авто"]
 
 
 def test_secrets_save_and_status(client):
@@ -69,6 +71,9 @@ def test_scan_lifecycle(client, monkeypatch):
     assert job["count"] == 1
     assert job["leads"][0]["outdated_score"] == 88
     assert job["leads"][0]["revenue"] == 5_000_000
+    assert job["leads"][0]["priority"] in ("A", "B", "C")
+    assert job["summary"]["total"] == 1
+    assert job["summary"]["corporate_email"] == 1  # a@old.ru на домене old.ru
 
     # экспорт
     csv = c.get(f"/api/scan/{job_id}/export.csv")

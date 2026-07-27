@@ -68,6 +68,11 @@ class Lead:
     contacts: Contacts = field(default_factory=Contacts)
     enrichment: Enrichment = field(default_factory=Enrichment)
 
+    # Аналитика для аутрича (насколько выгодно писать предложение)
+    outreach_score: int = 0
+    outreach_tier: str = ""          # A / B / C
+    corporate_email: bool = False    # есть email на собственном домене
+
     # Из какого поискового запроса пришёл сайт
     source_query: str | None = None
 
@@ -76,7 +81,10 @@ class Lead:
         c = self.contacts
         e = self.enrichment
         return {
+            "priority": self.outreach_tier,
+            "outreach_score": self.outreach_score,
             "outdated_score": self.outdated_score,
+            "corp_email": "да" if self.corporate_email else "",
             "domain": self.domain,
             "url": self.final_url or self.url,
             "company": e.official_name or c.company or "",

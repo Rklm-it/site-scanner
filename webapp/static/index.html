@@ -68,6 +68,28 @@
   .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
   .muted { color: var(--muted); }
   .empty { color: var(--muted); padding: 40px; text-align: center; }
+
+  /* Чипы категорий */
+  .catgroup { font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .04em; margin: 10px 0 4px; }
+  .catchips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .catchip { border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+    border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; user-select: none; }
+  .catchip.sel { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* Приоритетные бейджи и сводка */
+  .tier { display: inline-block; min-width: 20px; text-align: center; font-weight: 700;
+    border-radius: 5px; padding: 1px 7px; font-size: 12px; color: #fff; }
+  .tier.A { background: var(--ok); }
+  .tier.B { background: var(--warn); }
+  .tier.C { background: var(--muted); }
+  .tiles { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; min-width: 110px; }
+  .tile .n { font-size: 22px; font-weight: 700; }
+  .tile .l { font-size: 12px; color: var(--muted); }
+  .tile.hot { border-color: var(--ok); }
+  .mail-ok { color: var(--ok); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -80,8 +102,12 @@
   <aside class="side">
     <div class="panel">
       <h2>Что искать</h2>
-      <label>Категории (по одной на строку)</label>
-      <textarea id="categories" placeholder="стоматология&#10;автосервис&#10;натяжные потолки"></textarea>
+      <label>Категории — выбери из списка</label>
+      <div id="catchips"></div>
+      <details style="margin-top:8px">
+        <summary>+ добавить свои категории</summary>
+        <textarea id="categories" placeholder="своя категория&#10;по одной на строку"></textarea>
+      </details>
       <label>Города</label>
       <textarea id="cities" placeholder="Казань&#10;Набережные Челны"></textarea>
       <details>
@@ -127,6 +153,7 @@
 
   <main class="main">
     <div id="status"></div>
+    <div id="summary"></div>
     <div class="toolbar" id="toolbar" style="display:none">
       <strong id="count"></strong>
       <span class="muted" id="elapsed"></span>
@@ -146,7 +173,8 @@ const KEY_LABELS = {
   google_api_key: "Google: API key", google_cse_cx: "Google: cx",
   serpapi_key: "SerpAPI: key", dadata_token: "DaData: token",
 };
-let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outdated_score", SORT_DIR = -1, ROWS = [];
+let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outreach_score", SORT_DIR = -1, ROWS = [];
+const SELCATS = new Set();
 
 async function init() {
   const cfg = await (await fetch("/api/config")).json();
@@ -156,6 +184,23 @@ async function init() {
     const on = ["yandex", "google"].includes(p);
     wrap.insertAdjacentHTML("beforeend",
       `<label><input type="checkbox" class="prov" value="${p}" ${on ? "checked" : ""}> ${p}</label>`);
+  });
+  // каталог категорий (чипы)
+  const box = $("catchips"); box.innerHTML = "";
+  Object.entries(cfg.categories_catalog || {}).forEach(([group, cats]) => {
+    box.insertAdjacentHTML("beforeend", `<div class="catgroup">${group}</div>`);
+    const row = document.createElement("div");
+    row.className = "catchips";
+    cats.forEach(c => {
+      const chip = document.createElement("span");
+      chip.className = "catchip"; chip.textContent = c;
+      chip.onclick = () => {
+        chip.classList.toggle("sel");
+        chip.classList.contains("sel") ? SELCATS.add(c) : SELCATS.delete(c);
+      };
+      row.appendChild(chip);
+    });
+    box.appendChild(row);
   });
   renderKeys(cfg.secrets);
 }
@@ -178,8 +223,9 @@ $("savekeys").onclick = async () => {
 };
 
 $("run").onclick = async () => {
+  const cats = [...SELCATS, $("categories").value].filter(Boolean).join("\n");
   const body = {
-    categories: $("categories").value, cities: $("cities").value, queries: $("queries").value,
+    categories: cats, cities: $("cities").value, queries: $("queries").value,
     providers: [...document.querySelectorAll(".prov:checked")].map(i => i.value),
     max_per_query: +$("max_per_query").value, min_score: +$("min_score").value,
     concurrency: +$("concurrency").value, per_host_delay: +$("per_host_delay").value,
@@ -193,7 +239,7 @@ $("run").onclick = async () => {
   const {job_id, warnings} = await res.json();
   CURRENT_JOB = job_id;
   $("run").disabled = true; $("toolbar").style.display = "none";
-  $("results").innerHTML = "";
+  $("results").innerHTML = ""; $("summary").innerHTML = "";
   renderWarnings(warnings);
   poll();
 };
@@ -227,6 +273,7 @@ async function poll() {
 
 function showResults(job) {
   ROWS = job.leads;
+  renderSummary(job.summary || {});
   $("toolbar").style.display = ROWS.length ? "flex" : "none";
   $("count").textContent = `Лидов: ${job.count}`;
   $("elapsed").textContent = `· ${job.elapsed}s`;
@@ -236,29 +283,44 @@ function showResults(job) {
   renderTable();
 }
 
+function renderSummary(s) {
+  if (!s.total) { $("summary").innerHTML = ""; return; }
+  const tile = (n, l, hot) => `<div class="tile ${hot ? "hot" : ""}"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  $("summary").innerHTML = `<div class="tiles">
+    ${tile(s.ready_to_email, "готовы к письму на рабочую почту", true)}
+    ${tile(s.tier_a, "приоритет A")}
+    ${tile(s.tier_b, "приоритет B")}
+    ${tile(s.corporate_email, "с корп. почтой")}
+    ${tile(s.with_revenue, "с оборотом (ИНН)")}
+    ${tile(s.avg_outdated, "средний балл старости")}
+  </div>`;
+}
+
 const COLS = [
-  ["outdated_score", "Балл"], ["domain", "Домен"], ["company", "Компания"],
-  ["revenue", "Оборот"], ["phones", "Телефоны"], ["emails", "Email"],
-  ["cms", "CMS"], ["mobile_friendly", "Адапт."], ["signals", "Сигналы"],
+  ["priority", "Приоритет"], ["outreach_score", "Аутрич"], ["outdated_score", "Старость"],
+  ["domain", "Домен"], ["company", "Компания"], ["revenue", "Оборот"],
+  ["emails", "Email"], ["phones", "Телефоны"], ["signals", "Сигналы"],
 ];
 
 function renderTable() {
+  const num = new Set(["priority", "outreach_score", "outdated_score", "revenue"]);
   const sorted = [...ROWS].sort((a, b) => {
     let x = a[SORT_KEY], y = b[SORT_KEY];
-    if (SORT_KEY === "outdated_score" || SORT_KEY === "revenue") { x = +x || 0; y = +y || 0; }
+    if (SORT_KEY === "priority") { x = a.outreach_score; y = b.outreach_score; }
+    else if (num.has(SORT_KEY)) { x = +x || 0; y = +y || 0; }
     return (x < y ? -1 : x > y ? 1 : 0) * SORT_DIR;
   });
   const head = COLS.map(([k, t]) =>
     `<th data-k="${k}">${t}${SORT_KEY === k ? (SORT_DIR < 0 ? " ▾" : " ▴") : ""}</th>`).join("");
   const rows = sorted.map(r => `<tr>
-    <td class="score">${r.outdated_score}</td>
+    <td><span class="tier ${r.priority}">${r.priority}</span></td>
+    <td class="score">${r.outreach_score}</td>
+    <td>${r.outdated_score}</td>
     <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
     <td>${esc(r.company)}</td>
     <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
+    <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
     <td>${esc(r.phones)}</td>
-    <td>${esc(r.emails)}</td>
-    <td>${esc(r.cms)}</td>
-    <td>${r.mobile_friendly === "да" ? "✓" : "—"}</td>
     <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
   </tr>`).join("");
   $("results").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;

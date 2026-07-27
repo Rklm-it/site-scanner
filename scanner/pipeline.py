@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import requests
 import tldextract
 
+from . import analytics as analytics_mod
 from . import contacts as contacts_mod
 from . import heuristics as heuristics_mod
 from . import search as search_mod
@@ -201,11 +202,14 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None) -
                     progress(i, total)
 
         ranked = [l for l in leads if l.error is None and l.outdated_score >= settings.min_score]
-        ranked.sort(key=lambda x: x.outdated_score, reverse=True)
 
         if settings.enrich:
             log.info("Обогащение по ИНН: %d лидов", len(ranked))
             _enrich(ranked, dadata_token)
+
+        # Аналитика аутрича и сортировка по приоритету «кому писать»
+        analytics_mod.annotate(ranked)
+        ranked.sort(key=lambda x: (x.outreach_score, x.outdated_score), reverse=True)
 
         return ranked
     finally:
