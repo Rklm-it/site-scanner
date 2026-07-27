@@ -122,13 +122,19 @@ python -m scanner --config config.yaml --enrich
 export GOOGLE_API_KEY=...  GOOGLE_CSE_CX=...   # бесплатно 100 запросов/день
 ```
 
-**Яндекс — Search API / XML**
+**Яндекс — Search API**
+
+Провайдер `yandex` сам выбирает формат по заданным ключам:
 ```bash
-# Вариант А (Yandex Cloud): https://yandex.cloud/ru/docs/search-api/
+# Вариант А — Yandex Cloud Search API v2 (актуальный, нужен платёжный аккаунт):
+#   https://yandex.cloud/ru/docs/search-api/
+#   ключ сервисного аккаунта + id каталога (folder)
 export YANDEX_API_KEY=...  YANDEX_FOLDER_ID=...
-# Вариант Б (классический XML): https://yandex.ru/dev/xml/
+# Вариант Б — классический Яндекс.XML (user+key): https://yandex.ru/dev/xml/
 export YANDEX_XML_USER=...  YANDEX_XML_KEY=...
 ```
+При наличии `YANDEX_API_KEY`+`YANDEX_FOLDER_ID` используется Cloud v2 (ответ
+приходит в base64-XML), иначе — классический XML.
 
 **SerpAPI** — турнкей на оба движка одним ключом:
 ```bash
