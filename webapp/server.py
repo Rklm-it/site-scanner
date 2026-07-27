@@ -21,7 +21,7 @@ from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
 
-from . import secrets_store
+from . import mailer, secrets_store
 from .leads_store import STATUSES, LeadStore
 
 DATA_DIR = Path(os.environ.get("SCANNER_DATA", "webapp_data"))
@@ -193,7 +193,8 @@ def index() -> HTMLResponse:
 @app.get("/api/config")
 def get_config() -> dict:
     return {
-        "secrets": secrets_store.status(),
+        "secrets": secrets_store.api_key_status(),
+        "smtp": secrets_store.smtp_values(),
         "providers": ["yandex", "google", "serpapi_google", "serpapi_yandex", "duckduckgo"],
         "categories_catalog": CATALOG,
         "defaults": ScanRequest().model_dump(),
@@ -203,7 +204,7 @@ def get_config() -> dict:
 @app.post("/api/secrets")
 def save_secrets(values: dict[str, str]) -> dict:
     secrets_store.save(values)
-    return {"ok": True, "secrets": secrets_store.status()}
+    return {"ok": True, "secrets": secrets_store.api_key_status()}
 
 
 @app.post("/api/scan")
@@ -265,3 +266,119 @@ def set_lead_state(upd: LeadStateUpdate) -> dict:
     if upd.status is not None and upd.status not in STATUSES:
         raise HTTPException(400, f"Недопустимый статус. Допустимо: {', '.join(s for s in STATUSES if s)}")
     return {"domain": upd.domain, **STORE.set(upd.domain, status=upd.status, note=upd.note)}
+
+
+# --- рассылка писем через SMTP собственного ящика ---
+class SendOne(BaseModel):
+    domain: str
+    to: str
+    subject: str
+    body: str
+
+
+class SendBulk(BaseModel):
+    domains: list[str]
+    delay: float = mailer.DEFAULT_DELAY
+
+
+@app.get("/api/smtp")
+def smtp_info() -> dict:
+    return secrets_store.smtp_values()
+
+
+@app.post("/api/send/test")
+def send_test() -> dict:
+    cfg = mailer.smtp_config()
+    if not mailer.is_configured():
+        raise HTTPException(400, "SMTP не настроен.")
+    try:
+        mailer.send_email(cfg["user"], "site-scanner: проверка отправки",
+                          "Это тестовое письмо из site-scanner. Если вы его получили — SMTP работает.")
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"Ошибка отправки: {exc}")
+    return {"ok": True, "to": cfg["user"]}
+
+
+@app.post("/api/send")
+def send_one(req: SendOne) -> dict:
+    if not mailer.is_configured():
+        raise HTTPException(400, "SMTP не настроен.")
+    if not req.to or "@" not in req.to:
+        raise HTTPException(400, "У этого лида нет корректной почты.")
+    try:
+        mailer.send_email(req.to, req.subject, req.body)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"Ошибка отправки: {exc}")
+    if STORE:
+        STORE.set(req.domain, status="написал")
+    return {"ok": True}
+
+
+@dataclass
+class SendJob:
+    id: str
+    total: int = 0
+    sent: int = 0
+    failed: int = 0
+    done: bool = False
+    errors: list[str] = field(default_factory=list)
+
+    def public(self) -> dict:
+        return {"id": self.id, "total": self.total, "sent": self.sent,
+                "failed": self.failed, "done": self.done, "errors": self.errors[:10]}
+
+
+SEND_JOBS: dict[str, SendJob] = {}
+
+
+def _run_send(job: SendJob, targets: list[tuple[str, str, str, str]], delay: float) -> None:
+    for i, (domain, to, subject, body) in enumerate(targets):
+        try:
+            mailer.send_email(to, subject, body)
+            job.sent += 1
+            if STORE:
+                STORE.set(domain, status="написал")
+        except Exception as exc:  # noqa: BLE001
+            job.failed += 1
+            job.errors.append(f"{domain}: {exc}")
+        if i < len(targets) - 1:
+            time.sleep(delay)
+    job.done = True
+
+
+@app.post("/api/send/bulk")
+def send_bulk(req: SendBulk) -> dict:
+    if not mailer.is_configured():
+        raise HTTPException(400, "SMTP не настроен.")
+    if not STORE:
+        raise HTTPException(503, "Хранилище не готово.")
+
+    by_domain = {l["domain"]: l for l in STORE.all_leads()}
+    targets: list[tuple[str, str, str, str]] = []
+    for domain in req.domains[:mailer.DEFAULT_DAILY_CAP]:
+        lead = by_domain.get(domain)
+        if not lead:
+            continue
+        to = (lead.get("emails") or "").split(",")[0].strip()
+        if not to or "@" not in to:
+            continue
+        targets.append((domain, to, lead.get("pitch_subject") or "", lead.get("pitch_body") or ""))
+
+    if not targets:
+        raise HTTPException(400, "Некому слать: нет лидов с почтой в выборке.")
+
+    sid = uuid.uuid4().hex[:12]
+    job = SendJob(id=sid, total=len(targets))
+    SEND_JOBS[sid] = job
+    delay = max(5.0, float(req.delay))
+    threading.Thread(target=_run_send, args=(job, targets, delay), daemon=True).start()
+    capped = len(req.domains) > mailer.DEFAULT_DAILY_CAP
+    return {"send_id": sid, "total": len(targets), "capped": capped, "cap": mailer.DEFAULT_DAILY_CAP}
+
+
+@app.get("/api/send/{send_id}")
+def send_status(send_id: str) -> dict:
+    job = SEND_JOBS.get(send_id)
+    if not job:
+        raise HTTPException(404, "Рассылка не найдена.")
+    return job.public()

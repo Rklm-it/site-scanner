@@ -135,6 +135,57 @@ def test_base_accumulates_scanned_leads(client, monkeypatch):
     assert base["leads"][0]["status"] == "написал"  # статус подтянулся
 
 
+def test_smtp_config_roundtrip(client):
+    c, _ = client
+    assert c.get("/api/config").json()["smtp"]["configured"] is False
+    c.post("/api/secrets", json={"smtp_host": "smtp.yandex.ru", "smtp_port": "465",
+                                 "smtp_user": "me@yandex.ru", "smtp_password": "app-pass"})
+    smtp = c.get("/api/smtp").json()
+    assert smtp["configured"] is True and smtp["smtp_user"] == "me@yandex.ru"
+    assert "password" not in smtp  # пароль не отдаём наружу
+
+
+def test_send_one_marks_written(client, monkeypatch):
+    c, server = client
+    sent = []
+    monkeypatch.setattr(server.mailer, "is_configured", lambda: True)
+    monkeypatch.setattr(server.mailer, "send_email", lambda to, s, b: sent.append((to, s, b)))
+
+    r = c.post("/api/send", json={"domain": "firma.ru", "to": "info@firma.ru",
+                                  "subject": "Тема", "body": "Текст"})
+    assert r.status_code == 200 and sent == [("info@firma.ru", "Тема", "Текст")]
+    assert c.get("/api/leads/state").json()["firma.ru"]["status"] == "написал"
+
+
+def test_send_requires_smtp(client, monkeypatch):
+    c, server = client
+    monkeypatch.setattr(server.mailer, "is_configured", lambda: False)
+    r = c.post("/api/send", json={"domain": "x.ru", "to": "a@x.ru", "subject": "s", "body": "b"})
+    assert r.status_code == 400
+
+
+def test_bulk_send_throttled(client, monkeypatch):
+    c, server = client
+    sent = []
+    monkeypatch.setattr(server.mailer, "is_configured", lambda: True)
+    monkeypatch.setattr(server.mailer, "send_email", lambda to, s, b: sent.append(to))
+    monkeypatch.setattr(server.time, "sleep", lambda *_: None)  # без реальных пауз
+
+    # заранее положим лид с почтой в базу
+    server.STORE.upsert_leads([{"domain": "firma.ru", "emails": "info@firma.ru",
+                                "outreach_score": 70, "pitch_subject": "Тема", "pitch_body": "Текст"}])
+    start = c.post("/api/send/bulk", json={"domains": ["firma.ru"]}).json()
+    sid = start["send_id"]
+    for _ in range(50):
+        st = c.get(f"/api/send/{sid}").json()
+        if st["done"]:
+            break
+        time.sleep(0.02)
+    assert st["done"] and st["sent"] == 1
+    assert sent == ["info@firma.ru"]
+    assert c.get("/api/leads/state").json()["firma.ru"]["status"] == "написал"
+
+
 def test_index_served(client):
     c, _ = client
     html = c.get("/").text

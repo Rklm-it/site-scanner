@@ -20,7 +20,16 @@ FIELDS = {
     "google_cse_cx": "GOOGLE_CSE_CX",
     "serpapi_key": "SERPAPI_KEY",
     "dadata_token": "DADATA_TOKEN",
+    # SMTP для рассылки (хранится тут же)
+    "smtp_host": "SMTP_HOST",
+    "smtp_port": "SMTP_PORT",
+    "smtp_user": "SMTP_USER",
+    "smtp_password": "SMTP_PASSWORD",
+    "smtp_from_name": "SMTP_FROM_NAME",
 }
+
+# Поля SMTP не показываем в общем списке «API-ключи» — у них своя панель.
+SMTP_FIELDS = ("smtp_host", "smtp_port", "smtp_user", "smtp_password", "smtp_from_name")
 
 _PATH = Path(os.environ.get("SCANNER_SECRETS", "secrets.local.json"))
 
@@ -58,3 +67,20 @@ def save(values: dict[str, str]) -> None:
 def status() -> dict[str, bool]:
     """Какие ключи заданы (без раскрытия значений) — для индикаторов в UI."""
     return {field: bool(os.environ.get(env)) for field, env in FIELDS.items()}
+
+
+def api_key_status() -> dict[str, bool]:
+    """Статус только поисковых/обогащающих ключей (без SMTP)."""
+    return {f: v for f, v in status().items() if f not in SMTP_FIELDS}
+
+
+def smtp_values() -> dict:
+    """Текущие значения SMTP (без пароля) для префилла формы рассылки."""
+    return {
+        "smtp_host": os.environ.get("SMTP_HOST", ""),
+        "smtp_port": os.environ.get("SMTP_PORT", ""),
+        "smtp_user": os.environ.get("SMTP_USER", ""),
+        "smtp_from_name": os.environ.get("SMTP_FROM_NAME", ""),
+        "configured": bool(os.environ.get("SMTP_HOST") and os.environ.get("SMTP_USER")
+                           and os.environ.get("SMTP_PASSWORD")),
+    }

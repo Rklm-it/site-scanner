@@ -182,6 +182,31 @@
       </details>
     </div>
 
+    <div class="panel">
+      <h2>Рассылка (SMTP)</h2>
+      <div id="smtp-state" class="hint"></div>
+      <details>
+        <summary>Настроить отправку писем</summary>
+        <label>SMTP-хост</label>
+        <input type="text" id="smtp_host" placeholder="smtp.yandex.ru">
+        <div class="row">
+          <div><label>Порт</label><input type="text" id="smtp_port" placeholder="465"></div>
+          <div><label>Имя отправителя</label><input type="text" id="smtp_from_name" placeholder="Иван, веб-студия"></div>
+        </div>
+        <label>Логин (ваш email)</label>
+        <input type="text" id="smtp_user" placeholder="you@yandex.ru">
+        <label>Пароль приложения</label>
+        <input type="password" id="smtp_password" placeholder="•••• пароль приложения">
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button id="smtp-save">Сохранить</button>
+          <button id="smtp-test">Тест себе</button>
+        </div>
+        <div class="hint">Яндекс.Почта: <b>smtp.yandex.ru</b>, порт <b>465</b>, и <b>пароль приложения</b>
+          (не обычный пароль — создаётся в Яндекс ID → Безопасность → Пароли приложений).</div>
+        <div id="smtp-msg" class="hint"></div>
+      </details>
+    </div>
+
     <button class="primary" id="run">Запустить скан</button>
   </aside>
 
@@ -204,6 +229,7 @@
         <label><input type="checkbox" class="ftier" value="C" checked>C</label>
       </span>
       <span style="flex:1"></span>
+      <button id="bulk" class="primary" style="width:auto;display:none">Разослать</button>
       <button id="csv">CSV</button>
       <button id="json">JSON</button>
     </div>
@@ -219,7 +245,8 @@
     <label>Текст письма</label>
     <textarea id="m-body" rows="12"></textarea>
     <div class="modal-actions">
-      <button id="m-mail" class="primary" style="width:auto">Открыть в почте</button>
+      <button id="m-send" class="primary" style="width:auto;display:none">Отправить с сервера</button>
+      <button id="m-mail">Открыть в почте</button>
       <button id="m-copy">Копировать текст</button>
       <span style="flex:1"></span>
       <span class="muted" id="m-email"></span>
@@ -236,7 +263,7 @@ const KEY_LABELS = {
   serpapi_key: "SerpAPI: key", dadata_token: "DaData: token",
 };
 let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outreach_score", SORT_DIR = -1, ROWS = [];
-let VIEW = "scan", LAST_JOB = null, BASE = [];
+let VIEW = "scan", LAST_JOB = null, BASE = [], SMTP_OK = false;
 const SELCATS = new Set();
 
 async function init() {
@@ -266,6 +293,13 @@ async function init() {
     box.appendChild(row);
   });
   renderKeys(cfg.secrets);
+
+  // SMTP / рассылка
+  SMTP_OK = cfg.smtp.configured;
+  renderSmtp(cfg.smtp);
+  $("smtp-save").onclick = saveSmtp;
+  $("smtp-test").onclick = testSmtp;
+  $("bulk").onclick = bulkSend;
 
   // фильтры результатов
   ["search", "f_email", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
@@ -303,6 +337,62 @@ $("savekeys").onclick = async () => {
   renderKeys(r.secrets);
   document.querySelectorAll("#keyinputs input").forEach(i => i.value = "");
 };
+
+function renderSmtp(s) {
+  $("smtp-state").innerHTML = s.configured
+    ? `<span class="mail-ok">✓ настроено: ${esc(s.smtp_user)}</span>`
+    : "не настроено — рассылка недоступна";
+  $("smtp_host").value = s.smtp_host || "";
+  $("smtp_port").value = s.smtp_port || "";
+  $("smtp_user").value = s.smtp_user || "";
+  $("smtp_from_name").value = s.smtp_from_name || "";
+}
+
+async function saveSmtp() {
+  const vals = {
+    smtp_host: $("smtp_host").value.trim(), smtp_port: $("smtp_port").value.trim(),
+    smtp_user: $("smtp_user").value.trim(), smtp_from_name: $("smtp_from_name").value.trim(),
+  };
+  if ($("smtp_password").value.trim()) vals.smtp_password = $("smtp_password").value.trim();
+  await fetch("/api/secrets", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(vals)});
+  const s = await (await fetch("/api/smtp")).json();
+  SMTP_OK = s.configured; renderSmtp(s); render(); $("smtp_password").value = "";
+  $("smtp-msg").textContent = "Сохранено.";
+}
+
+async function testSmtp() {
+  $("smtp-msg").textContent = "Отправляю тест…";
+  const r = await fetch("/api/send/test", {method: "POST"});
+  const d = await r.json().catch(() => ({}));
+  $("smtp-msg").textContent = r.ok ? `Тест отправлен на ${d.to} — проверьте почту.` : `Ошибка: ${d.detail || r.status}`;
+}
+
+async function refreshStatuses() {
+  const st = await (await fetch("/api/leads/state")).json();
+  ROWS.forEach(r => { if (st[r.domain]) r.status = st[r.domain].status; });
+  renderTable();
+}
+
+async function bulkSend() {
+  const targets = ROWS.filter(passesFilters).filter(r => r.emails && !r.status).map(r => r.domain);
+  if (!targets.length) { alert("В текущей выборке нет лидов с почтой и без статуса."); return; }
+  if (!confirm(`Разослать письма ${targets.length} лидам?\n\nОтправка по одному с паузой (~45с), чтобы не попасть в спам и не словить бан ящика. Каждому уходит его персональное письмо.`)) return;
+  const r = await fetch("/api/send/bulk", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({domains: targets})});
+  const d = await r.json();
+  if (!r.ok) { alert(d.detail || "Ошибка"); return; }
+  if (d.capped) alert(`За один заход шлём не больше ${d.cap}. Отправлю ${d.total}, остальным — в следующий раз.`);
+  pollSend(d.send_id);
+}
+
+async function pollSend(sid) {
+  const s = await (await fetch(`/api/send/${sid}`)).json();
+  $("status").querySelectorAll(".sendbar").forEach(e => e.remove());
+  $("status").insertAdjacentHTML("afterbegin",
+    `<div class="panel sendbar"><strong>Рассылка:</strong> отправлено ${s.sent}/${s.total}` +
+    `${s.failed ? `, ошибок ${s.failed}` : ""}${s.done ? " — готово ✓" : "…"}</div>`);
+  if (s.done) { await refreshStatuses(); return; }
+  setTimeout(() => pollSend(sid), 2000);
+}
 
 $("run").onclick = async () => {
   const cats = [...SELCATS, $("categories").value].filter(Boolean).join("\n");
@@ -369,6 +459,7 @@ function render() {
     $("count").textContent = `В базе: ${ROWS.length}`;
     $("elapsed").textContent = "";
     $("csv").style.display = "none"; $("json").style.display = "none";
+    $("bulk").style.display = SMTP_OK ? "" : "none";
     if (!ROWS.length) { $("results").innerHTML = `<div class="empty">База пуста — запустите скан, найденные лиды накопятся здесь.</div>`; return; }
     renderTable();
     return;
@@ -384,6 +475,7 @@ function render() {
   ROWS = job.leads;
   renderSummary(job.summary || {});
   $("toolbar").style.display = ROWS.length ? "flex" : "none";
+  $("bulk").style.display = (SMTP_OK && ROWS.length) ? "" : "none";
   $("count").textContent = `Лидов: ${job.count}`;
   $("elapsed").textContent = `· ${job.elapsed}s`;
   $("csv").onclick = () => location.href = `/api/scan/${CURRENT_JOB}/export.csv`;
@@ -431,6 +523,22 @@ function openMail(domain) {
     navigator.clipboard && navigator.clipboard.writeText($("m-body").value);
     $("m-copy").textContent = "Скопировано ✓";
     setTimeout(() => $("m-copy").textContent = "Копировать текст", 1500);
+  };
+  const sendBtn = $("m-send");
+  sendBtn.style.display = (SMTP_OK && email) ? "" : "none";
+  sendBtn.textContent = "Отправить с сервера";
+  sendBtn.onclick = async () => {
+    sendBtn.disabled = true; sendBtn.textContent = "Отправляю…";
+    const res = await fetch("/api/send", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({domain, to: email, subject: $("m-subject").value, body: $("m-body").value})});
+    sendBtn.disabled = false; sendBtn.textContent = "Отправить с сервера";
+    if (res.ok) {
+      if (r) r.status = "написал";
+      renderTable(); $("modal").style.display = "none";
+    } else {
+      const d = await res.json().catch(() => ({}));
+      alert("Ошибка отправки: " + (d.detail || res.status));
+    }
   };
   $("modal").style.display = "flex";
 }
