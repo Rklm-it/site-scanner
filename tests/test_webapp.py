@@ -74,11 +74,32 @@ def test_scan_lifecycle(client, monkeypatch):
     assert job["leads"][0]["priority"] in ("A", "B", "C")
     assert job["summary"]["total"] == 1
     assert job["summary"]["corporate_email"] == 1  # a@old.ru на домене old.ru
+    # письмо сгенерировано и приложено к строке
+    assert "old.ru" in job["leads"][0]["pitch_body"]
+    assert job["leads"][0]["pitch_subject"]
+    assert job["leads"][0]["status"] == ""
 
     # экспорт
     csv = c.get(f"/api/scan/{job_id}/export.csv")
     assert csv.status_code == 200 and "old.ru" in csv.text
     assert c.get(f"/api/scan/{job_id}/export.json").status_code == 200
+
+
+def test_lead_state_persistence(client):
+    c, _ = client
+    assert c.get("/api/leads/state").json() == {}
+    r = c.post("/api/leads/state", json={"domain": "old.ru", "status": "написал"}).json()
+    assert r["status"] == "написал"
+    assert c.get("/api/leads/state").json()["old.ru"]["status"] == "написал"
+    # заметку можно добавить, не сбрасывая статус
+    c.post("/api/leads/state", json={"domain": "old.ru", "note": "звонил, перезвонят"})
+    st = c.get("/api/leads/state").json()["old.ru"]
+    assert st["status"] == "написал" and st["note"] == "звонил, перезвонят"
+
+
+def test_lead_state_rejects_bad_status(client):
+    c, _ = client
+    assert c.post("/api/leads/state", json={"domain": "x.ru", "status": "чепуха"}).status_code == 400
 
 
 def test_index_served(client):

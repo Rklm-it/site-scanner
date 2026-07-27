@@ -16,12 +16,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-from scanner import analytics, pipeline
+from scanner import analytics, outreach, pipeline
 from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
 
 from . import secrets_store
+from .leads_store import STATUSES, LeadStore
 
 DATA_DIR = Path(os.environ.get("SCANNER_DATA", "webapp_data"))
 JOBS_DIR = DATA_DIR / "jobs"
@@ -30,10 +31,14 @@ STATIC = Path(__file__).parent / "static"
 # Чтобы INFO-логи движка (scanner.*) были видны в docker compose logs
 logging.getLogger("scanner").setLevel(logging.INFO)
 
+STORE: LeadStore | None = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global STORE
     JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    STORE = LeadStore(str(DATA_DIR / "leads.sqlite"))
     secrets_store.load_into_env()
     yield
 
@@ -155,7 +160,17 @@ def _run_job(job: Job, settings: Settings) -> None:
         Path(settings.out).parent.mkdir(parents=True, exist_ok=True)
         write_csv(leads, settings.out + ".csv")
         write_json(leads, settings.out + ".json")
-        job.leads = [l.to_row() for l in leads]
+
+        saved = STORE.all() if STORE else {}
+        rows = []
+        for l in leads:
+            row = l.to_row()
+            row.update(outreach.build_message(l))
+            st = saved.get(l.domain, {})
+            row["status"] = st.get("status", "")
+            row["note"] = st.get("note", "")
+            rows.append(row)
+        job.leads = rows
         job.summary = analytics.summarize(leads)
         job.status = "done"
     except Exception as exc:  # noqa: BLE001
@@ -221,3 +236,24 @@ def export(job_id: str, fmt: str):
         raise HTTPException(404, "Файл ещё не готов.")
     media = "text/csv" if fmt == "csv" else "application/json"
     return FileResponse(path, media_type=media, filename=f"leads-{job_id}.{fmt}")
+
+
+# --- статусы лидов (мини-CRM) ---
+class LeadStateUpdate(BaseModel):
+    domain: str
+    status: str | None = None
+    note: str | None = None
+
+
+@app.get("/api/leads/state")
+def leads_state() -> dict:
+    return STORE.all() if STORE else {}
+
+
+@app.post("/api/leads/state")
+def set_lead_state(upd: LeadStateUpdate) -> dict:
+    if not STORE:
+        raise HTTPException(503, "Хранилище не готово.")
+    if upd.status is not None and upd.status not in STATUSES:
+        raise HTTPException(400, f"Недопустимый статус. Допустимо: {', '.join(s for s in STATUSES if s)}")
+    return {"domain": upd.domain, **STORE.set(upd.domain, status=upd.status, note=upd.note)}

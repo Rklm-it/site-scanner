@@ -90,6 +90,34 @@
   .tile .l { font-size: 12px; color: var(--muted); }
   .tile.hot { border-color: var(--ok); }
   .mail-ok { color: var(--ok); font-weight: 600; }
+
+  /* Фильтры */
+  .fchk { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+  .fchk label { display: inline-flex; align-items: center; gap: 3px; margin: 0; color: var(--ink); }
+  .fchk input { width: auto; }
+  #search { background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 9px; font: inherit; }
+
+  /* Статусы и действия в строке */
+  tr.done td { opacity: .5; }
+  .st-sel { font: inherit; font-size: 12px; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); padding: 2px 4px; }
+  .st-sel[data-s="клиент"] { border-color: var(--ok); color: var(--ok); }
+  .st-sel[data-s="отказ"] { border-color: var(--bad); }
+  .rowbtn { border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+    border-radius: 6px; padding: 2px 8px; font-size: 13px; cursor: pointer; }
+
+  /* Модалка письма */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.55);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .modal-box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    width: 640px; max-width: 100%; max-height: 90vh; overflow: auto; padding: 18px; }
+  .modal-head { display: flex; align-items: center; margin-bottom: 10px; }
+  .modal-head strong { flex: 1; }
+  .modal-head button { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
+  .modal-box input, .modal-box textarea { width: 100%; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 4px; }
+  .modal-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -157,12 +185,36 @@
     <div class="toolbar" id="toolbar" style="display:none">
       <strong id="count"></strong>
       <span class="muted" id="elapsed"></span>
+      <input id="search" placeholder="поиск по домену / компании" style="max-width:220px">
+      <label class="fchk"><input type="checkbox" id="f_email"> с почтой</label>
+      <label class="fchk"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
+      <span class="fchk">приоритет:
+        <label><input type="checkbox" class="ftier" value="A" checked>A</label>
+        <label><input type="checkbox" class="ftier" value="B" checked>B</label>
+        <label><input type="checkbox" class="ftier" value="C" checked>C</label>
+      </span>
       <span style="flex:1"></span>
-      <button id="csv">Скачать CSV</button>
-      <button id="json">Скачать JSON</button>
+      <button id="csv">CSV</button>
+      <button id="json">JSON</button>
     </div>
     <div id="results"><div class="empty">Настройте параметры слева и запустите скан — результаты появятся здесь.</div></div>
   </main>
+</div>
+
+<div id="modal" class="modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head"><strong id="m-title"></strong><button id="m-close">✕</button></div>
+    <label>Тема</label>
+    <input id="m-subject">
+    <label>Текст письма</label>
+    <textarea id="m-body" rows="12"></textarea>
+    <div class="modal-actions">
+      <button id="m-mail" class="primary" style="width:auto">Открыть в почте</button>
+      <button id="m-copy">Копировать текст</button>
+      <span style="flex:1"></span>
+      <span class="muted" id="m-email"></span>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -203,6 +255,13 @@ async function init() {
     box.appendChild(row);
   });
   renderKeys(cfg.secrets);
+
+  // фильтры результатов
+  ["search", "f_email", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
+  document.querySelectorAll(".ftier").forEach(c => c.onchange = () => ROWS.length && renderTable());
+  // модалка письма
+  $("m-close").onclick = () => $("modal").style.display = "none";
+  $("modal").onclick = e => { if (e.target.id === "modal") $("modal").style.display = "none"; };
 }
 
 function renderKeys(secrets) {
@@ -283,6 +342,91 @@ function showResults(job) {
   renderTable();
 }
 
+const STATUS_OPTS = ["", "написал", "ответили", "клиент", "отказ"];
+
+function passesFilters(r) {
+  const q = $("search").value.trim().toLowerCase();
+  if (q && !((r.domain || "").toLowerCase().includes(q) || (r.company || "").toLowerCase().includes(q))) return false;
+  if ($("f_email").checked && !r.emails) return false;
+  if ($("f_hide").checked && r.status) return false;
+  const tiers = [...document.querySelectorAll(".ftier:checked")].map(i => i.value);
+  if (!tiers.includes(r.priority)) return false;
+  return true;
+}
+
+async function setStatus(domain, status) {
+  await fetch("/api/leads/state", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({domain, status})});
+  const row = ROWS.find(r => r.domain === domain);
+  if (row) row.status = status;
+  renderTable();
+}
+
+function openMail(domain) {
+  const r = ROWS.find(x => x.domain === domain);
+  if (!r) return;
+  $("m-title").textContent = r.company || r.domain;
+  $("m-subject").value = r.pitch_subject || "";
+  $("m-body").value = r.pitch_body || "";
+  const email = (r.emails || "").split(",")[0].trim();
+  $("m-email").textContent = email ? "кому: " + email : "почта не найдена — отправьте вручную";
+  $("m-mail").onclick = () => {
+    const to = encodeURIComponent(email);
+    const su = encodeURIComponent($("m-subject").value);
+    const bo = encodeURIComponent($("m-body").value);
+    location.href = `mailto:${to}?subject=${su}&body=${bo}`;
+    if (!r.status) setStatus(domain, "написал");
+  };
+  $("m-copy").onclick = () => {
+    navigator.clipboard && navigator.clipboard.writeText($("m-body").value);
+    $("m-copy").textContent = "Скопировано ✓";
+    setTimeout(() => $("m-copy").textContent = "Копировать текст", 1500);
+  };
+  $("modal").style.display = "flex";
+}
+
+const COLS = [
+  ["priority", "Приоритет"], ["outreach_score", "Аутрич"], ["outdated_score", "Старость"],
+  ["domain", "Домен"], ["company", "Компания"], ["revenue", "Оборот"],
+  ["emails", "Email"], ["phones", "Телефоны"], ["signals", "Сигналы"],
+];
+
+function renderTable() {
+  const num = new Set(["priority", "outreach_score", "outdated_score", "revenue"]);
+  const rows = ROWS.filter(passesFilters).sort((a, b) => {
+    let x = a[SORT_KEY], y = b[SORT_KEY];
+    if (SORT_KEY === "priority") { x = a.outreach_score; y = b.outreach_score; }
+    else if (num.has(SORT_KEY)) { x = +x || 0; y = +y || 0; }
+    return (x < y ? -1 : x > y ? 1 : 0) * SORT_DIR;
+  });
+  const head = COLS.map(([k, t]) =>
+    `<th data-k="${k}">${t}${SORT_KEY === k ? (SORT_DIR < 0 ? " ▾" : " ▴") : ""}</th>`).join("")
+    + "<th>Статус</th><th></th>";
+  const body = rows.map(r => `<tr class="${r.status ? "done" : ""}">
+    <td><span class="tier ${r.priority}">${r.priority}</span></td>
+    <td class="score">${r.outreach_score}</td>
+    <td>${r.outdated_score}</td>
+    <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
+    <td>${esc(r.company)}</td>
+    <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
+    <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
+    <td>${esc(r.phones)}</td>
+    <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
+    <td><select class="st-sel" data-s="${r.status}" data-d="${r.domain}">
+      ${STATUS_OPTS.map(s => `<option value="${s}" ${r.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
+    </select></td>
+    <td><button class="rowbtn" data-mail="${r.domain}">✉ Письмо</button></td>
+  </tr>`).join("");
+  $("results").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    if (SORT_KEY === k) SORT_DIR *= -1; else { SORT_KEY = k; SORT_DIR = (k === "domain" || k === "company") ? 1 : -1; }
+    renderTable();
+  });
+  document.querySelectorAll(".st-sel").forEach(s => s.onchange = () => setStatus(s.dataset.d, s.value));
+  document.querySelectorAll(".rowbtn[data-mail]").forEach(b => b.onclick = () => openMail(b.dataset.mail));
+}
+
 function renderSummary(s) {
   if (!s.total) { $("summary").innerHTML = ""; return; }
   const tile = (n, l, hot) => `<div class="tile ${hot ? "hot" : ""}"><div class="n">${n}</div><div class="l">${l}</div></div>`;
@@ -294,41 +438,6 @@ function renderSummary(s) {
     ${tile(s.with_revenue, "с оборотом (ИНН)")}
     ${tile(s.avg_outdated, "средний балл старости")}
   </div>`;
-}
-
-const COLS = [
-  ["priority", "Приоритет"], ["outreach_score", "Аутрич"], ["outdated_score", "Старость"],
-  ["domain", "Домен"], ["company", "Компания"], ["revenue", "Оборот"],
-  ["emails", "Email"], ["phones", "Телефоны"], ["signals", "Сигналы"],
-];
-
-function renderTable() {
-  const num = new Set(["priority", "outreach_score", "outdated_score", "revenue"]);
-  const sorted = [...ROWS].sort((a, b) => {
-    let x = a[SORT_KEY], y = b[SORT_KEY];
-    if (SORT_KEY === "priority") { x = a.outreach_score; y = b.outreach_score; }
-    else if (num.has(SORT_KEY)) { x = +x || 0; y = +y || 0; }
-    return (x < y ? -1 : x > y ? 1 : 0) * SORT_DIR;
-  });
-  const head = COLS.map(([k, t]) =>
-    `<th data-k="${k}">${t}${SORT_KEY === k ? (SORT_DIR < 0 ? " ▾" : " ▴") : ""}</th>`).join("");
-  const rows = sorted.map(r => `<tr>
-    <td><span class="tier ${r.priority}">${r.priority}</span></td>
-    <td class="score">${r.outreach_score}</td>
-    <td>${r.outdated_score}</td>
-    <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
-    <td>${esc(r.company)}</td>
-    <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
-    <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
-    <td>${esc(r.phones)}</td>
-    <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
-  </tr>`).join("");
-  $("results").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
-  document.querySelectorAll("th").forEach(th => th.onclick = () => {
-    const k = th.dataset.k;
-    if (SORT_KEY === k) SORT_DIR *= -1; else { SORT_KEY = k; SORT_DIR = (k === "domain" || k === "company") ? 1 : -1; }
-    renderTable();
-  });
 }
 
 const esc = s => (s == null ? "" : String(s)).replace(/[&<>]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;"}[c]));
