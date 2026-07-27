@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import base64
+import logging
 import os
 import sys
 import time
@@ -31,6 +32,8 @@ YANDEX_XML = "https://yandex.ru/search/xml"
 YANDEX_CLOUD = "https://searchapi.api.cloud.yandex.net/v2/web/search"
 SERPAPI = "https://serpapi.com/search"
 DDG_HTML = "https://html.duckduckgo.com/html/"
+
+log = logging.getLogger("scanner.search")
 
 _warned: set[str] = set()
 
@@ -114,9 +117,47 @@ def _parse_yandex_xml(raw: bytes) -> tuple[list[str], str | None]:
     return [el.text for el in root.findall(".//doc/url") if el.text], None
 
 
+def _yandex_classic(query: str, auth: dict[str, str], max_results: int) -> list[str]:
+    """GET yandex.ru/search/xml. auth = {user,key} или {apikey,folderid}.
+    Этот endpoint принимает и Cloud-ключи (apikey+folderid), и старые user+key."""
+    per_page = min(max_results, 100)
+    groupby = f'attr="".mode=flat.groups-on-page={per_page}.docs-in-group=1'
+    urls: list[str] = []
+
+    for page in range(0, 11):
+        params = {**auth, "query": query, "l10n": "ru", "groupby": groupby, "page": page}
+        try:
+            resp = _http("get", YANDEX_XML, params=params, headers=DEFAULT_HEADERS, timeout=20)
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            log.warning("Yandex XML запрос упал: %s", exc)
+            break
+
+        found, error = _parse_yandex_xml(resp.content)
+        if error:
+            log.warning("Yandex XML ошибка API по «%s»: %s", query, error)
+            break
+        if not found:
+            break
+        urls += found
+        if len(urls) >= max_results:
+            break
+
+    return urls[:max_results]
+
+
+def search_yandex_xml(query: str, *, max_results: int = 20) -> list[str]:
+    """Классический Яндекс.XML по user+key."""
+    user = os.environ.get("YANDEX_XML_USER")
+    key = os.environ.get("YANDEX_XML_KEY")
+    if not (user and key):
+        return []
+    return _yandex_classic(query, {"user": user, "key": key}, max_results)
+
+
 def search_yandex_cloud(query: str, *, max_results: int = 20) -> list[str]:
-    """Новый Yandex Search API v2 (Yandex Cloud): apikey сервисного аккаунта
-    + folderId. Ответ приходит как base64-XML того же формата, что и раньше."""
+    """Yandex Search API v2 (POST на searchapi.api.cloud.yandex.net).
+    Ответ — base64-XML того же формата. Используется как фолбэк."""
     api_key = os.environ.get("YANDEX_API_KEY")
     folder = os.environ.get("YANDEX_FOLDER_ID")
     if not (api_key and folder):
@@ -137,56 +178,22 @@ def search_yandex_cloud(query: str, *, max_results: int = 20) -> list[str]:
         try:
             resp = _http("post", YANDEX_CLOUD, json=body, headers=headers, timeout=30)
         except requests.RequestException as exc:
-            _warn_once("yandex_cloud_err", f"ошибка Yandex Cloud: {exc}")
+            log.warning("Yandex Cloud запрос упал: %s", exc)
             break
         if resp.status_code != 200:
-            _warn_once("yandex_cloud_http", f"Yandex Cloud HTTP {resp.status_code}: {resp.text[:300]}")
+            log.warning("Yandex Cloud HTTP %s: %s", resp.status_code, resp.text[:300])
             break
         try:
             raw_b64 = resp.json().get("rawData")
         except ValueError:
-            _warn_once("yandex_cloud_json", f"Yandex Cloud: не JSON: {resp.text[:200]}")
+            log.warning("Yandex Cloud: не JSON: %s", resp.text[:200])
             break
         if not raw_b64:
             break
 
         found, error = _parse_yandex_xml(base64.b64decode(raw_b64))
         if error:
-            _warn_once("yandex_cloud_api", f"Yandex Cloud вернул ошибку: {error}")
-            break
-        if not found:
-            break
-        urls += found
-        if len(urls) >= max_results:
-            break
-
-    return urls[:max_results]
-
-
-def search_yandex_xml(query: str, *, max_results: int = 20) -> list[str]:
-    """Классический Яндекс.XML (user+key). Оставлен для старых аккаунтов."""
-    user = os.environ.get("YANDEX_XML_USER")
-    key = os.environ.get("YANDEX_XML_KEY")
-    if not (user and key):
-        return []
-
-    per_page = min(max_results, 100)
-    groupby = f'attr="".mode=flat.groups-on-page={per_page}.docs-in-group=1'
-    urls: list[str] = []
-
-    for page in range(0, 11):
-        params = {"user": user, "key": key, "query": query,
-                  "l10n": "ru", "groupby": groupby, "page": page}
-        try:
-            resp = _http("get", YANDEX_XML, params=params, headers=DEFAULT_HEADERS, timeout=20)
-            resp.raise_for_status()
-        except requests.RequestException as exc:
-            _warn_once("yandex_err", f"ошибка Yandex XML: {exc}")
-            break
-
-        found, error = _parse_yandex_xml(resp.content)
-        if error:
-            _warn_once("yandex_api_err", f"Yandex XML вернул ошибку: {error}")
+            log.warning("Yandex Cloud ошибка API по «%s»: %s", query, error)
             break
         if not found:
             break
@@ -198,17 +205,33 @@ def search_yandex_xml(query: str, *, max_results: int = 20) -> list[str]:
 
 
 def search_yandex(query: str, *, max_results: int = 20) -> list[str]:
-    """Единая точка входа для Яндекса: Cloud v2, если задан apikey+folder;
-    иначе классический XML по user+key."""
-    if os.environ.get("YANDEX_API_KEY") and os.environ.get("YANDEX_FOLDER_ID"):
-        return search_yandex_cloud(query, max_results=max_results)
-    if os.environ.get("YANDEX_XML_USER") and os.environ.get("YANDEX_XML_KEY"):
-        return search_yandex_xml(query, max_results=max_results)
+    """Единая точка входа для Яндекса.
+
+    Если заданы Cloud-ключи (apikey+folder) — сначала пробуем классический
+    endpoint yandex.ru/search/xml (он их принимает и стабильно отдаёт XML),
+    при пустом ответе — новый Cloud Search API v2. Иначе — user+key.
+    """
+    apikey = os.environ.get("YANDEX_API_KEY")
+    folder = os.environ.get("YANDEX_FOLDER_ID")
+    if apikey and folder:
+        urls = _yandex_classic(query, {"apikey": apikey, "folderid": folder}, max_results)
+        if urls:
+            log.info("Яндекс (classic apikey): %d url по «%s»", len(urls), query)
+            return urls
+        log.info("Яндекс classic пусто по «%s» — пробую Cloud v2", query)
+        urls = search_yandex_cloud(query, max_results=max_results)
+        log.info("Яндекс (cloud v2): %d url по «%s»", len(urls), query)
+        return urls
+
+    user = os.environ.get("YANDEX_XML_USER")
+    key = os.environ.get("YANDEX_XML_KEY")
+    if user and key:
+        return _yandex_classic(query, {"user": user, "key": key}, max_results)
+
     _warn_once(
         "yandex",
         "провайдер yandex пропущен: задайте YANDEX_API_KEY + YANDEX_FOLDER_ID "
-        "(Yandex Cloud Search API v2) либо YANDEX_XML_USER + YANDEX_XML_KEY "
-        "(классический yandex.ru/dev/xml)",
+        "либо YANDEX_XML_USER + YANDEX_XML_KEY",
     )
     return []
 

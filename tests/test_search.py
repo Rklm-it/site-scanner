@@ -95,25 +95,41 @@ def test_yandex_cloud_http_error(monkeypatch):
     assert search_mod.search_yandex_cloud("q") == []
 
 
-def test_yandex_dispatcher_prefers_cloud(monkeypatch):
+def test_yandex_dispatcher_classic_first(monkeypatch):
+    """С apikey+folder сначала пробуется классический endpoint; если он вернул
+    результаты — Cloud v2 не дёргается."""
     for v in ("YANDEX_API_KEY", "YANDEX_FOLDER_ID", "YANDEX_XML_USER", "YANDEX_XML_KEY"):
         monkeypatch.delenv(v, raising=False)
     monkeypatch.setenv("YANDEX_API_KEY", "apikey")
     monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
     called = {}
 
-    def cloud(q, *, max_results=20):
-        called["cloud"] = True
+    def classic(q, auth, mr):
+        called["classic_auth"] = auth
         return ["https://x.ru"]
 
-    def xml(q, *, max_results=20):
-        called["xml"] = True
+    def cloud(q, *, max_results=20):
+        called["cloud"] = True
         return []
 
+    monkeypatch.setattr(search_mod, "_yandex_classic", classic)
     monkeypatch.setattr(search_mod, "search_yandex_cloud", cloud)
-    monkeypatch.setattr(search_mod, "search_yandex_xml", xml)
     assert search_mod.search_yandex("q") == ["https://x.ru"]
-    assert called == {"cloud": True}
+    assert called["classic_auth"] == {"apikey": "apikey", "folderid": "b1gfolder"}
+    assert "cloud" not in called  # cloud не понадобился
+
+
+def test_yandex_dispatcher_falls_back_to_cloud(monkeypatch):
+    """Если классический endpoint пуст — используется Cloud v2."""
+    for v in ("YANDEX_API_KEY", "YANDEX_FOLDER_ID", "YANDEX_XML_USER", "YANDEX_XML_KEY"):
+        monkeypatch.delenv(v, raising=False)
+    monkeypatch.setenv("YANDEX_API_KEY", "apikey")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
+
+    monkeypatch.setattr(search_mod, "_yandex_classic", lambda q, auth, mr: [])
+    monkeypatch.setattr(search_mod, "search_yandex_cloud",
+                        lambda q, *, max_results=20: ["https://cloud.ru"])
+    assert search_mod.search_yandex("q") == ["https://cloud.ru"]
 
 
 def test_search_many_round_robin_dedupe(monkeypatch):

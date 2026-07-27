@@ -70,6 +70,7 @@ def collect_urls(
     out: list[tuple[str, str]] = []
     for query in queries:
         urls = search_mod.search_many(query, providers=providers, max_results=max_per_query, cache=cache)
+        kept = 0
         for url in urls:
             domain = registered_domain(url)
             if not domain or domain in SKIP_DOMAINS or domain in seen:
@@ -79,6 +80,8 @@ def collect_urls(
             seen.add(domain)
             scheme = urlparse(url).scheme or "https"
             out.append((f"{scheme}://{domain}", query))
+            kept += 1
+        log.info("«%s»: выдача %d → к скану %d (агрегаторы/дубли отсеяны)", query, len(urls), kept)
     return out
 
 
