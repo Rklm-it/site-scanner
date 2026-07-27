@@ -29,7 +29,8 @@ from .fetcher import DEFAULT_HEADERS
 
 GOOGLE_CSE = "https://www.googleapis.com/customsearch/v1"
 YANDEX_XML = "https://yandex.ru/search/xml"
-YANDEX_CLOUD = "https://searchapi.api.cloud.yandex.net/v2/web/search"
+YANDEX_CLOUD_ASYNC = "https://searchapi.api.cloud.yandex.net/v2/web/searchAsync"
+YANDEX_OPERATION = "https://operation.api.cloud.yandex.net/operations/"
 SERPAPI = "https://serpapi.com/search"
 DDG_HTML = "https://html.duckduckgo.com/html/"
 
@@ -155,39 +156,63 @@ def search_yandex_xml(query: str, *, max_results: int = 20) -> list[str]:
     return _yandex_classic(query, {"user": user, "key": key}, max_results)
 
 
+def _yandex_operation_rawdata(data: dict, headers: dict, *, poll_timeout: int = 30) -> str | None:
+    """Достаёт base64 rawData из ответа v2: либо сразу, либо дождавшись
+    асинхронной операции (searchAsync возвращает Operation)."""
+    if data.get("rawData"):                      # синхронный ответ
+        return data["rawData"]
+    op_id = data.get("id")
+    if not op_id:
+        log.warning("Yandex Cloud: неожиданный ответ без id/rawData: %s", str(data)[:400])
+        return None
+
+    for _ in range(poll_timeout):
+        if data.get("done"):
+            if data.get("error"):
+                log.warning("Yandex Cloud operation error: %s", str(data["error"])[:400])
+                return None
+            return (data.get("response") or {}).get("rawData")
+        time.sleep(1)
+        try:
+            r = _http("get", YANDEX_OPERATION + op_id, headers=headers, timeout=20)
+        except requests.RequestException as exc:
+            log.warning("Yandex Cloud: опрос операции упал: %s", exc)
+            return None
+        if r.status_code != 200:
+            log.warning("Yandex Cloud operation HTTP %s: %s", r.status_code, r.text[:300])
+            return None
+        data = r.json()
+    log.warning("Yandex Cloud: операция не завершилась за %dс", poll_timeout)
+    return None
+
+
 def search_yandex_cloud(query: str, *, max_results: int = 20) -> list[str]:
-    """Yandex Search API v2 (POST на searchapi.api.cloud.yandex.net).
-    Ответ — base64-XML того же формата. Используется как фолбэк."""
+    """Yandex Search API v2 (Yandex Cloud). Асинхронный поток:
+    POST searchAsync → дождаться операции → base64-XML → тот же парсер."""
     api_key = os.environ.get("YANDEX_API_KEY")
     folder = os.environ.get("YANDEX_FOLDER_ID")
     if not (api_key and folder):
         return []
 
-    per_page = min(max_results, 100)
     headers = {"Authorization": f"Api-Key {api_key}", "Content-Type": "application/json"}
     urls: list[str] = []
 
-    for page in range(0, 11):
+    for page in range(0, 5):
         body = {
             "query": {"searchType": "SEARCH_TYPE_RU", "queryText": query, "page": str(page)},
             "folderId": folder,
             "responseFormat": "FORMAT_XML",
-            "groupSpec": {"groupMode": "GROUP_MODE_FLAT",
-                          "groupsOnPage": str(per_page), "docsInGroup": "1"},
         }
         try:
-            resp = _http("post", YANDEX_CLOUD, json=body, headers=headers, timeout=30)
+            resp = _http("post", YANDEX_CLOUD_ASYNC, json=body, headers=headers, timeout=30)
         except requests.RequestException as exc:
-            log.warning("Yandex Cloud запрос упал: %s", exc)
+            log.warning("Yandex Cloud searchAsync упал: %s", exc)
             break
         if resp.status_code != 200:
-            log.warning("Yandex Cloud HTTP %s: %s", resp.status_code, resp.text[:300])
+            log.warning("Yandex Cloud searchAsync HTTP %s: %s", resp.status_code, resp.text[:400])
             break
-        try:
-            raw_b64 = resp.json().get("rawData")
-        except ValueError:
-            log.warning("Yandex Cloud: не JSON: %s", resp.text[:200])
-            break
+
+        raw_b64 = _yandex_operation_rawdata(resp.json(), headers)
         if not raw_b64:
             break
 
@@ -198,6 +223,7 @@ def search_yandex_cloud(query: str, *, max_results: int = 20) -> list[str]:
         if not found:
             break
         urls += found
+        log.info("Яндекс cloud v2: страница %d, +%d url по «%s»", page, len(found), query)
         if len(urls) >= max_results:
             break
 
@@ -214,11 +240,6 @@ def search_yandex(query: str, *, max_results: int = 20) -> list[str]:
     apikey = os.environ.get("YANDEX_API_KEY")
     folder = os.environ.get("YANDEX_FOLDER_ID")
     if apikey and folder:
-        urls = _yandex_classic(query, {"apikey": apikey, "folderid": folder}, max_results)
-        if urls:
-            log.info("Яндекс (classic apikey): %d url по «%s»", len(urls), query)
-            return urls
-        log.info("Яндекс classic пусто по «%s» — пробую Cloud v2", query)
         urls = search_yandex_cloud(query, max_results=max_results)
         log.info("Яндекс (cloud v2): %d url по «%s»", len(urls), query)
         return urls

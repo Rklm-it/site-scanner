@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import threading
 import time
@@ -25,6 +26,9 @@ from . import secrets_store
 DATA_DIR = Path(os.environ.get("SCANNER_DATA", "webapp_data"))
 JOBS_DIR = DATA_DIR / "jobs"
 STATIC = Path(__file__).parent / "static"
+
+# Чтобы INFO-логи движка (scanner.*) были видны в docker compose logs
+logging.getLogger("scanner").setLevel(logging.INFO)
 
 
 @asynccontextmanager

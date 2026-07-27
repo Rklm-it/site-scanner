@@ -75,7 +75,7 @@ def test_yandex_cloud_parsing(monkeypatch):
     search_mod._warned.clear()
 
     def fake_http(method, url, **k):
-        assert method == "post" and url == search_mod.YANDEX_CLOUD
+        assert method == "post" and url == search_mod.YANDEX_CLOUD_ASYNC
         assert k["headers"]["Authorization"] == "Api-Key apikey"
         page = int(k["json"]["query"]["page"])
         raw = YANDEX_XML if page == 0 else YANDEX_EMPTY
@@ -95,9 +95,9 @@ def test_yandex_cloud_http_error(monkeypatch):
     assert search_mod.search_yandex_cloud("q") == []
 
 
-def test_yandex_dispatcher_classic_first(monkeypatch):
-    """С apikey+folder сначала пробуется классический endpoint; если он вернул
-    результаты — Cloud v2 не дёргается."""
+def test_yandex_dispatcher_cloud_for_apikey(monkeypatch):
+    """С apikey+folder используется Cloud v2 (классический yandex.ru/search/xml
+    отдаёт таким ключам 403, поэтому не трогаем его)."""
     for v in ("YANDEX_API_KEY", "YANDEX_FOLDER_ID", "YANDEX_XML_USER", "YANDEX_XML_KEY"):
         monkeypatch.delenv(v, raising=False)
     monkeypatch.setenv("YANDEX_API_KEY", "apikey")
@@ -105,31 +105,46 @@ def test_yandex_dispatcher_classic_first(monkeypatch):
     called = {}
 
     def classic(q, auth, mr):
-        called["classic_auth"] = auth
-        return ["https://x.ru"]
-
-    def cloud(q, *, max_results=20):
-        called["cloud"] = True
+        called["classic"] = True
         return []
 
     monkeypatch.setattr(search_mod, "_yandex_classic", classic)
-    monkeypatch.setattr(search_mod, "search_yandex_cloud", cloud)
-    assert search_mod.search_yandex("q") == ["https://x.ru"]
-    assert called["classic_auth"] == {"apikey": "apikey", "folderid": "b1gfolder"}
-    assert "cloud" not in called  # cloud не понадобился
-
-
-def test_yandex_dispatcher_falls_back_to_cloud(monkeypatch):
-    """Если классический endpoint пуст — используется Cloud v2."""
-    for v in ("YANDEX_API_KEY", "YANDEX_FOLDER_ID", "YANDEX_XML_USER", "YANDEX_XML_KEY"):
-        monkeypatch.delenv(v, raising=False)
-    monkeypatch.setenv("YANDEX_API_KEY", "apikey")
-    monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
-
-    monkeypatch.setattr(search_mod, "_yandex_classic", lambda q, auth, mr: [])
     monkeypatch.setattr(search_mod, "search_yandex_cloud",
                         lambda q, *, max_results=20: ["https://cloud.ru"])
     assert search_mod.search_yandex("q") == ["https://cloud.ru"]
+    assert "classic" not in called  # классический endpoint не дёргаем
+
+
+def test_yandex_dispatcher_classic_for_userkey(monkeypatch):
+    """С user+key используется классический yandex.ru/search/xml."""
+    for v in ("YANDEX_API_KEY", "YANDEX_FOLDER_ID", "YANDEX_XML_USER", "YANDEX_XML_KEY"):
+        monkeypatch.delenv(v, raising=False)
+    monkeypatch.setenv("YANDEX_XML_USER", "u")
+    monkeypatch.setenv("YANDEX_XML_KEY", "k")
+    monkeypatch.setattr(search_mod, "_yandex_classic",
+                        lambda q, auth, mr: ["https://classic.ru"] if auth.get("user") else [])
+    assert search_mod.search_yandex("q") == ["https://classic.ru"]
+
+
+def test_yandex_cloud_async_operation(monkeypatch):
+    """search_yandex_cloud проходит асинхронный поток: searchAsync → операция → rawData."""
+    monkeypatch.setenv("YANDEX_API_KEY", "apikey")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
+    monkeypatch.setattr(search_mod.time, "sleep", lambda *_: None)
+    state = {"polls": 0}
+    b64 = base64.b64encode(YANDEX_XML).decode()
+
+    def fake_http(method, url, **k):
+        if method == "post":
+            return FakeJsonResp({"id": "op1", "done": False})       # операция запущена
+        state["polls"] += 1
+        done = state["polls"] >= 2
+        return FakeJsonResp({"id": "op1", "done": done,
+                             "response": {"rawData": b64} if done else None})
+
+    monkeypatch.setattr(search_mod, "_http", fake_http)
+    urls = search_mod.search_yandex_cloud("автосервис Казань", max_results=2)
+    assert urls == ["https://garage-old.ru/", "https://stoma-kzn.ru/"]
 
 
 def test_search_many_round_robin_dedupe(monkeypatch):
