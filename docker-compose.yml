@@ -1,0 +1,42 @@
+# Развёртывание site-scanner на VPS.
+#   app   — веб-интерфейс (наружу НЕ публикуется, только внутри сети)
+#   caddy — reverse-proxy: HTTPS (автоматически) + basic-auth
+#
+# Быстрый старт:
+#   cp .env.example .env   # заполнить DOMAIN и пароль (см. DEPLOY.md)
+#   docker compose up -d --build
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      - SCANNER_DATA=/data/webapp_data
+      - SCANNER_SECRETS=/data/secrets.local.json
+    volumes:
+      - scanner-data:/data
+    expose:
+      - "8600"          # доступен только другим сервисам compose, не хосту
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    # Файл НЕ должен называться .env: compose авто-подхватывает .env для
+    # интерполяции ${} и ломает знаки $ в bcrypt-хэше. env_file с другим
+    # именем передаёт значения в контейнер как есть.
+    env_file:
+      - scanner.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  scanner-data:
+  caddy-data:
+  caddy-config:

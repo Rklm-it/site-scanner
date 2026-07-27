@@ -21,3 +21,6 @@ cache.sqlite
 # Веб-интерфейс: секреты и данные прогонов
 secrets.local.json
 webapp_data/
+
+# Деплой: файл с доменом/паролем
+scanner.env

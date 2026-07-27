@@ -1,0 +1,15 @@
+.git
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+tests
+webapp_data
+*.sqlite
+*.sqlite-journal
+secrets.local.json
+.env
+scanner.env
+*.local.yaml
+ui-*.png

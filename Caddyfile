@@ -1,0 +1,11 @@
+# Reverse-proxy с HTTPS и паролем.
+# DOMAIN:
+#   - реальный домен (example.com) → Caddy сам выпустит и продлит сертификат;
+#   - ":80" → без TLS (доступ по IP), пароль всё равно работает.
+
+{$DOMAIN} {
+	basic_auth {
+		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
+	}
+	reverse_proxy app:8600
+}
