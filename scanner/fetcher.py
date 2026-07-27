@@ -117,8 +117,20 @@ def fetch(
                 allow_redirects=True,
                 stream=True,
             )
-            raw = resp.raw.read(max_bytes, decode_content=True) or b""
-            resp.close()
+            # Жёсткий дедлайн на чтение тела: при stream=True таймаут requests
+            # не покрывает медленную «струйку» байт, и read() может висеть
+            # намного дольше timeout. Читаем чанками с общим лимитом по времени.
+            deadline = started + timeout
+            buf = bytearray()
+            try:
+                for chunk in resp.iter_content(16384):
+                    if chunk:
+                        buf += chunk
+                    if len(buf) >= max_bytes or time.perf_counter() > deadline:
+                        break
+            finally:
+                resp.close()
+            raw = bytes(buf[:max_bytes])
             elapsed = int((time.perf_counter() - started) * 1000)
             headers = {k.lower(): v for k, v in resp.headers.items()}
 
