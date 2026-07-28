@@ -96,6 +96,12 @@ def test_lead_state_persistence(client):
     st = c.get("/api/leads/state").json()["old.ru"]
     assert st["status"] == "написал" and st["note"] == "звонил, перезвонят"
 
+    # статус звонка и дата «перезвонить»
+    c.post("/api/leads/state", json={"domain": "old.ru", "status": "перезвонить", "callback": "2026-08-01"})
+    st = c.get("/api/leads/state").json()["old.ru"]
+    assert st["status"] == "перезвонить" and st["callback"] == "2026-08-01"
+    assert st["note"] == "звонил, перезвонят"  # заметка не потерялась
+
 
 def test_lead_state_rejects_bad_status(client):
     c, _ = client

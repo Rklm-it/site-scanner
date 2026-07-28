@@ -226,6 +226,8 @@
       <span class="muted" id="elapsed"></span>
       <input id="search" placeholder="поиск по домену / компании" style="max-width:220px">
       <label class="fchk"><input type="checkbox" id="f_email"> с почтой</label>
+      <label class="fchk"><input type="checkbox" id="f_phone"> с телефоном</label>
+      <label class="fchk"><input type="checkbox" id="f_callback"> перезвонить сегодня</label>
       <label class="fchk"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
       <span class="fchk">приоритет:
         <label><input type="checkbox" class="ftier" value="A" checked>A</label>
@@ -239,6 +241,29 @@
     </div>
     <div id="results"><div class="empty">Настройте параметры слева и запустите скан — результаты появятся здесь.</div></div>
   </main>
+</div>
+
+<div id="cmodal" class="modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head"><strong id="c-title"></strong><button id="c-close">✕</button></div>
+    <div class="modal-actions" style="margin:0 0 10px">
+      <a id="c-call" class="primary" style="width:auto;text-decoration:none;padding:9px 14px;border-radius:8px">📞 Позвонить</a>
+      <span class="muted" id="c-phone"></span>
+      <span style="flex:1"></span>
+      <label class="fchk">перезвонить: <input type="date" id="c-callback"></label>
+    </div>
+    <div class="modal-actions" style="margin:0 0 10px;flex-wrap:wrap">
+      <span class="muted">Итог звонка:</span>
+      <button class="rowbtn c-out" data-s="звонил">дозвонился</button>
+      <button class="rowbtn c-out" data-s="недозвон">недозвон</button>
+      <button class="rowbtn c-out" data-s="перезвонить">перезвонить</button>
+      <button class="rowbtn c-out" data-s="интерес">интерес</button>
+      <button class="rowbtn c-out" data-s="отказ">отказ</button>
+    </div>
+    <label>Скрипт разговора</label>
+    <textarea id="c-script" rows="16" readonly></textarea>
+    <div class="modal-actions"><button id="c-copy">Копировать скрипт</button></div>
+  </div>
 </div>
 
 <div id="modal" class="modal" style="display:none">
@@ -306,11 +331,14 @@ async function init() {
   $("bulk").onclick = bulkSend;
 
   // фильтры результатов
-  ["search", "f_email", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
+  ["search", "f_email", "f_phone", "f_callback", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
   document.querySelectorAll(".ftier").forEach(c => c.onchange = () => ROWS.length && renderTable());
   // модалка письма
   $("m-close").onclick = () => $("modal").style.display = "none";
   $("modal").onclick = e => { if (e.target.id === "modal") $("modal").style.display = "none"; };
+  // модалка звонка
+  $("c-close").onclick = () => $("cmodal").style.display = "none";
+  $("cmodal").onclick = e => { if (e.target.id === "cmodal") $("cmodal").style.display = "none"; };
   // вкладки Скан / База
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchView(t.dataset.v));
 }
@@ -491,24 +519,53 @@ function render() {
   renderTable();
 }
 
-const STATUS_OPTS = ["", "написал", "ответили", "клиент", "отказ"];
+const STATUS_OPTS = ["", "написал", "звонил", "недозвон", "перезвонить", "интерес", "ответили", "клиент", "отказ"];
 
 function passesFilters(r) {
   const q = $("search").value.trim().toLowerCase();
   if (q && !((r.domain || "").toLowerCase().includes(q) || (r.company || "").toLowerCase().includes(q))) return false;
   if ($("f_email").checked && !r.emails) return false;
+  if ($("f_phone").checked && !r.phones) return false;
   if ($("f_hide").checked && r.status) return false;
+  if ($("f_callback").checked) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (!(r.callback && r.callback <= today)) return false;
+  }
   const tiers = [...document.querySelectorAll(".ftier:checked")].map(i => i.value);
   if (!tiers.includes(r.priority)) return false;
   return true;
 }
 
-async function setStatus(domain, status) {
+async function setStatus(domain, status, callback) {
+  const payload = {domain};
+  if (status !== undefined) payload.status = status;
+  if (callback !== undefined) payload.callback = callback;
   await fetch("/api/leads/state", {method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({domain, status})});
+    body: JSON.stringify(payload)});
   const row = ROWS.find(r => r.domain === domain);
-  if (row) row.status = status;
+  if (row) { if (status !== undefined) row.status = status; if (callback !== undefined) row.callback = callback; }
   renderTable();
+}
+
+function openCall(domain) {
+  const r = ROWS.find(x => x.domain === domain);
+  if (!r) return;
+  $("c-title").textContent = r.company || r.domain;
+  $("c-script").value = r.call_script || "Скрипт появится после нового скана (обновите базу сканом).";
+  const phone = (r.phones || "").split(",")[0].trim();
+  $("c-phone").textContent = phone || "телефон не найден";
+  const tel = "tel:" + phone.replace(/[^\d+]/g, "");
+  $("c-call").href = phone ? tel : "#";
+  $("c-call").style.display = phone ? "" : "none";
+  $("c-callback").value = r.callback || "";
+  $("c-callback").onchange = () => setStatus(domain, undefined, $("c-callback").value);
+  document.querySelectorAll(".c-out").forEach(b => b.onclick = () => {
+    setStatus(domain, b.dataset.s);
+    $("cmodal").style.display = "none";
+  });
+  $("c-copy").onclick = () => { navigator.clipboard && navigator.clipboard.writeText($("c-script").value);
+    $("c-copy").textContent = "Скопировано ✓"; setTimeout(() => $("c-copy").textContent = "Копировать скрипт", 1500); };
+  $("cmodal").style.display = "flex";
 }
 
 function openMail(domain) {
@@ -575,12 +632,16 @@ function renderTable() {
     <td>${esc(r.company)}</td>
     <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
     <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
-    <td>${esc(r.phones)}</td>
+    <td>${(r.phones || "").split(",").map(p => p.trim()).filter(Boolean)
+        .map(p => `<a href="tel:${p.replace(/[^\d+]/g, "")}">${esc(p)}</a>`).join("<br>")}</td>
     <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
     <td><select class="st-sel" data-s="${r.status}" data-d="${r.domain}">
       ${STATUS_OPTS.map(s => `<option value="${s}" ${r.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
-    </select></td>
-    <td><button class="rowbtn" data-mail="${r.domain}">✉ Письмо</button></td>
+      </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}</td>
+    <td style="white-space:nowrap">
+      <button class="rowbtn" data-call="${r.domain}">📞</button>
+      <button class="rowbtn" data-mail="${r.domain}">✉</button>
+    </td>
   </tr>`).join("");
   $("results").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
   document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
@@ -590,6 +651,7 @@ function renderTable() {
   });
   document.querySelectorAll(".st-sel").forEach(s => s.onchange = () => setStatus(s.dataset.d, s.value));
   document.querySelectorAll(".rowbtn[data-mail]").forEach(b => b.onclick = () => openMail(b.dataset.mail));
+  document.querySelectorAll(".rowbtn[data-call]").forEach(b => b.onclick = () => openCall(b.dataset.call));
 }
 
 function renderSummary(s) {

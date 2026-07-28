@@ -1,5 +1,17 @@
-from scanner.outreach import build_message, _pick_hook
+from scanner.outreach import build_message, build_call_script, _pick_hook
 from scanner.models import Lead, Contacts, Enrichment
+
+
+def test_build_call_script():
+    lead = Lead(url="https://stoma.ru", domain="stoma.ru",
+                signals=["нет meta viewport (не адаптивный)"],
+                enrichment=Enrichment(official_name="ООО Улыбка"))
+    s = build_call_script(lead, caller_name="Иван")
+    assert "Иван" in s
+    assert "stoma.ru" in s
+    assert "телефон" in s                 # зацепка про мобильную версию
+    assert "возражени" in s.lower()       # блок ответов на возражения
+    assert "Приветствие" in s
 
 
 def test_pick_hook_prioritizes_mobile():

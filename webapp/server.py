@@ -174,13 +174,16 @@ def _run_job(job: Job, settings: Settings) -> None:
 
         saved = STORE.all() if STORE else {}
         signature = compose_signature()
+        caller = os.environ.get("SMTP_FROM_NAME", "").strip()
         rows = []
         for l in leads:
             row = l.to_row()
             row.update(outreach.build_message(l, signature=signature))
+            row["call_script"] = outreach.build_call_script(l, caller_name=caller)
             st = saved.get(l.domain, {})
             row["status"] = st.get("status", "")
             row["note"] = st.get("note", "")
+            row["callback"] = st.get("callback", "")
             rows.append(row)
         job.leads = rows
         if STORE:
@@ -258,6 +261,7 @@ class LeadStateUpdate(BaseModel):
     domain: str
     status: str | None = None
     note: str | None = None
+    callback: str | None = None
 
 
 @app.get("/api/base")
@@ -277,7 +281,8 @@ def set_lead_state(upd: LeadStateUpdate) -> dict:
         raise HTTPException(503, "Хранилище не готово.")
     if upd.status is not None and upd.status not in STATUSES:
         raise HTTPException(400, f"Недопустимый статус. Допустимо: {', '.join(s for s in STATUSES if s)}")
-    return {"domain": upd.domain, **STORE.set(upd.domain, status=upd.status, note=upd.note)}
+    return {"domain": upd.domain,
+            **STORE.set(upd.domain, status=upd.status, note=upd.note, callback=upd.callback)}
 
 
 # --- рассылка писем через SMTP собственного ящика ---

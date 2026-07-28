@@ -10,7 +10,7 @@ import sqlite3
 import threading
 import time
 
-STATUSES = ("", "написал", "ответили", "клиент", "отказ")
+STATUSES = ("", "написал", "звонил", "недозвон", "перезвонить", "интерес", "ответили", "клиент", "отказ")
 
 
 class LeadStore:
@@ -22,6 +22,10 @@ class LeadStore:
                 "CREATE TABLE IF NOT EXISTS lead_state("
                 "domain TEXT PRIMARY KEY, status TEXT, note TEXT, updated REAL)"
             )
+            # миграция: колонка callback (дата «перезвонить») для старых баз
+            cols = {r[1] for r in self._conn.execute("PRAGMA table_info(lead_state)")}
+            if "callback" not in cols:
+                self._conn.execute("ALTER TABLE lead_state ADD COLUMN callback TEXT")
             self._conn.execute(
                 "CREATE TABLE IF NOT EXISTS leads("
                 "domain TEXT PRIMARY KEY, data TEXT, outreach_score INTEGER, "
@@ -30,26 +34,31 @@ class LeadStore:
 
     def all(self) -> dict[str, dict]:
         with self._lock:
-            rows = self._conn.execute("SELECT domain, status, note FROM lead_state").fetchall()
-        return {d: {"status": s or "", "note": n or ""} for d, s, n in rows}
+            rows = self._conn.execute("SELECT domain, status, note, callback FROM lead_state").fetchall()
+        return {d: {"status": s or "", "note": n or "", "callback": cb or ""} for d, s, n, cb in rows}
 
     def get(self, domain: str) -> dict:
         with self._lock:
             row = self._conn.execute(
-                "SELECT status, note FROM lead_state WHERE domain=?", (domain,)
+                "SELECT status, note, callback FROM lead_state WHERE domain=?", (domain,)
             ).fetchone()
-        return {"status": row[0] or "", "note": row[1] or ""} if row else {"status": "", "note": ""}
+        if not row:
+            return {"status": "", "note": "", "callback": ""}
+        return {"status": row[0] or "", "note": row[1] or "", "callback": row[2] or ""}
 
-    def set(self, domain: str, *, status: str | None = None, note: str | None = None) -> dict:
+    def set(self, domain: str, *, status: str | None = None, note: str | None = None,
+            callback: str | None = None) -> dict:
         cur = self.get(domain)
         new_status = cur["status"] if status is None else status
         new_note = cur["note"] if note is None else note
+        new_callback = cur["callback"] if callback is None else callback
         with self._lock, self._conn:
             self._conn.execute(
-                "INSERT OR REPLACE INTO lead_state(domain, status, note, updated) VALUES(?,?,?,?)",
-                (domain, new_status, new_note, time.time()),
+                "INSERT OR REPLACE INTO lead_state(domain, status, note, callback, updated)"
+                " VALUES(?,?,?,?,?)",
+                (domain, new_status, new_note, new_callback, time.time()),
             )
-        return {"status": new_status, "note": new_note}
+        return {"status": new_status, "note": new_note, "callback": new_callback}
 
     # --- накопительная база просканированных лидов ---
     def upsert_leads(self, rows: list[dict]) -> None:
@@ -83,6 +92,7 @@ class LeadStore:
             st = states.get(r.get("domain"), {})
             r["status"] = st.get("status", "")
             r["note"] = st.get("note", "")
+            r["callback"] = st.get("callback", "")
             r["first_seen"] = first
             r["last_seen"] = last
             out.append(r)
