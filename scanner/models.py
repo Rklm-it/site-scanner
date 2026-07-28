@@ -68,6 +68,9 @@ class Lead:
     contacts: Contacts = field(default_factory=Contacts)
     enrichment: Enrichment = field(default_factory=Enrichment)
 
+    # Признаки «живого бизнеса» — вкладывается в рекламу/аналитику/лидов
+    marketing: list[str] = field(default_factory=list)
+
     # Аналитика для аутрича (насколько выгодно писать предложение)
     outreach_score: int = 0
     outreach_tier: str = ""          # A / B / C
@@ -85,6 +88,7 @@ class Lead:
             "outreach_score": self.outreach_score,
             "outdated_score": self.outdated_score,
             "corp_email": "да" if self.corporate_email else "",
+            "marketing": ", ".join(self.marketing),
             "domain": self.domain,
             "url": self.final_url or self.url,
             "company": e.official_name or c.company or "",

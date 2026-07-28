@@ -9,7 +9,7 @@ from pathlib import Path
 from .models import Lead
 
 CSV_COLUMNS = [
-    "priority", "outreach_score", "outdated_score", "corp_email",
+    "priority", "outreach_score", "outdated_score", "corp_email", "marketing",
     "domain", "url", "company",
     "revenue", "company_status", "employees", "management",
     "title", "https", "tls_error", "mobile_friendly", "cms", "copyright_year",

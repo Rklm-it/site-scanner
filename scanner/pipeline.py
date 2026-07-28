@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import requests
 import tldextract
 
+from . import activity as activity_mod
 from . import analytics as analytics_mod
 from . import contacts as contacts_mod
 from . import heuristics as heuristics_mod
@@ -131,6 +132,7 @@ def scan_one(
     lead.copyright_year = h.copyright_year
     lead.title = h.title
     lead.contacts = contacts_mod.extract(res.html, base_url=base, title=h.title)
+    lead.marketing = activity_mod.detect(res.html)
 
     # Битый сертификат — сильный сигнал заброшенности
     if res.tls_error:

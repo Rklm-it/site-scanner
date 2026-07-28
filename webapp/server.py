@@ -188,6 +188,8 @@ def _run_job(job: Job, settings: Settings) -> None:
             row["status"] = st.get("status", "")
             row["note"] = st.get("note", "")
             row["callback"] = st.get("callback", "")
+            row["mrr"] = st.get("mrr", 0)
+            row["prototype_url"] = st.get("prototype_url", "")
             rows.append(row)
         job.leads = rows
         if STORE:
@@ -267,6 +269,8 @@ class LeadStateUpdate(BaseModel):
     note: str | None = None
     callback: str | None = None
     deal_amount: float | None = None
+    mrr: float | None = None
+    prototype_url: str | None = None
 
 
 @app.get("/api/base")
@@ -309,7 +313,7 @@ def set_lead_state(upd: LeadStateUpdate) -> dict:
         raise HTTPException(400, f"Недопустимый статус. Допустимо: {', '.join(s for s in STATUSES if s)}")
     return {"domain": upd.domain,
             **STORE.set(upd.domain, status=upd.status, note=upd.note, callback=upd.callback,
-                        deal_amount=upd.deal_amount)}
+                        deal_amount=upd.deal_amount, mrr=upd.mrr, prototype_url=upd.prototype_url)}
 
 
 # --- рассылка писем через SMTP собственного ящика ---

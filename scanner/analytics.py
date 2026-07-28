@@ -51,33 +51,41 @@ def _is_active(status: str | None) -> bool:
 
 
 def outreach_score(lead: Lead) -> tuple[int, str]:
-    """Считает балл аутрича (0..100) и приоритет A/B/C."""
+    """Считает балл аутрича (0..100) и приоритет A/B/C.
+
+    Логика: лучший клиент — тот, до кого можно достучаться (почта),
+    у кого сайт устарел И кто при этом ВКЛАДЫВАЕТСЯ в клиентов (реклама/
+    аналитика) или имеет оборот. «Просто старый» сайт без признаков жизни
+    часто заброшен — такой ниже.
+    """
     score = 0.0
 
-    # 1. Достижимость по почте (можно ли вообще написать предложение)
+    # 1. Достижимость по почте (до 30)
     if has_corporate_email(lead):
-        score += 35
+        score += 30
         lead.corporate_email = True
     elif lead.contacts.emails:
-        score += 20
+        score += 18
     elif lead.contacts.phones:
-        score += 8
+        score += 7
 
-    # 2. Потребность — насколько устарел сайт
-    score += lead.outdated_score * 0.35  # до 35
+    # 2. Потребность — насколько устарел сайт (до 30)
+    score += lead.outdated_score * 0.30
 
-    # 3. Бюджет и «живость» компании (если было обогащение по ИНН)
+    # 3. Бюджет и «живость» бизнеса (до 40)
     e = lead.enrichment
     budget = 0
     if e.revenue is not None:
-        budget += 20 if e.revenue >= REVENUE_BUDGET_THRESHOLD else 12
+        budget += 18 if e.revenue >= REVENUE_BUDGET_THRESHOLD else 10
     else:
-        budget += 5  # оборот неизвестен — нейтрально
+        budget += 4  # оборот неизвестен — нейтрально
     if _is_active(e.status):
-        budget += 5
+        budget += 4
     if e.employee_count:
-        budget += 5
-    score += min(budget, 30)
+        budget += 4
+    if lead.marketing:            # вкладывается в рекламу/аналитику — сильный сигнал
+        budget += 14
+    score += min(budget, 40)
 
     total = int(round(min(100, score)))
     tier = "A" if total >= 70 else "B" if total >= 45 else "C"
@@ -100,6 +108,7 @@ def summarize(leads: list[Lead]) -> dict:
     with_phone = sum(1 for l in leads if l.contacts.phones)
     with_revenue = sum(1 for l in leads if l.enrichment.revenue is not None)
     active = sum(1 for l in leads if _is_active(l.enrichment.status))
+    invests_marketing = sum(1 for l in leads if l.marketing)
     avg_outdated = round(sum(l.outdated_score for l in leads) / total) if total else 0
 
     by_category = Counter(l.source_query for l in leads if l.source_query)
@@ -114,6 +123,7 @@ def summarize(leads: list[Lead]) -> dict:
         "with_phone": with_phone,
         "with_revenue": with_revenue,
         "active": active,
+        "invests_marketing": invests_marketing,
         "avg_outdated": avg_outdated,
         "top_categories": by_category.most_common(8),
         # Готовы к письму на рабочую почту прямо сейчас

@@ -103,10 +103,13 @@ def test_lead_state_persistence(client):
     assert st["status"] == "перезвонить" and st["callback"] == "2026-08-01"
     assert st["note"] == "звонил, перезвонят"  # заметка не потерялась
 
-    # сумма сделки при переводе в клиенты
-    c.post("/api/leads/state", json={"domain": "old.ru", "status": "клиент", "deal_amount": 60000})
+    # сумма сделки + регулярная поддержка + прототип при переводе в клиенты
+    c.post("/api/leads/state", json={"domain": "old.ru", "status": "клиент",
+                                     "deal_amount": 60000, "mrr": 5000,
+                                     "prototype_url": "https://proto.lovable.app"})
     st = c.get("/api/leads/state").json()["old.ru"]
     assert st["status"] == "клиент" and st["deal_amount"] == 60000
+    assert st["mrr"] == 5000 and st["prototype_url"] == "https://proto.lovable.app"
     assert st["callback"] == "2026-08-01"  # прочие поля на месте
 
 

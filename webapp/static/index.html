@@ -90,6 +90,7 @@
   .tile .l { font-size: 12px; color: var(--muted); }
   .tile.hot { border-color: var(--ok); }
   .mail-ok { color: var(--ok); font-weight: 600; }
+  .chip.mkt { background: rgba(31,157,85,.15); color: var(--ok); }
 
   /* Фильтры */
   .fchk { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
@@ -134,8 +135,8 @@
   .kcol { flex: 0 0 220px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
   .khead { font-size: 13px; font-weight: 600; margin-bottom: 8px; padding: 0 2px; }
   .kcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 8px; }
-  .kcard .deal { width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
-    border-radius: 6px; padding: 4px 6px; font: inherit; font-size: 12px; }
+  .kcard .deal, .kcard .mrr { width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: 4px 6px; font: inherit; font-size: 12px; margin-top: 4px; }
   .kcard .st-sel { flex: 1; }
 </style>
 </head>
@@ -287,6 +288,8 @@
     <img id="m-shot" class="shot" alt="" loading="lazy">
     <label>Тема</label>
     <input id="m-subject">
+    <label>Ссылка на прототип (Lovable) — вставится в письмо как «вот набросок»</label>
+    <input id="m-proto" placeholder="https://... (необязательно)">
     <label>Текст письма</label>
     <textarea id="m-body" rows="12"></textarea>
     <div class="modal-actions">
@@ -387,6 +390,7 @@ function kcard(l) {
       </select>
     </div>
     <input class="deal" data-d="${esc(l.domain)}" type="number" placeholder="сумма сделки, ₽" value="${l.deal_amount || ""}">
+    <input class="mrr" data-d="${esc(l.domain)}" type="number" placeholder="поддержка, ₽/мес" value="${l.mrr || ""}">
   </div>`;
 }
 
@@ -394,18 +398,31 @@ function renderKanban() {
   $("summary").innerHTML = ""; $("toolbar").style.display = "none";
   $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
   const leads = BASE;
-  const earned = leads.filter(l => l.status === "клиент").reduce((s, l) => s + (+l.deal_amount || 0), 0);
-  const clients = leads.filter(l => l.status === "клиент").length;
+  const clientsArr = leads.filter(l => l.status === "клиент");
+  const earned = clientsArr.reduce((s, l) => s + (+l.deal_amount || 0), 0);
+  const mrr = clientsArr.reduce((s, l) => s + (+l.mrr || 0), 0);
   const cols = STAGES.map(([name, statuses]) => {
     const items = leads.filter(l => statuses.includes(l.status || ""));
     return `<div class="kcol"><div class="khead">${name} <span class="muted">${items.length}</span></div>${items.map(kcard).join("")}</div>`;
   }).join("");
   $("results").innerHTML =
-    `<div class="kearn">Заработано (клиентов ${clients}): <b>${earned.toLocaleString("ru")} ₽</b></div>` +
+    `<div class="kearn">Заработано (клиентов ${clientsArr.length}): <b>${earned.toLocaleString("ru")} ₽</b>` +
+    `${mrr ? ` &nbsp;•&nbsp; регулярно: <b>${mrr.toLocaleString("ru")} ₽/мес</b>` : ""}</div>` +
     `<div class="kanban">${cols}</div>`;
   document.querySelectorAll(".kcard .st-sel").forEach(s => s.onchange = () => setStatus(s.dataset.d, s.value));
   document.querySelectorAll(".kcard .deal").forEach(i =>
     i.onchange = () => setStatus(i.dataset.d, undefined, undefined, +i.value || 0));
+  document.querySelectorAll(".kcard .mrr").forEach(i =>
+    i.onchange = () => postState({domain: i.dataset.d, mrr: +i.value || 0}));
+}
+
+async function postState(payload) {
+  await fetch("/api/leads/state", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)});
+  [ROWS, BASE].forEach(arr => arr.forEach(r => {
+    if (r.domain === payload.domain) Object.assign(r, payload);
+  }));
+  refreshView();
 }
 
 function renderKeys(secrets) {
@@ -609,6 +626,17 @@ async function setStatus(domain, status, callback, deal) {
   refreshView();
 }
 
+const PROTO_MARK = "Кстати, набросал, как мог бы выглядеть ваш новый сайт:";
+function applyProto(body, url) {
+  body = body.split("\n").filter(l => !l.startsWith(PROTO_MARK)).join("\n").replace(/\n{3,}/g, "\n\n");
+  if (url) {
+    const line = PROTO_MARK + " " + url + "\n\n";
+    const idx = body.indexOf("С уважением,");
+    body = idx >= 0 ? body.slice(0, idx) + line + body.slice(idx) : body.trimEnd() + "\n\n" + line;
+  }
+  return body;
+}
+
 function loadShot(imgId, domain) {
   const img = $(imgId);
   img.style.display = "none";
@@ -645,7 +673,13 @@ function openMail(domain) {
   loadShot("m-shot", domain);
   $("m-title").textContent = r.company || r.domain;
   $("m-subject").value = r.pitch_subject || "";
-  $("m-body").value = r.pitch_body || "";
+  $("m-proto").value = r.prototype_url || "";
+  $("m-body").value = applyProto(r.pitch_body || "", r.prototype_url || "");
+  $("m-proto").onchange = () => {
+    const url = $("m-proto").value.trim();
+    $("m-body").value = applyProto($("m-body").value, url);
+    postState({domain, prototype_url: url});
+  };
   const email = (r.emails || "").split(",")[0].trim();
   $("m-email").textContent = email ? "кому: " + email : "почта не найдена — отправьте вручную";
   $("m-mail").onclick = () => {
@@ -701,7 +735,7 @@ function renderTable() {
     <td class="score">${r.outreach_score}</td>
     <td>${r.outdated_score}</td>
     <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
-    <td>${esc(r.company)}</td>
+    <td>${esc(r.company)}${r.marketing ? ` <span class="chip mkt" title="${esc(r.marketing)}">💰 реклама</span>` : ""}</td>
     <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
     <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
     <td>${(r.phones || "").split(",").map(p => p.trim()).filter(Boolean)
@@ -734,6 +768,7 @@ function renderSummary(s) {
     ${tile(s.tier_a, "приоритет A")}
     ${tile(s.tier_b, "приоритет B")}
     ${tile(s.corporate_email, "с корп. почтой")}
+    ${tile(s.invests_marketing, "вкладываются в рекламу", true)}
     ${tile(s.with_revenue, "с оборотом (ИНН)")}
     ${tile(s.avg_outdated, "средний балл старости")}
   </div>`;

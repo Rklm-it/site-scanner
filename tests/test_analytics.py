@@ -37,6 +37,14 @@ def test_outreach_prioritizes_corp_email_old_site_with_revenue():
     assert t2 == "C" and s2 < score
 
 
+def test_marketing_signal_boosts_score():
+    # два одинаковых лида, но один вкладывается в рекламу → у него выше балл
+    plain = _lead(outdated_score=70, contacts=Contacts(emails=["info@firma.ru"]))
+    active = _lead(outdated_score=70, contacts=Contacts(emails=["info@firma.ru"]),
+                   marketing=["Яндекс.Метрика", "Google Ads (реклама)"])
+    assert outreach_score(active)[0] > outreach_score(plain)[0]
+
+
 def test_annotate_sets_fields_and_flags_corporate():
     leads = [_lead(contacts=Contacts(emails=["info@firma.ru"]))]
     annotate(leads)
