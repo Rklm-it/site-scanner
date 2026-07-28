@@ -124,6 +124,17 @@
   .tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted);
     padding: 8px 12px; cursor: pointer; font: inherit; }
   .tab.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+
+  /* Канбан-воронка */
+  .kearn { margin-bottom: 12px; font-size: 15px; }
+  .kearn b { color: var(--ok); }
+  .kanban { display: flex; gap: 10px; overflow-x: auto; align-items: flex-start; padding-bottom: 8px; }
+  .kcol { flex: 0 0 220px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+  .khead { font-size: 13px; font-weight: 600; margin-bottom: 8px; padding: 0 2px; }
+  .kcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+  .kcard .deal { width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: 4px 6px; font: inherit; font-size: 12px; }
+  .kcard .st-sel { flex: 1; }
 </style>
 </head>
 <body>
@@ -218,6 +229,7 @@
     <div id="tabs" class="tabs">
       <button class="tab active" data-v="scan">Результаты скана</button>
       <button class="tab" data-v="base">База просканированных</button>
+      <button class="tab" data-v="kanban">Воронка</button>
     </div>
     <div id="status"></div>
     <div id="summary"></div>
@@ -349,8 +361,47 @@ function setActiveTab() {
 
 async function switchView(v) {
   VIEW = v; setActiveTab();
-  if (v === "base") { BASE = ((await (await fetch("/api/base")).json()).leads) || []; }
+  if (v === "base" || v === "kanban") { BASE = ((await (await fetch("/api/base")).json()).leads) || []; }
   render();
+}
+
+function refreshView() { if (VIEW === "kanban") renderKanban(); else renderTable(); }
+
+const STAGES = [
+  ["Новый", [""]], ["Написал", ["написал"]], ["Звонок", ["звонил", "недозвон", "перезвонить"]],
+  ["Интерес", ["интерес", "ответили"]], ["Клиент", ["клиент"]], ["Отказ", ["отказ"]],
+];
+
+function kcard(l) {
+  return `<div class="kcard">
+    <div><a href="${l.url}" target="_blank" rel="noopener">${esc(l.domain)}</a></div>
+    <div class="muted" style="font-size:12px">${esc(l.company || "")}</div>
+    <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+      <span class="tier ${l.priority}">${l.priority}</span>
+      <select class="st-sel" data-d="${esc(l.domain)}">
+        ${STATUS_OPTS.map(s => `<option value="${s}" ${l.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
+      </select>
+    </div>
+    <input class="deal" data-d="${esc(l.domain)}" type="number" placeholder="сумма сделки, ₽" value="${l.deal_amount || ""}">
+  </div>`;
+}
+
+function renderKanban() {
+  $("summary").innerHTML = ""; $("toolbar").style.display = "none";
+  $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
+  const leads = BASE;
+  const earned = leads.filter(l => l.status === "клиент").reduce((s, l) => s + (+l.deal_amount || 0), 0);
+  const clients = leads.filter(l => l.status === "клиент").length;
+  const cols = STAGES.map(([name, statuses]) => {
+    const items = leads.filter(l => statuses.includes(l.status || ""));
+    return `<div class="kcol"><div class="khead">${name} <span class="muted">${items.length}</span></div>${items.map(kcard).join("")}</div>`;
+  }).join("");
+  $("results").innerHTML =
+    `<div class="kearn">Заработано (клиентов ${clients}): <b>${earned.toLocaleString("ru")} ₽</b></div>` +
+    `<div class="kanban">${cols}</div>`;
+  document.querySelectorAll(".kcard .st-sel").forEach(s => s.onchange = () => setStatus(s.dataset.d, s.value));
+  document.querySelectorAll(".kcard .deal").forEach(i =>
+    i.onchange = () => setStatus(i.dataset.d, undefined, undefined, +i.value || 0));
 }
 
 function renderKeys(secrets) {
@@ -486,6 +537,7 @@ function showResults(job) {
 }
 
 function render() {
+  if (VIEW === "kanban") { renderKanban(); return; }
   if (VIEW === "base") {
     ROWS = BASE;
     $("summary").innerHTML = "";
@@ -536,15 +588,21 @@ function passesFilters(r) {
   return true;
 }
 
-async function setStatus(domain, status, callback) {
+async function setStatus(domain, status, callback, deal) {
   const payload = {domain};
   if (status !== undefined) payload.status = status;
   if (callback !== undefined) payload.callback = callback;
+  if (deal !== undefined) payload.deal_amount = deal;
   await fetch("/api/leads/state", {method: "POST", headers: {"Content-Type": "application/json"},
     body: JSON.stringify(payload)});
-  const row = ROWS.find(r => r.domain === domain);
-  if (row) { if (status !== undefined) row.status = status; if (callback !== undefined) row.callback = callback; }
-  renderTable();
+  [ROWS, BASE].forEach(arr => arr.forEach(r => {
+    if (r.domain === domain) {
+      if (status !== undefined) r.status = status;
+      if (callback !== undefined) r.callback = callback;
+      if (deal !== undefined) r.deal_amount = deal;
+    }
+  }));
+  refreshView();
 }
 
 function openCall(domain) {

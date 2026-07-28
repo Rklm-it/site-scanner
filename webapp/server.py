@@ -262,6 +262,7 @@ class LeadStateUpdate(BaseModel):
     status: str | None = None
     note: str | None = None
     callback: str | None = None
+    deal_amount: float | None = None
 
 
 @app.get("/api/base")
@@ -282,7 +283,8 @@ def set_lead_state(upd: LeadStateUpdate) -> dict:
     if upd.status is not None and upd.status not in STATUSES:
         raise HTTPException(400, f"Недопустимый статус. Допустимо: {', '.join(s for s in STATUSES if s)}")
     return {"domain": upd.domain,
-            **STORE.set(upd.domain, status=upd.status, note=upd.note, callback=upd.callback)}
+            **STORE.set(upd.domain, status=upd.status, note=upd.note, callback=upd.callback,
+                        deal_amount=upd.deal_amount)}
 
 
 # --- рассылка писем через SMTP собственного ящика ---

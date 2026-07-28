@@ -102,6 +102,12 @@ def test_lead_state_persistence(client):
     assert st["status"] == "перезвонить" and st["callback"] == "2026-08-01"
     assert st["note"] == "звонил, перезвонят"  # заметка не потерялась
 
+    # сумма сделки при переводе в клиенты
+    c.post("/api/leads/state", json={"domain": "old.ru", "status": "клиент", "deal_amount": 60000})
+    st = c.get("/api/leads/state").json()["old.ru"]
+    assert st["status"] == "клиент" and st["deal_amount"] == 60000
+    assert st["callback"] == "2026-08-01"  # прочие поля на месте
+
 
 def test_lead_state_rejects_bad_status(client):
     c, _ = client
