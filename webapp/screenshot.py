@@ -1,0 +1,40 @@
+"""Снимок главной страницы сайта (headless Chromium через Playwright).
+
+Ленивый: снимается по запросу и кэшируется на диск. Чтобы не запускать
+десяток браузеров разом, захват сериализован локом.
+"""
+
+from __future__ import annotations
+
+import os
+import threading
+from pathlib import Path
+
+_LOCK = threading.Lock()
+
+
+def capture(url: str, out_path: str | Path, *, timeout: int = 20000,
+            width: int = 1280, height: int = 820, executable_path: str | None = None) -> Path:
+    """Снимает верх главной страницы в PNG. Бросает исключение при ошибке.
+
+    ``executable_path`` (или env ``CHROMIUM_PATH``) — путь к бинарю Chromium;
+    если не задан, Playwright ищет установленный им браузер.
+    """
+    from playwright.sync_api import sync_playwright
+
+    out = Path(out_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    exe = executable_path or os.environ.get("CHROMIUM_PATH") or None
+
+    with _LOCK:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                args=["--no-sandbox", "--disable-dev-shm-usage"], executable_path=exe)
+            try:
+                page = browser.new_page(viewport={"width": width, "height": height})
+                page.goto(url, timeout=timeout, wait_until="domcontentloaded")
+                page.wait_for_timeout(1500)
+                page.screenshot(path=str(out), clip={"x": 0, "y": 0, "width": width, "height": height})
+            finally:
+                browser.close()
+    return out

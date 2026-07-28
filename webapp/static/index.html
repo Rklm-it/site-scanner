@@ -118,6 +118,8 @@
   .modal-box input, .modal-box textarea { width: 100%; background: var(--bg); color: var(--ink);
     border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font: inherit; margin-bottom: 4px; }
   .modal-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .shot { width: 100%; max-height: 240px; object-fit: cover; object-position: top;
+    border: 1px solid var(--line); border-radius: 8px; margin: 4px 0 10px; display: none; }
 
   /* Вкладки Скан / База */
   .tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
@@ -272,8 +274,9 @@
       <button class="rowbtn c-out" data-s="интерес">интерес</button>
       <button class="rowbtn c-out" data-s="отказ">отказ</button>
     </div>
+    <img id="c-shot" class="shot" alt="" loading="lazy">
     <label>Скрипт разговора</label>
-    <textarea id="c-script" rows="16" readonly></textarea>
+    <textarea id="c-script" rows="14" readonly></textarea>
     <div class="modal-actions"><button id="c-copy">Копировать скрипт</button></div>
   </div>
 </div>
@@ -281,6 +284,7 @@
 <div id="modal" class="modal" style="display:none">
   <div class="modal-box">
     <div class="modal-head"><strong id="m-title"></strong><button id="m-close">✕</button></div>
+    <img id="m-shot" class="shot" alt="" loading="lazy">
     <label>Тема</label>
     <input id="m-subject">
     <label>Текст письма</label>
@@ -605,9 +609,18 @@ async function setStatus(domain, status, callback, deal) {
   refreshView();
 }
 
+function loadShot(imgId, domain) {
+  const img = $(imgId);
+  img.style.display = "none";
+  img.onload = () => img.style.display = "";
+  img.onerror = () => img.style.display = "none";
+  img.src = `/api/screenshot/${encodeURIComponent(domain)}`;
+}
+
 function openCall(domain) {
   const r = ROWS.find(x => x.domain === domain);
   if (!r) return;
+  loadShot("c-shot", domain);
   $("c-title").textContent = r.company || r.domain;
   $("c-script").value = r.call_script || "Скрипт появится после нового скана (обновите базу сканом).";
   const phone = (r.phones || "").split(",")[0].trim();
@@ -629,6 +642,7 @@ function openCall(domain) {
 function openMail(domain) {
   const r = ROWS.find(x => x.domain === domain);
   if (!r) return;
+  loadShot("m-shot", domain);
   $("m-title").textContent = r.company || r.domain;
   $("m-subject").value = r.pitch_subject || "";
   $("m-body").value = r.pitch_body || "";

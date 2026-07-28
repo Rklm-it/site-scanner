@@ -7,6 +7,12 @@ WORKDIR /app
 COPY requirements.txt requirements-web.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-web.txt
 
+# Chromium для скриншотов сайтов + системные зависимости.
+# Ставится под root до переключения на пользователя app; браузер лежит в
+# общем пути и доступен app-пользователю.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+RUN playwright install --with-deps chromium
+
 COPY scanner ./scanner
 COPY webapp ./webapp
 

@@ -14,6 +14,7 @@ def client(tmp_path, monkeypatch):
 
     monkeypatch.setattr(server, "DATA_DIR", tmp_path)
     monkeypatch.setattr(server, "JOBS_DIR", tmp_path / "jobs")
+    monkeypatch.setattr(server, "SHOTS_DIR", tmp_path / "shots")
     monkeypatch.setattr(secrets_store, "_PATH", tmp_path / "secrets.local.json")
     for env in secrets_store.FIELDS.values():
         monkeypatch.delenv(env, raising=False)
@@ -196,6 +197,26 @@ def test_bulk_send_throttled(client, monkeypatch):
     assert st["done"] and st["sent"] == 1
     assert sent == ["info@firma.ru"]
     assert c.get("/api/leads/state").json()["firma.ru"]["status"] == "написал"
+
+
+def test_screenshot_endpoint(client, monkeypatch):
+    c, server = client
+
+    def fake_capture(url, out, **k):
+        from pathlib import Path
+        p = Path(out); p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(b"\x89PNG\r\n\x1a\n"); return p
+
+    monkeypatch.setattr(server.screenshot, "capture", fake_capture)
+    r = c.get("/api/screenshot/example.ru")
+    assert r.status_code == 200 and r.headers["content-type"].startswith("image/png")
+    # второй запрос отдаёт из кэша (capture не нужен) — файл уже есть
+    assert c.get("/api/screenshot/example.ru").status_code == 200
+
+
+def test_screenshot_bad_domain(client):
+    c, _ = client
+    assert c.get("/api/screenshot/bad!name").status_code == 400
 
 
 def test_index_served(client):

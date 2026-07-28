@@ -21,12 +21,16 @@ from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
 
-from . import mailer, secrets_store
+import re
+
+from . import mailer, screenshot, secrets_store
 from .leads_store import STATUSES, LeadStore
 
 DATA_DIR = Path(os.environ.get("SCANNER_DATA", "webapp_data"))
 JOBS_DIR = DATA_DIR / "jobs"
+SHOTS_DIR = DATA_DIR / "shots"
 STATIC = Path(__file__).parent / "static"
+_DOMAIN_RE = re.compile(r"^[a-z0-9.\-]+$", re.I)
 
 # Чтобы INFO-логи движка (scanner.*) были видны в docker compose logs
 logging.getLogger("scanner").setLevel(logging.INFO)
@@ -269,6 +273,27 @@ class LeadStateUpdate(BaseModel):
 def leads_base() -> dict:
     leads = STORE.all_leads() if STORE else []
     return {"count": len(leads), "leads": leads}
+
+
+@app.get("/api/screenshot/{domain}")
+def screenshot_of(domain: str):
+    """Ленивый скриншот главной страницы лида (кэшируется на диск)."""
+    if not _DOMAIN_RE.match(domain):
+        raise HTTPException(400, "Некорректный домен.")
+    path = SHOTS_DIR / f"{domain}.png"
+    if not path.exists():
+        url = None
+        if STORE:
+            for l in STORE.all_leads():
+                if l.get("domain") == domain:
+                    url = l.get("url") or f"https://{domain}"
+                    break
+        url = url or f"https://{domain}"
+        try:
+            screenshot.capture(url, path)
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(502, f"Не удалось снять скриншот: {exc}")
+    return FileResponse(path, media_type="image/png")
 
 
 @app.get("/api/leads/state")
