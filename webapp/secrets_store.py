@@ -26,10 +26,14 @@ FIELDS = {
     "smtp_user": "SMTP_USER",
     "smtp_password": "SMTP_PASSWORD",
     "smtp_from_name": "SMTP_FROM_NAME",
+    # Подпись в письмах
+    "sender_contact": "SENDER_CONTACT",
+    "portfolio_url": "PORTFOLIO_URL",
 }
 
-# Поля SMTP не показываем в общем списке «API-ключи» — у них своя панель.
-SMTP_FIELDS = ("smtp_host", "smtp_port", "smtp_user", "smtp_password", "smtp_from_name")
+# Эти поля не показываем в общем списке «API-ключи» — у них своя панель.
+SMTP_FIELDS = ("smtp_host", "smtp_port", "smtp_user", "smtp_password", "smtp_from_name",
+               "sender_contact", "portfolio_url")
 
 _PATH = Path(os.environ.get("SCANNER_SECRETS", "secrets.local.json"))
 
@@ -81,6 +85,8 @@ def smtp_values() -> dict:
         "smtp_port": os.environ.get("SMTP_PORT", ""),
         "smtp_user": os.environ.get("SMTP_USER", ""),
         "smtp_from_name": os.environ.get("SMTP_FROM_NAME", ""),
+        "sender_contact": os.environ.get("SENDER_CONTACT", ""),
+        "portfolio_url": os.environ.get("PORTFOLIO_URL", ""),
         "configured": bool(os.environ.get("SMTP_HOST") and os.environ.get("SMTP_USER")
                            and os.environ.get("SMTP_PASSWORD")),
     }

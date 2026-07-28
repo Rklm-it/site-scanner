@@ -197,6 +197,10 @@
         <input type="text" id="smtp_user" placeholder="you@yandex.ru">
         <label>Пароль приложения</label>
         <input type="password" id="smtp_password" placeholder="•••• пароль приложения">
+        <label>Контакты для подписи</label>
+        <input type="text" id="sender_contact" placeholder="+7 999 123-45-67, @telegram">
+        <label>Портфолио (ссылка, необязательно)</label>
+        <input type="text" id="portfolio_url" placeholder="https://...">
         <div style="display:flex;gap:8px;margin-top:10px">
           <button id="smtp-save">Сохранить</button>
           <button id="smtp-test">Тест себе</button>
@@ -346,12 +350,15 @@ function renderSmtp(s) {
   $("smtp_port").value = s.smtp_port || "";
   $("smtp_user").value = s.smtp_user || "";
   $("smtp_from_name").value = s.smtp_from_name || "";
+  $("sender_contact").value = s.sender_contact || "";
+  $("portfolio_url").value = s.portfolio_url || "";
 }
 
 async function saveSmtp() {
   const vals = {
     smtp_host: $("smtp_host").value.trim(), smtp_port: $("smtp_port").value.trim(),
     smtp_user: $("smtp_user").value.trim(), smtp_from_name: $("smtp_from_name").value.trim(),
+    sender_contact: $("sender_contact").value.trim(), portfolio_url: $("portfolio_url").value.trim(),
   };
   if ($("smtp_password").value.trim()) vals.smtp_password = $("smtp_password").value.trim();
   await fetch("/api/secrets", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(vals)});

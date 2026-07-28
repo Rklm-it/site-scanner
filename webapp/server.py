@@ -147,6 +147,17 @@ def _build_settings(req: ScanRequest, job_id: str) -> Settings:
     )
 
 
+def compose_signature() -> str:
+    """Подпись для писем из настроек: имя + контакты + портфолио."""
+    name = os.environ.get("SMTP_FROM_NAME", "").strip() or "[Ваше имя]"
+    contact = os.environ.get("SENDER_CONTACT", "").strip() or "[телефон / телеграм]"
+    lines = [name, contact]
+    portfolio = os.environ.get("PORTFOLIO_URL", "").strip()
+    if portfolio:
+        lines.append(portfolio)
+    return "\n".join(lines)
+
+
 def _run_job(job: Job, settings: Settings) -> None:
     job.status = "running"
 
@@ -162,10 +173,11 @@ def _run_job(job: Job, settings: Settings) -> None:
         write_json(leads, settings.out + ".json")
 
         saved = STORE.all() if STORE else {}
+        signature = compose_signature()
         rows = []
         for l in leads:
             row = l.to_row()
-            row.update(outreach.build_message(l))
+            row.update(outreach.build_message(l, signature=signature))
             st = saved.get(l.domain, {})
             row["status"] = st.get("status", "")
             row["note"] = st.get("note", "")
