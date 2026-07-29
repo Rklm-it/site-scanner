@@ -203,6 +203,7 @@
 
     <div class="panel">
       <h2>API-ключи</h2>
+      <div class="hint">Минимум для скана: <b>Яндекс Cloud</b> (apikey + folder) <b>или Google</b> (API key + cx). <b>DaData</b> — для проверки оборота.</div>
       <div id="keystatus"></div>
       <details>
         <summary>Ввести / изменить ключи</summary>
@@ -241,15 +242,15 @@
       </details>
     </div>
 
-    <button class="primary" id="run">Запустить скан</button>
+    <button class="primary" id="run" title="Найти сайты по выбранным нишам и городам и оценить, у кого дизайн устарел">Запустить скан</button>
   </aside>
 
   <main class="main">
     <div id="tabs" class="tabs">
-      <button class="tab active" data-v="scan">Результаты скана</button>
-      <button class="tab" data-v="base">Все лиды</button>
-      <button class="tab" data-v="work">В работе</button>
-      <button class="tab" data-v="kanban">Воронка</button>
+      <button class="tab active" data-v="scan" title="Лиды последнего запущенного скана">Результаты скана</button>
+      <button class="tab" data-v="base" title="Вся накопленная база найденных лидов за все сканы">Все лиды</button>
+      <button class="tab" data-v="work" title="Лиды, с которыми уже работаешь: написал / звонил / перезвонить / интерес">В работе</button>
+      <button class="tab" data-v="kanban" title="Стадии сделок и заработок">Воронка</button>
     </div>
     <details class="legend">
       <summary>❓ Что значат колонки и оценки</summary>
@@ -266,21 +267,21 @@
     <div class="toolbar" id="toolbar" style="display:none">
       <strong id="count"></strong>
       <span class="muted" id="elapsed"></span>
-      <input id="search" placeholder="поиск по домену / компании" style="max-width:220px">
-      <label class="fchk"><input type="checkbox" id="f_email"> с почтой</label>
-      <label class="fchk"><input type="checkbox" id="f_phone"> с телефоном</label>
-      <label class="fchk"><input type="checkbox" id="f_callback"> перезвонить сегодня</label>
-      <label class="fchk"><input type="checkbox" id="f_noproto"> без прототипа</label>
-      <label class="fchk"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
-      <span class="fchk">приоритет:
+      <input id="search" placeholder="поиск по домену / компании" style="max-width:220px" title="Быстрый поиск по домену или названию компании">
+      <label class="fchk" title="Только лиды, у которых нашлась почта"><input type="checkbox" id="f_email"> с почтой</label>
+      <label class="fchk" title="Только лиды, у которых нашёлся телефон"><input type="checkbox" id="f_phone"> с телефоном</label>
+      <label class="fchk" title="Кому обещал перезвонить сегодня или раньше"><input type="checkbox" id="f_callback"> перезвонить сегодня</label>
+      <label class="fchk" title="У кого ещё не сделан прототип в Lovable"><input type="checkbox" id="f_noproto"> без прототипа</label>
+      <label class="fchk" title="Спрятать лиды, по которым уже есть статус"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
+      <span class="fchk" title="Показывать только выбранные приоритеты">приоритет:
         <label><input type="checkbox" class="ftier" value="A" checked>A</label>
         <label><input type="checkbox" class="ftier" value="B" checked>B</label>
         <label><input type="checkbox" class="ftier" value="C" checked>C</label>
       </span>
       <span style="flex:1"></span>
-      <button id="bulk" class="primary" style="width:auto;display:none">Разослать</button>
-      <button id="csv">CSV</button>
-      <button id="json">JSON</button>
+      <button id="bulk" class="primary" style="width:auto;display:none" title="Разослать письма всем в текущей выборке — по одному, с паузой">Разослать</button>
+      <button id="csv" title="Скачать таблицу в CSV (открывается в Excel)">CSV</button>
+      <button id="json" title="Скачать данные в JSON">JSON</button>
     </div>
     <div id="results"><div class="empty">Настройте параметры слева и запустите скан — результаты появятся здесь.</div></div>
   </main>
@@ -302,6 +303,10 @@
       <span id="c-proto-ok" class="mail-ok"></span>
     </div>
     <div class="modal-actions" style="margin:0 0 10px;flex-wrap:wrap">
+      <button id="c-rev" title="Оборот и статус компании по ИНН/названию (нужен ключ DaData)">💰 Проверить оборот</button>
+      <span class="muted" id="c-rev-out"></span>
+    </div>
+    <div class="modal-actions" style="margin:0 0 10px;flex-wrap:wrap">
       <span class="muted">Итог звонка:</span>
       <button class="rowbtn c-out" data-s="звонил">дозвонился</button>
       <button class="rowbtn c-out" data-s="недозвон">недозвон</button>
@@ -319,6 +324,10 @@
 <div id="modal" class="modal" style="display:none">
   <div class="modal-box">
     <div class="modal-head"><strong id="m-title"></strong><button id="m-close">✕</button></div>
+    <div class="modal-actions" style="margin:0 0 10px">
+      <button id="m-rev" title="Оборот и статус компании по ИНН/названию (нужен ключ DaData)">💰 Проверить оборот</button>
+      <span class="muted" id="m-rev-out"></span>
+    </div>
     <img id="m-shot" class="shot" alt="" loading="lazy">
     <label>Тема</label>
     <input id="m-subject">
@@ -690,6 +699,24 @@ function applyProto(body, url) {
   return body;
 }
 
+async function checkRevenue(domain, btnId, outId) {
+  const btn = $(btnId), out = $(outId);
+  btn.disabled = true; out.textContent = "проверяю в ДаДата…";
+  const r = await fetch(`/api/revenue/${encodeURIComponent(domain)}`);
+  btn.disabled = false;
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { out.textContent = d.detail || "ошибка"; return; }
+  const parts = [];
+  if (d.official_name) parts.push(d.official_name);
+  if (d.revenue != null) parts.push("оборот " + (+d.revenue).toLocaleString("ru") + " ₽");
+  if (d.status) parts.push(d.status);
+  if (d.employee_count) parts.push(d.employee_count + " чел.");
+  if (d.management) parts.push("рук.: " + d.management);
+  out.textContent = parts.length ? parts.join(" · ") : "данные не найдены";
+  const row = ROWS.find(x => x.domain === domain);
+  if (row) { if (d.revenue != null) row.revenue = d.revenue; if (d.official_name) row.company = d.official_name; }
+}
+
 function loadShot(imgId, domain) {
   const img = $(imgId);
   img.style.display = "none";
@@ -713,6 +740,8 @@ function openCall(domain) {
   const r = ROWS.find(x => x.domain === domain);
   if (!r) return;
   loadShot("c-shot", domain);
+  $("c-rev-out").textContent = "";
+  $("c-rev").onclick = () => checkRevenue(domain, "c-rev", "c-rev-out");
   $("c-title").textContent = r.company || r.domain;
   $("c-proto").value = r.prototype_url || "";
   $("c-proto-ok").textContent = r.prototype_url ? "✅ готов — скинь в начале разговора" : "";
@@ -747,6 +776,8 @@ function openMail(domain) {
   const r = ROWS.find(x => x.domain === domain);
   if (!r) return;
   loadShot("m-shot", domain);
+  $("m-rev-out").textContent = "";
+  $("m-rev").onclick = () => checkRevenue(domain, "m-rev", "m-rev-out");
   $("m-title").textContent = r.company || r.domain;
   $("m-subject").value = r.pitch_subject || "";
   $("m-proto").value = r.prototype_url || "";

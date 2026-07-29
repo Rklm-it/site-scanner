@@ -222,6 +222,28 @@ def test_screenshot_bad_domain(client):
     assert c.get("/api/screenshot/bad!name").status_code == 400
 
 
+def test_revenue_check(client, monkeypatch):
+    c, server = client
+    from scanner.models import Enrichment
+    monkeypatch.setenv("DADATA_TOKEN", "x")
+    monkeypatch.setattr(server.enrich, "lookup",
+                        lambda inn=None, name=None, **k: Enrichment(
+                            official_name="ООО Тест", revenue=12_000_000, status="ACTIVE"))
+    server.STORE.upsert_leads([{"domain": "firma.ru", "company": "Тест",
+                                "source_query": "стоматология Казань", "inn": "7707083893",
+                                "outreach_score": 50}])
+    r = c.get("/api/revenue/firma.ru")
+    assert r.status_code == 200
+    assert r.json()["revenue"] == 12_000_000 and r.json()["official_name"] == "ООО Тест"
+
+
+def test_revenue_requires_token(client, monkeypatch):
+    c, server = client
+    monkeypatch.delenv("DADATA_TOKEN", raising=False)
+    server.STORE.upsert_leads([{"domain": "x.ru", "outreach_score": 1}])
+    assert c.get("/api/revenue/x.ru").status_code == 400
+
+
 def test_index_served(client):
     c, _ = client
     html = c.get("/").text

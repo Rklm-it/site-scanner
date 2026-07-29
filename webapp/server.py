@@ -16,7 +16,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-from scanner import analytics, outreach, pipeline
+from scanner import analytics, enrich, outreach, pipeline
 from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
@@ -298,6 +298,29 @@ def screenshot_of(domain: str):
         except Exception as exc:  # noqa: BLE001
             raise HTTPException(502, f"Не удалось снять скриншот: {exc}")
     return FileResponse(path, media_type="image/png")
+
+
+@app.get("/api/revenue/{domain}")
+def revenue_check(domain: str) -> dict:
+    """Проверка оборота/статуса компании по ИНН со страницы или по названию (DaData)."""
+    if not _DOMAIN_RE.match(domain):
+        raise HTTPException(400, "Некорректный домен.")
+    if not os.environ.get("DADATA_TOKEN"):
+        raise HTTPException(400, "Не задан DADATA_TOKEN (панель «API-ключи»).")
+    lead = None
+    if STORE:
+        lead = next((l for l in STORE.all_leads() if l.get("domain") == domain), None)
+    if not lead:
+        raise HTTPException(404, "Лид не найден в базе.")
+
+    name = " ".join(filter(None, [lead.get("company"), lead.get("source_query")])).strip()
+    e = enrich.lookup(inn=lead.get("inn") or None, name=name or None)
+    return {
+        "official_name": e.official_name, "status": e.status, "revenue": e.revenue,
+        "employee_count": e.employee_count, "management": e.management,
+        "address": e.address, "registration_date": e.registration_date,
+        "inn": lead.get("inn") or "",
+    }
 
 
 @app.get("/api/leads/state")

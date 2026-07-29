@@ -19,6 +19,7 @@ import requests
 from .models import Enrichment
 
 DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party"
+DADATA_SUGGEST = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/party"
 
 _warned = False
 
@@ -61,6 +62,42 @@ def enrich_by_inn(inn: str, *, token: str | None = None, session: requests.Sessi
     if not suggestions:
         return result
     return parse_party(suggestions[0].get("data") or {})
+
+
+def enrich_by_name(name: str, *, token: str | None = None,
+                   session: requests.Session | None = None) -> Enrichment:
+    """Ищет компанию по названию (когда ИНН на сайте нет). Берёт лучшее совпадение."""
+    token = token or os.environ.get("DADATA_TOKEN")
+    if not (name and name.strip() and token):
+        return Enrichment()
+    sess = session or requests
+    try:
+        resp = sess.post(
+            DADATA_SUGGEST,
+            json={"query": name.strip(), "count": 1},
+            headers={"Content-Type": "application/json", "Accept": "application/json",
+                     "Authorization": f"Token {token}"},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        suggestions = resp.json().get("suggestions") or []
+    except (requests.RequestException, ValueError) as exc:
+        _warn_once(f"ошибка DaData (по названию): {exc}")
+        return Enrichment()
+    if not suggestions:
+        return Enrichment()
+    return parse_party(suggestions[0].get("data") or {})
+
+
+def lookup(inn: str | None = None, name: str | None = None, *, token: str | None = None,
+           session: requests.Session | None = None) -> Enrichment:
+    """Единый чек компании: сначала по ИНН, при отсутствии данных — по названию."""
+    e = Enrichment()
+    if inn:
+        e = enrich_by_inn(inn, token=token, session=session)
+    if (e.revenue is None and not e.official_name) and name:
+        e = enrich_by_name(name, token=token, session=session)
+    return e
 
 
 def parse_party(data: dict) -> Enrichment:

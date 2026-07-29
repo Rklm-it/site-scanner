@@ -1,4 +1,4 @@
-from scanner.enrich import parse_party, enrich_by_inn
+from scanner.enrich import parse_party, enrich_by_inn, enrich_by_name, lookup
 
 DADATA_DATA = {
     "name": {"short_with_opf": "ООО \"Ромашка\"", "full_with_opf": "Общество ..."},
@@ -36,20 +36,37 @@ def test_enrich_without_token(monkeypatch):
     assert e.revenue is None and e.official_name is None
 
 
-def test_enrich_with_mocked_api(monkeypatch):
-    class FakeResp:
-        status_code = 200
+class FakeResp:
+    status_code = 200
 
-        def raise_for_status(self):
-            pass
+    def raise_for_status(self):
+        pass
 
-        def json(self):
-            return {"suggestions": [{"data": DADATA_DATA}]}
+    def json(self):
+        return {"suggestions": [{"data": DADATA_DATA}]}
 
-    class FakeSession:
-        def post(self, *a, **k):
-            return FakeResp()
 
+class FakeSession:
+    def post(self, *a, **k):
+        return FakeResp()
+
+
+def test_enrich_with_mocked_api():
     e = enrich_by_inn("7707083893", token="x", session=FakeSession())
     assert e.revenue == 15000000
     assert e.official_name == 'ООО "Ромашка"'
+
+
+def test_enrich_by_name():
+    e = enrich_by_name("ООО Ромашка Казань", token="x", session=FakeSession())
+    assert e.revenue == 15000000
+    assert e.official_name == 'ООО "Ромашка"'
+
+
+def test_lookup_falls_back_to_name(monkeypatch):
+    import scanner.enrich as m
+    # по ИНН пусто → ищем по названию
+    monkeypatch.setattr(m, "enrich_by_inn", lambda inn, **k: m.Enrichment())
+    monkeypatch.setattr(m, "enrich_by_name", lambda name, **k: m.Enrichment(revenue=999, official_name="Найдено"))
+    e = lookup(inn="123", name="ООО Тест", token="x")
+    assert e.revenue == 999 and e.official_name == "Найдено"
