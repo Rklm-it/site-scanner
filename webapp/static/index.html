@@ -581,11 +581,23 @@ function renderWarnings(warns) {
 async function poll() {
   clearTimeout(TIMER);
   const job = await (await fetch(`/api/scan/${CURRENT_JOB}`)).json();
-  const pct = job.total ? Math.round(job.done / job.total * 100) : 0;
   let head = "";
   if (job.status === "running" || job.status === "queued") {
-    head = `<div class="panel"><strong>Сканирую…</strong> ${job.total ? job.done + "/" + job.total : "собираю выдачу"}
-      <div class="progress"><i style="width:${pct}%"></i></div></div>`;
+    let label, pct;
+    if (job.total) {                       // фаза сканирования сайтов
+      label = `Проверяю сайты: ${job.done}/${job.total}`;
+      pct = Math.round(job.done / job.total * 100);
+    } else if (job.collect_total) {        // фаза сбора выдачи из поисковиков
+      label = `Собираю выдачу: ${job.collect_done}/${job.collect_total} запросов`;
+      pct = Math.round(job.collect_done / job.collect_total * 100);
+    } else {
+      label = "Собираю выдачу…"; pct = 0;
+    }
+    const slow = job.elapsed > 60 && !job.total
+      ? `<div class="hint" style="margin-top:6px">Долго? Проверь ключи поисковика в «API-ключи», либо посмотри <code>docker compose logs app</code>. Скан прервётся сам по таймауту.</div>`
+      : "";
+    head = `<div class="panel"><strong>${label}</strong>
+      <div class="progress"><i style="width:${pct}%"></i></div>${slow}</div>`;
   } else if (job.status === "error") {
     head = `<div class="warn bad">Ошибка: ${job.error}</div>`;
   }

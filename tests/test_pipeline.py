@@ -106,3 +106,15 @@ def test_skip_seen(monkeypatch, tmp_path):
     # второй прогон — те же домены уже в seen → отсеиваются
     second = pipeline.run(_settings(cache_path=db, skip_seen=True))
     assert second == []
+
+
+def test_collect_reports_progress(monkeypatch):
+    from scanner.cache import NullCache
+    monkeypatch.setattr(pipeline.search_mod, "search_many",
+                        lambda q, **k: [f"https://{q}-site.ru"])
+    prog = []
+    out = pipeline.collect_urls(["стоматология", "автосервис"], providers=["yandex"],
+                                max_per_query=5, cache=NullCache(),
+                                on_query=lambda d, t: prog.append((d, t)))
+    assert prog == [(1, 2), (2, 2)]        # колбэк по каждому запросу
+    assert len(out) == 2

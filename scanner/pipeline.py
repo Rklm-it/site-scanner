@@ -65,11 +65,25 @@ def collect_urls(
     max_per_query: int,
     cache,
     skip_seen: bool = False,
+    on_query=None,
+    time_budget: float = 180.0,
 ) -> list[tuple[str, str]]:
-    """Собирает уникальные (url, query), убирая агрегаторы и просмотренные домены."""
+    """Собирает уникальные (url, query), убирая агрегаторы и просмотренные домены.
+
+    ``on_query(done, total)`` — колбэк прогресса сбора выдачи.
+    ``time_budget`` — потолок по времени на всю фазу сбора, чтобы скан не
+    зависал, если поисковик отвечает слишком медленно.
+    """
+    import time as _time
+    started = _time.monotonic()
     seen: set[str] = set()
     out: list[tuple[str, str]] = []
-    for query in queries:
+    total = len(queries)
+    for i, query in enumerate(queries, start=1):
+        if _time.monotonic() - started > time_budget:
+            log.warning("Сбор выдачи прерван по таймауту (%.0fс): обработано %d/%d запросов, доменов %d",
+                        time_budget, i - 1, total, len(out))
+            break
         urls = search_mod.search_many(query, providers=providers, max_results=max_per_query, cache=cache)
         kept = 0
         for url in urls:
@@ -83,6 +97,8 @@ def collect_urls(
             out.append((f"{scheme}://{domain}", query))
             kept += 1
         log.info("«%s»: выдача %d → к скану %d (агрегаторы/дубли отсеяны)", query, len(urls), kept)
+        if on_query:
+            on_query(i, total)
     return out
 
 
@@ -158,8 +174,12 @@ def _enrich(leads: list[Lead], token: str | None) -> None:
             lead.enrichment = enrich_by_inn(lead.contacts.inn, token=token, session=session)
 
 
-def run(settings: Settings, *, dadata_token: str | None = None, progress=None) -> list[Lead]:
-    """Полный прогон по настройкам. ``progress`` — колбэк progress(done, total)."""
+def run(settings: Settings, *, dadata_token: str | None = None, progress=None, on_collect=None) -> list[Lead]:
+    """Полный прогон по настройкам.
+
+    ``progress(done, total)`` — прогресс сканирования;
+    ``on_collect(done, total)`` — прогресс сбора выдачи (по запросам).
+    """
     queries = expand_queries(settings)
     if not queries:
         raise ValueError("Не задано ни одного запроса (queries/categories).")
@@ -186,6 +206,7 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None) -
             max_per_query=settings.max_per_query,
             cache=cache,
             skip_seen=settings.skip_seen,
+            on_query=on_collect,
         )
         log.info("К сканированию: %d доменов из %d запросов", len(targets), len(queries))
         total = len(targets)

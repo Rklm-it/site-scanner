@@ -63,6 +63,8 @@ class Job:
     warnings: list[str] = field(default_factory=list)
     leads: list[dict] = field(default_factory=list)
     summary: dict = field(default_factory=dict)
+    collect_done: int = 0
+    collect_total: int = 0
     started: float = field(default_factory=time.time)
     finished: float | None = None
 
@@ -72,6 +74,8 @@ class Job:
             "status": self.status,
             "done": self.done,
             "total": self.total,
+            "collect_done": self.collect_done,
+            "collect_total": self.collect_total,
             "error": self.error,
             "warnings": self.warnings,
             "count": len(self.leads),
@@ -169,8 +173,12 @@ def _run_job(job: Job, settings: Settings) -> None:
         job.done = done
         job.total = total
 
+    def on_collect(done: int, total: int) -> None:
+        job.collect_done = done
+        job.collect_total = total
+
     try:
-        leads = pipeline.run(settings, progress=progress)
+        leads = pipeline.run(settings, progress=progress, on_collect=on_collect)
         analytics.annotate(leads)  # идемпотентно; гарантирует поля приоритета
         Path(settings.out).parent.mkdir(parents=True, exist_ok=True)
         write_csv(leads, settings.out + ".csv")

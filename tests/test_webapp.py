@@ -48,7 +48,7 @@ def test_scan_requires_query(client):
 def test_scan_lifecycle(client, monkeypatch):
     c, server = client
 
-    def fake_run(settings, *, dadata_token=None, progress=None):
+    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None):
         if progress:
             progress(1, 1)
         return [Lead(url="https://old.ru", domain="old.ru", outdated_score=88,
@@ -122,7 +122,7 @@ def test_base_accumulates_scanned_leads(client, monkeypatch):
     c, server = client
     assert c.get("/api/base").json()["count"] == 0
 
-    def fake_run(settings, *, dadata_token=None, progress=None):
+    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None):
         if progress:
             progress(1, 1)
         return [Lead(url="https://old.ru", domain="old.ru", outdated_score=80, outreach_score=70,
