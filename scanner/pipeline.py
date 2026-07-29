@@ -17,7 +17,7 @@ from . import heuristics as heuristics_mod
 from . import search as search_mod
 from .cache import Cache, NullCache
 from .config import Settings
-from .enrich import enrich_by_inn
+from . import enrich as enrich_mod
 from .fetcher import fetch
 from .models import Lead
 from .politeness import Politeness
@@ -168,10 +168,13 @@ def scan_one(
 
 
 def _enrich(leads: list[Lead], token: str | None) -> None:
+    """Обогащение по ИНН со страницы, а при его отсутствии — по названию компании."""
     session = requests.Session()
     for lead in leads:
-        if lead.contacts.inn:
-            lead.enrichment = enrich_by_inn(lead.contacts.inn, token=token, session=session)
+        inn = lead.contacts.inn or None
+        name = lead.contacts.company or None
+        if inn or name:
+            lead.enrichment = enrich_mod.lookup(inn=inn, name=name, token=token, session=session)
 
 
 def run(settings: Settings, *, dadata_token: str | None = None, progress=None, on_collect=None) -> list[Lead]:
