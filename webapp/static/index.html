@@ -70,11 +70,18 @@
   .empty { color: var(--muted); padding: 40px; text-align: center; }
 
   /* Чипы категорий */
-  .catgroup { font-size: 11px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: .04em; margin: 12px 0 4px; cursor: pointer; user-select: none;
-    display: flex; align-items: center; gap: 8px; }
-  .catgroup:hover { color: var(--ink); }
+  .catgroup-d { border-bottom: 1px solid var(--line); }
+  .catgroup-d > summary { list-style: none; cursor: pointer; user-select: none;
+    display: flex; align-items: center; gap: 8px; padding: 8px 2px;
+    font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+  .catgroup-d > summary::-webkit-details-marker { display: none; }
+  .catgroup-d > summary::before { content: "▸"; font-size: 10px; }
+  .catgroup-d[open] > summary::before { content: "▾"; }
+  .catgroup-d[open] > summary { color: var(--ink); }
+  .cg-name { flex: 1; }
+  .cg-count { text-transform: none; letter-spacing: 0; color: var(--accent); font-weight: 600; }
   .cat-all { text-transform: none; letter-spacing: 0; color: var(--accent); font-size: 11px; }
+  .catgroup-d > .catchips { padding: 2px 0 10px; }
   .catchips { display: flex; flex-wrap: wrap; gap: 6px; }
   .catchip { border: 1px solid var(--line); background: var(--bg); color: var(--ink);
     border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; user-select: none; }
@@ -369,34 +376,43 @@ async function init() {
     wrap.insertAdjacentHTML("beforeend",
       `<label><input type="checkbox" class="prov" value="${p}" ${on ? "checked" : ""}> ${p}</label>`);
   });
-  // каталог категорий (чипы)
+  // каталог категорий — сворачиваемые группы
   const box = $("catchips"); box.innerHTML = "";
   Object.entries(cfg.categories_catalog || {}).forEach(([group, cats]) => {
-    const head = document.createElement("div");
-    head.className = "catgroup";
-    head.innerHTML = `${group} <span class="cat-all">выбрать все</span>`;
+    const det = document.createElement("details");
+    det.className = "catgroup-d";
+    const sum = document.createElement("summary");
+    sum.innerHTML = `<span class="cg-name">${group}</span><span class="cg-count"></span><span class="cat-all">выбрать все</span>`;
     const row = document.createElement("div");
     row.className = "catchips";
+    const cnt = sum.querySelector(".cg-count");
+    const upd = () => {
+      const n = row.querySelectorAll(".catchip.sel").length;
+      cnt.textContent = n ? `(${n})` : "";
+      sum.querySelector(".cat-all").textContent =
+        n === cats.length ? "снять все" : "выбрать все";
+    };
     cats.forEach(c => {
       const chip = document.createElement("span");
       chip.className = "catchip"; chip.textContent = c;
       chip.onclick = () => {
         chip.classList.toggle("sel");
         chip.classList.contains("sel") ? SELCATS.add(c) : SELCATS.delete(c);
+        upd();
       };
       row.appendChild(chip);
     });
-    head.onclick = () => {
+    sum.querySelector(".cat-all").onclick = e => {
+      e.preventDefault(); e.stopPropagation();
       const chips = [...row.querySelectorAll(".catchip")];
       const allSel = chips.every(ch => ch.classList.contains("sel"));
       chips.forEach(ch => {
         if (allSel) { ch.classList.remove("sel"); SELCATS.delete(ch.textContent); }
         else { ch.classList.add("sel"); SELCATS.add(ch.textContent); }
       });
-      head.querySelector(".cat-all").textContent = allSel ? "выбрать все" : "снять все";
+      upd();
     };
-    box.appendChild(head);
-    box.appendChild(row);
+    det.appendChild(sum); det.appendChild(row); box.appendChild(det);
   });
   renderKeys(cfg.secrets);
 
