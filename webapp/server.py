@@ -321,13 +321,18 @@ def revenue_check(domain: str) -> dict:
     if not lead:
         raise HTTPException(404, "Лид не найден в базе.")
 
-    name = " ".join(filter(None, [lead.get("company"), lead.get("source_query")])).strip()
-    e = enrich.lookup(inn=lead.get("inn") or None, name=name or None)
+    inn = lead.get("inn") or None
+    name = (lead.get("company") or "").strip() or None
+    if not inn and not name:
+        raise HTTPException(422, "На сайте нет ни ИНН, ни названия компании — не по чему искать.")
+    e = enrich.lookup(inn=inn, name=name)
+    found = bool(e.official_name or e.revenue is not None)
     return {
+        "found": found,
         "official_name": e.official_name, "status": e.status, "revenue": e.revenue,
         "employee_count": e.employee_count, "management": e.management,
         "address": e.address, "registration_date": e.registration_date,
-        "inn": lead.get("inn") or "",
+        "inn": inn or "",
     }
 
 

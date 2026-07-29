@@ -71,7 +71,10 @@
 
   /* Чипы категорий */
   .catgroup { font-size: 11px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: .04em; margin: 10px 0 4px; }
+    letter-spacing: .04em; margin: 12px 0 4px; cursor: pointer; user-select: none;
+    display: flex; align-items: center; gap: 8px; }
+  .catgroup:hover { color: var(--ink); }
+  .cat-all { text-transform: none; letter-spacing: 0; color: var(--accent); font-size: 11px; }
   .catchips { display: flex; flex-wrap: wrap; gap: 6px; }
   .catchip { border: 1px solid var(--line); background: var(--bg); color: var(--ink);
     border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; user-select: none; }
@@ -369,7 +372,9 @@ async function init() {
   // каталог категорий (чипы)
   const box = $("catchips"); box.innerHTML = "";
   Object.entries(cfg.categories_catalog || {}).forEach(([group, cats]) => {
-    box.insertAdjacentHTML("beforeend", `<div class="catgroup">${group}</div>`);
+    const head = document.createElement("div");
+    head.className = "catgroup";
+    head.innerHTML = `${group} <span class="cat-all">выбрать все</span>`;
     const row = document.createElement("div");
     row.className = "catchips";
     cats.forEach(c => {
@@ -381,6 +386,16 @@ async function init() {
       };
       row.appendChild(chip);
     });
+    head.onclick = () => {
+      const chips = [...row.querySelectorAll(".catchip")];
+      const allSel = chips.every(ch => ch.classList.contains("sel"));
+      chips.forEach(ch => {
+        if (allSel) { ch.classList.remove("sel"); SELCATS.delete(ch.textContent); }
+        else { ch.classList.add("sel"); SELCATS.add(ch.textContent); }
+      });
+      head.querySelector(".cat-all").textContent = allSel ? "выбрать все" : "снять все";
+    };
+    box.appendChild(head);
     box.appendChild(row);
   });
   renderKeys(cfg.secrets);
@@ -718,13 +733,16 @@ async function checkRevenue(domain, btnId, outId) {
   btn.disabled = false;
   const d = await r.json().catch(() => ({}));
   if (!r.ok) { out.textContent = d.detail || "ошибка"; return; }
+  if (!d.found) { out.textContent = "компания в реестре не найдена (нет ИНН на сайте или не совпало название)"; return; }
   const parts = [];
   if (d.official_name) parts.push(d.official_name);
-  if (d.revenue != null) parts.push("оборот " + (+d.revenue).toLocaleString("ru") + " ₽");
+  parts.push(d.revenue != null
+    ? "оборот " + (+d.revenue).toLocaleString("ru") + " ₽"
+    : "оборот не публикуется (ИП/малое ООО)");
   if (d.status) parts.push(d.status);
   if (d.employee_count) parts.push(d.employee_count + " чел.");
   if (d.management) parts.push("рук.: " + d.management);
-  out.textContent = parts.length ? parts.join(" · ") : "данные не найдены";
+  out.textContent = parts.join(" · ");
   const row = ROWS.find(x => x.domain === domain);
   if (row) { if (d.revenue != null) row.revenue = d.revenue; if (d.official_name) row.company = d.official_name; }
 }
