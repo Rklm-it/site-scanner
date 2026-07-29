@@ -20,14 +20,14 @@ class Settings:
     max_per_query: int = 20
 
     # скан
-    concurrency: int = 8
+    concurrency: int = 16
     min_score: int = 0
-    timeout: float = 12.0
+    timeout: float = 8.0
     follow_contact_page: bool = True
 
     # вежливость
     respect_robots: bool = True
-    per_host_delay: float = 1.0
+    per_host_delay: float = 0.5
 
     # обогащение по ИНН (DaData)
     enrich: bool = False

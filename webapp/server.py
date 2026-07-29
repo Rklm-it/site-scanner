@@ -99,9 +99,9 @@ class ScanRequest(BaseModel):
     providers: list[str] = ["yandex", "google"]
     max_per_query: int = 20
     min_score: int = 30
-    concurrency: int = 8
-    timeout: float = 12.0
-    per_host_delay: float = 1.0
+    concurrency: int = 16
+    timeout: float = 8.0
+    per_host_delay: float = 0.5
     respect_robots: bool = True
     follow_contact_page: bool = True
     enrich: bool = False

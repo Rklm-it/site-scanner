@@ -32,7 +32,7 @@ class Politeness:
             resp = requests.get(
                 f"{scheme}://{host}/robots.txt",
                 headers={"User-Agent": USER_AGENT},
-                timeout=8,
+                timeout=5,
             )
             if resp.status_code < 400 and resp.text:
                 parser = urllib.robotparser.RobotFileParser()

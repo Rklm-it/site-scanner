@@ -155,9 +155,10 @@ def scan_one(
         lead.signals.insert(0, "битый SSL-сертификат")
         lead.outdated_score = min(100, lead.outdated_score + TLS_SIGNAL_POINTS)
 
-    # Доходим до страницы контактов за телефонами/ИНН, если их мало
+    # Доходим до страницы контактов только если на главной вообще нет
+    # контактов (иначе это удваивало запросы и сильно тормозило скан)
     cp = lead.contacts.contact_page
-    need_more = not lead.contacts.phones or not lead.contacts.inn
+    need_more = not lead.contacts.phones and not lead.contacts.emails
     if follow_contact_page and cp and cp != base and need_more:
         cres = _fetch_cached(cp, politeness=politeness, cache=cache, timeout=timeout)
         if cres.ok:
@@ -168,13 +169,18 @@ def scan_one(
 
 
 def _enrich(leads: list[Lead], token: str | None) -> None:
-    """Обогащение по ИНН со страницы, а при его отсутствии — по названию компании."""
-    session = requests.Session()
-    for lead in leads:
-        inn = lead.contacts.inn or None
-        name = lead.contacts.company or None
-        if inn or name:
-            lead.enrichment = enrich_mod.lookup(inn=inn, name=name, token=token, session=session)
+    """Обогащение по ИНН со страницы, а при его отсутствии — по названию.
+
+    Параллельно, чтобы десятки запросов к DaData не тормозили финал скана.
+    """
+    targets = [l for l in leads if (l.contacts.inn or l.contacts.company)]
+
+    def do(lead: Lead) -> None:
+        lead.enrichment = enrich_mod.lookup(
+            inn=lead.contacts.inn or None, name=lead.contacts.company or None, token=token)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(do, targets))
 
 
 def run(settings: Settings, *, dadata_token: str | None = None, progress=None, on_collect=None) -> list[Lead]:
