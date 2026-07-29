@@ -127,6 +127,13 @@
   .tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted);
     padding: 8px 12px; cursor: pointer; font: inherit; }
   .tab.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+  .req { background: rgba(214,69,69,.15); color: var(--bad); border-radius: 5px;
+    padding: 0 6px; font-size: 11px; font-weight: 600; margin-left: 4px; }
+  .legend { margin-bottom: 12px; font-size: 13px; }
+  .legend summary { color: var(--accent); cursor: pointer; }
+  .legend div { color: var(--muted); margin-top: 6px; line-height: 1.7; }
+  .legend b { color: var(--ink); }
+  th[title], label[title] { cursor: help; }
 
   /* Канбан-воронка */
   .kearn { margin-bottom: 12px; font-size: 15px; }
@@ -149,40 +156,49 @@
 <div class="wrap">
   <aside class="side">
     <div class="panel">
-      <h2>Что искать</h2>
-      <label>Категории — выбери из списка</label>
+      <h2>1. Что искать</h2>
+      <label>Ниши бизнеса — отметь нужные</label>
+      <div class="hint">Бот найдёт их сайты и проверит, у кого дизайн устарел.</div>
       <div id="catchips"></div>
       <details style="margin-top:8px">
-        <summary>+ добавить свои категории</summary>
-        <textarea id="categories" placeholder="своя категория&#10;по одной на строку"></textarea>
+        <summary>+ свои ниши</summary>
+        <textarea id="categories" placeholder="своя ниша, по одной на строку"></textarea>
       </details>
-      <label>Города</label>
+
+      <label>Города <span class="req">обязательно</span></label>
       <textarea id="cities" placeholder="Казань&#10;Набережные Челны"></textarea>
+      <div class="hint">Без города выдача — общероссийская, одни агрегаторы. Всегда указывай город.</div>
+
+      <label>Показывать сайты от … баллов старости</label>
+      <input type="number" id="min_score" value="30">
+      <div class="hint">0 — показать все, 30 — только заметно устаревшие, 50 — совсем древние.</div>
+
       <details>
-        <summary>Либо готовые запросы целиком</summary>
+        <summary>Готовые запросы целиком (для опытных)</summary>
         <textarea id="queries" placeholder="стоматология Казань"></textarea>
       </details>
     </div>
 
     <div class="panel">
-      <h2>Параметры</h2>
-      <label>Поисковики</label>
-      <div class="checks" id="providers"></div>
-      <div class="row">
-        <div><label>Результатов на запрос</label><input type="number" id="max_per_query" value="20"></div>
-        <div><label>Мин. балл</label><input type="number" id="min_score" value="30"></div>
-      </div>
-      <div class="row">
-        <div><label>Потоков</label><input type="number" id="concurrency" value="8"></div>
-        <div><label>Пауза на домен, с</label><input type="number" step="0.5" id="per_host_delay" value="1"></div>
-      </div>
-      <div class="checks">
-        <label><input type="checkbox" id="enrich"> обогащать по ИНН</label>
-        <label><input type="checkbox" id="respect_robots" checked> robots.txt</label>
-        <label><input type="checkbox" id="follow_contact_page" checked> заходить в контакты</label>
-        <label><input type="checkbox" id="skip_seen"> пропускать виденные</label>
-        <label><input type="checkbox" id="use_cache" checked> кэш</label>
-      </div>
+      <h2>Дополнительно</h2>
+      <details>
+        <summary>Технические настройки (можно не трогать)</summary>
+        <label>Поисковики</label>
+        <div class="checks" id="providers"></div>
+        <div class="row" style="margin-top:8px">
+          <div><label title="Сколько сайтов брать из выдачи на каждый запрос">Результатов на запрос</label><input type="number" id="max_per_query" value="20"></div>
+          <div><label title="Сколько сайтов проверять одновременно">Потоков</label><input type="number" id="concurrency" value="8"></div>
+        </div>
+        <label title="Пауза между обращениями к одному сайту">Пауза на домен, сек</label>
+        <input type="number" step="0.5" id="per_host_delay" value="1">
+        <div class="checks" style="margin-top:10px">
+          <label title="Достаёт оборот и статус компании по ИНН (нужен ключ DaData)"><input type="checkbox" id="enrich"> обогащать по ИНН</label>
+          <label title="Уважать запрет сканирования в robots.txt"><input type="checkbox" id="respect_robots" checked> robots.txt</label>
+          <label title="Заходить на страницу «Контакты» за телефоном и почтой"><input type="checkbox" id="follow_contact_page" checked> заходить в контакты</label>
+          <label title="Не сканировать домены, найденные в прошлых прогонах"><input type="checkbox" id="skip_seen"> пропускать виденные</label>
+          <label title="Кэшировать выдачу поиска, чтобы экономить лимиты поисковиков"><input type="checkbox" id="use_cache" checked> кэш</label>
+        </div>
+      </details>
     </div>
 
     <div class="panel">
@@ -231,9 +247,20 @@
   <main class="main">
     <div id="tabs" class="tabs">
       <button class="tab active" data-v="scan">Результаты скана</button>
-      <button class="tab" data-v="base">База просканированных</button>
+      <button class="tab" data-v="base">Все лиды</button>
+      <button class="tab" data-v="work">В работе</button>
       <button class="tab" data-v="kanban">Воронка</button>
     </div>
+    <details class="legend">
+      <summary>❓ Что значат колонки и оценки</summary>
+      <div>
+        <b>Приоритет A / B / C</b> — насколько выгодный лид (A — брать в работу первым).<br>
+        <b>Аутрич</b> — балл 0–100: стоит ли писать/звонить (есть куда писать + сайт старый + признаки денег).<br>
+        <b>Старость</b> — балл 0–100: насколько устарел сайт (чем выше — тем древнее).<br>
+        <b>💰 реклама</b> — бизнес вкладывается в рекламу/аналитику, значит есть бюджет на сайт.<br>
+        <b>✉ у почты</b> — рабочая почта на своём домене (лучший адресат для письма).
+      </div>
+    </details>
     <div id="status"></div>
     <div id="summary"></div>
     <div class="toolbar" id="toolbar" style="display:none">
@@ -367,15 +394,21 @@ async function init() {
   $("cmodal").onclick = e => { if (e.target.id === "cmodal") $("cmodal").style.display = "none"; };
   // вкладки Скан / База
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchView(t.dataset.v));
+
+  render();  // показать гайд сразу при загрузке
 }
 
 function setActiveTab() {
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.v === VIEW));
 }
 
+const IN_PROGRESS = ["написал", "звонил", "недозвон", "перезвонить", "интерес", "ответили"];
+
 async function switchView(v) {
   VIEW = v; setActiveTab();
-  if (v === "base" || v === "kanban") { BASE = ((await (await fetch("/api/base")).json()).leads) || []; }
+  if (v === "base" || v === "kanban" || v === "work") {
+    BASE = ((await (await fetch("/api/base")).json()).leads) || [];
+  }
   render();
 }
 
@@ -566,16 +599,21 @@ function showResults(job) {
 
 function render() {
   if (VIEW === "kanban") { renderKanban(); return; }
-  if (VIEW === "base") {
-    ROWS = BASE;
+  if (VIEW === "base" || VIEW === "work") {
+    ROWS = VIEW === "work" ? BASE.filter(l => IN_PROGRESS.includes(l.status)) : BASE;
     $("summary").innerHTML = "";
     $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
     $("toolbar").style.display = "flex";
-    $("count").textContent = `В базе: ${ROWS.length}`;
+    $("count").textContent = (VIEW === "work" ? "В работе: " : "Всего лидов: ") + ROWS.length;
     $("elapsed").textContent = "";
     $("csv").style.display = "none"; $("json").style.display = "none";
     $("bulk").style.display = SMTP_OK ? "" : "none";
-    if (!ROWS.length) { $("results").innerHTML = `<div class="empty">База пуста — запустите скан, найденные лиды накопятся здесь.</div>`; return; }
+    if (!ROWS.length) {
+      $("results").innerHTML = `<div class="empty">${VIEW === "work"
+        ? "Пока нет лидов в работе. Начни писать или звонить из вкладки «Все лиды» — они появятся здесь."
+        : "Лидов пока нет. Слева выбери ниши и города, нажми «Запустить скан»."}</div>`;
+      return;
+    }
     renderTable();
     return;
   }
@@ -584,7 +622,14 @@ function render() {
   if (!job) {
     ROWS = [];
     $("summary").innerHTML = ""; $("toolbar").style.display = "none";
-    $("results").innerHTML = `<div class="empty">Настройте параметры слева и запустите скан — результаты появятся здесь.</div>`;
+    $("results").innerHTML = `<div class="empty" style="text-align:left;max-width:520px;margin:30px auto">
+      <b>Как начать:</b><br><br>
+      1. Слева отметь <b>ниши</b> (стоматология, автосервис…) и впиши <b>города</b>.<br>
+      2. Нажми <b>«Запустить скан»</b> — бот найдёт сайты и оценит, у кого дизайн устарел.<br>
+      3. Работай по списку: сортировка по <b>«Аутрич»</b> — сверху самые выгодные. У каждого <b>📞 звонок</b> и <b>✉ письмо</b> с готовым текстом.<br>
+      4. Ставь статусы — лиды в работе видно на вкладке <b>«В работе»</b>, деньги — на <b>«Воронке»</b>.<br><br>
+      <span class="muted">Нужны ключи поисковика (панель «API-ключи» слева) — без них скан пустой.</span>
+    </div>`;
     return;
   }
   ROWS = job.leads;
@@ -745,9 +790,15 @@ function openMail(domain) {
 }
 
 const COLS = [
-  ["priority", "Приоритет"], ["outreach_score", "Аутрич"], ["outdated_score", "Старость"],
-  ["domain", "Домен"], ["company", "Компания"], ["revenue", "Оборот"],
-  ["emails", "Email"], ["phones", "Телефоны"], ["signals", "Сигналы"],
+  ["priority", "Приоритет", "A/B/C — насколько выгодный лид. A берём первым"],
+  ["outreach_score", "Аутрич", "0–100: стоит ли писать/звонить (почта + старый сайт + деньги)"],
+  ["outdated_score", "Старость", "0–100: насколько устарел сайт. Чем выше — тем древнее"],
+  ["domain", "Домен", "Сайт компании. Клик — открыть"],
+  ["company", "Компания", "Название; 💰 — вкладывается в рекламу"],
+  ["revenue", "Оборот", "Годовой оборот по ИНН (если включено обогащение)"],
+  ["emails", "Email", "✉ — рабочая почта на своём домене"],
+  ["phones", "Телефоны", "Клик — позвонить"],
+  ["signals", "Сигналы", "Почему сайт считается устаревшим"],
 ];
 
 function renderTable() {
@@ -758,9 +809,9 @@ function renderTable() {
     else if (num.has(SORT_KEY)) { x = +x || 0; y = +y || 0; }
     return (x < y ? -1 : x > y ? 1 : 0) * SORT_DIR;
   });
-  const head = COLS.map(([k, t]) =>
-    `<th data-k="${k}">${t}${SORT_KEY === k ? (SORT_DIR < 0 ? " ▾" : " ▴") : ""}</th>`).join("")
-    + "<th>Статус</th><th></th>";
+  const head = COLS.map(([k, t, tip]) =>
+    `<th data-k="${k}" title="${tip || ""}">${t}${SORT_KEY === k ? (SORT_DIR < 0 ? " ▾" : " ▴") : ""}</th>`).join("")
+    + `<th title="Статус лида в работе">Статус</th><th title="📞 звонок · ✉ письмо"></th>`;
   const body = rows.map(r => `<tr class="${r.status ? "done" : ""}">
     <td><span class="tier ${r.priority}">${r.priority}</span></td>
     <td class="score">${r.outreach_score}</td>
