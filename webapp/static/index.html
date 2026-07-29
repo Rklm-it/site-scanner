@@ -243,6 +243,7 @@
       <label class="fchk"><input type="checkbox" id="f_email"> с почтой</label>
       <label class="fchk"><input type="checkbox" id="f_phone"> с телефоном</label>
       <label class="fchk"><input type="checkbox" id="f_callback"> перезвонить сегодня</label>
+      <label class="fchk"><input type="checkbox" id="f_noproto"> без прототипа</label>
       <label class="fchk"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
       <span class="fchk">приоритет:
         <label><input type="checkbox" class="ftier" value="A" checked>A</label>
@@ -266,6 +267,12 @@
       <span class="muted" id="c-phone"></span>
       <span style="flex:1"></span>
       <label class="fchk">перезвонить: <input type="date" id="c-callback"></label>
+    </div>
+    <div class="modal-actions" style="margin:0 0 10px;flex-wrap:wrap">
+      <span class="muted">Прототип:</span>
+      <input id="c-proto" placeholder="ссылка на прототип (Lovable)" style="flex:1;min-width:180px">
+      <button id="c-prompt">Промпт для Lovable</button>
+      <span id="c-proto-ok" class="mail-ok"></span>
     </div>
     <div class="modal-actions" style="margin:0 0 10px;flex-wrap:wrap">
       <span class="muted">Итог звонка:</span>
@@ -350,7 +357,7 @@ async function init() {
   $("bulk").onclick = bulkSend;
 
   // фильтры результатов
-  ["search", "f_email", "f_phone", "f_callback", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
+  ["search", "f_email", "f_phone", "f_callback", "f_noproto", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
   document.querySelectorAll(".ftier").forEach(c => c.onchange = () => ROWS.length && renderTable());
   // модалка письма
   $("m-close").onclick = () => $("modal").style.display = "none";
@@ -599,6 +606,7 @@ function passesFilters(r) {
   if (q && !((r.domain || "").toLowerCase().includes(q) || (r.company || "").toLowerCase().includes(q))) return false;
   if ($("f_email").checked && !r.emails) return false;
   if ($("f_phone").checked && !r.phones) return false;
+  if ($("f_noproto").checked && r.prototype_url) return false;
   if ($("f_hide").checked && r.status) return false;
   if ($("f_callback").checked) {
     const today = new Date().toISOString().slice(0, 10);
@@ -645,11 +653,34 @@ function loadShot(imgId, domain) {
   img.src = `/api/screenshot/${encodeURIComponent(domain)}`;
 }
 
+function makeLovablePrompt(r) {
+  const who = r.company || r.domain;
+  const ctx = r.source_query ? ` (${r.source_query})` : "";
+  const contacts = [(r.phones || "").split(",")[0].trim(), (r.emails || "").split(",")[0].trim()]
+    .filter(Boolean).join(", ");
+  return `Сделай современный адаптивный сайт-визитку для компании «${who}»${ctx}. ` +
+    `Разделы: первый экран с оффером и кнопкой «Оставить заявку», услуги, преимущества, отзывы, ` +
+    `контакты${contacts ? ` (${contacts})` : ""}. Стиль чистый и светлый, крупные кнопки, ` +
+    `форма заявки, обязательно мобильная версия, тексты на русском.`;
+}
+
 function openCall(domain) {
   const r = ROWS.find(x => x.domain === domain);
   if (!r) return;
   loadShot("c-shot", domain);
   $("c-title").textContent = r.company || r.domain;
+  $("c-proto").value = r.prototype_url || "";
+  $("c-proto-ok").textContent = r.prototype_url ? "✅ готов — скинь в начале разговора" : "";
+  $("c-proto").onchange = () => {
+    const u = $("c-proto").value.trim();
+    $("c-proto-ok").textContent = u ? "✅ готов — скинь в начале разговора" : "";
+    postState({domain, prototype_url: u});
+  };
+  $("c-prompt").onclick = () => {
+    navigator.clipboard && navigator.clipboard.writeText(makeLovablePrompt(r));
+    $("c-prompt").textContent = "Скопировано ✓";
+    setTimeout(() => $("c-prompt").textContent = "Промпт для Lovable", 1500);
+  };
   $("c-script").value = r.call_script || "Скрипт появится после нового скана (обновите базу сканом).";
   const phone = (r.phones || "").split(",")[0].trim();
   $("c-phone").textContent = phone || "телефон не найден";
