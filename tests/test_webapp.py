@@ -48,7 +48,7 @@ def test_scan_requires_query(client):
 def test_scan_lifecycle(client, monkeypatch):
     c, server = client
 
-    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None):
+    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None, on_phase=None, on_enrich=None):
         if progress:
             progress(1, 1)
         return [Lead(url="https://old.ru", domain="old.ru", outdated_score=88,
@@ -84,6 +84,37 @@ def test_scan_lifecycle(client, monkeypatch):
     csv = c.get(f"/api/scan/{job_id}/export.csv")
     assert csv.status_code == 200 and "old.ru" in csv.text
     assert c.get(f"/api/scan/{job_id}/export.json").status_code == 200
+
+
+def test_scan_surfaces_phase_and_provider_warning(client, monkeypatch):
+    """Фаза обогащения и ошибка провайдера доходят до статуса задачи (для UI)."""
+    c, server = client
+    import logging
+
+    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None,
+                 on_phase=None, on_enrich=None):
+        if on_phase:
+            on_phase("enrich")
+        if on_enrich:
+            on_enrich(3, 5)
+        # эмулируем ошибку поисковика — она должна всплыть в warnings
+        logging.getLogger("scanner.search").warning("Yandex Cloud searchAsync HTTP 403: denied")
+        if progress:
+            progress(1, 1)
+        return [Lead(url="https://old.ru", domain="old.ru", outdated_score=50,
+                     signals=["нет HTTPS"])]
+
+    monkeypatch.setattr(server.pipeline, "run", fake_run)
+    jid = c.post("/api/scan", json={"categories": "стоматология"}).json()["job_id"]
+    job = {}
+    for _ in range(50):
+        job = c.get(f"/api/scan/{jid}").json()
+        if job["status"] in ("done", "error"):
+            break
+        time.sleep(0.05)
+    assert job["status"] == "done"
+    assert job["enrich_total"] == 5                       # фаза обогащения отражена
+    assert any("403" in w for w in job["warnings"])       # ошибка провайдера видна в UI
 
 
 def test_lead_state_persistence(client):
@@ -122,7 +153,7 @@ def test_base_accumulates_scanned_leads(client, monkeypatch):
     c, server = client
     assert c.get("/api/base").json()["count"] == 0
 
-    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None):
+    def fake_run(settings, *, dadata_token=None, progress=None, on_collect=None, on_phase=None, on_enrich=None):
         if progress:
             progress(1, 1)
         return [Lead(url="https://old.ru", domain="old.ru", outdated_score=80, outreach_score=70,

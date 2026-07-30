@@ -65,6 +65,9 @@ class Job:
     summary: dict = field(default_factory=dict)
     collect_done: int = 0
     collect_total: int = 0
+    phase: str = ""                  # collect / scan / enrich / rank
+    enrich_done: int = 0
+    enrich_total: int = 0
     started: float = field(default_factory=time.time)
     finished: float | None = None
 
@@ -72,10 +75,13 @@ class Job:
         return {
             "id": self.id,
             "status": self.status,
+            "phase": self.phase,
             "done": self.done,
             "total": self.total,
             "collect_done": self.collect_done,
             "collect_total": self.collect_total,
+            "enrich_done": self.enrich_done,
+            "enrich_total": self.enrich_total,
             "error": self.error,
             "warnings": self.warnings,
             "count": len(self.leads),
@@ -166,6 +172,25 @@ def compose_signature() -> str:
     return "\n".join(lines)
 
 
+class _WarnCollector(logging.Handler):
+    """Складывает WARNING-логи скана в job.warnings — чтобы ошибки провайдера
+    (например «Yandex 403») были видны в интерфейсе, а не только в docker logs."""
+
+    def __init__(self, job: "Job") -> None:
+        super().__init__(level=logging.WARNING)
+        self.job = job
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            msg = record.getMessage().strip().replace("\n", " ")
+        except Exception:  # noqa: BLE001
+            return
+        if len(msg) > 220:
+            msg = msg[:220] + "…"
+        if msg and msg not in self.job.warnings and len(self.job.warnings) < 25:
+            self.job.warnings.append(msg)
+
+
 def _run_job(job: Job, settings: Settings) -> None:
     job.status = "running"
 
@@ -177,8 +202,19 @@ def _run_job(job: Job, settings: Settings) -> None:
         job.collect_done = done
         job.collect_total = total
 
+    def on_phase(name: str) -> None:
+        job.phase = name
+
+    def on_enrich(done: int, total: int) -> None:
+        job.enrich_done = done
+        job.enrich_total = total
+
+    scan_log = logging.getLogger("scanner")
+    handler = _WarnCollector(job)
+    scan_log.addHandler(handler)
     try:
-        leads = pipeline.run(settings, progress=progress, on_collect=on_collect)
+        leads = pipeline.run(settings, progress=progress, on_collect=on_collect,
+                             on_phase=on_phase, on_enrich=on_enrich)
         analytics.annotate(leads)  # идемпотентно; гарантирует поля приоритета
         Path(settings.out).parent.mkdir(parents=True, exist_ok=True)
         write_csv(leads, settings.out + ".csv")
@@ -208,6 +244,8 @@ def _run_job(job: Job, settings: Settings) -> None:
         job.status = "error"
         job.error = f"{type(exc).__name__}: {exc}"
     finally:
+        scan_log.removeHandler(handler)
+        job.phase = ""
         job.finished = time.time()
 
 

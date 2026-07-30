@@ -168,26 +168,39 @@ def scan_one(
     return lead
 
 
-def _enrich(leads: list[Lead], token: str | None) -> None:
+def _enrich(leads: list[Lead], token: str | None, on_progress=None) -> None:
     """Обогащение по ИНН со страницы, а при его отсутствии — по названию.
 
-    Параллельно, чтобы десятки запросов к DaData не тормозили финал скана.
+    Параллельно, чтобы десятки запросов к DaData/DataNewton не тормозили финал
+    скана. ``on_progress(done, total)`` — прогресс обогащения (эта фаза долгая,
+    без индикатора кажется, что скан завис).
     """
     targets = [l for l in leads if (l.contacts.inn or l.contacts.company)]
+    total = len(targets)
+    if on_progress:
+        on_progress(0, total)
 
     def do(lead: Lead) -> None:
         lead.enrichment = enrich_mod.lookup(
             inn=lead.contacts.inn or None, name=lead.contacts.company or None, token=token)
 
     with ThreadPoolExecutor(max_workers=8) as pool:
-        list(pool.map(do, targets))
+        futures = [pool.submit(do, lead) for lead in targets]
+        done = 0
+        for _ in as_completed(futures):
+            done += 1
+            if on_progress:
+                on_progress(done, total)
 
 
-def run(settings: Settings, *, dadata_token: str | None = None, progress=None, on_collect=None) -> list[Lead]:
+def run(settings: Settings, *, dadata_token: str | None = None, progress=None,
+        on_collect=None, on_phase=None, on_enrich=None) -> list[Lead]:
     """Полный прогон по настройкам.
 
-    ``progress(done, total)`` — прогресс сканирования;
-    ``on_collect(done, total)`` — прогресс сбора выдачи (по запросам).
+    ``progress(done, total)`` — прогресс сканирования сайтов;
+    ``on_collect(done, total)`` — прогресс сбора выдачи (по запросам);
+    ``on_phase(name)`` — смена фазы: collect / scan / enrich / rank;
+    ``on_enrich(done, total)`` — прогресс обогащения (оборот/статус компаний).
     """
     queries = expand_queries(settings)
     if not queries:
@@ -209,6 +222,8 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None, o
     )
 
     try:
+        if on_phase:
+            on_phase("collect")
         targets = collect_urls(
             queries,
             providers=settings.providers,
@@ -220,6 +235,13 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None, o
         log.info("К сканированию: %d доменов из %d запросов", len(targets), len(queries))
         total = len(targets)
         leads: list[Lead] = []
+
+        # Сразу помечаем фазу и total, чтобы UI показал «Проверяю сайты: 0/N»,
+        # а не подвисал на «Собираю выдачу» до первого готового сайта.
+        if on_phase:
+            on_phase("scan")
+        if progress:
+            progress(0, total)
 
         # Жёсткий предохранитель: скан не может длиться дольше этого бюджета —
         # если пара сайтов зависли намертво, прогон всё равно завершится.
@@ -259,9 +281,13 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None, o
 
         if settings.enrich:
             log.info("Обогащение по ИНН: %d лидов", len(ranked))
-            _enrich(ranked, dadata_token)
+            if on_phase:
+                on_phase("enrich")
+            _enrich(ranked, dadata_token, on_progress=on_enrich)
 
         # Аналитика аутрича и сортировка по приоритету «кому писать»
+        if on_phase:
+            on_phase("rank")
         analytics_mod.annotate(ranked)
         ranked.sort(key=lambda x: (x.outreach_score, x.outdated_score), reverse=True)
 
