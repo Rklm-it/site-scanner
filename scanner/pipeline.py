@@ -45,6 +45,12 @@ SKIP_DOMAINS = {
     "domclick.ru", "cian.ru", "avito.ru", "youla.ru", "vkupiprodai.ru",
     "n1.ru", "move.ru", "mirkvartir.ru", "restate.ru", "gipernn.ru",
     "yandex.ru", "farpost.ru", "irr.ru", "from-ua.ru", "blizko.ru",
+    # федеральные бренды/франшизы и афиши — ранжируются по локальным запросам,
+    # но это не локальный клиент (у них свой корпоративный сайт)
+    "afisha.ru", "kassir.ru", "ticketland.ru", "kudago.com", "dodopizza.ru",
+    "delivery-club.ru", "kfc.ru", "papajohns.ru", "burgerking.ru", "sushiwok.ru",
+    "samokat.ru", "sbermarket.ru", "vkusvill.ru", "citymobil.ru", "delivery.yandex.ru",
+    "drom.ru", "auto.ru", "avito.ru",
 }
 
 TLS_SIGNAL_POINTS = 18
