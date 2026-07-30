@@ -50,15 +50,39 @@ def _pick_hook(signals: list[str]) -> str:
     return _FALLBACK_HOOK
 
 
+def _name_patronymic(full: str | None) -> str:
+    """«Фамилия Имя Отчество» → «Имя Отчество» (обращение по имени-отчеству)."""
+    if not full:
+        return ""
+    parts = full.strip().split()
+    if len(parts) >= 3:          # Фамилия Имя Отчество
+        return f"{parts[1]} {parts[2]}"
+    if len(parts) == 2:          # Имя Отчество (без фамилии)
+        return f"{parts[0]} {parts[1]}"
+    return parts[0] if parts else ""
+
+
 def build_call_script(lead: Lead, *, caller_name: str = "") -> str:
     """Короткий скрипт холодного звонка под конкретный лид."""
     company = lead.enrichment.official_name or lead.contacts.company or lead.domain
     who = f"Меня зовут {caller_name}, " if caller_name.strip() else ""
     hook = _pick_hook(lead.signals)
 
+    # ФИО руководителя из ЕГРЮЛ (DaData отдаёт даже на бесплатном тарифе) —
+    # проход через секретаря прямо к тому, кто принимает решение.
+    boss = _name_patronymic(lead.enrichment.management)
+    gate = (
+        f"Проход через секретаря (если возьмут не сразу):\n"
+        f"«Соедините, пожалуйста, с {boss} — по вопросу сайта компании.»\n\n"
+        if boss else ""
+    )
+    hello = (f"«Здравствуйте, {boss}! " if boss
+             else "«Здравствуйте! ")
+
     return (
+        f"{gate}"
         f"Приветствие:\n"
-        f"«Здравствуйте! {who}я занимаюсь сайтами. Звоню по вашему сайту "
+        f"{hello}{who}я занимаюсь сайтами. Звоню по вашему сайту "
         f"{lead.domain} — пара минут найдётся?»\n\n"
         f"Зацепка (проблема):\n"
         f"«Посмотрел ваш сайт и заметил: {hook}. Из-за этого часть клиентов, "

@@ -14,6 +14,21 @@ def test_build_call_script():
     assert "Приветствие" in s
 
 
+def test_call_script_uses_director_name():
+    # ФИО руководителя из ЕГРЮЛ → обращение по имени-отчеству и проход через секретаря
+    lead = Lead(url="https://stoma.ru", domain="stoma.ru",
+                signals=["нет HTTPS"],
+                enrichment=Enrichment(official_name="ООО Улыбка",
+                                      management="Петров Сергей Иванович"))
+    s = build_call_script(lead)
+    assert "Сергей Иванович" in s          # обращаемся по имени-отчеству
+    assert "Соедините" in s                # блок прохода через секретаря
+    # без руководителя блока прохода нет
+    plain = build_call_script(Lead(url="https://x.ru", domain="x.ru", signals=["нет HTTPS"]))
+    assert "Соедините" not in plain
+    assert plain.count("Здравствуйте")      # приветствие всё равно есть
+
+
 def test_pick_hook_prioritizes_mobile():
     # из нескольких проблем выбирается ОДНА, самая приоритетная (мобильная)
     hook = _pick_hook(["нет HTTPS", "нет meta viewport (не адаптивный)", "битый SSL-сертификат"])
