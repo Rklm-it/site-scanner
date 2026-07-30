@@ -1,12 +1,15 @@
-"""Обогащение лида данными о компании по ИНН через DaData.
+"""Обогащение лида данными о компании: название/статус/директор — DaData,
+оборот — DataNewton.
 
 Это тот самый шаг «смотришь оборот» из исходной идеи: по ИНН со страницы
 достаём официальное название, статус (действующая/ликвидирована), оборот,
 число сотрудников и руководителя. Позволяет поднимать в топ не просто
 старые сайты, а старые сайты у компаний с деньгами.
 
-Нужен бесплатный токен DaData (env ``DADATA_TOKEN``):
-https://dadata.ru/api/find-party/
+DaData (env ``DADATA_TOKEN``, https://dadata.ru/api/find-party/) на бесплатном
+тарифе отдаёт название, статус и ФИО руководителя, но НЕ выручку. Поэтому оборот
+берём у DataNewton (env ``DATANEWTON_TOKEN``, https://datanewton.ru), у которого
+финансы есть и на бесплатном тарифе.
 """
 
 from __future__ import annotations
@@ -16,6 +19,7 @@ import sys
 
 import requests
 
+from . import datanewton
 from .models import Enrichment
 
 DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party"
@@ -91,12 +95,8 @@ def enrich_by_name(name: str, *, token: str | None = None,
 
 def lookup(inn: str | None = None, name: str | None = None, *, token: str | None = None,
            session: requests.Session | None = None) -> Enrichment:
-    """Единый чек компании: сначала по ИНН, при отсутствии данных — по названию."""
-    e = Enrichment()
-    if inn:
-        e = enrich_by_inn(inn, token=token, session=session)
-    if (e.revenue is None and not e.official_name) and name:
-        e = enrich_by_name(name, token=token, session=session)
+    """Единый чек компании: название/статус/директор (DaData) + оборот (DataNewton)."""
+    e, _ = lookup_verbose(inn, name, token=token, session=session)
     return e
 
 
@@ -127,27 +127,50 @@ def _dadata_post(url: str, payload: dict, token: str,
 
 
 def lookup_verbose(inn: str | None = None, name: str | None = None, *,
-                   token: str | None = None,
+                   token: str | None = None, dn_token: str | None = None,
                    session: requests.Session | None = None) -> tuple[Enrichment, str | None]:
-    """Как lookup(), но возвращает и текст ошибки DaData (для диагностики в UI)."""
+    """Как lookup(), но возвращает и текст ошибки (для диагностики в UI).
+
+    DaData даёт название/статус/директора; параллельно резолвим ИНН (со страницы
+    или по названию через DaData) и добираем оборот у DataNewton.
+    """
     token = token or os.environ.get("DADATA_TOKEN")
-    if not token:
-        return Enrichment(), "не задан ключ DaData"
-    if inn:
-        data, err = _dadata_post(DADATA_URL, {"query": inn, "count": 1}, token, session)
-        if err:
-            return Enrichment(), err
-        sugg = data.get("suggestions") or []
-        if sugg:
-            return parse_party(sugg[0].get("data") or {}), None
-    if name:
-        data, err = _dadata_post(DADATA_SUGGEST, {"query": name, "count": 1}, token, session)
-        if err:
-            return Enrichment(), err
-        sugg = data.get("suggestions") or []
-        if sugg:
-            return parse_party(sugg[0].get("data") or {}), None
-    return Enrichment(), None
+    dn_token = dn_token or os.environ.get("DATANEWTON_TOKEN")
+
+    e = Enrichment()
+    err: str | None = None
+    resolved_inn = (inn or "").strip() or None
+
+    # 1. Название/статус/директор из DaData (по ИНН, затем по названию)
+    if token:
+        if inn:
+            data, err = _dadata_post(DADATA_URL, {"query": inn, "count": 1}, token, session)
+            if not err and data:
+                sugg = data.get("suggestions") or []
+                if sugg:
+                    d = sugg[0].get("data") or {}
+                    e = parse_party(d)
+                    resolved_inn = (d.get("inn") or resolved_inn)
+        if not e.official_name and name and not err:
+            data, err = _dadata_post(DADATA_SUGGEST, {"query": name, "count": 1}, token, session)
+            if not err and data:
+                sugg = data.get("suggestions") or []
+                if sugg:
+                    d = sugg[0].get("data") or {}
+                    e = parse_party(d)
+                    resolved_inn = resolved_inn or (d.get("inn") or None)
+    elif not dn_token:
+        return e, "не задан ключ DaData"
+
+    # 2. Оборот из DataNewton по резолвнутому ИНН (DaData его бесплатно не отдаёт)
+    if e.revenue is None and resolved_inn and dn_token:
+        rev, rev_err = datanewton.revenue_by_inn(resolved_inn, token=dn_token, session=session)
+        if rev is not None:
+            e.revenue = rev
+        elif rev_err and not err:
+            err = rev_err
+
+    return e, err
 
 
 def parse_party(data: dict) -> Enrichment:

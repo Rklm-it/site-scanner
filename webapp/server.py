@@ -321,8 +321,8 @@ def revenue_check(req: RevenueReq) -> dict:
     Данные лида принимаются напрямую от клиента (работает даже если скан
     ещё не сохранён в базу); при их отсутствии — фолбэк на базу по домену.
     """
-    if not os.environ.get("DADATA_TOKEN"):
-        raise HTTPException(400, "Не задан DADATA_TOKEN (панель «API-ключи»).")
+    if not (os.environ.get("DADATA_TOKEN") or os.environ.get("DATANEWTON_TOKEN")):
+        raise HTTPException(400, "Не задан ключ DaData или DataNewton (панель «API-ключи»).")
 
     inn = (req.inn or "").strip() or None
     name = (req.company or "").strip() or None
@@ -339,7 +339,7 @@ def revenue_check(req: RevenueReq) -> dict:
     # Компания нашлась, но оборот не публикуется (ИП, малое ООО, свежая
     # регистрация) — это не ошибка ключа, а особенность самой компании.
     if not err and found and e.revenue is None:
-        err = "компания найдена, но оборот в ЕГРЮЛ не публикуется (частая история у ИП и малых ООО)"
+        err = "компания найдена, но бухотчётность не сдавала (обычно ИП — у них выручки в реестрах нет)"
     elif not err and not found:
         err = ("компания не найдена в DaData по " +
                ("ИНН" if inn else "названию") + " — проверьте данные лида")

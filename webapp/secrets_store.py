@@ -20,6 +20,7 @@ FIELDS = {
     "google_cse_cx": "GOOGLE_CSE_CX",
     "serpapi_key": "SERPAPI_KEY",
     "dadata_token": "DADATA_TOKEN",
+    "datanewton_token": "DATANEWTON_TOKEN",
     # SMTP для рассылки (хранится тут же)
     "smtp_host": "SMTP_HOST",
     "smtp_port": "SMTP_PORT",
