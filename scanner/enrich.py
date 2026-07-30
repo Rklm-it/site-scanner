@@ -100,6 +100,56 @@ def lookup(inn: str | None = None, name: str | None = None, *, token: str | None
     return e
 
 
+def _dadata_post(url: str, payload: dict, token: str,
+                 session: requests.Session | None) -> tuple[dict | None, str | None]:
+    """POST в DaData → (json, ошибка). Ошибку формулируем понятно."""
+    sess = session or requests
+    try:
+        resp = sess.post(
+            url, json=payload,
+            headers={"Content-Type": "application/json", "Accept": "application/json",
+                     "Authorization": f"Token {token}"},
+            timeout=15,
+        )
+    except requests.RequestException as exc:
+        return None, f"нет связи с DaData: {exc}"
+    if resp.status_code in (401, 403):
+        return None, (f"DaData отклонил ключ ({resp.status_code}) — вставьте именно "
+                      f"API-ключ (не секретный) и проверьте, что он активен")
+    if resp.status_code == 429:
+        return None, "DaData: превышен дневной лимит запросов (429)"
+    if resp.status_code != 200:
+        return None, f"DaData вернул HTTP {resp.status_code}"
+    try:
+        return resp.json(), None
+    except ValueError:
+        return None, "DaData прислал не-JSON ответ"
+
+
+def lookup_verbose(inn: str | None = None, name: str | None = None, *,
+                   token: str | None = None,
+                   session: requests.Session | None = None) -> tuple[Enrichment, str | None]:
+    """Как lookup(), но возвращает и текст ошибки DaData (для диагностики в UI)."""
+    token = token or os.environ.get("DADATA_TOKEN")
+    if not token:
+        return Enrichment(), "не задан ключ DaData"
+    if inn:
+        data, err = _dadata_post(DADATA_URL, {"query": inn, "count": 1}, token, session)
+        if err:
+            return Enrichment(), err
+        sugg = data.get("suggestions") or []
+        if sugg:
+            return parse_party(sugg[0].get("data") or {}), None
+    if name:
+        data, err = _dadata_post(DADATA_SUGGEST, {"query": name, "count": 1}, token, session)
+        if err:
+            return Enrichment(), err
+        sugg = data.get("suggestions") or []
+        if sugg:
+            return parse_party(sugg[0].get("data") or {}), None
+    return Enrichment(), None
+
+
 def parse_party(data: dict) -> Enrichment:
     """Разбирает блок ``data`` из ответа DaData в Enrichment."""
     e = Enrichment()

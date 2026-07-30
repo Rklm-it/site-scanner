@@ -750,8 +750,8 @@ async function checkRevenue(domain, btnId, outId) {
     body: JSON.stringify({domain, inn: row.inn || "", company: row.company || ""})});
   btn.disabled = false;
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) { out.textContent = d.detail || "ошибка"; return; }
-  if (!d.found) { out.textContent = "компания в реестре не найдена (нет ИНН на сайте или не совпало название)"; return; }
+  if (!r.ok) { out.textContent = "⚠ " + (d.detail || "ошибка"); return; }
+  if (!d.found) { out.textContent = "⚠ " + (d.error || "компания в реестре не найдена (нет ИНН на сайте или не совпало название)"); return; }
   const parts = [];
   if (d.official_name) parts.push(d.official_name);
   parts.push(d.revenue != null

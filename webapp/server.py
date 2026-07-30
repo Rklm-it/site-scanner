@@ -334,14 +334,22 @@ def revenue_check(req: RevenueReq) -> dict:
     if not inn and not name:
         raise HTTPException(422, "Нет ни ИНН, ни названия компании — не по чему искать.")
 
-    e = enrich.lookup(inn=inn, name=name)
+    e, err = enrich.lookup_verbose(inn=inn, name=name)
     found = bool(e.official_name or e.revenue is not None)
+    # Компания нашлась, но оборот не публикуется (ИП, малое ООО, свежая
+    # регистрация) — это не ошибка ключа, а особенность самой компании.
+    if not err and found and e.revenue is None:
+        err = "компания найдена, но оборот в ЕГРЮЛ не публикуется (частая история у ИП и малых ООО)"
+    elif not err and not found:
+        err = ("компания не найдена в DaData по " +
+               ("ИНН" if inn else "названию") + " — проверьте данные лида")
     return {
         "found": found,
         "official_name": e.official_name, "status": e.status, "revenue": e.revenue,
         "employee_count": e.employee_count, "management": e.management,
         "address": e.address, "registration_date": e.registration_date,
         "inn": inn or "",
+        "error": err,
     }
 
 

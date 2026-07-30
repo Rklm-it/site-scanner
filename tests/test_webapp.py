@@ -226,19 +226,32 @@ def test_revenue_check(client, monkeypatch):
     c, server = client
     from scanner.models import Enrichment
     monkeypatch.setenv("DADATA_TOKEN", "x")
-    monkeypatch.setattr(server.enrich, "lookup",
-                        lambda inn=None, name=None, **k: Enrichment(
-                            official_name="ООО Тест", revenue=12_000_000, status="ACTIVE"))
+    monkeypatch.setattr(server.enrich, "lookup_verbose",
+                        lambda inn=None, name=None, **k: (Enrichment(
+                            official_name="ООО Тест", revenue=12_000_000, status="ACTIVE"), None))
     r = c.post("/api/revenue", json={"domain": "firma.ru", "inn": "7707083893", "company": "Тест"})
     assert r.status_code == 200
     assert r.json()["revenue"] == 12_000_000 and r.json()["official_name"] == "ООО Тест"
     assert r.json()["found"] is True
+    assert r.json()["error"] is None
 
 
 def test_revenue_requires_token(client, monkeypatch):
     c, server = client
     monkeypatch.delenv("DADATA_TOKEN", raising=False)
     assert c.post("/api/revenue", json={"domain": "x.ru", "inn": "7707083893"}).status_code == 400
+
+
+def test_revenue_surfaces_dadata_error(client, monkeypatch):
+    """Плохой ключ/лимит DaData доходит до UI как понятный текст, а не пустой ответ."""
+    c, server = client
+    from scanner.models import Enrichment
+    monkeypatch.setenv("DADATA_TOKEN", "x")
+    monkeypatch.setattr(server.enrich, "lookup_verbose",
+                        lambda inn=None, name=None, **k: (Enrichment(), "DaData отклонил ключ (403)"))
+    d = c.post("/api/revenue", json={"domain": "x.ru", "inn": "7707083893"}).json()
+    assert d["found"] is False
+    assert "403" in d["error"]
 
 
 def test_index_served(client):
