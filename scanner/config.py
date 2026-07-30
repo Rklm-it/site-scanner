@@ -23,6 +23,7 @@ class Settings:
     concurrency: int = 16
     min_score: int = 0
     timeout: float = 8.0
+    scan_budget: float | None = None   # потолок времени на фазу скана (сек); None — авто
     follow_contact_page: bool = True
 
     # вежливость

@@ -221,26 +221,39 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None, o
         total = len(targets)
         leads: list[Lead] = []
 
-        with ThreadPoolExecutor(max_workers=settings.concurrency) as pool:
-            futures = {
-                pool.submit(
-                    scan_one, url, q,
-                    politeness=politeness, cache=cache,
-                    timeout=settings.timeout,
-                    follow_contact_page=settings.follow_contact_page,
-                ): url
-                for url, q in targets
-            }
-            for i, future in enumerate(as_completed(futures), start=1):
+        # Жёсткий предохранитель: скан не может длиться дольше этого бюджета —
+        # если пара сайтов зависли намертво, прогон всё равно завершится.
+        budget = settings.scan_budget or \
+            min(600.0, max(120.0, total * settings.timeout / max(1, settings.concurrency) * 3))
+        pool = ThreadPoolExecutor(max_workers=settings.concurrency)
+        futures = {
+            pool.submit(
+                scan_one, url, q,
+                politeness=politeness, cache=cache,
+                timeout=settings.timeout,
+                follow_contact_page=settings.follow_contact_page,
+            ): url
+            for url, q in targets
+        }
+        done = 0
+        try:
+            for future in as_completed(futures, timeout=budget):
                 try:
                     lead = future.result()
                 except Exception as exc:  # noqa: BLE001 — не роняем прогон из-за одного сайта
                     lead = Lead(url=futures[future], error=f"scan failed: {exc}")
                 leads.append(lead)
+                done += 1
                 if lead.domain:
                     cache.mark_seen(lead.domain, lead.outdated_score)
                 if progress:
-                    progress(i, total)
+                    progress(done, total)
+        except TimeoutError:
+            log.warning("Скан прерван по таймауту %.0fс: обработано %d/%d "
+                        "(остальные сайты не ответили)", budget, done, total)
+        finally:
+            # не ждём зависшие потоки — они сами отвалятся по таймауту сокета
+            pool.shutdown(wait=False, cancel_futures=True)
 
         ranked = [l for l in leads if l.error is None and l.outdated_score >= settings.min_score]
 

@@ -308,23 +308,32 @@ def screenshot_of(domain: str):
     return FileResponse(path, media_type="image/png")
 
 
-@app.get("/api/revenue/{domain}")
-def revenue_check(domain: str) -> dict:
-    """Проверка оборота/статуса компании по ИНН со страницы или по названию (DaData)."""
-    if not _DOMAIN_RE.match(domain):
-        raise HTTPException(400, "Некорректный домен.")
+class RevenueReq(BaseModel):
+    domain: str = ""
+    inn: str | None = None
+    company: str | None = None
+
+
+@app.post("/api/revenue")
+def revenue_check(req: RevenueReq) -> dict:
+    """Проверка оборота/статуса компании: по ИНН со страницы или по названию.
+
+    Данные лида принимаются напрямую от клиента (работает даже если скан
+    ещё не сохранён в базу); при их отсутствии — фолбэк на базу по домену.
+    """
     if not os.environ.get("DADATA_TOKEN"):
         raise HTTPException(400, "Не задан DADATA_TOKEN (панель «API-ключи»).")
-    lead = None
-    if STORE:
-        lead = next((l for l in STORE.all_leads() if l.get("domain") == domain), None)
-    if not lead:
-        raise HTTPException(404, "Лид не найден в базе.")
 
-    inn = lead.get("inn") or None
-    name = (lead.get("company") or "").strip() or None
+    inn = (req.inn or "").strip() or None
+    name = (req.company or "").strip() or None
+    if not inn and not name and req.domain and STORE:
+        lead = next((l for l in STORE.all_leads() if l.get("domain") == req.domain), None)
+        if lead:
+            inn = lead.get("inn") or None
+            name = (lead.get("company") or "").strip() or None
     if not inn and not name:
-        raise HTTPException(422, "На сайте нет ни ИНН, ни названия компании — не по чему искать.")
+        raise HTTPException(422, "Нет ни ИНН, ни названия компании — не по чему искать.")
+
     e = enrich.lookup(inn=inn, name=name)
     found = bool(e.official_name or e.revenue is not None)
     return {

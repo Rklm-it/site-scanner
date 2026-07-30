@@ -229,19 +229,16 @@ def test_revenue_check(client, monkeypatch):
     monkeypatch.setattr(server.enrich, "lookup",
                         lambda inn=None, name=None, **k: Enrichment(
                             official_name="ООО Тест", revenue=12_000_000, status="ACTIVE"))
-    server.STORE.upsert_leads([{"domain": "firma.ru", "company": "Тест",
-                                "source_query": "стоматология Казань", "inn": "7707083893",
-                                "outreach_score": 50}])
-    r = c.get("/api/revenue/firma.ru")
+    r = c.post("/api/revenue", json={"domain": "firma.ru", "inn": "7707083893", "company": "Тест"})
     assert r.status_code == 200
     assert r.json()["revenue"] == 12_000_000 and r.json()["official_name"] == "ООО Тест"
+    assert r.json()["found"] is True
 
 
 def test_revenue_requires_token(client, monkeypatch):
     c, server = client
     monkeypatch.delenv("DADATA_TOKEN", raising=False)
-    server.STORE.upsert_leads([{"domain": "x.ru", "outreach_score": 1}])
-    assert c.get("/api/revenue/x.ru").status_code == 400
+    assert c.post("/api/revenue", json={"domain": "x.ru", "inn": "7707083893"}).status_code == 400
 
 
 def test_index_served(client):

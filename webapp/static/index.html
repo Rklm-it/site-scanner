@@ -744,8 +744,10 @@ function applyProto(body, url) {
 
 async function checkRevenue(domain, btnId, outId) {
   const btn = $(btnId), out = $(outId);
+  const row = ROWS.find(x => x.domain === domain) || {};
   btn.disabled = true; out.textContent = "проверяю в ДаДата…";
-  const r = await fetch(`/api/revenue/${encodeURIComponent(domain)}`);
+  const r = await fetch("/api/revenue", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({domain, inn: row.inn || "", company: row.company || ""})});
   btn.disabled = false;
   const d = await r.json().catch(() => ({}));
   if (!r.ok) { out.textContent = d.detail || "ошибка"; return; }
@@ -759,8 +761,8 @@ async function checkRevenue(domain, btnId, outId) {
   if (d.employee_count) parts.push(d.employee_count + " чел.");
   if (d.management) parts.push("рук.: " + d.management);
   out.textContent = parts.join(" · ");
-  const row = ROWS.find(x => x.domain === domain);
-  if (row) { if (d.revenue != null) row.revenue = d.revenue; if (d.official_name) row.company = d.official_name; }
+  if (d.revenue != null) row.revenue = d.revenue;
+  if (d.official_name) row.company = d.official_name;
 }
 
 function loadShot(imgId, domain) {

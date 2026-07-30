@@ -118,3 +118,22 @@ def test_collect_reports_progress(monkeypatch):
                                 on_query=lambda d, t: prog.append((d, t)))
     assert prog == [(1, 2), (2, 2)]        # колбэк по каждому запросу
     assert len(out) == 2
+
+
+def test_scan_hard_timeout(monkeypatch):
+    """Предохранитель: даже если сайты виснут, run() завершается по бюджету."""
+    import time as _t
+    monkeypatch.setattr(pipeline.search_mod, "search",
+                        lambda q, *, provider, max_results=20, cache=None:
+                        ["https://hang1.ru", "https://hang2.ru", "https://hang3.ru"])
+
+    def hanging(url, **kw):
+        _t.sleep(30)  # имитируем зависший сайт
+        return FetchResult(url=url, error="never")
+
+    monkeypatch.setattr(pipeline, "fetch", hanging)
+    start = _t.monotonic()
+    leads = pipeline.run(_settings(queries=["x"], scan_budget=1.0, concurrency=3))
+    elapsed = _t.monotonic() - start
+    assert elapsed < 10          # не завис на 30с, вышел по бюджету ~1с
+    assert leads == []           # ничего не успело — но прогон завершился
