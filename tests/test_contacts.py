@@ -43,6 +43,14 @@ def test_invalid_inn_rejected():
     assert c.inn is None  # контрольная сумма не сходится — не берём
 
 
+def test_inn_extracted_across_tags():
+    # метка и число в соседних тегах — частый случай в подвале сайта
+    page = ("<html><body><footer><span>ИНН:</span>"
+            "<span>7707083893</span></footer></body></html>")
+    c = extract(page, base_url="https://x.ru")
+    assert c.inn == "7707083893"
+
+
 def test_email_deobfuscation():
     assert _deobfuscate("info (at) romashka точка ru") == "info@romashka.ru"
     page = "<html><body>Почта: info (at) romashka точка ru</body></html>"

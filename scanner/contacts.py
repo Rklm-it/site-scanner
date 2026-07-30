@@ -99,9 +99,12 @@ def extract(html: str, *, base_url: str, title: str | None = None) -> Contacts:
             socials.append(full.split("?")[0])
     contacts.socials = list(dict.fromkeys(socials))[:10]
 
-    # ИНН / ОГРН — берём первый прошедший контрольную сумму
-    contacts.inn = _first_valid(INN_RE.findall(raw), validate_inn)
-    contacts.ogrn = _first_valid(OGRN_RE.findall(raw), validate_ogrn)
+    # ИНН / ОГРН — по ВИДИМОМУ тексту, а не по сырому HTML. Иначе метку и число
+    # в соседних тегах (<span>ИНН:</span> <span>7712345678</span>) разделяют
+    # теги, и регэксп по HTML их не склеивает — ИНН терялся у большинства сайтов.
+    text = soup.get_text(" ", strip=True)
+    contacts.inn = _first_valid(INN_RE.findall(text), validate_inn)
+    contacts.ogrn = _first_valid(OGRN_RE.findall(text), validate_ogrn)
 
     # Название компании: og:site_name -> title
     og_name = soup.find("meta", attrs={"property": "og:site_name"})

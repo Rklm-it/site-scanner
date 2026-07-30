@@ -131,8 +131,13 @@ def scan_one(
     cache,
     timeout: float = 12.0,
     follow_contact_page: bool = True,
+    want_inn: bool = False,
 ) -> Lead:
-    """Сканирует один сайт (главная + при необходимости страница контактов)."""
+    """Сканирует один сайт (главная + при необходимости страница контактов).
+
+    ``want_inn`` — при включённом обогащении заходим на «Реквизиты/Контакты»
+    ещё и ради ИНН (он нужен для проверки оборота), даже если контакты уже есть.
+    """
     lead = Lead(url=url, domain=registered_domain(url), source_query=source_query)
     res = _fetch_cached(url, politeness=politeness, cache=cache, timeout=timeout)
     lead.final_url = res.final_url
@@ -164,10 +169,12 @@ def scan_one(
         lead.signals.insert(0, "битый SSL-сертификат")
         lead.outdated_score = min(100, lead.outdated_score + TLS_SIGNAL_POINTS)
 
-    # Доходим до страницы контактов только если на главной вообще нет
-    # контактов (иначе это удваивало запросы и сильно тормозило скан)
+    # Доходим до страницы контактов, если на главной нет контактов ИЛИ (при
+    # обогащении) нет ИНН — он почти всегда на «Реквизитах», а без него не
+    # узнать оборот. Без обогащения не ходим зря, чтобы не тормозить скан.
     cp = lead.contacts.contact_page
-    need_more = not lead.contacts.phones and not lead.contacts.emails
+    need_more = (not lead.contacts.phones and not lead.contacts.emails) \
+        or (want_inn and not lead.contacts.inn)
     if follow_contact_page and cp and cp != base and need_more:
         cres = _fetch_cached(cp, politeness=politeness, cache=cache, timeout=timeout)
         if cres.ok:
@@ -263,6 +270,7 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None,
                 politeness=politeness, cache=cache,
                 timeout=settings.timeout,
                 follow_contact_page=settings.follow_contact_page,
+                want_inn=settings.enrich,
             ): url
             for url, q in targets
         }
