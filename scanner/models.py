@@ -56,6 +56,9 @@ class Lead:
     outdated_score: int = 0
     signals: list[str] = field(default_factory=list)
 
+    # Похоже на агрегатор/каталог (не клиент) — причина или None
+    aggregator: str | None = None
+
     # Технические флаги
     https: bool = False
     tls_error: bool = False

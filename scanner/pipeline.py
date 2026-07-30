@@ -11,6 +11,7 @@ import requests
 import tldextract
 
 from . import activity as activity_mod
+from . import aggregator as aggregator_mod
 from . import analytics as analytics_mod
 from . import contacts as contacts_mod
 from . import heuristics as heuristics_mod
@@ -38,6 +39,12 @@ SKIP_DOMAINS = {
     "dzen.ru", "zen.yandex.ru", "pikabu.ru", "vc.ru", "habr.com", "tripadvisor.ru",
     "maps.yandex.ru", "blizko.ru", "spr.ru", "orgpage.ru", "yandex.by", "mail.ru",
     "tiu.ru", "pulscen.ru", "regmarkets.ru", "satom.ru", "flampp.ru", "zoon.com",
+    # финансовые/справочные агрегаторы и доски объявлений
+    "banki.ru", "banktop.ru", "sravni.ru", "vbr.ru", "bankiros.ru", "myfin.ru",
+    "unicom24.ru", "vsezaimyonline.ru", "banki-tut.ru", "creditbanking.ru",
+    "domclick.ru", "cian.ru", "avito.ru", "youla.ru", "vkupiprodai.ru",
+    "n1.ru", "move.ru", "mirkvartir.ru", "restate.ru", "gipernn.ru",
+    "yandex.ru", "farpost.ru", "irr.ru", "from-ua.ru", "blizko.ru",
 }
 
 TLS_SIGNAL_POINTS = 18
@@ -149,6 +156,8 @@ def scan_one(
     lead.title = h.title
     lead.contacts = contacts_mod.extract(res.html, base_url=base, title=h.title)
     lead.marketing = activity_mod.detect(res.html)
+    lead.aggregator = aggregator_mod.aggregator_reason(
+        title=h.title, company=lead.contacts.company, html=res.html)
 
     # Битый сертификат — сильный сигнал заброшенности
     if res.tls_error:
@@ -277,7 +286,15 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None,
             # не ждём зависшие потоки — они сами отвалятся по таймауту сокета
             pool.shutdown(wait=False, cancel_futures=True)
 
-        ranked = [l for l in leads if l.error is None and l.outdated_score >= settings.min_score]
+        # Агрегаторы/каталоги (доски объявлений, справочники «все банки») — это
+        # не клиенты, а сами каталоги. Выкидываем их из выдачи.
+        aggregators = [l for l in leads if l.aggregator]
+        if aggregators:
+            log.info("Отсеяно агрегаторов/каталогов: %d (%s)", len(aggregators),
+                     ", ".join(l.domain for l in aggregators[:8]))
+        ranked = [l for l in leads
+                  if l.error is None and not l.aggregator
+                  and l.outdated_score >= settings.min_score]
 
         if settings.enrich:
             log.info("Обогащение по ИНН: %d лидов", len(ranked))
