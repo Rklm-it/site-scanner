@@ -74,6 +74,17 @@ def revenue_by_inn(inn: str, *, token: str | None = None,
     if resp.status_code != 200:
         return None, f"DataNewton вернул HTTP {resp.status_code}"
     try:
-        return _latest_revenue(resp.json()), None
+        data = resp.json()
     except ValueError:
         return None, "DataNewton прислал не-JSON ответ"
+
+    # Пустой ответ и «нет строки Выручка» — разные вещи, и ни одна из них не
+    # означает «компания не публиковала отчётность»: так же выглядит тариф без
+    # финансов и сменившаяся структура ответа. Не выдаём догадку за факт.
+    if not isinstance(data, dict) or not data.get("fin_results"):
+        return None, ("DataNewton не отдал финотчёт по этому ИНН — компания не публиковала "
+                      "отчётность либо тариф ключа не включает финансы")
+    revenue = _latest_revenue(data)
+    if revenue is None:
+        return None, "в отчёте DataNewton нет строки «Выручка» (код 2110)"
+    return revenue, None

@@ -55,10 +55,21 @@ def test_revenue_by_inn_bad_key():
     assert rev is None and "403" in err
 
 
-def test_revenue_by_inn_no_data_is_not_error():
+def test_revenue_by_inn_reports_missing_report():
+    """Пустой финотчёт — не повод утверждать «компания не публиковала»:
+    так же выглядит тариф без финансов. Причину формулируем честно."""
     rev, err = datanewton.revenue_by_inn("7707083893", token="k",
                                          session=_sess(FakeResp(200, {"fin_results": {}})))
-    assert rev is None and err is None
+    assert rev is None and "тариф" in err
+
+
+def test_revenue_by_inn_reports_missing_revenue_row():
+    """Отчёт есть, а строки 2110 в нём нет — это уже другая причина."""
+    rev, err = datanewton.revenue_by_inn(
+        "7707083893", token="k",
+        session=_sess(FakeResp(200, {"fin_results": {"code": "0710002",
+                                                     "childrenMap": {"П": {"code": "2400"}}}})))
+    assert rev is None and "2110" in err
 
 
 def test_revenue_by_inn_skips_without_inn_or_token():

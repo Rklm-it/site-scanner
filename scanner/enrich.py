@@ -210,7 +210,7 @@ def explain_revenue(e: Enrichment, err: str | None = None, *, inn: str | None = 
     if not e.official_name:
         by = "ИНН" if inn else "ОГРН" if ogrn else "названию с сайта"
         return f"компания не найдена в реестре по {by}"
-    return "компания найдена, но бухотчётность не публиковала (малое/новое ООО)"
+    return "компания найдена, но источник не отдал выручку"
 
 
 def parse_party(data: dict) -> Enrichment:

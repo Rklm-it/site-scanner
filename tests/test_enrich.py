@@ -197,7 +197,7 @@ def test_explain_revenue_reasons():
     assert "не по чему искать" in m.explain_revenue(Enrichment())
     assert "лимит" in m.explain_revenue(Enrichment(), "DataNewton: превышен лимит", inn="1")
     assert "не найдена" in m.explain_revenue(Enrichment(), inn="7707083893", dn_token="dn")
-    assert "не публиковала" in m.explain_revenue(
+    assert "не отдал выручку" in m.explain_revenue(
         Enrichment(official_name="ООО Ромашка"), inn="7707083893", dn_token="dn")
 
 
@@ -209,4 +209,4 @@ def test_lookup_sets_note_for_empty_revenue(monkeypatch):
                             "name": {"short_with_opf": "ООО Ромашка"}}}]}, None))
     monkeypatch.setattr(m.datanewton, "revenue_by_inn", lambda i, **kw: (None, None))
     e, _ = m.lookup_verbose(inn="7707083893", token="x", dn_token="dn")
-    assert e.revenue is None and "не публиковала" in e.note
+    assert e.revenue is None and "не отдал выручку" in e.note
