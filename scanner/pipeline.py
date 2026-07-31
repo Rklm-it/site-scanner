@@ -79,39 +79,54 @@ def collect_urls(
     cache,
     skip_seen: bool = False,
     on_query=None,
-    time_budget: float = 180.0,
+    time_budget: float = 240.0,
+    concurrency: int = 6,
 ) -> list[tuple[str, str]]:
     """Собирает уникальные (url, query), убирая агрегаторы и просмотренные домены.
 
-    ``on_query(done, total)`` — колбэк прогресса сбора выдачи.
-    ``time_budget`` — потолок по времени на всю фазу сбора, чтобы скан не
-    зависал, если поисковик отвечает слишком медленно.
+    Запросы к поисковику идут ПАРАЛЛЕЛЬНО (Яндекс отвечает по несколько секунд —
+    последовательно десятки запросов не укладывались в бюджет). ``on_query`` —
+    прогресс, ``time_budget`` — потолок по времени на всю фазу сбора.
     """
-    import time as _time
-    started = _time.monotonic()
     seen: set[str] = set()
     out: list[tuple[str, str]] = []
     total = len(queries)
-    for i, query in enumerate(queries, start=1):
-        if _time.monotonic() - started > time_budget:
-            log.warning("Сбор выдачи прерван по таймауту (%.0fс): обработано %d/%d запросов, доменов %d",
-                        time_budget, i - 1, total, len(out))
-            break
-        urls = search_mod.search_many(query, providers=providers, max_results=max_per_query, cache=cache)
-        kept = 0
-        for url in urls:
-            domain = registered_domain(url)
-            if not domain or domain in SKIP_DOMAINS or domain in seen:
-                continue
-            if skip_seen and cache.is_seen(domain):
-                continue
-            seen.add(domain)
-            scheme = urlparse(url).scheme or "https"
-            out.append((f"{scheme}://{domain}", query))
-            kept += 1
-        log.info("«%s»: выдача %d → к скану %d (агрегаторы/дубли отсеяны)", query, len(urls), kept)
-        if on_query:
-            on_query(i, total)
+    done = 0
+
+    pool = ThreadPoolExecutor(max_workers=max(1, min(concurrency, total)))
+    futures = {
+        pool.submit(search_mod.search_many, q, providers=providers,
+                    max_results=max_per_query, cache=cache): q
+        for q in queries
+    }
+    try:
+        for future in as_completed(futures, timeout=time_budget):
+            query = futures[future]
+            try:
+                urls = future.result()
+            except Exception as exc:  # noqa: BLE001 — не роняем сбор из-за одного запроса
+                log.warning("поиск по «%s» упал: %s", query, exc)
+                urls = []
+            kept = 0
+            for url in urls:                       # дедуп/фильтрация — в главном потоке
+                domain = registered_domain(url)
+                if not domain or domain in SKIP_DOMAINS or domain in seen:
+                    continue
+                if skip_seen and cache.is_seen(domain):
+                    continue
+                seen.add(domain)
+                scheme = urlparse(url).scheme or "https"
+                out.append((f"{scheme}://{domain}", query))
+                kept += 1
+            done += 1
+            log.info("«%s»: выдача %d → к скану %d (агрегаторы/дубли отсеяны)", query, len(urls), kept)
+            if on_query:
+                on_query(done, total)
+    except TimeoutError:
+        log.warning("Сбор выдачи прерван по таймауту (%.0fс): обработано %d/%d запросов, доменов %d",
+                    time_budget, done, total, len(out))
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
     return out
 
 
