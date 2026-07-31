@@ -31,7 +31,7 @@ PAGES = {
 }
 
 
-def fake_search(query, *, provider, max_results=20, cache=None):
+def fake_search(query, *, provider, max_results=20, cache=None, **kw):
     return [
         "https://old-garage.ru/uslugi/remont",
         "https://modern-shop.ru/",
@@ -84,7 +84,7 @@ def test_pipeline_end_to_end(monkeypatch, tmp_path):
 
 def test_tls_error_boosts_score(monkeypatch):
     monkeypatch.setattr(pipeline.search_mod, "search",
-                        lambda q, *, provider, max_results=20, cache=None: ["https://broken-ssl.ru/"])
+                        lambda q, *, provider, max_results=20, cache=None, **kw: ["https://broken-ssl.ru/"])
 
     def broken(url, **kw):
         return FetchResult(url=url, final_url="http://broken-ssl.ru", status=200,
@@ -123,7 +123,7 @@ def test_collect_reports_progress(monkeypatch):
 def test_aggregator_excluded(monkeypatch):
     """Каталог/доска объявлений отсеивается по заголовку, даже если домен новый."""
     monkeypatch.setattr(pipeline.search_mod, "search",
-                        lambda q, *, provider, max_results=20, cache=None: ["https://doska-new.ru/"])
+                        lambda q, *, provider, max_results=20, cache=None, **kw: ["https://doska-new.ru/"])
     AGG = ("<html><head><title>Доска бесплатных объявлений города</title></head>"
            "<body><table width=800><tr><td>объявления</td></tr></table>© 2011</body></html>")
 
@@ -140,7 +140,7 @@ def test_scan_hard_timeout(monkeypatch):
     """Предохранитель: даже если сайты виснут, run() завершается по бюджету."""
     import time as _t
     monkeypatch.setattr(pipeline.search_mod, "search",
-                        lambda q, *, provider, max_results=20, cache=None:
+                        lambda q, *, provider, max_results=20, cache=None, **kw:
                         ["https://hang1.ru", "https://hang2.ru", "https://hang3.ru"])
 
     def hanging(url, **kw):

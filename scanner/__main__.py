@@ -28,7 +28,7 @@ def _apply_cli(settings: Settings, args: argparse.Namespace) -> Settings:
     if args.provider:
         settings.providers = args.provider
     for name in ("max_per_query", "concurrency", "min_score", "timeout", "out", "top",
-                 "per_host_delay", "cache_path", "search_ttl"):
+                 "per_host_delay", "cache_path", "search_ttl", "total_budget"):
         val = getattr(args, name)
         if val is not None:
             setattr(settings, name, val)
@@ -71,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
     scan.add_argument("--concurrency", type=int, help="сколько сайтов сканировать параллельно")
     scan.add_argument("--min-score", type=int, help="минимальный балл устаревания для попадания в список")
     scan.add_argument("--timeout", type=float, help="таймаут запроса к сайту, сек")
+    scan.add_argument("--total-budget", type=float,
+                      help="потолок времени на весь прогон, сек (по умолчанию 1800)")
     scan.add_argument("--per-host-delay", type=float, help="пауза между запросами к одному домену, сек")
     scan.add_argument("--no-robots", action="store_true", help="не учитывать robots.txt")
     scan.add_argument("--no-follow-contacts", action="store_true", help="не заходить на страницу контактов")

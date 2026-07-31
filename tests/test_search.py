@@ -104,13 +104,13 @@ def test_yandex_dispatcher_cloud_for_apikey(monkeypatch):
     monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
     called = {}
 
-    def classic(q, auth, mr):
+    def classic(q, auth, mr, deadline=None):
         called["classic"] = True
         return []
 
     monkeypatch.setattr(search_mod, "_yandex_classic", classic)
     monkeypatch.setattr(search_mod, "search_yandex_cloud",
-                        lambda q, *, max_results=20: ["https://cloud.ru"])
+                        lambda q, *, max_results=20, **kw: ["https://cloud.ru"])
     assert search_mod.search_yandex("q") == ["https://cloud.ru"]
     assert "classic" not in called  # классический endpoint не дёргаем
 
@@ -122,7 +122,7 @@ def test_yandex_dispatcher_classic_for_userkey(monkeypatch):
     monkeypatch.setenv("YANDEX_XML_USER", "u")
     monkeypatch.setenv("YANDEX_XML_KEY", "k")
     monkeypatch.setattr(search_mod, "_yandex_classic",
-                        lambda q, auth, mr: ["https://classic.ru"] if auth.get("user") else [])
+                        lambda q, auth, mr, deadline=None: ["https://classic.ru"] if auth.get("user") else [])
     assert search_mod.search_yandex("q") == ["https://classic.ru"]
 
 
@@ -148,7 +148,7 @@ def test_yandex_cloud_async_operation(monkeypatch):
 
 
 def test_search_many_round_robin_dedupe(monkeypatch):
-    def fake_search(query, *, provider, max_results=20, cache=None):
+    def fake_search(query, *, provider, max_results=20, cache=None, **kw):
         data = {
             "yandex": ["https://a.ru", "https://b.ru", "https://c.ru"],
             "google": ["https://b.ru", "https://d.ru"],  # b.ru — дубль

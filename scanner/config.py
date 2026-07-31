@@ -23,8 +23,14 @@ class Settings:
     concurrency: int = 16
     min_score: int = 0
     timeout: float = 8.0
-    scan_budget: float | None = None   # потолок времени на фазу скана (сек); None — авто
     follow_contact_page: bool = True
+
+    # потолки времени (сек). Прогон не может идти дольше total_budget: каждая
+    # фаза берёт не больше своего бюджета И не больше остатка от общего.
+    total_budget: float = 1800.0       # весь прогон целиком
+    collect_budget: float = 240.0      # сбор выдачи из поисковиков
+    scan_budget: float | None = None   # фаза скана сайтов; None — авто от объёма
+    enrich_budget: float = 600.0       # обогащение через DaData/DataNewton
 
     # вежливость
     respect_robots: bool = True

@@ -92,11 +92,18 @@ def fetch(
     timeout: float = 12.0,
     max_bytes: int = 3_000_000,
     session: requests.Session | None = None,
+    max_total: float | None = None,
 ) -> FetchResult:
     """Скачивает HTML страницы.
 
     Пробует https, при ошибке TLS/соединения — http, и фиксирует факт
     битого сертификата (``tls_error``) — это отдельный сигнал заброшенности.
+
+    ``timeout`` у requests — потолок на ОДНУ операцию с сокетом, а не на запрос
+    целиком: цепочка редиректов (их до 30) множит его на каждый переход, плюс
+    сверху ложится вторая попытка по http. Поэтому весь вызов ограничен ещё и
+    ``max_total`` (по умолчанию — 2.5 таймаута): именно такие сайты и держали
+    скан на одном «пункте».
     """
     sess = session or requests.Session()
     target = _normalize(url)
@@ -106,21 +113,26 @@ def fetch(
 
     last_error: str | None = None
     tls_error = False
+    hard_deadline = time.perf_counter() + (max_total if max_total is not None else timeout * 2.5)
 
     for candidate in candidates:
         started = time.perf_counter()
+        left = hard_deadline - started
+        if left <= 0:
+            last_error = last_error or f"превышен общий лимит {timeout * 2.5:.0f}с на загрузку"
+            break
         try:
             resp = sess.get(
                 candidate,
                 headers=DEFAULT_HEADERS,
-                timeout=timeout,
+                timeout=min(timeout, left),
                 allow_redirects=True,
                 stream=True,
             )
             # Жёсткий дедлайн на чтение тела: при stream=True таймаут requests
             # не покрывает медленную «струйку» байт, и read() может висеть
             # намного дольше timeout. Читаем чанками с общим лимитом по времени.
-            deadline = started + timeout
+            deadline = min(started + timeout, hard_deadline)
             buf = bytearray()
             try:
                 for chunk in resp.iter_content(16384):

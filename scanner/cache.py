@@ -23,6 +23,7 @@ class Cache:
         self.page_ttl = page_ttl
         self.cache_pages = cache_pages
         self._lock = threading.Lock()
+        self._closed = False
         self._conn = sqlite3.connect(path, check_same_thread=False)
         self._init()
 
@@ -42,8 +43,14 @@ class Cache:
             )
 
     # ---- поиск ----
+    # Все чтения/записи проходят через _closed: прогон закрывает кэш сразу после
+    # выхода по таймауту, а брошенные потоки скана ещё какое-то время живы и
+    # продолжают в него писать. Раньше это давало ProgrammingError на закрытом
+    # соединении вместо тихого no-op.
     def get_search(self, query: str, provider: str) -> list[str] | None:
         with self._lock:
+            if self._closed:
+                return None
             row = self._conn.execute(
                 "SELECT ts, urls FROM search_cache WHERE query=? AND provider=?",
                 (query, provider),
@@ -53,17 +60,26 @@ class Cache:
         return None
 
     def set_search(self, query: str, provider: str, urls: list[str]) -> None:
-        with self._lock, self._conn:
-            self._conn.execute(
-                "INSERT OR REPLACE INTO search_cache(query, provider, ts, urls) VALUES(?,?,?,?)",
-                (query, provider, time.time(), json.dumps(urls, ensure_ascii=False)),
-            )
+        self._write(
+            "INSERT OR REPLACE INTO search_cache(query, provider, ts, urls) VALUES(?,?,?,?)",
+            (query, provider, time.time(), json.dumps(urls, ensure_ascii=False)),
+        )
+
+    def _write(self, sql: str, params: tuple) -> None:
+        """Запись под локом, с проверкой «кэш ещё не закрыт» внутри лока."""
+        with self._lock:
+            if self._closed:
+                return
+            with self._conn:
+                self._conn.execute(sql, params)
 
     # ---- страницы ----
     def get_page(self, url: str) -> FetchResult | None:
         if not self.cache_pages:
             return None
         with self._lock:
+            if self._closed:
+                return None
             row = self._conn.execute(
                 "SELECT ts, status, final_url, html, headers, https, tls_error "
                 "FROM page_cache WHERE url=?",
@@ -80,31 +96,32 @@ class Cache:
     def set_page(self, res: FetchResult) -> None:
         if not self.cache_pages or not res.ok:
             return
-        with self._lock, self._conn:
-            self._conn.execute(
-                "INSERT OR REPLACE INTO page_cache"
-                "(url, ts, status, final_url, html, headers, https, tls_error) "
-                "VALUES(?,?,?,?,?,?,?,?)",
-                (res.url, time.time(), res.status, res.final_url, res.html,
-                 json.dumps(res.headers or {}, ensure_ascii=False),
-                 int(res.https), int(res.tls_error)),
-            )
+        self._write(
+            "INSERT OR REPLACE INTO page_cache"
+            "(url, ts, status, final_url, html, headers, https, tls_error) "
+            "VALUES(?,?,?,?,?,?,?,?)",
+            (res.url, time.time(), res.status, res.final_url, res.html,
+             json.dumps(res.headers or {}, ensure_ascii=False),
+             int(res.https), int(res.tls_error)),
+        )
 
     # ---- просмотренные домены ----
     def is_seen(self, domain: str) -> bool:
         with self._lock:
+            if self._closed:
+                return False
             row = self._conn.execute("SELECT 1 FROM seen WHERE domain=?", (domain,)).fetchone()
         return row is not None
 
     def mark_seen(self, domain: str, score: int) -> None:
-        with self._lock, self._conn:
-            self._conn.execute(
-                "INSERT OR REPLACE INTO seen(domain, ts, score) VALUES(?,?,?)",
-                (domain, time.time(), score),
-            )
+        self._write("INSERT OR REPLACE INTO seen(domain, ts, score) VALUES(?,?,?)",
+                    (domain, time.time(), score))
 
     def close(self) -> None:
         with self._lock:
+            if self._closed:
+                return
+            self._closed = True
             self._conn.close()
 
 

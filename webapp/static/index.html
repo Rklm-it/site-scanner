@@ -679,9 +679,10 @@ async function poll() {
       pct = t ? Math.round(job.enrich_done / t * 100) : 100;
     } else if (job.phase === "rank") {
       label = "Готовлю список и приоритеты…"; pct = 100;
-    } else if (job.total) {                 // сканирование сайтов
-      label = `Проверяю сайты: ${job.done}/${job.total}`;
-      pct = Math.round(job.done / job.total * 100);
+    } else if (job.phase === "scan") {      // сканирование сайтов
+      label = job.total ? `Проверяю сайты: ${job.done}/${job.total}`
+                        : "Проверяю сайты: поисковики не дали ни одного домена";
+      pct = job.total ? Math.round(job.done / job.total * 100) : 100;
     } else if (job.collect_total) {         // сбор выдачи из поисковиков
       label = `Собираю выдачу из поисковиков: ${job.collect_done}/${job.collect_total} запросов`;
       pct = Math.round(job.collect_done / job.collect_total * 100);
@@ -691,9 +692,16 @@ async function poll() {
     // Секундомер-«пульс»: даже когда счётчик стоит, видно, что скан жив.
     sub = `<div class="hint" style="margin-top:6px">идёт ${job.elapsed}s` +
       (job.count ? ` · уже найдено лидов: ${job.count}` : "") + `</div>`;
-    const slow = job.elapsed > 90 && !job.total && job.phase !== "enrich"
-      ? `<div class="hint bad" style="margin-top:4px">Долго собирается выдача — проверьте ключ/баланс поисковика в «API-ключи». Скан прервётся сам по таймауту.</div>`
-      : "";
+    // Подсказки, когда счётчик подолгу стоит на месте. У каждой фазы свой
+    // бюджет, за который она прервётся сама — скан не может висеть вечно.
+    let slow = "";
+    if (job.elapsed > 90 && (job.phase === "collect" || job.phase === "")) {
+      slow = `<div class="hint bad" style="margin-top:4px">Долго собирается выдача — проверьте ключ/баланс поисковика в «API-ключи». Фаза прервётся сама через 4 минуты.</div>`;
+    } else if (job.elapsed > 300 && job.phase === "enrich") {
+      slow = `<div class="hint bad" style="margin-top:4px">Реестры отвечают медленно. Фаза оборвётся сама по бюджету — у части компаний оборот останется пустым.</div>`;
+    } else if (job.elapsed > 900) {
+      slow = `<div class="hint bad" style="margin-top:4px">Прогон затянулся. Он завершится сам не позже 30 минут — результат сохранится частичным.</div>`;
+    }
     html += `<div class="panel"><strong>${label}</strong>
       <div class="progress"><i style="width:${pct}%"></i></div>${sub}${slow}</div>`;
   } else if (job.status === "error") {
