@@ -415,6 +415,56 @@ let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outreach_score", SORT_DIR = -1
 let VIEW = "scan", LAST_JOB = null, BASE = [], SMTP_OK = false;
 const SELCATS = new Set();
 
+// --- сохранение формы между перезагрузками -------------------------------
+// Ключи и лиды лежат на сервере, а вот сама форма жила только в памяти
+// вкладки: перезагрузил страницу — и заново набирай ниши, города и галочки.
+const LS_FORM = "site-scanner:form";
+const LS_JOB = "site-scanner:job";
+const FORM_TEXT = ["queries", "cities", "categories", "max_per_query", "min_score",
+                   "concurrency", "per_host_delay"];
+const FORM_CHECK = ["enrich", "respect_robots", "follow_contact_page", "skip_seen", "use_cache"];
+const CAT_UPDATERS = [];          // пересчёт счётчиков групп категорий
+
+function saveForm() {
+  const data = {
+    cats: [...SELCATS],
+    providers: [...document.querySelectorAll(".prov:checked")].map(i => i.value),
+  };
+  FORM_TEXT.forEach(id => { if ($(id)) data[id] = $(id).value; });
+  FORM_CHECK.forEach(id => { if ($(id)) data[id] = $(id).checked; });
+  try { localStorage.setItem(LS_FORM, JSON.stringify(data)); } catch (e) { /* приватный режим */ }
+}
+
+function restoreForm() {
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(LS_FORM) || "null"); } catch (e) { return; }
+  if (!data) return;
+  FORM_TEXT.forEach(id => { if ($(id) && data[id] != null) $(id).value = data[id]; });
+  FORM_CHECK.forEach(id => { if ($(id) && data[id] != null) $(id).checked = data[id]; });
+  if (Array.isArray(data.providers) && data.providers.length) {
+    document.querySelectorAll(".prov").forEach(i => i.checked = data.providers.includes(i.value));
+  }
+  if (Array.isArray(data.cats)) {
+    SELCATS.clear();
+    data.cats.forEach(c => SELCATS.add(c));
+    document.querySelectorAll(".catchip").forEach(ch => {
+      if (SELCATS.has(ch.textContent)) {
+        ch.classList.add("sel");
+        // группу с выбранными нишами раскрываем — иначе выбор не виден
+        const d = ch.closest(".catgroup-d");
+        if (d) d.open = true;
+      }
+    });
+    CAT_UPDATERS.forEach(fn => fn());
+  }
+}
+
+function watchForm() {
+  FORM_TEXT.forEach(id => $(id) && $(id).addEventListener("input", saveForm));
+  FORM_CHECK.forEach(id => $(id) && $(id).addEventListener("change", saveForm));
+  document.querySelectorAll(".prov").forEach(i => i.addEventListener("change", saveForm));
+}
+
 async function init() {
   const cfg = await (await fetch("/api/config")).json();
   // провайдеры
@@ -446,7 +496,7 @@ async function init() {
       chip.onclick = () => {
         chip.classList.toggle("sel");
         chip.classList.contains("sel") ? SELCATS.add(c) : SELCATS.delete(c);
-        upd();
+        upd(); saveForm();
       };
       row.appendChild(chip);
     });
@@ -458,8 +508,9 @@ async function init() {
         if (allSel) { ch.classList.remove("sel"); SELCATS.delete(ch.textContent); }
         else { ch.classList.add("sel"); SELCATS.add(ch.textContent); }
       });
-      upd();
+      upd(); saveForm();
     };
+    CAT_UPDATERS.push(upd);
     det.appendChild(sum); det.appendChild(row); box.appendChild(det);
   });
   renderKeys(cfg.secrets);
@@ -486,7 +537,20 @@ async function init() {
   // вкладки Скан / База
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchView(t.dataset.v));
 
+  // форма — после того, как построены чипы категорий и чекбоксы провайдеров
+  restoreForm();
+  watchForm();
+
   render();  // показать гайд сразу при загрузке
+
+  // Скан идёт на сервере и переживает перезагрузку страницы — подхватываем его,
+  // а не бросаем пользователя с заблокированной кнопкой.
+  const running = localStorage.getItem(LS_JOB);
+  if (running) {
+    CURRENT_JOB = running;
+    $("run").disabled = true;
+    poll();
+  }
 }
 
 function setActiveTab() {
@@ -643,11 +707,21 @@ $("run").onclick = async () => {
     follow_contact_page: $("follow_contact_page").checked, skip_seen: $("skip_seen").checked,
     use_cache: $("use_cache").checked,
   };
-  const res = await fetch("/api/scan", {method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(body)});
-  if (!res.ok) { $("status").innerHTML = `<div class="warn bad">${(await res.json()).detail}</div>`; return; }
-  const {job_id, warnings} = await res.json();
+  saveForm();                      // запомнить настройки прогона на будущее
+
+  let res, data;
+  try {
+    res = await fetch("/api/scan", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body)});
+    data = await res.json();
+  } catch (e) {
+    $("status").innerHTML = `<div class="warn bad">Не достучались до сервера — проверьте, что он запущен.</div>`;
+    return;                        // кнопку не блокировали, повторить можно сразу
+  }
+  if (!res.ok) { $("status").innerHTML = `<div class="warn bad">${escHtml(data.detail || "Ошибка запуска.")}</div>`; return; }
+  const {job_id, warnings} = data;
   CURRENT_JOB = job_id;
+  try { localStorage.setItem(LS_JOB, job_id); } catch (e) { /* приватный режим */ }
   VIEW = "scan"; setActiveTab();
   $("run").disabled = true; $("toolbar").style.display = "none";
   $("results").innerHTML = ""; $("summary").innerHTML = "";
@@ -664,9 +738,50 @@ function escHtml(s) {
   return String(s).replace(/[&<>]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;"}[c]));
 }
 
+let POLL_FAILS = 0;
+
+/** Завершить прогон в интерфейсе: разблокировать кнопку и снять «щёлк» опроса.
+ *  Раньше кнопка разблокировалась ТОЛЬКО при успешном ответе со статусом
+ *  done/error. Любой сбой — моргнула сеть, перезапустился контейнер, задача
+ *  потерялась — обрывал цикл опроса молча, и «Запустить скан» оставалась
+ *  нажатой навсегда: помогала лишь перезагрузка страницы. */
+function stopRun(message) {
+  clearTimeout(TIMER);
+  POLL_FAILS = 0;
+  $("run").disabled = false;
+  try { localStorage.removeItem(LS_JOB); } catch (e) { /* приватный режим */ }
+  if (message) {
+    $("status").innerHTML = `<div class="warn bad">${escHtml(message)}</div>`;
+  }
+}
+
 async function poll() {
   clearTimeout(TIMER);
-  const job = await (await fetch(`/api/scan/${CURRENT_JOB}`)).json();
+
+  let res, job;
+  try {
+    res = await fetch(`/api/scan/${CURRENT_JOB}`);
+    job = await res.json();
+  } catch (e) {
+    // Сеть моргнула или сервер перезапускается — не роняем цикл, ждём и пробуем
+    // снова. Сдаёмся только после серии неудач, и тогда честно об этом говорим.
+    if (++POLL_FAILS > 15) {
+      stopRun("Потеряна связь с сервером. Обновите страницу — если скан ещё идёт, он подхватится сам.");
+      return;
+    }
+    TIMER = setTimeout(poll, 2000);
+    return;
+  }
+
+  if (res.status === 404) {
+    stopRun("Задача не найдена: сервер перезапускался, список задач хранится в его памяти. Запустите скан заново.");
+    return;
+  }
+  if (!res.ok) {
+    stopRun((job && job.detail) || `Сервер ответил ошибкой ${res.status}.`);
+    return;
+  }
+  POLL_FAILS = 0;
 
   // Предупреждения (в т.ч. живые ошибки провайдера) — заново каждый опрос.
   let html = (job.warnings || []).map(x => `<div class="warn">⚠ ${escHtml(x)}</div>`).join("");
@@ -710,7 +825,7 @@ async function poll() {
   $("status").innerHTML = html;
 
   if (job.status === "done" || job.status === "error") {
-    $("run").disabled = false;
+    stopRun();                     // кнопка снова активна, метка задачи снята
     if (job.status === "done") showResults(job);
     return;
   }
