@@ -228,6 +228,9 @@ def _run_job(job: Job, settings: Settings) -> None:
             row = l.to_row()
             row.update(outreach.build_message(l, signature=signature))
             row["call_script"] = outreach.build_call_script(l, caller_name=caller)
+            tp = outreach.build_talking_points(l)
+            row["talk_savvy"] = tp["savvy"]
+            row["talk_simple"] = tp["simple"]
             st = saved.get(l.domain, {})
             row["status"] = st.get("status", "")
             row["note"] = st.get("note", "")

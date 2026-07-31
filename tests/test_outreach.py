@@ -1,5 +1,24 @@
-from scanner.outreach import build_message, build_call_script, _pick_hook
+from scanner.outreach import build_message, build_call_script, build_talking_points, _pick_hook
 from scanner.models import Lead, Contacts, Enrichment
+
+
+def test_talking_points_two_registers():
+    lead = Lead(url="https://x.ru", domain="x.ru",
+                signals=["нет meta viewport (не адаптивный)", "нет HTTPS", "старый PHP (php/5.3.29)"])
+    tp = build_talking_points(lead)
+    assert tp["savvy"] and tp["simple"]
+    # для шарящих — термины, для не шарящих — без них
+    savvy_txt, simple_txt = " ".join(tp["savvy"]).lower(), " ".join(tp["simple"]).lower()
+    assert "mobile-first" in savvy_txt or "ранжир" in savvy_txt
+    assert "телефон" in simple_txt
+    # обе версии заканчиваются оффером про готовый прототип
+    assert any("набросок" in x for x in tp["savvy"])
+    assert any("набросок" in x for x in tp["simple"])
+
+
+def test_talking_points_fallback_without_signals():
+    tp = build_talking_points(Lead(url="https://x.ru", domain="x.ru", signals=[]))
+    assert len(tp["savvy"]) >= 1 and len(tp["simple"]) >= 1
 
 
 def test_build_call_script():
