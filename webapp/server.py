@@ -32,8 +32,18 @@ SHOTS_DIR = DATA_DIR / "shots"
 STATIC = Path(__file__).parent / "static"
 _DOMAIN_RE = re.compile(r"^[a-z0-9.\-]+$", re.I)
 
-# Чтобы INFO-логи движка (scanner.*) были видны в docker compose logs
-logging.getLogger("scanner").setLevel(logging.INFO)
+# Чтобы логи движка (scanner.*) были видны в docker compose logs.
+# ВАЖНО: одного setLevel мало. Свой обработчик тут не настроен, uvicorn
+# настраивает только свои логгеры, и сообщения уходили в аварийный обработчик
+# logging.lastResort — а он пропускает лишь WARNING и выше. В итоге весь
+# INFO-разбор прогона («выдача N → к скану M», «К сканированию: N доменов»)
+# в логи не попадал вообще, и диагностировать пустой скан было нечем.
+_scan_log = logging.getLogger("scanner")
+_scan_log.setLevel(logging.INFO)
+if not _scan_log.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("%(levelname)s [%(name)s] %(message)s"))
+    _scan_log.addHandler(_h)
 
 STORE: LeadStore | None = None
 

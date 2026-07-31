@@ -138,6 +138,7 @@ def collect_urls(
     out: list[tuple[str, str]] = []
     total = len(queries)
     done = 0
+    skipped_seen = 0          # сколько доменов срезала галочка «пропускать виденные»
     deadline = time.monotonic() + time_budget
 
     pool = ThreadPoolExecutor(max_workers=max(1, min(concurrency, total)))
@@ -160,6 +161,8 @@ def collect_urls(
                 if not domain or domain in SKIP_DOMAINS or domain in seen:
                     continue
                 if skip_seen and cache.is_seen(domain):
+                    seen.add(domain)          # чтобы не считать один домен дважды
+                    skipped_seen += 1
                     continue
                 seen.add(domain)
                 scheme = urlparse(url).scheme or "https"
@@ -175,6 +178,16 @@ def collect_urls(
                     time_budget, done, total, len(out))
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
+
+    # Самый обидный вид пустого результата: выдача пришла, но всё срезано как
+    # «уже виденное». Снаружи это неотличимо от «поисковик молчит», поэтому
+    # говорим прямо, что делать.
+    if skipped_seen and not out:
+        log.warning("Все %d найденных доменов уже есть в базе просмотренных — "
+                    "снимите галочку «пропускать виденные» или смените ниши/город",
+                    skipped_seen)
+    elif skipped_seen:
+        log.info("Пропущено как уже виденные: %d доменов", skipped_seen)
     return out
 
 

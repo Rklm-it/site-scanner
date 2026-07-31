@@ -289,3 +289,13 @@ def test_index_served(client):
     c, _ = client
     html = c.get("/").text
     assert "site-scanner" in html and "Запустить скан" in html
+
+
+def test_scanner_logs_reach_stdout():
+    """У логгера движка должен быть обработчик: без него INFO-разбор прогона
+    уходил в logging.lastResort и не попадал в docker compose logs вообще."""
+    import logging
+
+    log = logging.getLogger("scanner")
+    assert log.handlers, "у логгера scanner нет обработчика — логи прогона не видны"
+    assert log.level <= logging.INFO

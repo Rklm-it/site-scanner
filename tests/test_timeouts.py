@@ -257,3 +257,36 @@ def test_regexes_still_match_real_values():
     assert EMAIL_RE.findall("i.van-ov+tag@mail.spb.ru") == ["i.van-ov+tag@mail.spb.ru"]
     assert PHONE_RE.findall("+7 (843) 555-00-11") == ["+7 (843) 555-00-11"]
     assert PHONE_RE.findall("8-800-555-35-35") == ["8-800-555-35-35"]
+
+
+# --------------------------------------------------------------------------- #
+# Пустой результат должен объяснять себя
+# --------------------------------------------------------------------------- #
+def test_collect_warns_when_everything_already_seen(monkeypatch, caplog):
+    """Выдача пришла, но всё срезано как «уже виденное». Снаружи это выглядит
+    так же, как «поисковик молчит» — поэтому говорим прямо."""
+    from scanner.cache import NullCache
+
+    class SeenAll(NullCache):
+        def is_seen(self, domain):
+            return True
+
+    monkeypatch.setattr(pipeline.search_mod, "search_many",
+                        lambda q, **kw: ["https://a.ru", "https://b.ru"])
+    with caplog.at_level("WARNING", logger="scanner"):
+        out = pipeline.collect_urls(["стоматология"], providers=["yandex"],
+                                    max_per_query=5, cache=SeenAll(), skip_seen=True)
+    assert out == []
+    assert "пропускать виденные" in caplog.text
+    assert "Все 2 найденных домена" in caplog.text or "Все 2" in caplog.text
+
+
+def test_collect_no_seen_warning_when_results_found(monkeypatch, caplog):
+    from scanner.cache import NullCache
+
+    monkeypatch.setattr(pipeline.search_mod, "search_many",
+                        lambda q, **kw: ["https://a.ru"])
+    with caplog.at_level("WARNING", logger="scanner"):
+        out = pipeline.collect_urls(["стоматология"], providers=["yandex"],
+                                    max_per_query=5, cache=NullCache(), skip_seen=True)
+    assert len(out) == 1 and "пропускать виденные" not in caplog.text
