@@ -75,3 +75,13 @@ def test_revenue_by_inn_reports_missing_revenue_row():
 def test_revenue_by_inn_skips_without_inn_or_token():
     assert datanewton.revenue_by_inn("", token="k") == (None, None)
     assert datanewton.revenue_by_inn("123", token=None) == (None, None)
+
+
+def test_revenue_by_inn_detects_exhausted_key():
+    """Исчерпанный ключ приходит как HTTP 200 с заглушкой вместо отчёта —
+    без кода ошибки. Молча это выглядело как «нет данных о компании»."""
+    rev, err = datanewton.revenue_by_inn(
+        "7707083893", token="k",
+        session=_sess(FakeResp(200, {"available_count": 0, "demo_available_count": 182})))
+    assert rev is None
+    assert "закончились запросы" in err and "182" in err

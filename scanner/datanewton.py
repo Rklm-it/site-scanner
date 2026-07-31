@@ -78,6 +78,17 @@ def revenue_by_inn(inn: str, *, token: str | None = None,
     except ValueError:
         return None, "DataNewton прислал не-JSON ответ"
 
+    # Исчерпанный ключ выглядит как успех: HTTP 200 и тело вида
+    # {"available_count": 0, "demo_available_count": 182} вместо отчёта, без
+    # какого-либо кода ошибки. Раньше это молча читалось как «нет данных о
+    # компании», и оборот пропадал у всех лидов разом без объяснения.
+    if isinstance(data, dict) and "available_count" in data and not data.get("fin_results"):
+        left = data.get("available_count")
+        demo = data.get("demo_available_count")
+        tail = f", демо-запросов {demo}" if demo else ""
+        return None, (f"DataNewton: на ключе закончились запросы (осталось {left}{tail}) — "
+                      f"пополните ключ в личном кабинете datanewton.ru")
+
     # Пустой ответ и «нет строки Выручка» — разные вещи, и ни одна из них не
     # означает «компания не публиковала отчётность»: так же выглядит тариф без
     # финансов и сменившаяся структура ответа. Не выдаём догадку за факт.
