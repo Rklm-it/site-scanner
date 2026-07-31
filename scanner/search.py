@@ -29,6 +29,7 @@ from .fetcher import DEFAULT_HEADERS
 
 GOOGLE_CSE = "https://www.googleapis.com/customsearch/v1"
 YANDEX_XML = "https://yandex.ru/search/xml"
+YANDEX_CLOUD_SYNC = "https://searchapi.api.cloud.yandex.net/v2/web/search"
 YANDEX_CLOUD_ASYNC = "https://searchapi.api.cloud.yandex.net/v2/web/searchAsync"
 YANDEX_OPERATION = "https://operation.api.cloud.yandex.net/operations/"
 SERPAPI = "https://serpapi.com/search"
@@ -218,7 +219,8 @@ def _yandex_operation_rawdata(data: dict, headers: dict, *, poll_timeout: int = 
             r = _http("get", YANDEX_OPERATION + op_id, headers=headers, timeout=20,
                       deadline=until)
         except requests.RequestException as exc:
-            log.warning("Yandex Cloud: опрос операции упал: %s", exc)
+            log.warning("Yandex Cloud: нет связи с operation.api.cloud.yandex.net "
+                        "(сам поиск при этом отработал) — проверьте сеть/IPv6 сервера: %s", exc)
             return None
         if r.status_code != 200:
             log.warning("Yandex Cloud operation HTTP %s: %s", r.status_code, r.text[:300])
@@ -228,10 +230,40 @@ def _yandex_operation_rawdata(data: dict, headers: dict, *, poll_timeout: int = 
     return None
 
 
+def _yandex_cloud_sync_page(body: dict, headers: dict,
+                            deadline: float | None) -> tuple[str | None, bool]:
+    """Синхронный метод v2: rawData приходит прямо в ответе.
+
+    Возвращает ``(rawData, доступен_ли_метод)``. Второй флаг гасит дальнейшие
+    попытки в этом прогоне, если метод не поддерживается — чтобы не тратить
+    по запросу на каждую страницу выдачи.
+    """
+    try:
+        resp = _http("post", YANDEX_CLOUD_SYNC, json=body, headers=headers, timeout=30,
+                     deadline=deadline)
+    except requests.RequestException as exc:
+        log.warning("Yandex Cloud search (синхронный) недоступен: %s", exc)
+        return None, False
+    if resp.status_code != 200:
+        log.info("Yandex Cloud search (синхронный) HTTP %s — перехожу на отложенный",
+                 resp.status_code)
+        return None, False
+    try:
+        return (resp.json() or {}).get("rawData"), True
+    except ValueError:
+        return None, False
+
+
 def search_yandex_cloud(query: str, *, max_results: int = 20,
                         deadline: float | None = None) -> list[str]:
-    """Yandex Search API v2 (Yandex Cloud). Асинхронный поток:
-    POST searchAsync → дождаться операции → base64-XML → тот же парсер."""
+    """Yandex Search API v2 (Yandex Cloud).
+
+    Сначала синхронный метод (`/v2/web/search`) — он отдаёт выдачу сразу и
+    ходит только на `searchapi.api.cloud.yandex.net`. Отложенный поток
+    (`searchAsync` → опрос операции) оставлен запасным: он требует второго
+    хоста, `operation.api.cloud.yandex.net`, и если до того нет сети — выдача
+    терялась целиком, хотя сам поиск отрабатывал.
+    """
     api_key = os.environ.get("YANDEX_API_KEY")
     folder = os.environ.get("YANDEX_FOLDER_ID")
     if not (api_key and folder):
@@ -239,6 +271,7 @@ def search_yandex_cloud(query: str, *, max_results: int = 20,
 
     headers = {"Authorization": f"Api-Key {api_key}", "Content-Type": "application/json"}
     urls: list[str] = []
+    sync_available = True
 
     for page in range(0, 5):
         if _expired(deadline):
@@ -248,17 +281,24 @@ def search_yandex_cloud(query: str, *, max_results: int = 20,
             "folderId": folder,
             "responseFormat": "FORMAT_XML",
         }
-        try:
-            resp = _http("post", YANDEX_CLOUD_ASYNC, json=body, headers=headers, timeout=30,
-                         deadline=deadline)
-        except requests.RequestException as exc:
-            log.warning("Yandex Cloud searchAsync упал: %s", exc)
-            break
-        if resp.status_code != 200:
-            log.warning("Yandex Cloud searchAsync HTTP %s: %s", resp.status_code, resp.text[:400])
-            break
 
-        raw_b64 = _yandex_operation_rawdata(resp.json(), headers, deadline=deadline)
+        raw_b64 = None
+        if sync_available:
+            raw_b64, sync_available = _yandex_cloud_sync_page(body, headers, deadline)
+
+        if raw_b64 is None:                      # запасной путь: отложенный запрос
+            try:
+                resp = _http("post", YANDEX_CLOUD_ASYNC, json=body, headers=headers, timeout=30,
+                             deadline=deadline)
+            except requests.RequestException as exc:
+                log.warning("Yandex Cloud searchAsync упал: %s", exc)
+                break
+            if resp.status_code != 200:
+                log.warning("Yandex Cloud searchAsync HTTP %s: %s",
+                            resp.status_code, resp.text[:400])
+                break
+            raw_b64 = _yandex_operation_rawdata(resp.json(), headers, deadline=deadline)
+
         if not raw_b64:
             break
 

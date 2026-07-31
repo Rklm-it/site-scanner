@@ -75,7 +75,9 @@ def test_yandex_cloud_parsing(monkeypatch):
     search_mod._warned.clear()
 
     def fake_http(method, url, **k):
-        assert method == "post" and url == search_mod.YANDEX_CLOUD_ASYNC
+        # основной путь — синхронный метод; отложенный остаётся запасным
+        assert method == "post" and url in (search_mod.YANDEX_CLOUD_SYNC,
+                                            search_mod.YANDEX_CLOUD_ASYNC)
         assert k["headers"]["Authorization"] == "Api-Key apikey"
         page = int(k["json"]["query"]["page"])
         raw = YANDEX_XML if page == 0 else YANDEX_EMPTY
@@ -159,3 +161,69 @@ def test_search_many_round_robin_dedupe(monkeypatch):
     merged = search_mod.search_many("q", providers=["yandex", "google"], max_results=20)
     # round-robin: yandex[0], google[0]=b, yandex[1]=b(дубль,скип), google[1]=d, yandex[2]=c
     assert merged == ["https://a.ru", "https://b.ru", "https://d.ru", "https://c.ru"]
+
+
+# --------------------------------------------------------------------------- #
+# Яндекс Cloud: синхронный метод как основной, отложенный — запасной
+# --------------------------------------------------------------------------- #
+def test_yandex_cloud_prefers_sync(monkeypatch):
+    """Синхронный метод не требует operation.api.cloud.yandex.net — если он
+    работает, второй хост вообще не трогаем."""
+    monkeypatch.setenv("YANDEX_API_KEY", "apikey")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
+    search_mod._warned.clear()
+    hit = []
+
+    def fake_http(method, url, **k):
+        hit.append(url)
+        if url == search_mod.YANDEX_CLOUD_SYNC:
+            page = int(k["json"]["query"]["page"])
+            raw = YANDEX_XML if page == 0 else YANDEX_EMPTY
+            return FakeJsonResp({"rawData": base64.b64encode(raw).decode()})
+        raise AssertionError(f"лишний запрос к {url}")
+
+    monkeypatch.setattr(search_mod, "_http", fake_http)
+    urls = search_mod.search_yandex_cloud("автосервис Казань", max_results=10)
+    assert urls == ["https://garage-old.ru/", "https://stoma-kzn.ru/"]
+    assert all(u == search_mod.YANDEX_CLOUD_SYNC for u in hit)
+    assert search_mod.YANDEX_OPERATION not in hit
+
+
+def test_yandex_cloud_falls_back_to_async(monkeypatch):
+    """Синхронного метода нет (404) — уходим в отложенный поток, выдача цела."""
+    monkeypatch.setenv("YANDEX_API_KEY", "apikey")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
+    monkeypatch.setattr(search_mod.time, "sleep", lambda *_: None)
+    search_mod._warned.clear()
+    sync_calls = []
+
+    def fake_http(method, url, **k):
+        if url == search_mod.YANDEX_CLOUD_SYNC:
+            sync_calls.append(url)
+            return FakeJsonResp({}, status=404, text="not found")
+        if url == search_mod.YANDEX_CLOUD_ASYNC:
+            page = int(k["json"]["query"]["page"])
+            raw = YANDEX_XML if page == 0 else YANDEX_EMPTY
+            return FakeJsonResp({"rawData": base64.b64encode(raw).decode()})
+        raise AssertionError(f"неожиданный url {url}")
+
+    monkeypatch.setattr(search_mod, "_http", fake_http)
+    urls = search_mod.search_yandex_cloud("автосервис Казань", max_results=10)
+    assert urls == ["https://garage-old.ru/", "https://stoma-kzn.ru/"]
+    assert len(sync_calls) == 1        # убедились один раз и больше не пробуем
+
+
+def test_yandex_cloud_sync_survives_network_error(monkeypatch):
+    """Синхронный хост недоступен — не падаем, идём отложенным путём."""
+    monkeypatch.setenv("YANDEX_API_KEY", "apikey")
+    monkeypatch.setenv("YANDEX_FOLDER_ID", "b1gfolder")
+    search_mod._warned.clear()
+
+    def fake_http(method, url, **k):
+        if url == search_mod.YANDEX_CLOUD_SYNC:
+            raise search_mod.requests.ConnectionError("NewConnectionError")
+        return FakeJsonResp({"rawData": base64.b64encode(YANDEX_XML).decode()})
+
+    monkeypatch.setattr(search_mod, "_http", fake_http)
+    assert search_mod.search_yandex_cloud("q", max_results=2) == [
+        "https://garage-old.ru/", "https://stoma-kzn.ru/"]
