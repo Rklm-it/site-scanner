@@ -1,5 +1,5 @@
 """Обогащение лида данными о компании: название/статус/директор — DaData,
-оборот — DataNewton.
+оборот — ГИР БО (ФНС), с DataNewton как запасным источником.
 
 Это тот самый шаг «смотришь оборот» из исходной идеи: по ИНН со страницы
 достаём официальное название, статус (действующая/ликвидирована), оборот,
@@ -7,9 +7,13 @@
 старые сайты, а старые сайты у компаний с деньгами.
 
 DaData (env ``DADATA_TOKEN``, https://dadata.ru/api/find-party/) на бесплатном
-тарифе отдаёт название, статус и ФИО руководителя, но НЕ выручку. Поэтому оборот
-берём у DataNewton (env ``DATANEWTON_TOKEN``, https://datanewton.ru), у которого
-финансы есть и на бесплатном тарифе.
+тарифе отдаёт название, статус и ФИО руководителя, но НЕ выручку.
+
+Оборот берём в ГИР БО (https://bo.nalog.gov.ru) — государственном ресурсе
+бухотчётности ФНС: открыт, без ключа и без лимитов, и это первоисточник, из
+которого агрегаторы данные и перепродают. DataNewton (env ``DATANEWTON_TOKEN``)
+остался запасным: вопреки прежнему комментарию здесь, на бесплатном тарифе он
+финансы не отдаёт — на запрос приходит 200 с ``{"available_count": 0}``.
 """
 
 from __future__ import annotations
@@ -20,6 +24,7 @@ import sys
 import requests
 
 from . import datanewton
+from . import girbo
 from .models import Enrichment
 
 DADATA_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party"
@@ -162,8 +167,10 @@ def lookup_verbose(inn: str | None = None, name: str | None = None, *,
                 e = parse_party(sugg[0].get("data") or {})
                 resolved_inn = resolved_inn or e.inn or None
                 err = None         # получилось со второй/третьей попытки
-    elif not dn_token:
-        e.note = "не задан ключ DaData"
+    elif not resolved_inn:
+        # Без ключа DaData оборот всё ещё достижим — ГИР БО работает по ИНН со
+        # страницы и ключа не требует. Сдаёмся только если и ИНН нет.
+        e.note = "не задан ключ DaData, а ИНН на сайте не нашёлся"
         return e, e.note
 
     # 2. У ИП оборота в реестрах нет — не тратим на них запрос к DataNewton.
@@ -171,13 +178,21 @@ def lookup_verbose(inn: str | None = None, name: str | None = None, *,
         e.note = explain_revenue(e, err, inn=inn, ogrn=ogrn, name=name, dn_token=dn_token)
         return e, err
 
-    # 3. Оборот из DataNewton по резолвнутому ИНН (DaData его бесплатно не отдаёт)
-    if e.revenue is None and resolved_inn and dn_token:
-        rev, rev_err = datanewton.revenue_by_inn(resolved_inn, token=dn_token, session=session)
+    # 3. Оборот. Сначала ГИР БО — первоисточник ФНС, бесплатный и без лимитов.
+    # DataNewton остаётся запасным: на бесплатном тарифе он финансы не отдаёт
+    # (отвечает 200 с {"available_count": 0} вместо отчёта).
+    if e.revenue is None and resolved_inn:
+        rev, gb_err = girbo.revenue_by_inn(resolved_inn, session=session)
         if rev is not None:
             e.revenue = rev
-        elif rev_err and not err:
-            err = rev_err
+        elif dn_token:
+            rev, dn_err = datanewton.revenue_by_inn(resolved_inn, token=dn_token, session=session)
+            if rev is not None:
+                e.revenue = rev
+            elif not err:
+                err = dn_err or gb_err
+        elif not err:
+            err = gb_err
 
     e.note = explain_revenue(e, err, inn=inn, ogrn=ogrn, name=name, dn_token=dn_token)
     return e, err
@@ -205,8 +220,6 @@ def explain_revenue(e: Enrichment, err: str | None = None, *, inn: str | None = 
         return err
     if not (inn or ogrn or name):
         return "на сайте нет ни ИНН, ни названия компании — не по чему искать"
-    if not (dn_token or os.environ.get("DATANEWTON_TOKEN")):
-        return "не задан ключ DataNewton — на бесплатных тарифах оборот отдаёт только он"
     if not e.official_name:
         by = "ИНН" if inn else "ОГРН" if ogrn else "названию с сайта"
         return f"компания не найдена в реестре по {by}"

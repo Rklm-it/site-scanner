@@ -137,10 +137,6 @@ def _credential_warnings(req: ScanRequest) -> list[str]:
             warns.append("SerpAPI: не задан SERPAPI_KEY.")
     if req.enrich and not env("DADATA_TOKEN"):
         warns.append("Обогащение по ИНН: не задан DADATA_TOKEN.")
-    if req.enrich and not env("DATANEWTON_TOKEN"):
-        # Без него оборота не будет НИ У ОДНОГО лида: DaData на бесплатном
-        # тарифе выручку не отдаёт. Раньше об этом нигде не предупреждали.
-        warns.append("Оборот: не задан DATANEWTON_TOKEN — выручку не покажет ни один лид.")
     return warns
 
 

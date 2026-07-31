@@ -207,6 +207,7 @@ def test_lookup_sets_note_for_empty_revenue(monkeypatch):
                         lambda *a: ({"suggestions": [{"data": {
                             "inn": "7707083893",
                             "name": {"short_with_opf": "ООО Ромашка"}}}]}, None))
+    monkeypatch.setattr(m.girbo, "revenue_by_inn", lambda i, **kw: (None, None))
     monkeypatch.setattr(m.datanewton, "revenue_by_inn", lambda i, **kw: (None, None))
     e, _ = m.lookup_verbose(inn="7707083893", token="x", dn_token="dn")
     assert e.revenue is None and "не отдал выручку" in e.note
