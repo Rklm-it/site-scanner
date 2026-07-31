@@ -1034,7 +1034,9 @@ function renderTable() {
     <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
     <td>${esc(r.company)}${r.marketing ? ` <span class="chip mkt" title="${esc(r.marketing)}">💰 реклама</span>` : ""}</td>
     <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽"
-      : r.is_individual ? "<span class='muted' title='у ИП выручки в реестрах нет'>ИП</span>" : ""}</td>
+      : r.is_individual ? "<span class='muted' title='у ИП выручки в реестрах нет'>ИП</span>"
+      : r.revenue_note ? `<span class="muted" title="${esc(r.revenue_note)}">— <span class="hint">?</span></span>`
+      : ""}</td>
     <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
     <td>${(r.phones || "").split(",").map(p => p.trim()).filter(Boolean)
         .map(p => `<a href="tel:${p.replace(/[^\d+]/g, "")}">${esc(p)}</a>`).join("<br>")}</td>

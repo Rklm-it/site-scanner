@@ -146,20 +146,29 @@ def lookup_verbose(inn: str | None = None, name: str | None = None, *,
     if token:
         attempts = [(DADATA_URL, inn), (DADATA_URL, ogrn), (DADATA_SUGGEST, name)]
         for url, query in attempts:
-            if not query or e.official_name or err:
+            if not query or e.official_name:
                 continue
-            data, err = _dadata_post(url, {"query": query, "count": 1}, token, session)
-            if err or not data:
+            data, attempt_err = _dadata_post(url, {"query": query, "count": 1}, token, session)
+            if attempt_err:
+                # Раньше любая ошибка на первой попытке отменяла и поиск по ОГРН,
+                # и поиск по названию — из-за одного сетевого сбоя лид оставался
+                # без оборота. Запоминаем причину, но продолжаем пробовать.
+                err = err or attempt_err
+                if _is_fatal(attempt_err):
+                    break          # плохой ключ или исчерпанный лимит — дальше без толку
                 continue
             sugg = data.get("suggestions") or []
             if sugg:
                 e = parse_party(sugg[0].get("data") or {})
                 resolved_inn = resolved_inn or e.inn or None
+                err = None         # получилось со второй/третьей попытки
     elif not dn_token:
-        return e, "не задан ключ DaData"
+        e.note = "не задан ключ DaData"
+        return e, e.note
 
     # 2. У ИП оборота в реестрах нет — не тратим на них запрос к DataNewton.
     if e.is_individual:
+        e.note = explain_revenue(e, err, inn=inn, ogrn=ogrn, name=name, dn_token=dn_token)
         return e, err
 
     # 3. Оборот из DataNewton по резолвнутому ИНН (DaData его бесплатно не отдаёт)
@@ -170,7 +179,38 @@ def lookup_verbose(inn: str | None = None, name: str | None = None, *,
         elif rev_err and not err:
             err = rev_err
 
+    e.note = explain_revenue(e, err, inn=inn, ogrn=ogrn, name=name, dn_token=dn_token)
     return e, err
+
+
+def _is_fatal(err: str) -> bool:
+    """Ошибка, при которой остальные попытки бессмысленны: ключ или лимит."""
+    return "отклонил ключ" in err or "лимит" in err
+
+
+def explain_revenue(e: Enrichment, err: str | None = None, *, inn: str | None = None,
+                    ogrn: str | None = None, name: str | None = None,
+                    dn_token: str | None = None) -> str | None:
+    """Почему у лида пустой оборот. ``None`` — оборот есть, объяснять нечего.
+
+    Пустая ячейка «Оборот» сама по себе ничего не говорит: не найдена компания,
+    ИП, нет отчётности и кончился лимит выглядят одинаково. Причину считаем один
+    раз здесь — её используют и скан, и ручная проверка в интерфейсе.
+    """
+    if e.revenue is not None:
+        return None
+    if e.is_individual:
+        return "ИП — выручки в реестрах нет"
+    if err:
+        return err
+    if not (inn or ogrn or name):
+        return "на сайте нет ни ИНН, ни названия компании — не по чему искать"
+    if not (dn_token or os.environ.get("DATANEWTON_TOKEN")):
+        return "не задан ключ DataNewton — на бесплатных тарифах оборот отдаёт только он"
+    if not e.official_name:
+        by = "ИНН" if inn else "ОГРН" if ogrn else "названию с сайта"
+        return f"компания не найдена в реестре по {by}"
+    return "компания найдена, но бухотчётность не публиковала (малое/новое ООО)"
 
 
 def parse_party(data: dict) -> Enrichment:

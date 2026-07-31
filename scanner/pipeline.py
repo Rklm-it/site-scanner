@@ -277,7 +277,13 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None,
     таймаут requests считается на отдельную операцию с сокетом, а не на запрос
     целиком (редиректы и «струйка» байт его обходят).
     """
-    targets = [l for l in leads if (l.contacts.inn or l.contacts.company)]
+    targets = []
+    for lead in leads:
+        if lead.contacts.inn or lead.contacts.company:
+            targets.append(lead)
+        else:
+            # Искать компанию не по чему — так и пишем, вместо пустой ячейки.
+            lead.enrichment.note = "на сайте нет ни ИНН, ни названия компании — не по чему искать"
     total = len(targets)
     if on_progress:
         on_progress(0, total)
@@ -288,6 +294,8 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None,
         if _stopped(stop):
             return
         try:
+            # Причина пустого оборота лежит в enrichment.note — раньше она
+            # терялась, и в таблице был просто пустой прочерк без объяснений.
             lead.enrichment, _ = enrich_mod.lookup_verbose(
                 inn=lead.contacts.inn or None, name=lead.contacts.company or None,
                 ogrn=lead.contacts.ogrn or None, token=token)

@@ -147,3 +147,66 @@ def test_lookup_revenue_without_dadata(monkeypatch):
     monkeypatch.setattr(m.datanewton, "revenue_by_inn", lambda inn, **k: (7_000_000, None))
     e, err = m.lookup_verbose(inn="7707083893", token=None, dn_token="dn")
     assert e.revenue == 7_000_000
+
+
+# --------------------------------------------------------------------------- #
+# Почему оборот пустой (раньше причина терялась — была просто пустая ячейка)
+# --------------------------------------------------------------------------- #
+def test_lookup_keeps_trying_after_transient_error(monkeypatch):
+    """Сетевой сбой на попытке по ИНН не должен отменять поиск по названию:
+    из-за этого лиды оставались без оборота на ровном месте."""
+    import scanner.enrich as m
+    calls = []
+
+    def fake_post(url, payload, token, session):
+        calls.append(payload["query"])
+        if payload["query"] == "7707083893":
+            return None, "нет связи с DaData: таймаут"
+        return {"suggestions": [{"data": {"inn": "7707083893",
+                                          "name": {"short_with_opf": "ООО Ромашка"}}}]}, None
+
+    monkeypatch.setattr(m, "_dadata_post", fake_post)
+    monkeypatch.setattr(m.datanewton, "revenue_by_inn", lambda i, **kw: (44_000_000, None))
+    e, err = m.lookup_verbose(inn="7707083893", name="Ромашка", token="x", dn_token="dn")
+    assert calls == ["7707083893", "Ромашка"]      # вторая попытка состоялась
+    assert e.revenue == 44_000_000 and err is None
+
+
+def test_lookup_stops_on_bad_key(monkeypatch):
+    """А вот при плохом ключе/лимите повторять бессмысленно — не жжём квоту."""
+    import scanner.enrich as m
+    calls = []
+
+    def fake_post(url, payload, token, session):
+        calls.append(payload["query"])
+        return None, "DaData отклонил ключ (403) — вставьте именно API-ключ"
+
+    monkeypatch.setattr(m, "_dadata_post", fake_post)
+    e, err = m.lookup_verbose(inn="7707083893", ogrn="1027700132195", name="Ромашка",
+                              token="x", dn_token="dn")
+    assert calls == ["7707083893"]                 # остальные попытки не делались
+    assert "отклонил ключ" in err
+
+
+def test_explain_revenue_reasons():
+    import scanner.enrich as m
+    from scanner.models import Enrichment
+
+    assert m.explain_revenue(Enrichment(revenue=1)) is None
+    assert "ИП" in m.explain_revenue(Enrichment(is_individual=True), inn="1")
+    assert "не по чему искать" in m.explain_revenue(Enrichment())
+    assert "лимит" in m.explain_revenue(Enrichment(), "DataNewton: превышен лимит", inn="1")
+    assert "не найдена" in m.explain_revenue(Enrichment(), inn="7707083893", dn_token="dn")
+    assert "не публиковала" in m.explain_revenue(
+        Enrichment(official_name="ООО Ромашка"), inn="7707083893", dn_token="dn")
+
+
+def test_lookup_sets_note_for_empty_revenue(monkeypatch):
+    import scanner.enrich as m
+    monkeypatch.setattr(m, "_dadata_post",
+                        lambda *a: ({"suggestions": [{"data": {
+                            "inn": "7707083893",
+                            "name": {"short_with_opf": "ООО Ромашка"}}}]}, None))
+    monkeypatch.setattr(m.datanewton, "revenue_by_inn", lambda i, **kw: (None, None))
+    e, _ = m.lookup_verbose(inn="7707083893", token="x", dn_token="dn")
+    assert e.revenue is None and "не публиковала" in e.note

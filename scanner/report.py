@@ -11,7 +11,7 @@ from .models import Lead
 CSV_COLUMNS = [
     "priority", "outreach_score", "outdated_score", "corp_email", "marketing",
     "domain", "url", "company",
-    "revenue", "is_individual", "company_status", "employees", "management",
+    "revenue", "revenue_note", "is_individual", "company_status", "employees", "management",
     "title", "https", "tls_error", "mobile_friendly", "cms", "copyright_year",
     "emails", "phones", "socials", "inn", "ogrn", "reg_date", "address",
     "http_status", "load_ms", "signals", "source_query", "error",

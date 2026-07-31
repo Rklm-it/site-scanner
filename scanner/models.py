@@ -42,6 +42,7 @@ class Enrichment:
     address: str | None = None
     is_individual: bool = False         # ИП (у ИП оборота в реестрах нет)
     inn: str | None = None              # ИНН из реестра (резолвнутый)
+    note: str | None = None             # почему оборот пустой (для прочерка в UI)
 
 
 @dataclass
@@ -98,6 +99,7 @@ class Lead:
             "url": self.final_url or self.url,
             "company": e.official_name or c.company or "",
             "revenue": e.revenue if e.revenue is not None else "",
+            "revenue_note": e.note or "",
             "is_individual": "да" if e.is_individual else "",
             "company_status": e.status or "",
             "employees": e.employee_count if e.employee_count is not None else "",

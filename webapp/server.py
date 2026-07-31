@@ -381,14 +381,10 @@ def revenue_check(req: RevenueReq) -> dict:
 
     e, err = enrich.lookup_verbose(inn=inn, name=name, ogrn=ogrn)
     found = bool(e.official_name or e.revenue is not None)
-    # Разные причины пустого оборота — это не ошибка ключа, а особенность компании.
-    if not err and e.is_individual:
-        err = "это ИП — у индивидуальных предпринимателей выручки в реестрах нет"
-    elif not err and found and e.revenue is None:
-        err = "компания найдена, но бухотчётность не публиковала (малое/новое ООО)"
-    elif not err and not found:
-        err = ("компания не найдена в реестре по " +
-               ("ИНН" if inn else "ОГРН" if ogrn else "названию") + " — проверьте данные лида")
+    # Разные причины пустого оборота — это не ошибка ключа, а особенность
+    # компании. Формулировка общая со сканом, чтобы ручная проверка и таблица
+    # не объясняли одно и то же разными словами.
+    err = err or e.note
     return {
         "found": found,
         "official_name": e.official_name, "status": e.status, "revenue": e.revenue,
