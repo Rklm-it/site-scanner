@@ -774,7 +774,7 @@ async function checkRevenue(domain, btnId, outId) {
   const row = ROWS.find(x => x.domain === domain) || {};
   btn.disabled = true; out.textContent = "проверяю в ДаДата…";
   const r = await fetch("/api/revenue", {method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({domain, inn: row.inn || "", company: row.company || ""})});
+    body: JSON.stringify({domain, inn: row.inn || "", ogrn: row.ogrn || "", company: row.company || ""})});
   btn.disabled = false;
   const d = await r.json().catch(() => ({}));
   if (!r.ok) { out.textContent = "⚠ " + (d.detail || "ошибка"); return; }
@@ -783,13 +783,14 @@ async function checkRevenue(domain, btnId, outId) {
   if (d.official_name) parts.push(d.official_name);
   parts.push(d.revenue != null
     ? "оборот " + (+d.revenue).toLocaleString("ru") + " ₽"
-    : "оборот не публикуется (ИП/малое ООО)");
+    : d.is_individual ? "ИП — оборота в реестрах нет" : "оборот не публикуется (малое/новое ООО)");
   if (d.status) parts.push(d.status);
   if (d.employee_count) parts.push(d.employee_count + " чел.");
   if (d.management) parts.push("рук.: " + d.management);
   out.textContent = parts.join(" · ");
   if (d.revenue != null) row.revenue = d.revenue;
   if (d.official_name) row.company = d.official_name;
+  if (d.is_individual) row.is_individual = "да";
 }
 
 function loadShot(imgId, domain) {
@@ -937,7 +938,8 @@ function renderTable() {
     <td>${r.outdated_score}</td>
     <td><a href="${r.url}" target="_blank" rel="noopener">${r.domain}</a></td>
     <td>${esc(r.company)}${r.marketing ? ` <span class="chip mkt" title="${esc(r.marketing)}">💰 реклама</span>` : ""}</td>
-    <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽" : ""}</td>
+    <td>${r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽"
+      : r.is_individual ? "<span class='muted' title='у ИП выручки в реестрах нет'>ИП</span>" : ""}</td>
     <td class="${r.corp_email === "да" ? "mail-ok" : ""}">${esc(r.emails)}${r.corp_email === "да" ? " ✉" : ""}</td>
     <td>${(r.phones || "").split(",").map(p => p.trim()).filter(Boolean)
         .map(p => `<a href="tel:${p.replace(/[^\d+]/g, "")}">${esc(p)}</a>`).join("<br>")}</td>

@@ -98,6 +98,48 @@ def test_lookup_gets_revenue_from_datanewton(monkeypatch):
     assert err is None
 
 
+def test_parse_party_individual():
+    e = parse_party({"type": "INDIVIDUAL", "inn": "770000000000",
+                     "fio": {"source": "ИВАНОВ ИВАН ИВАНОВИЧ"}, "state": {"status": "ACTIVE"}})
+    assert e.is_individual
+    assert e.official_name == "ИП Иванов Иван Иванович"
+    assert e.management == "Иванов Иван Иванович"   # к ИП обращаемся по его же ФИО
+
+
+def test_lookup_individual_skips_datanewton(monkeypatch):
+    """У ИП оборота нет — не тратим на них запрос к DataNewton."""
+    import scanner.enrich as m
+    called = []
+
+    def fake_post(url, payload, token, session):
+        return {"suggestions": [{"data": {
+            "type": "INDIVIDUAL", "inn": "770000000000",
+            "fio": {"source": "ПЕТРОВ ПЁТР ПЕТРОВИЧ"}}}]}, None
+
+    monkeypatch.setattr(m, "_dadata_post", fake_post)
+    monkeypatch.setattr(m.datanewton, "revenue_by_inn",
+                        lambda inn, **k: (called.append(inn), (5, None))[1])
+    e, err = m.lookup_verbose(name="Пекарня Петрова", token="x", dn_token="dn")
+    assert e.is_individual and e.revenue is None
+    assert called == []                              # DataNewton не дёргали
+
+
+def test_lookup_resolves_by_ogrn(monkeypatch):
+    """ИНН на сайте нет, но есть ОГРН → резолвим компанию и добираем оборот."""
+    import scanner.enrich as m
+
+    def fake_post(url, payload, token, session):
+        if payload["query"] == "1027700132195":      # находим только по ОГРН
+            return {"suggestions": [{"data": {
+                "name": {"short_with_opf": "ООО Ромашка"}, "inn": "7707083893"}}]}, None
+        return {"suggestions": []}, None
+
+    monkeypatch.setattr(m, "_dadata_post", fake_post)
+    monkeypatch.setattr(m.datanewton, "revenue_by_inn", lambda inn, **k: (5_000_000, None))
+    e, err = m.lookup_verbose(ogrn="1027700132195", token="x", dn_token="dn")
+    assert e.official_name == "ООО Ромашка" and e.revenue == 5_000_000
+
+
 def test_lookup_revenue_without_dadata(monkeypatch):
     """Оборот работает даже без DaData, если ИНН есть со страницы."""
     import scanner.enrich as m

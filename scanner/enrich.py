@@ -127,12 +127,13 @@ def _dadata_post(url: str, payload: dict, token: str,
 
 
 def lookup_verbose(inn: str | None = None, name: str | None = None, *,
-                   token: str | None = None, dn_token: str | None = None,
+                   ogrn: str | None = None, token: str | None = None,
+                   dn_token: str | None = None,
                    session: requests.Session | None = None) -> tuple[Enrichment, str | None]:
     """Как lookup(), но возвращает и текст ошибки (для диагностики в UI).
 
-    DaData даёт название/статус/директора; параллельно резолвим ИНН (со страницы
-    или по названию через DaData) и добираем оборот у DataNewton.
+    DaData даёт название/статус/директора и резолвит ИНН по ИНН/ОГРН со страницы
+    или по названию; затем DataNewton добирает оборот по этому ИНН.
     """
     token = token or os.environ.get("DADATA_TOKEN")
     dn_token = dn_token or os.environ.get("DATANEWTON_TOKEN")
@@ -141,28 +142,27 @@ def lookup_verbose(inn: str | None = None, name: str | None = None, *,
     err: str | None = None
     resolved_inn = (inn or "").strip() or None
 
-    # 1. Название/статус/директор из DaData (по ИНН, затем по названию)
+    # 1. Название/статус/директор из DaData: по ИНН, затем ОГРН, затем названию.
     if token:
-        if inn:
-            data, err = _dadata_post(DADATA_URL, {"query": inn, "count": 1}, token, session)
-            if not err and data:
-                sugg = data.get("suggestions") or []
-                if sugg:
-                    d = sugg[0].get("data") or {}
-                    e = parse_party(d)
-                    resolved_inn = (d.get("inn") or resolved_inn)
-        if not e.official_name and name and not err:
-            data, err = _dadata_post(DADATA_SUGGEST, {"query": name, "count": 1}, token, session)
-            if not err and data:
-                sugg = data.get("suggestions") or []
-                if sugg:
-                    d = sugg[0].get("data") or {}
-                    e = parse_party(d)
-                    resolved_inn = resolved_inn or (d.get("inn") or None)
+        attempts = [(DADATA_URL, inn), (DADATA_URL, ogrn), (DADATA_SUGGEST, name)]
+        for url, query in attempts:
+            if not query or e.official_name or err:
+                continue
+            data, err = _dadata_post(url, {"query": query, "count": 1}, token, session)
+            if err or not data:
+                continue
+            sugg = data.get("suggestions") or []
+            if sugg:
+                e = parse_party(sugg[0].get("data") or {})
+                resolved_inn = resolved_inn or e.inn or None
     elif not dn_token:
         return e, "не задан ключ DaData"
 
-    # 2. Оборот из DataNewton по резолвнутому ИНН (DaData его бесплатно не отдаёт)
+    # 2. У ИП оборота в реестрах нет — не тратим на них запрос к DataNewton.
+    if e.is_individual:
+        return e, err
+
+    # 3. Оборот из DataNewton по резолвнутому ИНН (DaData его бесплатно не отдаёт)
     if e.revenue is None and resolved_inn and dn_token:
         rev, rev_err = datanewton.revenue_by_inn(resolved_inn, token=dn_token, session=session)
         if rev is not None:
@@ -177,8 +177,14 @@ def parse_party(data: dict) -> Enrichment:
     """Разбирает блок ``data`` из ответа DaData в Enrichment."""
     e = Enrichment()
 
+    e.inn = data.get("inn")
+    e.is_individual = (data.get("type") == "INDIVIDUAL")
+
     name = data.get("name") or {}
     e.official_name = name.get("short_with_opf") or name.get("full_with_opf")
+    fio = (data.get("fio") or {}).get("source")
+    if not e.official_name and e.is_individual and fio:
+        e.official_name = f"ИП {fio.title()}"
 
     state = data.get("state") or {}
     e.status = state.get("status")
@@ -198,6 +204,9 @@ def parse_party(data: dict) -> Enrichment:
 
     mgmt = data.get("management") or {}
     e.management = mgmt.get("name")
+    # У ИП руководителя в реестре нет — «главный» это сам предприниматель.
+    if not e.management and e.is_individual and fio:
+        e.management = fio.title()
 
     address = data.get("address") or {}
     e.address = address.get("value")

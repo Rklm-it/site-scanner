@@ -352,6 +352,7 @@ def screenshot_of(domain: str):
 class RevenueReq(BaseModel):
     domain: str = ""
     inn: str | None = None
+    ogrn: str | None = None
     company: str | None = None
 
 
@@ -366,30 +367,34 @@ def revenue_check(req: RevenueReq) -> dict:
         raise HTTPException(400, "Не задан ключ DaData или DataNewton (панель «API-ключи»).")
 
     inn = (req.inn or "").strip() or None
+    ogrn = (req.ogrn or "").strip() or None
     name = (req.company or "").strip() or None
-    if not inn and not name and req.domain and STORE:
+    if not inn and not ogrn and not name and req.domain and STORE:
         lead = next((l for l in STORE.all_leads() if l.get("domain") == req.domain), None)
         if lead:
             inn = lead.get("inn") or None
+            ogrn = lead.get("ogrn") or None
             name = (lead.get("company") or "").strip() or None
-    if not inn and not name:
-        raise HTTPException(422, "Нет ни ИНН, ни названия компании — не по чему искать.")
+    if not inn and not ogrn and not name:
+        raise HTTPException(422, "Нет ни ИНН/ОГРН, ни названия компании — не по чему искать.")
 
-    e, err = enrich.lookup_verbose(inn=inn, name=name)
+    e, err = enrich.lookup_verbose(inn=inn, name=name, ogrn=ogrn)
     found = bool(e.official_name or e.revenue is not None)
-    # Компания нашлась, но оборот не публикуется (ИП, малое ООО, свежая
-    # регистрация) — это не ошибка ключа, а особенность самой компании.
-    if not err and found and e.revenue is None:
-        err = "компания найдена, но бухотчётность не сдавала (обычно ИП — у них выручки в реестрах нет)"
+    # Разные причины пустого оборота — это не ошибка ключа, а особенность компании.
+    if not err and e.is_individual:
+        err = "это ИП — у индивидуальных предпринимателей выручки в реестрах нет"
+    elif not err and found and e.revenue is None:
+        err = "компания найдена, но бухотчётность не публиковала (малое/новое ООО)"
     elif not err and not found:
-        err = ("компания не найдена в DaData по " +
-               ("ИНН" if inn else "названию") + " — проверьте данные лида")
+        err = ("компания не найдена в реестре по " +
+               ("ИНН" if inn else "ОГРН" if ogrn else "названию") + " — проверьте данные лида")
     return {
         "found": found,
         "official_name": e.official_name, "status": e.status, "revenue": e.revenue,
         "employee_count": e.employee_count, "management": e.management,
         "address": e.address, "registration_date": e.registration_date,
-        "inn": inn or "",
+        "is_individual": e.is_individual,
+        "inn": e.inn or inn or "",
         "error": err,
     }
 

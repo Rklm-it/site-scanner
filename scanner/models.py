@@ -40,6 +40,8 @@ class Enrichment:
     registration_date: str | None = None
     management: str | None = None       # ФИО руководителя
     address: str | None = None
+    is_individual: bool = False         # ИП (у ИП оборота в реестрах нет)
+    inn: str | None = None              # ИНН из реестра (резолвнутый)
 
 
 @dataclass
@@ -96,6 +98,7 @@ class Lead:
             "url": self.final_url or self.url,
             "company": e.official_name or c.company or "",
             "revenue": e.revenue if e.revenue is not None else "",
+            "is_individual": "да" if e.is_individual else "",
             "company_status": e.status or "",
             "employees": e.employee_count if e.employee_count is not None else "",
             "management": e.management or "",

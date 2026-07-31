@@ -203,8 +203,9 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None) -> None:
         on_progress(0, total)
 
     def do(lead: Lead) -> None:
-        lead.enrichment = enrich_mod.lookup(
-            inn=lead.contacts.inn or None, name=lead.contacts.company or None, token=token)
+        lead.enrichment, _ = enrich_mod.lookup_verbose(
+            inn=lead.contacts.inn or None, name=lead.contacts.company or None,
+            ogrn=lead.contacts.ogrn or None, token=token)
 
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = [pool.submit(do, lead) for lead in targets]
