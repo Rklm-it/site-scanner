@@ -122,6 +122,12 @@
     padding: 10px 12px; margin-bottom: 12px; font-size: 13px; }
   .talkbox ul { margin: 0; padding-left: 18px; }
   .talkbox li { margin-bottom: 7px; }
+  .dgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+  @media (max-width: 640px) { .dgrid { grid-template-columns: 1fr; } }
+  .factbox { font-size: 13px; margin-top: 8px; }
+  .factbox .f { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+  .factbox .f .k { color: var(--muted); flex: 0 0 108px; }
+  .factbox .f .v { flex: 1; }
 
   /* Модалка письма */
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,.55);
@@ -342,6 +348,36 @@
   </div>
 </div>
 
+<div id="dmodal" class="modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head"><strong id="d-title"></strong><button id="d-close">✕</button></div>
+    <div class="dgrid">
+      <div>
+        <img id="d-shot" class="shot" alt="" loading="lazy">
+        <div id="d-facts" class="factbox"></div>
+      </div>
+      <div>
+        <label>Что не так с сайтом (аргументы)</label>
+        <div id="d-signals" class="talkbox"></div>
+        <label>На что давить в звонке</label>
+        <div class="modal-actions" style="margin:0 0 8px">
+          <button class="rowbtn dtp-tab" data-tp="simple">🙂 не шарит</button>
+          <button class="rowbtn dtp-tab" data-tp="savvy">🤓 шарит</button>
+        </div>
+        <div id="d-talk" class="talkbox"></div>
+      </div>
+    </div>
+    <label>🎨 Промпт для Lovable — собрать прототип нового сайта клиента</label>
+    <div class="hint" style="margin-bottom:6px">Скопируй → вставь в Lovable → покажи клиенту на звонке, как мог бы выглядеть его новый сайт.</div>
+    <textarea id="d-brief" rows="16" readonly></textarea>
+    <div class="modal-actions">
+      <button id="d-brief-copy" class="primary" style="width:auto">📋 Скопировать промпт</button>
+      <a id="d-lovable" href="https://lovable.dev" target="_blank" rel="noopener"
+         style="text-decoration:none"><button class="rowbtn">Открыть Lovable ↗</button></a>
+    </div>
+  </div>
+</div>
+
 <div id="modal" class="modal" style="display:none">
   <div class="modal-box">
     <div class="modal-head"><strong id="m-title"></strong><button id="m-close">✕</button></div>
@@ -444,6 +480,9 @@ async function init() {
   // модалка звонка
   $("c-close").onclick = () => $("cmodal").style.display = "none";
   $("cmodal").onclick = e => { if (e.target.id === "cmodal") $("cmodal").style.display = "none"; };
+  // модалка карточки лида
+  $("d-close").onclick = () => $("dmodal").style.display = "none";
+  $("dmodal").onclick = e => { if (e.target.id === "dmodal") $("dmodal").style.display = "none"; };
   // вкладки Скан / База
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchView(t.dataset.v));
 
@@ -812,6 +851,54 @@ function makeLovablePrompt(r) {
     `форма заявки, обязательно мобильная версия, тексты на русском.`;
 }
 
+function openDetail(domain) {
+  const r = ROWS.find(x => x.domain === domain);
+  if (!r) return;
+  loadShot("d-shot", domain);
+  $("d-title").textContent = r.company || r.domain;
+
+  const rev = r.revenue ? (+r.revenue).toLocaleString("ru") + " ₽"
+    : r.is_individual ? "ИП — оборота в реестрах нет" : "—";
+  const facts = [
+    ["Домен", `<a href="${r.url}" target="_blank" rel="noopener">${esc(r.domain)}</a>`],
+    ["Приоритет", `${esc(r.priority)} · аутрич ${r.outreach_score} · старость ${r.outdated_score}`],
+    ["Оборот", esc(rev)],
+    ["Руководитель", esc(r.management || "—")],
+    ["Статус", esc(r.company_status || "—")],
+    ["ИНН / ОГРН", esc([r.inn, r.ogrn].filter(Boolean).join(" / ") || "—")],
+    ["Телефоны", esc(r.phones || "—")],
+    ["Email", esc(r.emails || "—")],
+    ["Ниша (запрос)", esc(r.source_query || "—")],
+    ["Реклама", esc(r.marketing || "—")],
+  ];
+  $("d-facts").innerHTML = facts.map(([k, v]) =>
+    `<div class="f"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+
+  const sigs = (r.signals || "").split("; ").filter(Boolean);
+  $("d-signals").innerHTML = sigs.length
+    ? "<ul>" + sigs.map(s => `<li>${esc(s)}</li>`).join("") + "</ul>"
+    : "<span class='muted'>—</span>";
+
+  const talk = {simple: r.talk_simple || [], savvy: r.talk_savvy || []};
+  const renderDTalk = (kind) => {
+    const items = talk[kind] || [];
+    $("d-talk").innerHTML = items.length
+      ? "<ul>" + items.map(x => `<li>${escHtml(x)}</li>`).join("") + "</ul>"
+      : "<span class='muted'>появится после нового скана</span>";
+    document.querySelectorAll(".dtp-tab").forEach(b => b.classList.toggle("active", b.dataset.tp === kind));
+  };
+  document.querySelectorAll(".dtp-tab").forEach(b => b.onclick = () => renderDTalk(b.dataset.tp));
+  renderDTalk("simple");
+
+  $("d-brief").value = r.lovable_brief || makeLovablePrompt(r);
+  $("d-brief-copy").onclick = () => {
+    navigator.clipboard && navigator.clipboard.writeText($("d-brief").value);
+    $("d-brief-copy").textContent = "Скопировано ✓";
+    setTimeout(() => $("d-brief-copy").textContent = "📋 Скопировать промпт", 1500);
+  };
+  $("dmodal").style.display = "flex";
+}
+
 function openCall(domain) {
   const r = ROWS.find(x => x.domain === domain);
   if (!r) return;
@@ -948,6 +1035,7 @@ function renderTable() {
       ${STATUS_OPTS.map(s => `<option value="${s}" ${r.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
       </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}</td>
     <td style="white-space:nowrap">
+      <button class="rowbtn" data-detail="${r.domain}" title="Карточка лида: вся инфа + промпт для Lovable">🔍</button>
       <button class="rowbtn" data-call="${r.domain}">📞</button>
       <button class="rowbtn" data-mail="${r.domain}">✉</button>
     </td>
@@ -961,6 +1049,7 @@ function renderTable() {
   document.querySelectorAll(".st-sel").forEach(s => s.onchange = () => setStatus(s.dataset.d, s.value));
   document.querySelectorAll(".rowbtn[data-mail]").forEach(b => b.onclick = () => openMail(b.dataset.mail));
   document.querySelectorAll(".rowbtn[data-call]").forEach(b => b.onclick = () => openCall(b.dataset.call));
+  document.querySelectorAll(".rowbtn[data-detail]").forEach(b => b.onclick = () => openDetail(b.dataset.detail));
 }
 
 function renderSummary(s) {

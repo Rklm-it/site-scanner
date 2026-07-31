@@ -1,5 +1,19 @@
-from scanner.outreach import build_message, build_call_script, build_talking_points, _pick_hook
+from scanner.outreach import (build_message, build_call_script, build_talking_points,
+                              build_lovable_brief, _pick_hook)
 from scanner.models import Lead, Contacts, Enrichment
+
+
+def test_lovable_brief_personalized():
+    lead = Lead(url="https://stoma.ru", domain="stoma.ru", source_query="стоматология Батайск",
+                signals=["нет meta viewport (не адаптивный)", "нет HTTPS"],
+                contacts=Contacts(phones=["+7 900 000-00-00"], emails=["a@stoma.ru"]),
+                enrichment=Enrichment(official_name="ООО Улыбка"))
+    brief = build_lovable_brief(lead)
+    assert "ООО Улыбка" in brief and "стоматология Батайск" in brief
+    assert "stoma.ru" in brief                       # ссылка на старый сайт
+    assert "+7 900 000-00-00" in brief               # контакты в брифе
+    assert "бело-голубой" in brief                   # стиль подобран под нишу
+    assert "Форма заявки" in brief
 
 
 def test_talking_points_two_registers():

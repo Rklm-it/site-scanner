@@ -231,6 +231,7 @@ def _run_job(job: Job, settings: Settings) -> None:
             tp = outreach.build_talking_points(l)
             row["talk_savvy"] = tp["savvy"]
             row["talk_simple"] = tp["simple"]
+            row["lovable_brief"] = outreach.build_lovable_brief(l)
             st = saved.get(l.domain, {})
             row["status"] = st.get("status", "")
             row["note"] = st.get("note", "")
