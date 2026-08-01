@@ -264,14 +264,23 @@ def scan_one(
     # Доходим до страницы контактов, если на главной нет контактов ИЛИ (при
     # обогащении) нет ИНН — он почти всегда на «Реквизитах», а без него не
     # узнать оборот. Без обогащения не ходим зря, чтобы не тормозить скан.
-    cp = lead.contacts.contact_page
-    need_more = (not lead.contacts.phones and not lead.contacts.emails) \
-        or (want_inn and not lead.contacts.inn)
-    if follow_contact_page and cp and cp != base and need_more and not _stopped(stop):
-        cres = _fetch_cached(cp, politeness=politeness, cache=cache, timeout=timeout, stop=stop)
-        if cres.ok:
-            extra = contacts_mod.extract(cres.html, base_url=cres.final_url or cp, title=h.title)
-            lead.contacts.merge(extra)
+    # Страницы обходим по приоритету: «Реквизиты» → «Контакты» → «О компании».
+    # Вторую берём, только если ради ИНН и на первой его не оказалось — он почти
+    # всегда лежит именно на «Реквизитах», а без ИНН не узнать оборот.
+    pages = [p for p in (lead.contacts.contact_page, *lead.contacts.extra_pages)
+             if p and p != base]
+    if follow_contact_page:
+        for page in pages[:2]:
+            need_more = (not lead.contacts.phones and not lead.contacts.emails) \
+                or (want_inn and not lead.contacts.inn)
+            if not need_more or _stopped(stop):
+                break
+            cres = _fetch_cached(page, politeness=politeness, cache=cache,
+                                 timeout=timeout, stop=stop)
+            if cres.ok:
+                extra = contacts_mod.extract(cres.html, base_url=cres.final_url or page,
+                                             title=h.title)
+                lead.contacts.merge(extra)
 
     return lead
 
@@ -292,7 +301,7 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None,
     """
     targets = []
     for lead in leads:
-        if lead.contacts.inn or lead.contacts.company:
+        if lead.contacts.inn or lead.contacts.legal_name or lead.contacts.company:
             targets.append(lead)
         else:
             # Искать компанию не по чему — так и пишем, вместо пустой ячейки.
@@ -309,8 +318,11 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None,
         try:
             # Причина пустого оборота лежит в enrichment.note — раньше она
             # терялась, и в таблице был просто пустой прочерк без объяснений.
+            # Юрлицо из текста («ООО «Крокус»») ищется в реестре куда лучше
+            # заголовка страницы («Салон красоты "Крокус" в Ростове-на-Дону.»).
             lead.enrichment, _ = enrich_mod.lookup_verbose(
-                inn=lead.contacts.inn or None, name=lead.contacts.company or None,
+                inn=lead.contacts.inn or None,
+                name=lead.contacts.legal_name or lead.contacts.company or None,
                 ogrn=lead.contacts.ogrn or None, token=token)
         except Exception as exc:  # noqa: BLE001 — один битый ответ не рушит фазу
             log.warning("обогащение %s упало: %s", lead.domain, exc)

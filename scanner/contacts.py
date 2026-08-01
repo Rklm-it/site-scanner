@@ -131,22 +131,88 @@ def extract(html: str, *, base_url: str, title: str | None = None) -> Contacts:
     elif title:
         contacts.company = title.split("|")[0].split("—")[0].strip()[:120] or None
 
-    # Ссылка на страницу контактов
-    contacts.contact_page = find_contact_link(soup, base_url)
+    # Юридическое название из текста страницы — им ищем компанию в реестрах.
+    contacts.legal_name = find_legal_name(text)
+
+    # Ссылки на страницы контактов/реквизитов, в порядке полезности
+    pages = find_contact_links(soup, base_url)
+    contacts.contact_page = pages[0] if pages else None
+    contacts.extra_pages = pages[1:]
 
     return contacts
 
 
-_CONTACT_HINTS = ("контакт", "contact", "kontakt", "о нас", "about", "реквизит")
+# Организационно-правовые формы. По заголовку страницы («Салон красоты "Крокус"
+# в Ростове-на-Дону.») реестр компанию не находит, а по «ООО «Крокус»» —
+# находит. Поэтому юрлицо ищем в видимом тексте отдельно от заголовка.
+_OPF = "ООО|ЗАО|ОАО|ПАО|АО|ГУП|МУП|ФГУП|АНО|НКО|ТСЖ|КФХ"
+# Между формой и названием часто стоит короткая аббревиатура-приставка:
+# «ООО ПКФ "НОВЫЙ КОЛОС"», «ГУП РО "Фармацевтический центр"», «ЗАО НПО ...».
+# Без неё в реестр уходило обрубленное «ООО ПКФ».
+LEGAL_RE = re.compile(
+    rf"\b({_OPF})\s*(\w{{2,5}}\s+)?[«\"'“]([^»\"'”<>\n]{{2,80}})[»\"'”]", re.I)
+# То же без кавычек: «ООО Ромашка», «ГУП РО Фармацевтический центр».
+# Продолжать название могут слова с большой буквы или типовые «хвосты» вроде
+# «центр»/«завод» — иначе в имя утягивался сказуемый глагол из предложения
+# («ЗАО Ростовский Завод работает с 1998»).
+_NAME_TAIL = ("центр|завод|дом|комбинат|компания|группа|фабрика|банк|холдинг"
+              "|сервис|строй|торг|бюро|агентство|студия|клиника|аптека")
+LEGAL_BARE_RE = re.compile(
+    rf"\b({_OPF})\s+((?:[А-ЯЁ][А-Яа-яЁё\-]+|[А-ЯЁ]{{2,5}})"
+    rf"(?:\s+(?:[А-ЯЁ][А-Яа-яЁё\-]+|(?:{_NAME_TAIL})\b)){{0,4}})")
+IP_NAME_RE = re.compile(
+    r"\bИП\s+([А-ЯЁ][а-яё\-]{1,30}\s+[А-ЯЁ][а-яё]{1,30}(?:\s+[А-ЯЁ][а-яё]{1,30})?)")
 
 
-def find_contact_link(soup: BeautifulSoup, base_url: str) -> str | None:
-    """Ищет ссылку на страницу контактов/реквизитов."""
+def find_legal_name(text: str) -> str | None:
+    """Юридическое название компании из видимого текста страницы."""
+    m = LEGAL_RE.search(text)
+    if m:
+        # Приставку берём только если это аббревиатура (ПКФ, РО, НПО), иначе
+        # в название затесалось бы обычное слово из предложения.
+        prefix = (m.group(2) or "").strip()
+        prefix = f"{prefix} " if prefix.isupper() else ""
+        return f'{m.group(1).upper()} {prefix}«{m.group(3).strip()}»'
+    m = IP_NAME_RE.search(text)
+    if m:
+        return f"ИП {m.group(1).strip()}"
+    m = LEGAL_BARE_RE.search(text)
+    if m:
+        return f"{m.group(1).upper()} {m.group(2).strip()}"
+    return None
+
+
+# Чем выше в списке — тем вероятнее на странице есть ИНН. «Реквизиты» бьют
+# «контакты»: раньше бралась первая попавшаяся ссылка, и вместо реквизитов
+# бот часто уходил на «О нас», где ИНН нет.
+_LINK_HINTS = (
+    (("реквизит", "requisite", "rekvizit"), 0),
+    (("контакт", "contact", "kontakt"), 1),
+    (("о компании", "о нас", "about"), 2),
+)
+
+
+def find_contact_links(soup: BeautifulSoup, base_url: str, limit: int = 3) -> list[str]:
+    """Ссылки на контакты/реквизиты в порядке шанса найти там ИНН."""
+    found: list[tuple[int, str]] = []
+    seen: set[str] = set()
     for a in soup.find_all("a", href=True):
         text = a.get_text(" ", strip=True).lower()
         href = a["href"].lower()
-        if any(h in text for h in _CONTACT_HINTS) or any(h in href for h in ("contact", "kontakt")):
-            full = urljoin(base_url, a["href"])
-            if urlparse(full).netloc == urlparse(base_url).netloc:
-                return full
-    return None
+        rank = next((r for hints, r in _LINK_HINTS
+                     if any(h in text for h in hints) or any(h in href for h in hints)), None)
+        if rank is None:
+            continue
+        full = urljoin(base_url, a["href"])
+        if urlparse(full).netloc != urlparse(base_url).netloc or full in seen:
+            continue
+        seen.add(full)
+        found.append((rank, full))
+    found.sort(key=lambda x: x[0])
+    return [url for _, url in found[:limit]]
+
+
+def find_contact_link(soup: BeautifulSoup, base_url: str) -> str | None:
+    """Самая перспективная страница контактов/реквизитов (или None)."""
+    links = find_contact_links(soup, base_url, limit=1)
+    return links[0] if links else None

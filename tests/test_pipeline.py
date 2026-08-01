@@ -153,3 +153,30 @@ def test_scan_hard_timeout(monkeypatch):
     elapsed = _t.monotonic() - start
     assert elapsed < 10          # не завис на 30с, вышел по бюджету ~1с
     assert leads == []           # ничего не успело — но прогон завершился
+
+
+def test_scan_follows_second_page_for_inn(monkeypatch):
+    """Если на «Контактах» ИНН не оказалось, ради оборота доходим до
+    «Реквизитов» — вторая страница берётся только при want_inn."""
+    from scanner.politeness import Politeness
+    from scanner.cache import NullCache
+
+    MAIN = ('<html><body><a href="/contacts">Контакты</a>'
+            '<a href="/rekvizity">Реквизиты</a></body></html>')
+    PAGES = {
+        "https://firma.ru": MAIN,
+        "https://firma.ru/rekvizity": "<html><body>ИНН/КПП 7707083893/770701001</body></html>",
+        "https://firma.ru/contacts": "<html><body>тел 8 863 200 00 00</body></html>",
+    }
+    visited = []
+
+    def fake_fetch(url, **kw):
+        visited.append(url)
+        return FetchResult(url=url, final_url=url, status=200, headers={},
+                           html=PAGES.get(url, ""), load_ms=10, https=True)
+
+    monkeypatch.setattr(pipeline, "fetch", fake_fetch)
+    lead = pipeline.scan_one("https://firma.ru", politeness=Politeness(respect_robots=False),
+                             cache=NullCache(), want_inn=True)
+    assert lead.contacts.inn == "7707083893"
+    assert visited[1].endswith("/rekvizity")     # реквизиты идут первыми

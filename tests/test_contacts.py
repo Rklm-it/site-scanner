@@ -104,3 +104,57 @@ def test_reqisites_do_not_capture_other_numbers():
     c = extract("<html><body>р/с 40702810900000012345 БИК 044525225 ОКПО 12345678"
                 "</body></html>", base_url="https://x.ru")
     assert c.inn is None
+
+
+# --------------------------------------------------------------------------- #
+# Юрлицо из текста: по заголовку страницы реестр компанию не находит
+# --------------------------------------------------------------------------- #
+def test_legal_name_beats_page_title():
+    """«Салон красоты "Крокус" в Ростове-на-Дону.» в реестре не ищется,
+    а «ООО «Крокус»» из подвала — ищется."""
+    from scanner.contacts import extract
+
+    c = extract('<html><body>Салон красоты'
+                '<footer>ООО «Крокус», г. Ростов-на-Дону</footer></body></html>',
+                base_url="https://x.ru", title='Салон красоты "Крокус" в Ростове-на-Дону.')
+    assert c.legal_name == "ООО «Крокус»"
+    assert c.company == 'Салон красоты "Крокус" в Ростове-на-Дону.'   # для показа
+
+
+def test_legal_name_keeps_abbreviation_prefix():
+    """Между формой и названием бывает приставка: ООО ПКФ, ГУП РО, ЗАО НПО."""
+    from scanner.contacts import find_legal_name
+
+    assert find_legal_name('ООО ПКФ "НОВЫЙ КОЛОС"') == 'ООО ПКФ «НОВЫЙ КОЛОС»'
+    assert find_legal_name('ГУП РО "Фармацевтический центр"') == 'ГУП РО «Фармацевтический центр»'
+
+
+def test_legal_name_without_quotes_stops_at_sentence():
+    """Без кавычек название не должно утягивать сказуемое из предложения."""
+    from scanner.contacts import find_legal_name
+
+    assert find_legal_name("Наша компания ЗАО Ростовский Завод работает с 1998") == \
+        "ЗАО Ростовский Завод"
+    assert find_legal_name("ГУП РО Фармацевтический центр — справочная") == \
+        "ГУП РО Фармацевтический центр"
+
+
+def test_legal_name_ip_and_absent():
+    from scanner.contacts import find_legal_name
+
+    assert find_legal_name("ИП Мкртичян Наталья Сергеевна, тел 8 918") == \
+        "ИП Мкртичян Наталья Сергеевна"
+    assert find_legal_name("ООО было создано как «филиал» в прошлом году") is None
+    assert find_legal_name("обычный текст без юрлица") is None
+
+
+def test_requisites_page_wins_over_contacts():
+    """ИНН почти всегда на «Реквизитах». Раньше бралась первая попавшаяся
+    ссылка, и бот уходил на «О нас», где ИНН нет."""
+    from scanner.contacts import extract
+
+    c = extract('<html><body><a href="/about">О нас</a>'
+                '<a href="/contacts">Контакты</a><a href="/rekvizity">Реквизиты</a>'
+                '</body></html>', base_url="https://x.ru")
+    assert c.contact_page == "https://x.ru/rekvizity"
+    assert c.extra_pages == ["https://x.ru/contacts", "https://x.ru/about"]

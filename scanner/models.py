@@ -15,8 +15,10 @@ class Contacts:
     socials: list[str] = field(default_factory=list)
     inn: str | None = None
     ogrn: str | None = None
-    company: str | None = None
+    company: str | None = None          # для показа: og:site_name или заголовок
+    legal_name: str | None = None       # для реестров: «ООО «Ромашка»» из текста
     contact_page: str | None = None
+    extra_pages: list[str] = field(default_factory=list)   # запасные «Реквизиты»
 
     def merge(self, other: "Contacts") -> None:
         """Дополняет контакты данными с другой страницы (напр. /контакты)."""
@@ -26,6 +28,7 @@ class Contacts:
         self.inn = self.inn or other.inn
         self.ogrn = self.ogrn or other.ogrn
         self.company = self.company or other.company
+        self.legal_name = self.legal_name or other.legal_name
         self.contact_page = self.contact_page or other.contact_page
 
 
@@ -97,7 +100,7 @@ class Lead:
             "marketing": ", ".join(self.marketing),
             "domain": self.domain,
             "url": self.final_url or self.url,
-            "company": e.official_name or c.company or "",
+            "company": e.official_name or c.legal_name or c.company or "",
             "revenue": e.revenue if e.revenue is not None else "",
             "revenue_note": e.note or "",
             "is_individual": "да" if e.is_individual else "",
