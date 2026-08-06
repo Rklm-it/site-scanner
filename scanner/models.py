@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field, asdict
 from typing import Any
 
+from .content import SiteContent
+
 
 @dataclass
 class Contacts:
@@ -76,6 +78,8 @@ class Lead:
     title: str | None = None
     contacts: Contacts = field(default_factory=Contacts)
     enrichment: Enrichment = field(default_factory=Enrichment)
+    # Содержимое старого сайта — из него собирается бриф на прототип
+    content: SiteContent = field(default_factory=SiteContent)
 
     # Признаки «живого бизнеса» — вкладывается в рекламу/аналитику/лидов
     marketing: list[str] = field(default_factory=list)

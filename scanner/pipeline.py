@@ -16,6 +16,7 @@ from . import activity as activity_mod
 from . import aggregator as aggregator_mod
 from . import analytics as analytics_mod
 from . import contacts as contacts_mod
+from . import content as content_mod
 from . import heuristics as heuristics_mod
 from . import search as search_mod
 from .cache import Cache, NullCache
@@ -252,6 +253,7 @@ def scan_one(
     lead.copyright_year = h.copyright_year
     lead.title = h.title
     lead.contacts = contacts_mod.extract(res.html, base_url=base, title=h.title)
+    lead.content = content_mod.extract(res.html, base_url=base)
     lead.marketing = activity_mod.detect(res.html)
     lead.aggregator = aggregator_mod.aggregator_reason(
         title=h.title, company=lead.contacts.company, html=res.html)
