@@ -97,3 +97,53 @@ def test_build_message_uses_custom_signature():
     assert "Иван Петров" in msg["pitch_body"]
     assert "https://portfolio.ru" in msg["pitch_body"]
     assert "[Ваше имя]" not in msg["pitch_body"]
+
+
+# --------------------------------------------------------------------------- #
+# Блок «кто мы»: единый для писем и звонков, правится в настройках
+# --------------------------------------------------------------------------- #
+from scanner import outreach  # noqa: E402
+def _lead_for_about():
+    from scanner.models import Lead
+
+    l = Lead(url="https://firma.ru", domain="firma.ru")
+    l.signals = ["нет meta viewport (не адаптивный)"]
+    return l
+
+
+def test_about_lands_in_email_and_call(monkeypatch):
+    monkeypatch.delenv("STUDIO_ABOUT", raising=False)
+    lead = _lead_for_about()
+    body = outreach.build_message(lead, about="Нас четверо, я веду проект.")["pitch_body"]
+    script = outreach.build_call_script(lead, about="Нас четверо, я веду проект.")
+    assert "Нас четверо, я веду проект." in body
+    assert "Нас четверо, я веду проект." in script
+
+
+def test_about_falls_back_to_settings_then_default(monkeypatch):
+    lead = _lead_for_about()
+
+    monkeypatch.setenv("STUDIO_ABOUT", "Из настроек.")
+    assert "Из настроек." in outreach.build_message(lead)["pitch_body"]
+
+    monkeypatch.delenv("STUDIO_ABOUT", raising=False)
+    assert outreach.DEFAULT_ABOUT in outreach.build_message(lead)["pitch_body"]
+
+    monkeypatch.setenv("STUDIO_ABOUT", "   ")          # пробелы = не задано
+    assert outreach.DEFAULT_ABOUT in outreach.build_message(lead)["pitch_body"]
+
+
+def test_call_script_answers_team_questions(monkeypatch):
+    monkeypatch.delenv("STUDIO_ABOUT", raising=False)
+    script = outreach.build_call_script(_lead_for_about())
+    for q in ("портфолио", "Кто конкретно будет делать", "пропадёте с деньгами",
+              "Почему так дёшево"):
+        assert q in script, q
+
+
+def test_default_about_claims_nothing_unverifiable():
+    """В формулировке по умолчанию нет выдуманного стажа и чужих кейсов —
+    такое проверяется за пять минут и хоронит сделку."""
+    low = outreach.DEFAULT_ABOUT.lower()
+    for bad in ("лет на рынке", "сделали", "более ", "крупнейш", "№1", "лидер"):
+        assert bad not in low, bad

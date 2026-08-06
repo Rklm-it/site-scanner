@@ -233,11 +233,12 @@ def _run_job(job: Job, settings: Settings) -> None:
         saved = STORE.all() if STORE else {}
         signature = compose_signature()
         caller = os.environ.get("SMTP_FROM_NAME", "").strip()
+        about = os.environ.get("STUDIO_ABOUT", "").strip() or None
         rows = []
         for l in leads:
             row = l.to_row()
-            row.update(outreach.build_message(l, signature=signature))
-            row["call_script"] = outreach.build_call_script(l, caller_name=caller)
+            row.update(outreach.build_message(l, signature=signature, about=about))
+            row["call_script"] = outreach.build_call_script(l, caller_name=caller, about=about)
             tp = outreach.build_talking_points(l)
             row["talk_savvy"] = tp["savvy"]
             row["talk_simple"] = tp["simple"]

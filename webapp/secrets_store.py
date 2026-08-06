@@ -10,6 +10,8 @@ import json
 import os
 from pathlib import Path
 
+from scanner import outreach
+
 # поле в UI -> переменная окружения
 FIELDS = {
     "yandex_xml_user": "YANDEX_XML_USER",
@@ -30,11 +32,13 @@ FIELDS = {
     # Подпись в письмах
     "sender_contact": "SENDER_CONTACT",
     "portfolio_url": "PORTFOLIO_URL",
+    # «Кто мы» — единый блок для писем и скриптов звонка
+    "studio_about": "STUDIO_ABOUT",
 }
 
 # Эти поля не показываем в общем списке «API-ключи» — у них своя панель.
 SMTP_FIELDS = ("smtp_host", "smtp_port", "smtp_user", "smtp_password", "smtp_from_name",
-               "sender_contact", "portfolio_url")
+               "sender_contact", "portfolio_url", "studio_about")
 
 _PATH = Path(os.environ.get("SCANNER_SECRETS", "secrets.local.json"))
 
@@ -88,6 +92,8 @@ def smtp_values() -> dict:
         "smtp_from_name": os.environ.get("SMTP_FROM_NAME", ""),
         "sender_contact": os.environ.get("SENDER_CONTACT", ""),
         "portfolio_url": os.environ.get("PORTFOLIO_URL", ""),
+        "studio_about": os.environ.get("STUDIO_ABOUT", ""),
+        "studio_about_default": outreach.DEFAULT_ABOUT,
         "configured": bool(os.environ.get("SMTP_HOST") and os.environ.get("SMTP_USER")
                            and os.environ.get("SMTP_PASSWORD")),
     }
