@@ -118,7 +118,8 @@ def test_legal_name_beats_page_title():
                 '<footer>ООО «Крокус», г. Ростов-на-Дону</footer></body></html>',
                 base_url="https://x.ru", title='Салон красоты "Крокус" в Ростове-на-Дону.')
     assert c.legal_name == "ООО «Крокус»"
-    assert c.company == 'Салон красоты "Крокус" в Ростове-на-Дону.'   # для показа
+    # для показа — заголовок, но подчищенный от мусора по краям
+    assert c.company == 'Салон красоты "Крокус" в Ростове-на-Дону'
 
 
 def test_legal_name_keeps_abbreviation_prefix():
@@ -158,3 +159,49 @@ def test_requisites_page_wins_over_contacts():
                 '</body></html>', base_url="https://x.ru")
     assert c.contact_page == "https://x.ru/rekvizity"
     assert c.extra_pages == ["https://x.ru/contacts", "https://x.ru/about"]
+
+
+# --------------------------------------------------------------------------- #
+# Мусорные контакты: в разметке полно цифр, похожих на телефон
+# --------------------------------------------------------------------------- #
+JUNK_PAGE = '''<html><body>
+<script>var id=78109932179; var t=78601808416; var x=72115664775; var y=76460995315;</script>
+<div data-uid="73768489450">Телефоны: +7 495 783-29-50, 8 800 707-47-67</div>
+<span>Пишите: info@firma.ru</span>
+</body></html>'''
+
+
+def test_phones_from_visible_text_not_markup():
+    """Идентификаторы в скриптах и data-атрибутах выглядят как телефоны.
+    Раньше они попадали в карточку, и лид казался достижимым."""
+    from scanner.contacts import extract
+
+    c = extract(JUNK_PAGE, base_url="https://firma.ru")
+    assert c.phones == ["+7 495 783-29-50", "+7 800 707-47-67"]
+    assert c.emails == ["info@firma.ru"]
+
+
+def test_implausible_phone_codes_rejected():
+    """В России код региона/оператора начинается только с 3, 4, 8 или 9,
+    а 810 — префикс международной связи, а не код."""
+    from scanner.contacts import _plausible_phone
+
+    for good in ("+7 495 783-29-50", "+7 800 707-47-67", "+7 918 581-56-65",
+                 "+7 863 263-20-07", "+7 342 100-00-00"):
+        assert _plausible_phone(good), good
+    for bad in ("+7 810 993-21-79", "+7 646 099-53-15", "+7 211 566-47-75",
+                "+7 123 456-78-90", "130", ""):
+        assert not _plausible_phone(bad), bad
+
+
+def test_seo_title_not_sent_to_registry():
+    """По рекламному заголовку компанию не найти, а лимит DaData он потратит."""
+    from scanner.contacts import clean_title, looks_like_company_name
+
+    title = ("❤ Интернет-магазин мебели в Москве. Купить мебель недорого. "
+             "☺ Каталог мебели: кровати, диваны, столы")
+    assert clean_title(title) == "Интернет-магазин мебели в Москве"
+    assert not looks_like_company_name(clean_title(title))
+    assert not looks_like_company_name("Купить окна в Ростове с доставкой")
+    assert looks_like_company_name("ООО «Ромашка»")
+    assert looks_like_company_name("Стоматология Улыбка")

@@ -301,7 +301,8 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None,
     """
     targets = []
     for lead in leads:
-        if lead.contacts.inn or lead.contacts.legal_name or lead.contacts.company:
+        if (lead.contacts.inn or lead.contacts.legal_name
+                or contacts_mod.looks_like_company_name(lead.contacts.company)):
             targets.append(lead)
         else:
             # Искать компанию не по чему — так и пишем, вместо пустой ячейки.
@@ -320,9 +321,13 @@ def _enrich(leads: list[Lead], token: str | None, on_progress=None,
             # терялась, и в таблице был просто пустой прочерк без объяснений.
             # Юрлицо из текста («ООО «Крокус»») ищется в реестре куда лучше
             # заголовка страницы («Салон красоты "Крокус" в Ростове-на-Дону.»).
+            # Рекламный заголовок в реестр не отправляем: компанию по нему не
+            # найти, а лимит DaData он потратит.
+            name = lead.contacts.legal_name
+            if not name and contacts_mod.looks_like_company_name(lead.contacts.company):
+                name = lead.contacts.company
             lead.enrichment, _ = enrich_mod.lookup_verbose(
-                inn=lead.contacts.inn or None,
-                name=lead.contacts.legal_name or lead.contacts.company or None,
+                inn=lead.contacts.inn or None, name=name or None,
                 ogrn=lead.contacts.ogrn or None, token=token)
         except Exception as exc:  # noqa: BLE001 — один битый ответ не рушит фазу
             log.warning("обогащение %s упало: %s", lead.domain, exc)

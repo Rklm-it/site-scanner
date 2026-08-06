@@ -75,6 +75,21 @@ def _deobfuscate(text: str) -> str:
     return text
 
 
+def _plausible_phone(value: str) -> bool:
+    """Похоже ли на настоящий российский номер.
+
+    В российском плане нумерации код региона или оператора начинается только
+    с 3, 4, 8 или 9 (3xx/4xx — регионы, 8xx — регионы и федеральные 800/804,
+    9xx — мобильные). А 810 — это префикс выхода на международную связь, а не
+    код. Случайные цифры со страницы такую проверку почти не проходят.
+    """
+    digits = re.sub(r"\D", "", value)
+    if len(digits) != 11 or digits[0] != "7":
+        return False
+    code = digits[1:4]
+    return code[0] in "3489" and code != "810"
+
+
 def _first_valid(matches: list[str], validator) -> str | None:
     for m in matches:
         if validator(m):
@@ -86,8 +101,13 @@ def extract(html: str, *, base_url: str, title: str | None = None) -> Contacts:
     """Тянет со страницы email, телефоны, соцсети, ИНН/ОГРН и компанию."""
     soup = BeautifulSoup(html or "", "lxml")
     contacts = Contacts()
-    raw = html or ""
-    deobf = _deobfuscate(raw)
+
+    # Контакты ищем в ВИДИМОМ тексте, а не в сыром HTML. В разметке полно цифр,
+    # которые выглядят как телефон: идентификаторы в скриптах, метки времени,
+    # data-атрибуты. Из-за них в карточку попадали номера с несуществующими
+    # кодами (+7 810, +7 646) и адреса вида user1651496935@домен — звонить и
+    # писать по ним некуда, а скоринг считал лид достижимым.
+    text = soup.get_text(" ", strip=True)
 
     # Email: из mailto и из текста (с учётом деобфускации)
     emails: list[str] = []
@@ -95,18 +115,19 @@ def extract(html: str, *, base_url: str, title: str | None = None) -> Contacts:
         addr = a["href"][len("mailto:"):].split("?")[0].strip()
         if addr:
             emails.append(addr)
-    emails += EMAIL_RE.findall(deobf)
+    emails += EMAIL_RE.findall(_deobfuscate(text))
     contacts.emails = [
         e for e in dict.fromkeys(e.strip().rstrip(".").lower() for e in emails)
         if not any(j in e for j in JUNK_EMAIL_HINTS)
     ][:8]
 
-    # Телефоны: из tel: и из текста
+    # Телефоны: из tel: и из текста, с проверкой кода
     phones: list[str] = []
     for a in soup.select('a[href^="tel:"]'):
         phones.append(a["href"][len("tel:"):])
-    phones += PHONE_RE.findall(raw)
-    contacts.phones = [p for p in dict.fromkeys(_clean_phone(p) for p in phones) if p][:8]
+    phones += PHONE_RE.findall(text)
+    contacts.phones = [p for p in dict.fromkeys(_clean_phone(p) for p in phones)
+                       if p and _plausible_phone(p)][:8]
 
     # Соцсети и мессенджеры
     socials: list[str] = []
@@ -129,7 +150,7 @@ def extract(html: str, *, base_url: str, title: str | None = None) -> Contacts:
     if og_name and og_name.get("content"):
         contacts.company = og_name["content"].strip()
     elif title:
-        contacts.company = title.split("|")[0].split("—")[0].strip()[:120] or None
+        contacts.company = clean_title(title)
 
     # Юридическое название из текста страницы — им ищем компанию в реестрах.
     contacts.legal_name = find_legal_name(text)
@@ -162,6 +183,44 @@ LEGAL_BARE_RE = re.compile(
     rf"(?:\s+(?:[А-ЯЁ][А-Яа-яЁё\-]+|(?:{_NAME_TAIL})\b)){{0,4}})")
 IP_NAME_RE = re.compile(
     r"\bИП\s+([А-ЯЁ][а-яё\-]{1,30}\s+[А-ЯЁ][а-яё]{1,30}(?:\s+[А-ЯЁ][а-яё]{1,30})?)")
+
+
+# Мусор по краям заголовка: эмодзи, стрелки, звёздочки.
+_EDGE_JUNK = re.compile(r"^[^\w«\"'(]+|[^\w»\"')]+$", re.UNICODE)
+
+# Слова, по которым видно рекламный заголовок, а не название компании.
+_TITLE_NOISE = (
+    "купить", "интернет-магазин", "каталог", "недорого", "цены", "цена",
+    "доставка", "заказать", "официальный сайт", "распродажа", "акции",
+    "скидк", "оптом", "низким ценам", "с доставкой",
+)
+
+
+def clean_title(title: str) -> str | None:
+    """Заголовок страницы → пригодное для показа название.
+
+    SEO-заголовки бывают на три предложения с эмодзи («❤ Интернет-магазин
+    мебели в Москве. Купить мебель недорого. ☺ Каталог…») — в карточке лида
+    это выглядит мусором. Берём первое предложение и чистим края.
+    """
+    value = (title or "").split("|")[0].split("—")[0].split(". ")[0]
+    value = _EDGE_JUNK.sub("", value).strip()
+    return value[:120] or None
+
+
+def looks_like_company_name(value: str | None) -> bool:
+    """Годится ли строка как запрос в реестр компаний.
+
+    По рекламному заголовку реестр компанию не найдёт, а запрос всё равно
+    потратит лимит DaData. Дешевле распознать заголовок заранее.
+    """
+    if not value:
+        return False
+    v = value.strip()
+    if not (2 < len(v) <= 60):
+        return False
+    low = v.lower()
+    return not any(w in low for w in _TITLE_NOISE)
 
 
 def find_legal_name(text: str) -> str | None:
