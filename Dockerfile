@@ -7,11 +7,23 @@ WORKDIR /app
 COPY requirements.txt requirements-web.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-web.txt
 
-# Chromium для скриншотов сайтов + системные зависимости.
-# Ставится под root до переключения на пользователя app; браузер лежит в
-# общем пути и доступен app-пользователю.
-ENV PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-RUN playwright install --with-deps chromium
+# Chromium для скриншотов сайтов.
+#
+# Берём системный пакет Debian, а НЕ `playwright install`: тот качает бинарь с
+# CDN Google, который доступен не из каждой сети — и сборка всего образа падала
+# из-за необязательной функции. Playwright умеет работать с готовым бинарём
+# через executable_path, его подхватывает CHROMIUM_PATH в webapp/screenshot.py.
+#
+# Шаг намеренно не фатальный: не поставился браузер — образ всё равно собран,
+# скан работает, недоступны только скриншоты. Сборка без браузера (легче и
+# быстрее): docker compose build --build-arg WITH_SCREENSHOTS=0
+ARG WITH_SCREENSHOTS=1
+RUN if [ "$WITH_SCREENSHOTS" = "1" ]; then \
+      (apt-get update && apt-get install -y --no-install-recommends chromium \
+       && rm -rf /var/lib/apt/lists/*) \
+      || echo "ВНИМАНИЕ: Chromium не установлен — скриншоты будут недоступны, остальное работает"; \
+    fi
+ENV CHROMIUM_PATH=/usr/bin/chromium
 
 COPY scanner ./scanner
 COPY webapp ./webapp

@@ -26,6 +26,15 @@ def capture(url: str, out_path: str | Path, *, timeout: int = 20000,
     out.parent.mkdir(parents=True, exist_ok=True)
     exe = executable_path or os.environ.get("CHROMIUM_PATH") or None
 
+    # Браузер в образе необязателен: если его не поставили (или не смогли —
+    # скачивание с CDN Google доступно не отовсюду), говорим об этом прямо,
+    # а не роняем пользователя в стектрейс Playwright.
+    if exe and not Path(exe).exists():
+        raise RuntimeError(
+            f"Chromium не найден по пути {exe}. Скриншоты отключены — остальное работает. "
+            f"Поставьте браузер в образ или укажите путь в CHROMIUM_PATH."
+        )
+
     with _LOCK:
         with sync_playwright() as p:
             browser = p.chromium.launch(

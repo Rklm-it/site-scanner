@@ -117,8 +117,10 @@ Talk-Me), виджеты обратного звонка, квизы. Их на�
 по запросу через headless Chromium (`webapp/screenshot.py`) и кэшируется в
 `webapp_data/shots/`. Эндпоинт `GET /api/screenshot/{domain}`.
 
-> Для скриншотов в образ ставится Chromium (`playwright install --with-deps
-> chromium` в Dockerfile) — образ заметно тяжелее и дольше собирается.
+> Для скриншотов в образ ставится системный Chromium (пакет Debian) — образ
+> заметно тяжелее и дольше собирается. Шаг не фатальный: браузер не поставился
+> — образ соберётся, скан работает, недоступны только скриншоты. Собрать без
+> браузера: `docker compose build --build-arg WITH_SCREENSHOTS=0`.
 
 ## Воронка (канбан)
 

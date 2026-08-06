@@ -299,3 +299,14 @@ def test_scanner_logs_reach_stdout():
     log = logging.getLogger("scanner")
     assert log.handlers, "у логгера scanner нет обработчика — логи прогона не видны"
     assert log.level <= logging.INFO
+
+
+def test_screenshot_reports_missing_browser(tmp_path, monkeypatch):
+    """Chromium в образе необязателен: скачивание с CDN Google доступно не
+    отовсюду и раньше роняло сборку целиком. Если браузера нет — понятная
+    ошибка, а не стектрейс Playwright."""
+    from webapp import screenshot
+
+    monkeypatch.setenv("CHROMIUM_PATH", str(tmp_path / "нет-такого-файла"))
+    with pytest.raises(RuntimeError, match="Chromium не найден"):
+        screenshot.capture("https://example.com", tmp_path / "shot.png")
