@@ -32,7 +32,7 @@ import zipfile
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -167,7 +167,11 @@ def _local_path(url: str) -> str:
     """
     parsed = urlparse(url)
     raw = [s for s in parsed.path.split("/") if s not in ("", ".", "..")]
-    segments = [_BAD_SEG.sub("_", s)[:120] or "_" for s in raw]
+    # Раскодировать %-последовательности ДО чистки имени. Иначе «410%201.jpg»
+    # (то есть файл «410 1.jpg» с пробелом — на старых сайтах таких полно)
+    # превращался в «410_201.jpg»: имя читается как число 201 и не совпадает
+    # ни с чем на сайте. После unquote получается честное «410_1.jpg».
+    segments = [_BAD_SEG.sub("_", unquote(s))[:120] or "_" for s in raw]
     if not segments:
         segments = ["index"] if _keep_query(parsed.query) else ["index.html"]
     if _ext(segments[-1]) in ASSET_EXT:

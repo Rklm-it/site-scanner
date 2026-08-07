@@ -207,6 +207,10 @@ def test_manifest_i_arhiv(site, tmp_path):
     ("https://x.ru/uslugi", "uslugi.html"),
     ("https://x.ru/a/b/", "a/b.html"),
     ("https://x.ru/images/foto.jpg", "images/foto.jpg"),
+    # Пробел в имени файла: на сайте «410 1.jpg», в адресе «410%201.jpg».
+    # Без раскодирования получалось «410_201.jpg» — имя читается как число.
+    ("https://x.ru/images/410%201.jpg", "images/410_1.jpg"),
+    ("https://x.ru/%D0%B4%D0%BE%D0%BC.html", "дом.html"),
     ("https://x.ru/style.css?v=3", "style.css"),
     # Пагинация каталога: вторая страница не должна перезаписать первую
     ("https://x.ru/katalog?start=60", "katalog~start_60.html"),
