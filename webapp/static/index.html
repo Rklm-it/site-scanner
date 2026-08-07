@@ -594,7 +594,12 @@ async function switchView(v) {
   if (v === "base" || v === "kanban" || v === "work" || v === "trash") {
     BASE = ((await (await fetch("/api/base")).json()).leads) || [];
   }
-  if (v === "dumps") await loadDumps();
+  if (v === "dumps") {
+    // Домены лидов нужны для подсказки в поле: набранный руками домен —
+    // источник опечаток, а опечатка молча выгружает чужой сайт.
+    if (!BASE.length) BASE = ((await (await fetch("/api/base")).json()).leads) || [];
+    await loadDumps();
+  }
   render();
 }
 
@@ -620,6 +625,33 @@ function readDumpForm() {
   DUMP_FORM.robots = $("dmp-robots").checked;
 }
 
+/** Ближайший по написанию домен из базы — чтобы поймать опечатку до запуска.
+ *  Расстояние редактирования, а не поиск по куску строки: «project-doma.ru»
+ *  отличается от «projekt-doma.ru» одной буквой в середине, и подстрочный
+ *  поиск такое не ловит вовсе, зато охотно предлагает случайный домен на
+ *  совершенно постороннем адресе. Порог 3 — дальше это уже другой сайт. */
+function nearestDomain(typed, known) {
+  if (!typed || !known.length) return null;
+  const dist = (a, b) => {
+    let prev = [...Array(b.length + 1).keys()];
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1,
+                          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  };
+  let best = null, bestD = Infinity;
+  for (const d of known) {
+    const cur = dist(typed.toLowerCase(), d.toLowerCase());
+    if (cur < bestD) { bestD = cur; best = d; }
+  }
+  return bestD > 0 && bestD <= 3 ? best : null;
+}
+
 function fmtMB(b) {
   if (!b) return "0 КБ";
   return b < 1048576 ? Math.round(b / 1024) + " КБ" : (b / 1048576).toFixed(1) + " МБ";
@@ -637,6 +669,15 @@ function renderDumps() {
   $("toolbar").style.display = "none";
 
   const busy = DUMP_JOB && DUMP_JOB.status === "running";
+  const known = [...new Set(BASE.map(l => l.domain).filter(Boolean))].sort();
+  // Домена нет среди найденных лидов — почти всегда опечатка. Не запрещаем
+  // (сайт клиента мог прийти не из скана), но говорим об этом ДО запуска:
+  // «project-doma.ru» вместо «projekt-doma.ru» трижды уехал молча.
+  const near = nearestDomain(DUMP_FORM.domain, known);
+  const unknown = DUMP_FORM.domain && known.length && !known.includes(DUMP_FORM.domain)
+    ? `<div class="warn">Домена <b>${escHtml(DUMP_FORM.domain)}</b> нет в базе лидов.` +
+      (near ? ` Возможно, имелся в виду <b>${escHtml(near)}</b>.` : " Проверьте опечатку.") +
+      `</div>` : "";
   const list = DUMPS.length ? DUMPS.map(d => `<div class="dumprow">
       <span class="dname">${escHtml(d.domain)}
         <span class="dmeta">${escHtml(d.created)} · ${fmtMB(d.bytes)}</span></span>
@@ -650,7 +691,9 @@ function renderDumps() {
       <h2>Выгрузить сайт клиента</h2>
       <div class="dumpform">
         <div><label>Домен</label>
-          <input type="text" id="dmp-domain" placeholder="projekt-doma.ru" value="${escHtml(DUMP_FORM.domain)}"></div>
+          <input type="text" id="dmp-domain" list="dmp-domains" placeholder="начни печатать — подставится из базы"
+                 value="${escHtml(DUMP_FORM.domain)}">
+          <datalist id="dmp-domains">${known.map(d => `<option value="${escHtml(d)}">`).join("")}</datalist></div>
         <div><label title="Сколько страниц скачивать максимум">Страниц</label>
           <input type="number" id="dmp-pages" value="${DUMP_FORM.pages}"></div>
         <div><label title="Как глубоко уходить по ссылкам от главной">Глубина</label>
@@ -661,6 +704,7 @@ function renderDumps() {
         <label title="Снимать только для сайта клиента, который сам попросил его переделать: robots.txt на Joomla часто закрывает папку с картинками, и выгрузка приезжает без единой фотографии">
           <input type="checkbox" id="dmp-robots" ${DUMP_FORM.robots ? "checked" : ""}> уважать robots.txt</label>
       </div>
+      ${unknown}
       <div id="dmp-progress"></div>
       <div class="hint">Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
         равно не нужны для разбора и раздувают репозиторий. Страницы приводятся к UTF-8,
@@ -673,8 +717,11 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-domain", "dmp-pages", "dmp-depth", "dmp-robots"].forEach(
+  ["dmp-pages", "dmp-depth", "dmp-robots"].forEach(
     id => $(id).addEventListener("change", readDumpForm));
+  // Домен перерисовывает секцию: предупреждение про опечатку должно появиться
+  // до запуска, а не после того, как выгрузился чужой сайт.
+  $("dmp-domain").addEventListener("change", () => { readDumpForm(); renderDumps(); });
   document.querySelectorAll(".ddel").forEach(b => b.onclick = async () => {
     if (!confirm("Удалить архив с сервера?")) return;
     await fetch(`/api/dumps/${encodeURIComponent(b.dataset.n)}`, { method: "DELETE" });
