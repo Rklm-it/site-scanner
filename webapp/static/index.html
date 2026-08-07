@@ -605,6 +605,21 @@ function refreshView() { if (VIEW === "kanban") renderKanban(); else renderTable
 // кнопкой: сервер обходит сайт сам и кладёт готовый zip в список ниже.
 let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 
+// Состояние формы держим отдельно от разметки. Секция перерисовывается на
+// каждом ответе сервера, и без этого поля возвращались к значениям по
+// умолчанию: снятая галочка robots.txt снова оказывалась поставленной, а
+// «Страниц» и «Глубина» сбрасывались. На экране было одно, применялось
+// другое — и выгрузка молча приезжала без картинок.
+const DUMP_FORM = { domain: "", pages: 150, depth: 3, robots: true };
+
+function readDumpForm() {
+  if (!$("dmp-domain")) return;
+  DUMP_FORM.domain = $("dmp-domain").value.trim();
+  DUMP_FORM.pages = +$("dmp-pages").value || 150;
+  DUMP_FORM.depth = +$("dmp-depth").value || 3;
+  DUMP_FORM.robots = $("dmp-robots").checked;
+}
+
 function fmtMB(b) {
   if (!b) return "0 КБ";
   return b < 1048576 ? Math.round(b / 1024) + " КБ" : (b / 1048576).toFixed(1) + " МБ";
@@ -635,16 +650,16 @@ function renderDumps() {
       <h2>Выгрузить сайт клиента</h2>
       <div class="dumpform">
         <div><label>Домен</label>
-          <input type="text" id="dmp-domain" placeholder="projekt-doma.ru" value="${escHtml(DUMP_JOB ? DUMP_JOB.domain : "")}"></div>
+          <input type="text" id="dmp-domain" placeholder="projekt-doma.ru" value="${escHtml(DUMP_FORM.domain)}"></div>
         <div><label title="Сколько страниц скачивать максимум">Страниц</label>
-          <input type="number" id="dmp-pages" value="150"></div>
+          <input type="number" id="dmp-pages" value="${DUMP_FORM.pages}"></div>
         <div><label title="Как глубоко уходить по ссылкам от главной">Глубина</label>
-          <input type="number" id="dmp-depth" value="3"></div>
+          <input type="number" id="dmp-depth" value="${DUMP_FORM.depth}"></div>
         <div><button id="dmp-run" class="primary" style="width:auto" ${busy ? "disabled" : ""}>Выгрузить сайт</button></div>
       </div>
       <div class="checks">
-        <label title="Снимать только для сайта клиента, который сам попросил его переделать: robots.txt на Joomla часто закрывает папки со стилями, и выгрузка выходит без оформления">
-          <input type="checkbox" id="dmp-robots" checked> уважать robots.txt</label>
+        <label title="Снимать только для сайта клиента, который сам попросил его переделать: robots.txt на Joomla часто закрывает папку с картинками, и выгрузка приезжает без единой фотографии">
+          <input type="checkbox" id="dmp-robots" ${DUMP_FORM.robots ? "checked" : ""}> уважать robots.txt</label>
       </div>
       <div id="dmp-progress"></div>
       <div class="hint">Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
@@ -658,6 +673,8 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
+  ["dmp-domain", "dmp-pages", "dmp-depth", "dmp-robots"].forEach(
+    id => $(id).addEventListener("change", readDumpForm));
   document.querySelectorAll(".ddel").forEach(b => b.onclick = async () => {
     if (!confirm("Удалить архив с сервера?")) return;
     await fetch(`/api/dumps/${encodeURIComponent(b.dataset.n)}`, { method: "DELETE" });
@@ -690,13 +707,17 @@ function renderDumpProgress() {
     const noimg = j.assets === 0 ? `<div class="warn">Ни одной картинки. Обычно это
         robots.txt сайта закрывает папку с изображениями — снимите галочку и
         повторите, иначе портфолио собирать не из чего.</div>` : "";
+    // Что реально применилось, а не что сейчас нарисовано в форме
+    const how = `<div class="hint">Домен: <b>${escHtml(j.domain)}</b>, robots.txt
+        ${j.robots ? "уважали" : "игнорировали"}.</div>`;
     box.innerHTML = `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
-      файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>${who}${noimg}`;
+      файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>${who}${how}${noimg}`;
   }
 }
 
 async function startDump() {
-  const domain = ($("dmp-domain").value || "").trim();
+  readDumpForm();
+  const domain = DUMP_FORM.domain;
   if (!domain) { $("dmp-domain").focus(); return; }
   $("dmp-run").disabled = true;
   let res, data;
@@ -705,9 +726,9 @@ async function startDump() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         domain,
-        max_pages: +$("dmp-pages").value || 150,
-        max_depth: +$("dmp-depth").value || 3,
-        respect_robots: $("dmp-robots").checked,
+        max_pages: DUMP_FORM.pages,
+        max_depth: DUMP_FORM.depth,
+        respect_robots: DUMP_FORM.robots,
       }),
     });
     data = await res.json();

@@ -579,6 +579,7 @@ class DumpJob:
     archive_bytes: int = 0
     stopped_by: str | None = None
     title: str = ""                  # заголовок главной — чей сайт скачали
+    robots: bool = True              # с какой галочкой реально прошла выгрузка
     error: str | None = None
     errors: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.time)
@@ -589,6 +590,7 @@ class DumpJob:
             "pages": self.pages, "assets": self.assets, "bytes": self.bytes,
             "archive": self.archive, "archive_bytes": self.archive_bytes,
             "stopped_by": self.stopped_by, "title": self.title,
+            "robots": self.robots,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
@@ -649,7 +651,7 @@ def start_dump(req: DumpRequest) -> dict:
         raise HTTPException(400, "Укажите домен вида example.ru")
     if any(j.status == "running" for j in DUMP_JOBS.values()):
         raise HTTPException(409, "Одна выгрузка уже идёт — дождитесь её окончания.")
-    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain)
+    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain, robots=req.respect_robots)
     DUMP_JOBS[job.id] = job
     threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
     return {"dump_id": job.id}
