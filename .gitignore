@@ -24,3 +24,14 @@ webapp_data/
 
 # Деплой: файл с доменом/паролем
 scanner.env
+
+# Выгрузки сайтов клиентов: сами файлы держим в репозитории (их читает
+# новая сессия), но тяжёлое — нет, иначе репозиторий раздуется.
+clients/**/*.mp4
+clients/**/*.avi
+clients/**/*.mov
+clients/**/*.zip
+clients/**/*.rar
+clients/**/*.pdf
+clients/**/*.woff*
+clients/**/*.ttf
