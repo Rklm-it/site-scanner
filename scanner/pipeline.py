@@ -120,6 +120,7 @@ def collect_urls(
     max_per_query: int,
     cache,
     skip_seen: bool = False,
+    skip_domains: set[str] | None = None,
     on_query=None,
     time_budget: float = DEFAULT_COLLECT_BUDGET,
     concurrency: int = 6,
@@ -140,6 +141,8 @@ def collect_urls(
     total = len(queries)
     done = 0
     skipped_seen = 0          # сколько доменов срезала галочка «пропускать виденные»
+    skipped_trash = 0         # сколько отсеяно как помеченный вручную мусор
+    trash = skip_domains or set()
     deadline = time.monotonic() + time_budget
 
     pool = ThreadPoolExecutor(max_workers=max(1, min(concurrency, total)))
@@ -160,6 +163,10 @@ def collect_urls(
             for url in urls:                       # дедуп/фильтрация — в главном потоке
                 domain = registered_domain(url)
                 if not domain or domain in SKIP_DOMAINS or domain in seen:
+                    continue
+                if domain in trash:       # помечен в базе как мусор
+                    seen.add(domain)
+                    skipped_trash += 1
                     continue
                 if skip_seen and cache.is_seen(domain):
                     seen.add(domain)          # чтобы не считать один домен дважды
@@ -189,6 +196,8 @@ def collect_urls(
                     skipped_seen)
     elif skipped_seen:
         log.info("Пропущено как уже виденные: %d доменов", skipped_seen)
+    if skipped_trash:
+        log.info("Пропущено помеченных мусором: %d доменов", skipped_trash)
     return out
 
 
@@ -399,6 +408,7 @@ def run(settings: Settings, *, dadata_token: str | None = None, progress=None,
             max_per_query=settings.max_per_query,
             cache=cache,
             skip_seen=settings.skip_seen,
+            skip_domains=set(settings.skip_domains or ()),
             on_query=on_collect,
             time_budget=min(settings.collect_budget or DEFAULT_COLLECT_BUDGET,
                             _left(deadline)),

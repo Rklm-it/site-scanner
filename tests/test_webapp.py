@@ -310,3 +310,38 @@ def test_screenshot_reports_missing_browser(tmp_path, monkeypatch):
     monkeypatch.setenv("CHROMIUM_PATH", str(tmp_path / "нет-такого-файла"))
     with pytest.raises(RuntimeError, match="Chromium не найден"):
         screenshot.capture("https://example.com", tmp_path / "shot.png")
+
+
+# --------------------------------------------------------------------------- #
+# Мусорные лиды: помеченный домен не должен возвращаться в новых сканах
+# --------------------------------------------------------------------------- #
+def test_trash_status_accepted(client):
+    from webapp.leads_store import TRASH
+
+    c, _ = client
+    r = c.post("/api/leads/state", json={"domain": "centrkim.ru", "status": TRASH,
+                                         "note": "переехали на новый сайт"})
+    assert r.status_code == 200
+    state = c.get("/api/leads/state").json()["centrkim.ru"]
+    assert state["status"] == TRASH and "переехали" in state["note"]
+
+
+def test_statuses_exposed_to_frontend(client):
+    """Список статусов отдаём с сервера, чтобы он не расходился с JS."""
+    c, _ = client
+    statuses = c.get("/api/config").json()["statuses"]
+    assert "мусор" in statuses and "отказ" in statuses
+
+
+def test_trash_domains_go_into_scan_settings(client):
+    """Помеченный мусором домен уходит в скан как исключение — иначе он
+    всплывал бы в каждом следующем прогоне."""
+    from webapp import server
+
+    c, _ = client
+    c.post("/api/leads/state", json={"domain": "gov.ru", "status": "мусор"})
+    c.post("/api/leads/state", json={"domain": "живой.ru", "status": "интерес"})
+
+    assert server.trash_domains() == ["gov.ru"]
+    s = server._build_settings(server.ScanRequest(queries="x"), "job1")
+    assert s.skip_domains == ["gov.ru"]

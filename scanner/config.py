@@ -18,6 +18,9 @@ class Settings:
     # поиск
     providers: list[str] = field(default_factory=lambda: ["yandex", "google"])
     max_per_query: int = 20
+    # Домены, помеченные в базе как мусор: брошенные сайты, переехавшие
+    # компании, агрегаторы. Один раз отметил — больше не попадается.
+    skip_domains: list[str] = field(default_factory=list)
 
     # скан
     concurrency: int = 16

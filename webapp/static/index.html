@@ -115,6 +115,11 @@
     background: var(--bg); color: var(--ink); padding: 2px 4px; }
   .st-sel[data-s="клиент"] { border-color: var(--ok); color: var(--ok); }
   .st-sel[data-s="отказ"] { border-color: var(--bad); }
+  .st-sel[data-s="мусор"] { border-color: var(--line); color: var(--muted); opacity: .7; }
+  .note-inp { font: inherit; font-size: 12px; width: 100%; margin-top: 4px; padding: 3px 6px;
+              border-radius: 6px; border: 1px solid var(--line); background: transparent;
+              color: inherit; }
+  .note-inp::placeholder { color: var(--muted); opacity: .6; }
   .rowbtn { border: 1px solid var(--line); background: var(--panel); color: var(--ink);
     border-radius: 6px; padding: 2px 8px; font-size: 13px; cursor: pointer; }
   .rowbtn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -299,6 +304,7 @@
       <label class="fchk" title="Кому обещал перезвонить сегодня или раньше"><input type="checkbox" id="f_callback"> перезвонить сегодня</label>
       <label class="fchk" title="У кого ещё не сделан прототип в Lovable"><input type="checkbox" id="f_noproto"> без прототипа</label>
       <label class="fchk" title="Спрятать лиды, по которым уже есть статус"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
+      <label class="fchk" title="Показать лиды, помеченные мусором (брошенные сайты, переезды, агрегаторы)"><input type="checkbox" id="f_trash"> показать мусор</label>
       <span class="fchk" title="Показывать только выбранные приоритеты">приоритет:
         <label><input type="checkbox" class="ftier" value="A" checked>A</label>
         <label><input type="checkbox" class="ftier" value="B" checked>B</label>
@@ -518,6 +524,7 @@ async function init() {
     CAT_UPDATERS.push(upd);
     det.appendChild(sum); det.appendChild(row); box.appendChild(det);
   });
+  if (Array.isArray(cfg.statuses) && cfg.statuses.length) STATUS_OPTS = cfg.statuses;
   renderKeys(cfg.secrets);
 
   // SMTP / рассылка
@@ -528,7 +535,7 @@ async function init() {
   $("bulk").onclick = bulkSend;
 
   // фильтры результатов
-  ["search", "f_email", "f_phone", "f_callback", "f_noproto", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
+  ["search", "f_email", "f_phone", "f_callback", "f_noproto", "f_hide", "f_trash"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
   document.querySelectorAll(".ftier").forEach(c => c.onchange = () => ROWS.length && renderTable());
   // модалка письма
   $("m-close").onclick = () => $("modal").style.display = "none";
@@ -893,7 +900,10 @@ function render() {
   renderTable();
 }
 
-const STATUS_OPTS = ["", "написал", "звонил", "недозвон", "перезвонить", "интерес", "ответили", "клиент", "отказ"];
+// Приходит из /api/config — чтобы список не расходился с бэкендом.
+let STATUS_OPTS = ["", "написал", "звонил", "недозвон", "перезвонить", "интерес",
+                   "ответили", "клиент", "отказ", "мусор"];
+const TRASH = "мусор";
 
 function passesFilters(r) {
   const q = $("search").value.trim().toLowerCase();
@@ -902,6 +912,8 @@ function passesFilters(r) {
   if ($("f_phone").checked && !r.phones) return false;
   if ($("f_noproto").checked && r.prototype_url) return false;
   if ($("f_hide").checked && r.status) return false;
+  // Мусор прячем всегда, пока явно не попросили показать
+  if (!$("f_trash").checked && r.status === TRASH) return false;
   if ($("f_callback").checked) {
     const today = new Date().toISOString().slice(0, 10);
     if (!(r.callback && r.callback <= today)) return false;
@@ -911,9 +923,10 @@ function passesFilters(r) {
   return true;
 }
 
-async function setStatus(domain, status, callback, deal) {
+async function setStatus(domain, status, callback, deal, note) {
   const payload = {domain};
   if (status !== undefined) payload.status = status;
+  if (note !== undefined) payload.note = note;
   if (callback !== undefined) payload.callback = callback;
   if (deal !== undefined) payload.deal_amount = deal;
   await fetch("/api/leads/state", {method: "POST", headers: {"Content-Type": "application/json"},
@@ -921,6 +934,7 @@ async function setStatus(domain, status, callback, deal) {
   [ROWS, BASE].forEach(arr => arr.forEach(r => {
     if (r.domain === domain) {
       if (status !== undefined) r.status = status;
+      if (note !== undefined) r.note = note;
       if (callback !== undefined) r.callback = callback;
       if (deal !== undefined) r.deal_amount = deal;
     }
@@ -1166,7 +1180,9 @@ function renderTable() {
     <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
     <td><select class="st-sel" data-s="${r.status}" data-d="${r.domain}">
       ${STATUS_OPTS.map(s => `<option value="${s}" ${r.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
-      </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}</td>
+      </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}
+      <input class="note-inp" data-d="${esc(r.domain)}" value="${esc(r.note || "")}"
+             placeholder="заметка" title="Что выяснили по этому лиду. Сохраняется сразу."></td>
     <td style="white-space:nowrap">
       <button class="rowbtn" data-detail="${r.domain}" title="Карточка лида: вся инфа + промпт для Lovable">🔍</button>
       <button class="rowbtn" data-call="${r.domain}">📞</button>
@@ -1180,6 +1196,14 @@ function renderTable() {
     renderTable();
   });
   document.querySelectorAll(".st-sel").forEach(s => s.onchange = () => setStatus(s.dataset.d, s.value));
+  document.querySelectorAll(".note-inp").forEach(i => {
+    const save = () => { if (i.value !== (i.dataset.saved ?? i.defaultValue)) {
+      i.dataset.saved = i.value;
+      setStatus(i.dataset.d, undefined, undefined, undefined, i.value);
+    }};
+    i.onblur = save;
+    i.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); i.blur(); } };
+  });
   document.querySelectorAll(".rowbtn[data-mail]").forEach(b => b.onclick = () => openMail(b.dataset.mail));
   document.querySelectorAll(".rowbtn[data-call]").forEach(b => b.onclick = () => openCall(b.dataset.call));
   document.querySelectorAll(".rowbtn[data-detail]").forEach(b => b.onclick = () => openDetail(b.dataset.detail));
@@ -1199,7 +1223,10 @@ function renderSummary(s) {
   </div>`;
 }
 
-const esc = s => (s == null ? "" : String(s)).replace(/[&<>]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;"}[c]));
+// Кавычки экранируем тоже: значения подставляются в атрибуты value/title,
+// и одна кавычка в заметке ломала бы разметку строки.
+const esc = s => (s == null ? "" : String(s))
+  .replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 init();
 </script>
 </body>

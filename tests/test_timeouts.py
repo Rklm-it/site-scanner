@@ -290,3 +290,16 @@ def test_collect_no_seen_warning_when_results_found(monkeypatch, caplog):
         out = pipeline.collect_urls(["стоматология"], providers=["yandex"],
                                     max_per_query=5, cache=NullCache(), skip_seen=True)
     assert len(out) == 1 and "пропускать виденные" not in caplog.text
+
+
+def test_collect_skips_trash_domains(monkeypatch, caplog):
+    """Домены, помеченные мусором, не собираются заново."""
+    from scanner.cache import NullCache
+
+    monkeypatch.setattr(pipeline.search_mod, "search_many",
+                        lambda q, **kw: ["https://gov.ru/x", "https://firma.ru/y"])
+    with caplog.at_level("INFO", logger="scanner"):
+        out = pipeline.collect_urls(["ниша"], providers=["yandex"], max_per_query=5,
+                                    cache=NullCache(), skip_domains={"gov.ru"})
+    assert [u for u, _ in out] == ["https://firma.ru"]
+    assert "мусором" in caplog.text

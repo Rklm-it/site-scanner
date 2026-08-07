@@ -24,7 +24,7 @@ from scanner.report import write_csv, write_json
 import re
 
 from . import mailer, screenshot, secrets_store
-from .leads_store import STATUSES, LeadStore
+from .leads_store import STATUSES, TRASH, LeadStore
 
 DATA_DIR = Path(os.environ.get("SCANNER_DATA", "webapp_data"))
 JOBS_DIR = DATA_DIR / "jobs"
@@ -167,8 +167,16 @@ def _build_settings(req: ScanRequest, job_id: str) -> Settings:
         enrich=req.enrich,
         skip_seen=req.skip_seen,
         cache_path=str(DATA_DIR / "cache.sqlite") if req.use_cache else None,
+        skip_domains=trash_domains(),
         out=out_base,
     )
+
+
+def trash_domains() -> list[str]:
+    """Домены, помеченные в базе как мусор — их не собираем заново."""
+    if not STORE:
+        return []
+    return [d for d, st in STORE.all().items() if st.get("status") == TRASH]
 
 
 def compose_signature() -> str:
@@ -279,6 +287,7 @@ def get_config() -> dict:
         "smtp": secrets_store.smtp_values(),
         "providers": ["yandex", "google", "serpapi_google", "serpapi_yandex", "duckduckgo"],
         "categories_catalog": CATALOG,
+        "statuses": list(STATUSES),        # чтобы список не дублировался в JS
         "defaults": ScanRequest().model_dump(),
     }
 
