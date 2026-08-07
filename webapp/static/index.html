@@ -286,6 +286,7 @@
       <button class="tab" data-v="base" title="Вся накопленная база найденных лидов за все сканы">Все лиды</button>
       <button class="tab" data-v="work" title="Лиды, с которыми уже работаешь: написал / звонил / перезвонить / интерес">В работе</button>
       <button class="tab" data-v="kanban" title="Стадии сделок и заработок">Воронка</button>
+      <button class="tab" data-v="trash" title="Негодные лиды: сайт брошен, компания переехала, агрегатор. В сканах больше не собираются">🗑 Мусор</button>
     </div>
     <details class="legend">
       <summary>❓ Что значат колонки и оценки</summary>
@@ -308,7 +309,6 @@
       <label class="fchk" title="Кому обещал перезвонить сегодня или раньше"><input type="checkbox" id="f_callback"> перезвонить сегодня</label>
       <label class="fchk" title="У кого ещё не сделан прототип в Lovable"><input type="checkbox" id="f_noproto"> без прототипа</label>
       <label class="fchk" title="Спрятать лиды, по которым уже есть статус"><input type="checkbox" id="f_hide"> скрыть обработанные</label>
-      <label class="fchk" title="Показать лиды, помеченные мусором (брошенные сайты, переезды, агрегаторы)"><input type="checkbox" id="f_trash"> показать мусор</label>
       <span class="fchk" title="Показывать только выбранные приоритеты">приоритет:
         <label><input type="checkbox" class="ftier" value="A" checked>A</label>
         <label><input type="checkbox" class="ftier" value="B" checked>B</label>
@@ -539,7 +539,7 @@ async function init() {
   $("bulk").onclick = bulkSend;
 
   // фильтры результатов
-  ["search", "f_email", "f_phone", "f_callback", "f_noproto", "f_hide", "f_trash"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
+  ["search", "f_email", "f_phone", "f_callback", "f_noproto", "f_hide"].forEach(id => $(id).oninput = () => ROWS.length && renderTable());
   document.querySelectorAll(".ftier").forEach(c => c.onchange = () => ROWS.length && renderTable());
   // модалка письма
   $("m-close").onclick = () => $("modal").style.display = "none";
@@ -577,7 +577,7 @@ const IN_PROGRESS = ["написал", "звонил", "недозвон", "пе
 
 async function switchView(v) {
   VIEW = v; setActiveTab();
-  if (v === "base" || v === "kanban" || v === "work") {
+  if (v === "base" || v === "kanban" || v === "work" || v === "trash") {
     BASE = ((await (await fetch("/api/base")).json()).leads) || [];
   }
   render();
@@ -859,18 +859,23 @@ function showResults(job) {
 
 function render() {
   if (VIEW === "kanban") { renderKanban(); return; }
-  if (VIEW === "base" || VIEW === "work") {
-    ROWS = VIEW === "work" ? BASE.filter(l => IN_PROGRESS.includes(l.status)) : BASE;
+  if (VIEW === "base" || VIEW === "work" || VIEW === "trash") {
+    ROWS = VIEW === "work" ? BASE.filter(l => IN_PROGRESS.includes(l.status))
+         : VIEW === "trash" ? BASE.filter(l => l.status === TRASH)
+         : BASE;
     $("summary").innerHTML = "";
     $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
     $("toolbar").style.display = "flex";
-    $("count").textContent = (VIEW === "work" ? "В работе: " : "Всего лидов: ") + ROWS.length;
+    $("count").textContent = (VIEW === "work" ? "В работе: "
+      : VIEW === "trash" ? "В мусоре: " : "Всего лидов: ") + ROWS.length;
     $("elapsed").textContent = "";
     $("csv").style.display = "none"; $("json").style.display = "none";
     $("bulk").style.display = SMTP_OK ? "" : "none";
     if (!ROWS.length) {
       $("results").innerHTML = `<div class="empty">${VIEW === "work"
         ? "Пока нет лидов в работе. Начни писать или звонить из вкладки «Все лиды» — они появятся здесь."
+        : VIEW === "trash"
+        ? "Мусора нет. Помечай так лиды, к которым возвращаться незачем: брошенный сайт, компания переехала, агрегатор. В новых сканах они больше не появятся."
         : "Лидов пока нет. Слева выбери ниши и города, нажми «Запустить скан»."}</div>`;
       return;
     }
@@ -916,8 +921,8 @@ function passesFilters(r) {
   if ($("f_phone").checked && !r.phones) return false;
   if ($("f_noproto").checked && r.prototype_url) return false;
   if ($("f_hide").checked && r.status) return false;
-  // Мусор прячем всегда, пока явно не попросили показать
-  if (!$("f_trash").checked && r.status === TRASH) return false;
+  // Мусор виден только на своей вкладке — в остальных списках он не мешает
+  if (VIEW !== "trash" && r.status === TRASH) return false;
   if ($("f_callback").checked) {
     const today = new Date().toISOString().slice(0, 10);
     if (!(r.callback && r.callback <= today)) return false;
@@ -1182,7 +1187,7 @@ function renderTable() {
     <td>${(r.phones || "").split(",").map(p => p.trim()).filter(Boolean)
         .map(p => `<a href="tel:${p.replace(/[^\d+]/g, "")}">${esc(p)}</a>`).join("<br>")}</td>
     <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
-    <td><select class="st-sel" data-s="${r.status}" data-d="${r.domain}">
+    <td><select class="st-sel" data-s="${r.status}" data-d="${r.domain}" title="«Мусор» — лид уедет на свою вкладку и больше не попадётся в сканах">
       ${STATUS_OPTS.map(s => `<option value="${s}" ${r.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
       </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}</td>
     <td style="white-space:nowrap">
