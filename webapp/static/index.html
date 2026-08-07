@@ -163,6 +163,19 @@
   .legend summary { color: var(--accent); cursor: pointer; }
   .legend div { color: var(--muted); margin-top: 6px; line-height: 1.7; }
   .legend b { color: var(--ink); }
+
+  /* Выгрузки сайтов */
+  .dumpform { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+  .dumpform > div { flex: 0 0 auto; }
+  .dumpform label { margin: 0 0 4px; }
+  .dumpform input[type=text] { width: 240px; }
+  .dumpform input[type=number] { width: 90px; }
+  .dumpform button { white-space: nowrap; }
+  .dumprow { display: flex; align-items: center; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--line); font-size: 14px; }
+  .dumprow .dname { flex: 1; font-weight: 600; }
+  .dumprow .dmeta { color: var(--muted); font-size: 12px; font-weight: 400; }
+  .dumprow a.dl { text-decoration: none; }
   th[title], label[title] { cursor: help; }
 
   /* Канбан-воронка */
@@ -287,6 +300,7 @@
       <button class="tab" data-v="work" title="Лиды, с которыми уже работаешь: написал / звонил / перезвонить / интерес">В работе</button>
       <button class="tab" data-v="kanban" title="Стадии сделок и заработок">Воронка</button>
       <button class="tab" data-v="trash" title="Негодные лиды: сайт брошен, компания переехала, агрегатор. В сканах больше не собираются">🗑 Мусор</button>
+      <button class="tab" data-v="dumps" title="Скачать сайт клиента целиком одним архивом — для разбора перед переделкой">📦 Выгрузки</button>
     </div>
     <details class="legend">
       <summary>❓ Что значат колонки и оценки</summary>
@@ -580,10 +594,154 @@ async function switchView(v) {
   if (v === "base" || v === "kanban" || v === "work" || v === "trash") {
     BASE = ((await (await fetch("/api/base")).json()).leads) || [];
   }
+  if (v === "dumps") await loadDumps();
   render();
 }
 
 function refreshView() { if (VIEW === "kanban") renderKanban(); else renderTable(); }
+
+// --- выгрузка сайта клиента ---------------------------------------------- //
+// Раньше сайт качали wget-ом на сервере и перекладывали архив руками. Теперь
+// кнопкой: сервер обходит сайт сам и кладёт готовый zip в список ниже.
+let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
+
+function fmtMB(b) {
+  if (!b) return "0 КБ";
+  return b < 1048576 ? Math.round(b / 1024) + " КБ" : (b / 1048576).toFixed(1) + " МБ";
+}
+
+async function loadDumps() {
+  try {
+    DUMPS = ((await (await fetch("/api/dumps")).json()).dumps) || [];
+  } catch (e) { DUMPS = []; }
+}
+
+function renderDumps() {
+  $("summary").innerHTML = "";
+  $("status").querySelectorAll(".panel,.bad").forEach(e => e.remove());
+  $("toolbar").style.display = "none";
+
+  const busy = DUMP_JOB && DUMP_JOB.status === "running";
+  const list = DUMPS.length ? DUMPS.map(d => `<div class="dumprow">
+      <span class="dname">${escHtml(d.domain)}
+        <span class="dmeta">${escHtml(d.created)} · ${fmtMB(d.bytes)}</span></span>
+      <a class="rowbtn dl" href="/api/dumps/${encodeURIComponent(d.name)}">⬇ Скачать</a>
+      <button class="rowbtn ddel" data-n="${escHtml(d.name)}" title="Удалить архив с сервера">✕</button>
+    </div>`).join("")
+    : `<div class="empty">Выгрузок пока нет. Впиши домен клиента выше и нажми «Выгрузить сайт».</div>`;
+
+  $("results").innerHTML = `
+    <div class="panel">
+      <h2>Выгрузить сайт клиента</h2>
+      <div class="dumpform">
+        <div><label>Домен</label>
+          <input type="text" id="dmp-domain" placeholder="projekt-doma.ru" value="${escHtml(DUMP_JOB ? DUMP_JOB.domain : "")}"></div>
+        <div><label title="Сколько страниц скачивать максимум">Страниц</label>
+          <input type="number" id="dmp-pages" value="150"></div>
+        <div><label title="Как глубоко уходить по ссылкам от главной">Глубина</label>
+          <input type="number" id="dmp-depth" value="3"></div>
+        <div><button id="dmp-run" class="primary" style="width:auto" ${busy ? "disabled" : ""}>Выгрузить сайт</button></div>
+      </div>
+      <div class="checks">
+        <label title="Снимать только для сайта клиента, который сам попросил его переделать: robots.txt на Joomla часто закрывает папки со стилями, и выгрузка выходит без оформления">
+          <input type="checkbox" id="dmp-robots" checked> уважать robots.txt</label>
+      </div>
+      <div id="dmp-progress"></div>
+      <div class="hint">Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
+        равно не нужны для разбора и раздувают репозиторий. Страницы приводятся к UTF-8,
+        внутри архива есть <code>manifest.json</code> с картой сайта.</div>
+    </div>
+    <div class="panel">
+      <h2>Готовые выгрузки</h2>
+      ${list}
+    </div>`;
+
+  $("dmp-run").onclick = startDump;
+  $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
+  document.querySelectorAll(".ddel").forEach(b => b.onclick = async () => {
+    if (!confirm("Удалить архив с сервера?")) return;
+    await fetch(`/api/dumps/${encodeURIComponent(b.dataset.n)}`, { method: "DELETE" });
+    await loadDumps(); renderDumps();
+  });
+  renderDumpProgress();
+}
+
+function renderDumpProgress() {
+  const box = $("dmp-progress");
+  if (!box || !DUMP_JOB) return;
+  const j = DUMP_JOB;
+  if (j.status === "running") {
+    box.innerHTML = `<div class="progress"><i style="width:${Math.min(95, j.pages)}%"></i></div>
+      <div class="hint">Качаю ${escHtml(j.domain)}: страниц ${j.pages}, файлов ${j.assets},
+        ${fmtMB(j.bytes)} · ${j.elapsed}с</div>`;
+  } else if (j.status === "error") {
+    box.innerHTML = `<div class="warn bad">Не вышло: ${escHtml(j.error || "")}</div>`;
+  } else {
+    const cut = j.stopped_by === "limit" ? " — упёрлись в лимит страниц или объёма, подними «Страниц» и повтори"
+              : j.stopped_by === "deadline" ? " — кончился бюджет времени, часть страниц могла не попасть"
+              : "";
+    box.innerHTML = `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
+      файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>`;
+  }
+}
+
+async function startDump() {
+  const domain = ($("dmp-domain").value || "").trim();
+  if (!domain) { $("dmp-domain").focus(); return; }
+  $("dmp-run").disabled = true;
+  let res, data;
+  try {
+    res = await fetch("/api/dump", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        domain,
+        max_pages: +$("dmp-pages").value || 150,
+        max_depth: +$("dmp-depth").value || 3,
+        respect_robots: $("dmp-robots").checked,
+      }),
+    });
+    data = await res.json();
+  } catch (e) {
+    $("dmp-run").disabled = false;
+    $("dmp-progress").innerHTML = `<div class="warn bad">Сервер не ответил.</div>`;
+    return;
+  }
+  if (!res.ok) {
+    $("dmp-run").disabled = false;
+    $("dmp-progress").innerHTML = `<div class="warn bad">${escHtml(data.detail || "Ошибка запуска.")}</div>`;
+    return;
+  }
+  DUMP_JOB = { id: data.dump_id, domain, status: "running", pages: 0, assets: 0, bytes: 0, elapsed: 0 };
+  renderDumpProgress();
+  pollDump();
+}
+
+async function pollDump() {
+  clearTimeout(DUMP_TIMER);
+  if (!DUMP_JOB) return;
+  let res, job;
+  try {
+    res = await fetch(`/api/dump/${DUMP_JOB.id}`);
+    job = await res.json();
+  } catch (e) {
+    // Сеть моргнула — не роняем цикл, как и на опросе скана.
+    DUMP_TIMER = setTimeout(pollDump, 2500);
+    return;
+  }
+  if (!res.ok) {
+    DUMP_JOB = { ...DUMP_JOB, status: "error",
+                 error: res.status === 404
+                   ? "сервер перезапускался, задача потерялась — запусти заново"
+                   : (job && job.detail) || `сервер ответил ${res.status}` };
+    if (VIEW === "dumps") { renderDumpProgress(); if ($("dmp-run")) $("dmp-run").disabled = false; }
+    return;
+  }
+  DUMP_JOB = job;
+  if (VIEW === "dumps") renderDumpProgress();
+  if (job.status === "running") { DUMP_TIMER = setTimeout(pollDump, 2000); return; }
+  await loadDumps();
+  if (VIEW === "dumps") renderDumps();
+}
 
 const STAGES = [
   ["Новый", [""]], ["Написал", ["написал"]], ["Звонок", ["звонил", "недозвон", "перезвонить"]],
@@ -858,6 +1016,7 @@ function showResults(job) {
 }
 
 function render() {
+  if (VIEW === "dumps") { renderDumps(); return; }
   if (VIEW === "kanban") { renderKanban(); return; }
   if (VIEW === "base" || VIEW === "work" || VIEW === "trash") {
     ROWS = VIEW === "work" ? BASE.filter(l => IN_PROGRESS.includes(l.status))

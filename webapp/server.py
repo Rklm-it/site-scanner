@@ -16,7 +16,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-from scanner import analytics, enrich, outreach, pipeline
+from scanner import analytics, enrich, mirror, outreach, pipeline
 from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
@@ -29,8 +29,12 @@ from .leads_store import STATUSES, TRASH, LeadStore
 DATA_DIR = Path(os.environ.get("SCANNER_DATA", "webapp_data"))
 JOBS_DIR = DATA_DIR / "jobs"
 SHOTS_DIR = DATA_DIR / "shots"
+DUMPS_DIR = DATA_DIR / "dumps"
 STATIC = Path(__file__).parent / "static"
 _DOMAIN_RE = re.compile(r"^[a-z0-9.\-]+$", re.I)
+# Имя архива приходит из URL — пускаем только то, что сами же и сгенерировали,
+# иначе «../» в имени увела бы отдачу файла за пределы папки выгрузок.
+_ARCHIVE_RE = re.compile(r"^[a-z0-9.\-]+-\d{4}-\d{2}-\d{2}-\d{4}\.zip$", re.I)
 
 # Чтобы логи движка (scanner.*) были видны в docker compose logs.
 # ВАЖНО: одного setLevel мало. Свой обработчик тут не настроен, uvicorn
@@ -52,6 +56,7 @@ STORE: LeadStore | None = None
 async def lifespan(app: FastAPI):
     global STORE
     JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    DUMPS_DIR.mkdir(parents=True, exist_ok=True)
     STORE = LeadStore(str(DATA_DIR / "leads.sqlite"))
     secrets_store.load_into_env()
     yield
@@ -546,3 +551,150 @@ def send_status(send_id: str) -> dict:
     if not job:
         raise HTTPException(404, "Рассылка не найдена.")
     return job.public()
+
+
+# --------------------------------------------------------------------------- #
+# Выгрузка сайта клиента целиком
+#
+# Раньше это делалось руками на сервере через wget, а архив перекладывался в
+# репозиторий. Теперь кнопкой: выгрузка идёт тем же движком, что и скан, и
+# ложится готовым zip-архивом в список — его остаётся только скачать.
+# --------------------------------------------------------------------------- #
+class DumpRequest(BaseModel):
+    domain: str
+    max_pages: int = 150
+    max_depth: int = 3
+    respect_robots: bool = True
+
+
+@dataclass
+class DumpJob:
+    id: str
+    domain: str
+    status: str = "running"          # running / done / error
+    pages: int = 0
+    assets: int = 0
+    bytes: int = 0
+    archive: str | None = None
+    archive_bytes: int = 0
+    stopped_by: str | None = None
+    error: str | None = None
+    errors: list[str] = field(default_factory=list)
+    started: float = field(default_factory=time.time)
+
+    def public(self) -> dict:
+        return {
+            "id": self.id, "domain": self.domain, "status": self.status,
+            "pages": self.pages, "assets": self.assets, "bytes": self.bytes,
+            "archive": self.archive, "archive_bytes": self.archive_bytes,
+            "stopped_by": self.stopped_by, "error": self.error,
+            "errors": self.errors[:10],
+            "elapsed": round(time.time() - self.started, 1),
+        }
+
+
+DUMP_JOBS: dict[str, DumpJob] = {}
+
+
+def _run_dump(job: DumpJob, req: DumpRequest) -> None:
+    work = DUMPS_DIR / f".work-{job.id}"
+    try:
+        def on_progress(st: mirror.MirrorStats) -> None:
+            job.pages, job.assets, job.bytes = st.pages, st.assets, st.bytes
+
+        stats = mirror.run(
+            job.domain, work,
+            max_pages=max(1, min(req.max_pages, 600)),
+            max_depth=max(1, min(req.max_depth, 6)),
+            respect_robots=req.respect_robots,
+            on_progress=on_progress,
+        )
+        job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes
+        job.stopped_by = stats.stopped_by
+        job.errors = stats.errors
+        if not stats.pages:
+            raise RuntimeError(
+                "не удалось скачать ни одной страницы — сайт недоступен "
+                "или закрыт в robots.txt (снимите галочку)"
+            )
+        name = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}.zip"
+        job.archive_bytes = mirror.pack(work, DUMPS_DIR / name)
+        job.archive = name
+        job.status = "done"
+    except Exception as exc:  # noqa: BLE001
+        job.status = "error"
+        job.error = f"{type(exc).__name__}: {exc}"
+        # Недокачанное не оставляем на томе: место на сервере не бесконечное,
+        # а повторный запуск всё равно начинает с нуля.
+        if work.exists():
+            for p in sorted(work.rglob("*"), reverse=True):
+                p.rmdir() if p.is_dir() else p.unlink()
+            work.rmdir()
+
+
+@app.post("/api/dump")
+def start_dump(req: DumpRequest) -> dict:
+    domain = (req.domain or "").strip().lower()
+    for prefix in ("https://", "http://"):
+        domain = domain.removeprefix(prefix)
+    domain = domain.split("/")[0].strip(".")
+    if not domain or not _DOMAIN_RE.match(domain) or "." not in domain:
+        raise HTTPException(400, "Укажите домен вида example.ru")
+    if any(j.status == "running" for j in DUMP_JOBS.values()):
+        raise HTTPException(409, "Одна выгрузка уже идёт — дождитесь её окончания.")
+    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain)
+    DUMP_JOBS[job.id] = job
+    threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
+    return {"dump_id": job.id}
+
+
+@app.get("/api/dump/{dump_id}")
+def dump_status(dump_id: str) -> dict:
+    job = DUMP_JOBS.get(dump_id)
+    if not job:
+        raise HTTPException(404, "Выгрузка не найдена.")
+    return job.public()
+
+
+@app.get("/api/dumps")
+def list_dumps() -> dict:
+    """Список готовых архивов.
+
+    Читается с диска, а не из памяти процесса: задачи перезапуск контейнера не
+    переживают (известное ограничение), а вот уже собранные архивы лежат на
+    томе и теряться не должны.
+    """
+    DUMPS_DIR.mkdir(parents=True, exist_ok=True)
+    items = []
+    for path in DUMPS_DIR.glob("*.zip"):
+        st = path.stat()
+        items.append({
+            "name": path.name,
+            "domain": path.name.rsplit("-", 4)[0],
+            "bytes": st.st_size,
+            "created": time.strftime("%d.%m.%Y %H:%M", time.localtime(st.st_mtime)),
+            "mtime": st.st_mtime,
+        })
+    items.sort(key=lambda i: i["mtime"], reverse=True)
+    return {"count": len(items), "dumps": items}
+
+
+@app.get("/api/dumps/{name}")
+def download_dump(name: str):
+    if not _ARCHIVE_RE.match(name):
+        raise HTTPException(400, "Некорректное имя архива.")
+    path = DUMPS_DIR / name
+    if not path.exists():
+        raise HTTPException(404, "Архив не найден.")
+    return FileResponse(path, media_type="application/zip", filename=name)
+
+
+@app.delete("/api/dumps/{name}")
+def delete_dump(name: str) -> dict:
+    if not _ARCHIVE_RE.match(name):
+        raise HTTPException(400, "Некорректное имя архива.")
+    path = DUMPS_DIR / name
+    if not path.exists():
+        raise HTTPException(404, "Архив не найден.")
+    path.unlink()
+    return {"ok": True}

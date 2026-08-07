@@ -15,6 +15,7 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(server, "DATA_DIR", tmp_path)
     monkeypatch.setattr(server, "JOBS_DIR", tmp_path / "jobs")
     monkeypatch.setattr(server, "SHOTS_DIR", tmp_path / "shots")
+    monkeypatch.setattr(server, "DUMPS_DIR", tmp_path / "dumps")
     monkeypatch.setattr(secrets_store, "_PATH", tmp_path / "secrets.local.json")
     for env in secrets_store.FIELDS.values():
         monkeypatch.delenv(env, raising=False)
@@ -345,3 +346,59 @@ def test_trash_domains_go_into_scan_settings(client):
     assert server.trash_domains() == ["gov.ru"]
     s = server._build_settings(server.ScanRequest(queries="x"), "job1")
     assert s.skip_domains == ["gov.ru"]
+
+
+# --- выгрузка сайта клиента ------------------------------------------------ #
+@pytest.mark.parametrize("bad", ["", "не домен", "localhost", "http://", "site"])
+def test_dump_rejects_bad_domain(client, bad):
+    """Домен уходит в сетевой обход — мусор из формы отсекаем до запуска."""
+    c, _ = client
+    assert c.post("/api/dump", json={"domain": bad}).status_code in (400, 422)
+
+
+def test_dump_list_reads_from_disk(client, tmp_path):
+    """Список архивов читается с тома, а не из памяти процесса: задачи
+    перезапуск контейнера не переживают, а собранные архивы обязаны."""
+    c, _ = client
+    (tmp_path / "dumps").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "dumps" / "projekt-doma.ru-2026-08-07-2019.zip").write_bytes(b"PK\x05\x06" + b"\0" * 18)
+
+    data = c.get("/api/dumps").json()
+    assert data["count"] == 1
+    assert data["dumps"][0]["domain"] == "projekt-doma.ru"   # дефисы в домене не режем
+
+
+@pytest.mark.parametrize("name", [
+    "../../etc/passwd", "..%2fsecrets.local.json", "leads.sqlite",
+    "site.ru.zip", "site.ru-2026-08-07-2019.zip.bak",
+])
+def test_dump_download_rejects_stray_names(client, name):
+    """Имя архива приходит из URL. Пускаем только то, что сами и сгенерировали,
+    иначе «../» отдала бы наружу ключи с тома."""
+    c, _ = client
+    assert c.get(f"/api/dumps/{name}").status_code in (400, 404)
+    assert c.delete(f"/api/dumps/{name}").status_code in (400, 404)
+
+
+def test_dump_download_and_delete(client, tmp_path):
+    c, _ = client
+    (tmp_path / "dumps").mkdir(parents=True, exist_ok=True)
+    path = tmp_path / "dumps" / "site.ru-2026-08-07-2019.zip"
+    path.write_bytes(b"PK\x05\x06" + b"\0" * 18)
+
+    assert c.get("/api/dumps/site.ru-2026-08-07-2019.zip").status_code == 200
+    assert c.delete("/api/dumps/site.ru-2026-08-07-2019.zip").json() == {"ok": True}
+    assert not path.exists()
+    assert c.get("/api/dumps").json()["count"] == 0
+
+
+def test_dump_one_at_a_time(client, monkeypatch):
+    """Две выгрузки разом душат и наш сервер, и чужой — вторую не пускаем."""
+    from webapp import server
+
+    c, _ = client
+    server.DUMP_JOBS["busy"] = server.DumpJob(id="busy", domain="a.ru", status="running")
+    try:
+        assert c.post("/api/dump", json={"domain": "b.ru"}).status_code == 409
+    finally:
+        server.DUMP_JOBS.clear()
