@@ -1,0 +1,884 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" lang="ru-ru" >
+<head>
+	
+  <base href="https://projekt-doma.ru/informacziya" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="index, follow" />
+  <meta name="keywords" content="Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону" />
+  <meta name="title" content="Реализованные проекты" />
+  <meta name="author" content="Administrator" />
+  <meta name="description" content="Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону" />
+  <title>Реализованные проекты</title>
+  <link href="/templates/projektdoma/favicon.png" rel="icon" type="image/png" />
+  <script type="text/javascript" src="/media/system/js/mootools.js"></script>
+  <script type="text/javascript" src="/media/system/js/caption.js"></script>
+
+
+<link rel="stylesheet" href="/templates/system/css/system.css" type="text/css" />
+<link rel="stylesheet" href="/templates/system/css/general.css" type="text/css" />
+<link rel="stylesheet" href="/templates/projektdoma/css/template.css?ver=2" type="text/css" />
+<link href='http://fonts.googleapis.com/css?family=Open+Sans&subset=latin,cyrillic' rel='stylesheet' type='text/css' />
+
+
+
+
+
+<script type="text/javascript" src="/templates/projektdoma/js/jquery-1.4.3.min.js"></script>
+<script type="text/javascript" src="/templates/projektdoma/js/jquery.fancybox-1.3.4.js"></script>    
+<link href="/templates/projektdoma/css/jquery.fancybox-1.3.4.css" rel="stylesheet" type="text/css" />		
+
+
+
+
+
+
+
+<!--[if lte IE 6]>
+<link href="/templates/projektdoma/css/ieonly.css" rel="stylesheet" type="text/css" />
+<![endif]-->
+
+
+
+<script language="JavaScript" type="text/javascript">
+
+window.addEvent('domready', function() {
+        $$('ul.menu-top li.parent').each(function( liparent ){
+        var list = liparent.getElement('ul');
+        var mySlide = new Fx.Slide(list).hide();
+        liparent.addEvents({
+        'mouseover': function(){
+	mySlide.stop();
+	mySlide.slideIn();
+        },
+        'mouseleave': function(){
+        mySlide.stop();
+	mySlide.slideOut();
+        }
+        });
+        })   
+});
+
+</script>
+
+
+
+			
+		<script language="JavaScript">
+
+		   jQuery.noConflict();
+	       jQuery(document).ready(function() {
+	       
+	       
+	       		jQuery(".lightitem").fancybox({
+	       			'titlePosition': 'inside'			
+				});
+	      
+		      
+			    
+			    
+               jQuery(".close_zakaz_small").click(function() {	 			
+			       jQuery(".bg_z").fadeOut();
+			       jQuery(".ok").fadeOut();
+			       jQuery(".orderform").fadeOut();		
+			    });
+				
+				jQuery(".bg_z").click(function() {
+			       jQuery(".bg_z").fadeOut();
+			       jQuery(".ok").fadeOut();
+			       jQuery(".orderform").fadeOut();	
+			    });
+			    
+			   jQuery(".order").click(function() {
+			       jQuery(".orderform").fadeIn();	
+			       jQuery(".ok").hide();		 			 			
+			       jQuery(".bg_z").fadeIn();
+			    });
+		
+
+			})
+            
+            
+             function zakazat(formName){
+               jQuery('#'+formName+' input[type=text]').each(function() {
+			        if(jQuery(this).val()==""){
+			            alert('Заполните все поля!');
+                        return false;
+			        }else{
+			          jQuery('#'+formName).submit();
+			        }
+			    });				    
+            }
+			
+			
+			
+</script>
+<script type="text/javascript" src="//yandex.st/share/share.js" charset="utf-8"></script>
+</head>
+<body id="page_bg">
+	
+	
+	
+	<form class="orderform" method="post" action="send.php" name="topForm1" id="topForm1" style="display: none;">
+		           <a class="close_zakaz_small"></a>		           
+				   <input type="text" placeholder="Ваше имя*"  class="text_pole" name="fio" id="fio1">
+				   <input type="text" placeholder="Ваш телефон*"  class="text_pole" name="phone" id="phone1">  
+				   <div class="clr"></div>
+				   <br/> 
+				   <a class="send" onclick="zakazat('topForm1');">оставить заявку</a>   
+				   <div class="clr"></div>
+
+	</form>
+	
+	
+		    
+		     
+	
+	
+
+	<div id="header">						
+		<div class="subhead">	
+	       	<a href="/" class="logo"></a>  	       		       	
+	       	
+	       			       		       	
+	       		  	       		             
+    			
+			<div class="tel">
+				<span>email:</span> <a href="mailto:goranvit258@mail.ru">goranvit258@mail.ru</a><br/>
+				<span>Tел.:</span> <div>+7-903-470-81-80</div>
+			</div>								      
+	   </div>
+	   		<div class="moduletable_menu">
+					<ul class="menu-top"><li class="item34"><a href="/gotovye-proekty"><span>Каталог проектов</span></a></li><li class="item10"><a href="/individualnoe-proektirovanie"><span>Индивидуальное проектирование</span></a></li><li id="current" class="active item12"><a href="/informacziya"><span>Реализованные проекты</span></a></li><li class="item33"><a href="/stroitelstvo"><span>Строительство</span></a></li><li class="item32"><a href="/obo-mne"><span>О нас</span></a></li><li class="item11"><a href="/contacts"><span>Контакты</span></a></li></ul>		</div>
+	
+    </div>	
+	
+	
+	
+		
+<div id="main-wrapper">
+	<div id="page-wrapper">	 					
+            <table width="100%" cellspacing="0" cellpadding="0" >
+		           <tr>
+		           	                            
+                        <td valign="top">
+                        	
+                        	<div class="content">
+                        				<div class="moduletable">
+					<span class="breadcrumbs pathway">
+<a href="https://projekt-doma.ru/" class="pathway">Главная</a> <img src="/templates/projektdoma/images/arrow.png" alt=""  /> Реализованные проекты</span>
+		</div>
+		
+	                        			                        	
+	                        	<div class="clr"></div>		   	                       
+	                        		                  	
+	                        	
+<table class="contentpaneopen">
+
+
+
+<tr>
+<td valign="top">
+	<div class="inneritem">
+				<div class="componentheading centerpos">Реализованные проекты</div>
+<table cellspacing="0" cellpadding="0" class="blog">
+   <tbody>
+      <tr>
+         <td valign="top">
+            <table width="100%" cellspacing="0" cellpadding="0">
+               <tbody>
+                  <tr>
+                     <td width="33%" valign="top" class="article_column">
+                        <!-- div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/150-200/90-proekt-k-183-dvuxetazhnyj-dom-s-garazhom">
+                                       Проект дома K-183</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-183-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-183-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/150-200/94-proekt-k-192-dvuxetazhnyj-dom-s-erkerom">
+                                       Проект дома K-192</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-192-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-192-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/168-proekt-k-135-odnoetazhnyj-dom-s-podvalom">
+                                       Проект дома К-135</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-135-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-135-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span -->
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/237-proekt-k-136-odnoetazhnyj-dom">
+                                       Проект дома К-136</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/K-136-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/K-136-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>                        
+						
+						
+						
+						
+						<div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/149-proekt-k-142-dvuxetazhnyj-dom-v-anglijskom-stile">
+                                       Проект дома К-142</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-142-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-142-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/200-250/179-proekt-k-209-dvuxetazhnyj-kamennyj-dom">
+                                       Проект дома К-209</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-209-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-209-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+						
+						<span class="article_separator">&nbsp;</span>     
+						
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/300-i-bolee/226-proekt-k-331-dvuxetazhnyj-dom-v-stile-prerij">
+                                       Проект дома К-331</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/K-331-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/K-331-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+						
+						
+						
+						
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/89-proekt-k-148-dom-v-anglijskom-stile">
+                                       Проект дома K-148</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-148-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-148-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+						
+						
+						
+						
+						
+
+                        
+						
+						
+                        <!-- div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/250-300/104-proekt-k-300-dvuxetazhnyj-dom-v-stile-shale">
+                                       Проект дома К-300</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-300-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-300-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span -->
+                     </td>
+                     <td width="33%" valign="top" class="article_column column_separator">
+                        <!-- div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/150-200/87-proekt-k-151-dvuxetazhnyj-kirpichnyj-dom">
+                                       Проект дома K-151</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-151-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-151-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/200-250/99-proekt-k-250-dvuxetazhnyj-dom-s-podvalom">
+                                       Проект дома K-250</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-250-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-250-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/91-proekt-k-139-dvuxetazhnyj-dom-s-mansardoj">
+                                       Проект дома К-139</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-139-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-139-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div -->
+						
+						
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/200-250/216-proekt-k-232-dvuxetazhnyj-dom-v-stile-prerij">
+                                       Проект дома К-232</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/K-232-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/K-232-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>                        
+						
+
+
+						
+                        
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/100-150/191-proekt-k-137-odnoetazhnyj-oshtukaturennyj-dom-s-mansardoj">
+                                       Проект дома К-137</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/K-137-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/K-137-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/150-200/178-proekt-k-175-dvuxetazhnyj-dom-s-podvalom">
+                                       Проект дома K-175</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-175-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-175-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/200-250/180-proekt-k-210-dvuxetazhnyj-mansrdnij-dom-s-podvalom">
+                                       Проект дома K-210</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-210-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-210-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+						
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/300-i-bolee/107-proekt-k-504-osobnyak-v-anglijskom-stile">
+                                       Проект дома K-504</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-504-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-504-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+
+                        
+                     </td>
+                     <td width="33%" valign="top" class="article_column column_separator">
+                        <!-- div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/88-proekt-k-120-dvuxetazhnyj-dom-s-mansardoj">
+                                       Проект дома K-120</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-120-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-120-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+
+                        
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/150-200/95-proekt-k-186-uyutnyj-dvuxetazhnyj-dom">
+                                       Проект дома К-186</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/K-186-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/K-186-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/80-150/137-proekt-k-096-odnoetazhnyj-dom">
+                                       Проект дома К-96</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-96-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-96-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/150-200/161-proekt-k-193-dvuxetazhnyj-dom-s-garazhom">
+                                       Проект дома К-193</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-193-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-193-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div -->
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/200-250/152-proekt-k-240-trexetazhnyj-osobnyak-so-vtorym-svetom">
+                                       Проект дома К-240</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/K-240-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/K-240-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>       
+						
+						
+						
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/200-250/147-proekt-k-222-dvuxetazhnyj-zagorodnyj-dom-s-mansardoj">
+                                       Проект дома К-222</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-222-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-222-realizovannyy.jpg" class="imgtxt"></a></p>
+                                   </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/300/189-proekt-k-395-dvuxetazhnyj-dom-s-terrasami">
+                                       Проект дома К-395</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/postroennye/K-395-realizovannyy1.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/postroennye/K-395-realizovannyy1.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+
+                        <span class="article_separator">&nbsp;</span>
+                        <div class="blogitem">
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td width="100%" class="contentheading">
+                                       <a class="contentpagetitle" href="/gotovye-proekty/300/186-proekt-k-301-dvuxetazhnyj-dom-s-garazhom-i-terrasoj">
+                                       Проект дома K-301</a>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                           <table class="contentpaneopen">
+                              <tbody>
+                                 <tr>
+                                    <td valign="top" colspan="2">
+                                       <p><a rel="gallery" href="/images/stories/gotovye/k-301-realizovannyy.jpg" class="shopitem mainimg lightitem"><img border="0" src="/images/stories/gotovye/k-301-realizovannyy.jpg" class="imgtxt"></a></p>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+                        </div>
+						
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </td>
+      </tr>
+      <tr>
+         <td valign="top" align="center">
+            <br /><br />
+         </td>
+      </tr>
+      <tr>
+         <td valign="top" align="center">
+         </td>
+      </tr>
+   </tbody>
+</table>	</div>
+</td>
+</tr>
+
+</table>
+<span class="article_separator">&nbsp;</span>
+ 
+	                        	<div class="clr"></div>		 	
+	                        		
+	                        </div>
+                        	
+                        </td>
+                        
+                         			       </tr>
+		       </table>
+		       <br/>			   		   			   			   
+    </div>  
+</div>
+
+
+<div id="footer">
+      <div>
+      		<a href="/" class="footlogo"></a>  	     
+	        <div class="counters">
+	      	
+	      	   <noindex>
+
+					<!-- Yandex.Metrika informer -->
+					<a href="https://metrika.yandex.ru/stat/?id=32907785&amp;from=informer"
+					target="_blank" rel="nofollow"><img src="https://informer.yandex.ru/informer/32907785/3_1_FFFFFFFF_EFEFEFFF_0_pageviews"
+					style="width:88px; height:31px; border:0;" alt="Яндекс.Метрика" title="Яндекс.Метрика: данные за сегодня (просмотры, визиты и уникальные посетители)" onclick="try{Ya.Metrika.informer({i:this,id:32907785,lang:'ru'});return false}catch(e){}" /></a>
+					<!-- /Yandex.Metrika informer -->
+					
+					<!-- Yandex.Metrika counter -->
+					<script type="text/javascript">
+					    (function (d, w, c) {
+					        (w[c] = w[c] || []).push(function() {
+					            try {
+					                w.yaCounter32907785 = new Ya.Metrika({
+					                    id:32907785,
+					                    clickmap:true,
+					                    trackLinks:true,
+					                    accurateTrackBounce:true,
+					                    webvisor:true,
+					                    ecommerce:"dataLayer"
+					                });
+					            } catch(e) { }
+					        });
+					
+					        var n = d.getElementsByTagName("script")[0],
+					            s = d.createElement("script"),
+					            f = function () { n.parentNode.insertBefore(s, n); };
+					        s.type = "text/javascript";
+					        s.async = true;
+					        s.src = "https://mc.yandex.ru/metrika/watch.js";
+					
+					        if (w.opera == "[object Opera]") {
+					            d.addEventListener("DOMContentLoaded", f, false);
+					        } else { f(); }
+					    })(document, window, "yandex_metrika_callbacks");
+					</script>
+					<noscript><div><img src="https://mc.yandex.ru/watch/32907785" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+					<!-- /Yandex.Metrika counter -->
+
+ 
+				 </noindex>
+ 
+		     </div>
+	      
+	        		<div class="moduletable-footmenu">
+					<ul class="menu"><li class="item34"><a href="/gotovye-proekty"><span>Каталог проектов</span></a></li><li class="item10"><a href="/individualnoe-proektirovanie"><span>Индивидуальное проектирование</span></a></li><li id="current" class="active item12"><a href="/informacziya"><span>Реализованные проекты</span></a></li><li class="item33"><a href="/stroitelstvo"><span>Строительство</span></a></li><li class="item32"><a href="/obo-mne"><span>О нас</span></a></li><li class="item11"><a href="/contacts"><span>Контакты</span></a></li></ul>		</div>
+	  
+	        
+	        <div class="info">
+		       	 Тел.: +7-903-470-81-80 <br/> 
+                 email: <a href="mailto:goranvit258@mail.ru">goranvit258@mail.ru</a>
+                 <div class="copyright">&copy; 2015-2026 projekt-doma.ru. Все права защищены.</div>
+			</div>
+			
+			<div class="clr"></div>	
+				      
+	   </div>   
+</div>
+    
+    
+
+<div class="bg_z"></div>
+
+
+</body>
+</html>
+
