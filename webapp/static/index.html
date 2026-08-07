@@ -116,10 +116,14 @@
   .st-sel[data-s="клиент"] { border-color: var(--ok); color: var(--ok); }
   .st-sel[data-s="отказ"] { border-color: var(--bad); }
   .st-sel[data-s="мусор"] { border-color: var(--line); color: var(--muted); opacity: .7; }
-  .note-inp { font: inherit; font-size: 12px; width: 100%; margin-top: 4px; padding: 3px 6px;
-              border-radius: 6px; border: 1px solid var(--line); background: transparent;
+  /* Заметка — отдельной строкой под лидом: в колонке статуса поле выходило
+     шириной в пару сантиметров, и прочитать написанное было невозможно. */
+  .note-row td { border-top: 0; padding: 0 8px 10px; }
+  .note-inp { font: inherit; font-size: 13px; width: 100%; padding: 6px 10px;
+              border-radius: 8px; border: 1px solid var(--line); background: transparent;
               color: inherit; }
-  .note-inp::placeholder { color: var(--muted); opacity: .6; }
+  .note-inp:focus { border-color: var(--accent); outline: none; }
+  .note-inp::placeholder { color: var(--muted); opacity: .7; }
   .rowbtn { border: 1px solid var(--line); background: var(--panel); color: var(--ink);
     border-radius: 6px; padding: 2px 8px; font-size: 13px; cursor: pointer; }
   .rowbtn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -1180,15 +1184,17 @@ function renderTable() {
     <td>${(r.signals || "").split("; ").filter(Boolean).map(s => `<span class="chip">${esc(s)}</span>`).join("")}</td>
     <td><select class="st-sel" data-s="${r.status}" data-d="${r.domain}">
       ${STATUS_OPTS.map(s => `<option value="${s}" ${r.status === s ? "selected" : ""}>${s || "— новый"}</option>`).join("")}
-      </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}
-      <input class="note-inp" data-d="${esc(r.domain)}" value="${esc(r.note || "")}"
-             placeholder="заметка" title="Что выяснили по этому лиду. Сохраняется сразу."></td>
+      </select>${r.callback ? `<div class="hint">⏰ ${esc(r.callback)}</div>` : ""}</td>
     <td style="white-space:nowrap">
       <button class="rowbtn" data-detail="${r.domain}" title="Карточка лида: вся инфа + промпт для Lovable">🔍</button>
       <button class="rowbtn" data-call="${r.domain}">📞</button>
       <button class="rowbtn" data-mail="${r.domain}">✉</button>
     </td>
-  </tr>`).join("");
+  </tr>
+  <tr class="note-row ${r.status ? "done" : ""}"><td colspan="${COLS.length + 2}">
+    <input class="note-inp" data-d="${esc(r.domain)}" value="${esc(r.note || "")}"
+           placeholder="✎ заметка: что выяснили, о чём договорились, когда перезвонить">
+  </td></tr>`).join("");
   $("results").innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
   document.querySelectorAll("th[data-k]").forEach(th => th.onclick = () => {
     const k = th.dataset.k;
