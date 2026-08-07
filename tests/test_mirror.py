@@ -28,6 +28,8 @@ PAGES = {
         <a href="/uslugi">Услуги</a>
         <a href="/katalog/dom-1">Дом 1</a>
         <a href="/?format=feed&type=rss">RSS</a>
+        <a href="/katalog?start=60">Страница 2</a>
+        <a href="/uslugi?sort=name&dir=asc">Сортировка</a>
         <a href="/prays.pdf">Прайс</a>
         <a href="https://chужой.example/x">Партнёр</a>
         <a href="/administrator/index.php">Админка</a>
@@ -36,6 +38,10 @@ PAGES = {
                "<a href='/katalog/dom-2'>Дом 2</a></body></html>",
     "/katalog/dom-1": "<html><head><title>Дом 1</title></head><body>Дом 1</body></html>",
     "/katalog/dom-2": "<html><head><title>Дом 2</title></head><body>Дом 2</body></html>",
+    # вторая страница каталога: карточка К-3 больше ниоткуда не доступна
+    "/katalog": "<html><head><title>Каталог</title></head><body>"
+                "<a href='/katalog/dom-3'>Дом 3</a></body></html>",
+    "/katalog/dom-3": "<html><head><title>Дом 3</title></head><body>Дом 3</body></html>",
     "/administrator/index.php": "<html><title>Админка</title><body>секрет</body></html>",
 }
 CSS = b"body { background: url('/images/fon.png') repeat; }"
@@ -138,6 +144,18 @@ def test_dekoder_vryot_zayavlennoy_kodirovke_ne_verit():
     assert "Дом 1" in text and used == "windows-1251"
 
 
+def test_paginaciya_kataloga_ne_teryaetsya(site, tmp_path):
+    """Адреса с запросом мы глушим ради RSS-лент, но пагинация — исключение:
+    у projekt-doma.ru за `?start=60` лежала половина каталога, и без неё
+    выгрузка молча возвращала неполный список проектов."""
+    _run(site, tmp_path / "d")
+    files = {p.relative_to(tmp_path / "d").as_posix()
+             for p in (tmp_path / "d").rglob("*") if p.is_file()}
+    assert "katalog~start_60.html" in files      # сама страница пагинации
+    assert "katalog/dom-3.html" in files         # и карточка, доступная только с неё
+    assert not any("sort" in f for f in files)   # а сортировка по-прежнему мимо
+
+
 def test_musor_ne_kachaetsya(site, tmp_path):
     _run(site, tmp_path / "d")
     files = {p.name for p in (tmp_path / "d").rglob("*") if p.is_file()}
@@ -190,6 +208,9 @@ def test_manifest_i_arhiv(site, tmp_path):
     ("https://x.ru/a/b/", "a/b.html"),
     ("https://x.ru/images/foto.jpg", "images/foto.jpg"),
     ("https://x.ru/style.css?v=3", "style.css"),
+    # Пагинация каталога: вторая страница не должна перезаписать первую
+    ("https://x.ru/katalog?start=60", "katalog~start_60.html"),
+    ("https://x.ru/katalog.html?start=60", "katalog~start_60.html"),
     # «..» в чужой ссылке не должна уводить запись выше папки выгрузки
     ("https://x.ru/../../etc/passwd", "etc/passwd.html"),
 ])

@@ -66,6 +66,17 @@ _CSS_URL = re.compile(r"""url\(\s*['"]?([^'")]+)['"]?\s*\)""", re.I)
 _BAD_SEG = re.compile(r"[^\w.\-]+", re.U)
 _CHARSET_HDR = re.compile(r"charset=[\"']?([\w\-]+)", re.I)
 _META_CHARSET = re.compile(rb"""charset=["']?([\w\-]+)""", re.I)
+# Постраничная навигация каталога. Адреса с запросом мы вообще-то пропускаем
+# (на Joomla по ним живут ленты и сортировки — тот же контент под другим
+# адресом), но пагинация — исключение: за ней лежат товары, которых больше
+# нигде нет. У projekt-doma.ru это `gotovye-proekty?start=60`, и без неё
+# половина каталога в выгрузку не попадала.
+_PAGING_Q = re.compile(r"^(start|page|limitstart|PAGEN_\d+)=\d+$", re.I)
+
+
+def _keep_query(query: str) -> bool:
+    """Пускать ли адрес с запросом. Только чистая пагинация, ничего больше."""
+    return bool(query) and all(_PAGING_Q.match(p) for p in query.split("&") if p)
 
 
 def _decode_page(raw: bytes, ctype: str, learned: str | None) -> tuple[str, str]:
@@ -158,9 +169,13 @@ def _local_path(url: str) -> str:
     raw = [s for s in parsed.path.split("/") if s not in ("", ".", "..")]
     segments = [_BAD_SEG.sub("_", s)[:120] or "_" for s in raw]
     if not segments:
-        return "index.html"
+        segments = ["index"] if _keep_query(parsed.query) else ["index.html"]
     if _ext(segments[-1]) in ASSET_EXT:
-        return "/".join(segments)
+        return "/".join(segments)     # у картинок и стилей запрос в имя не идёт
+    # Страница пагинации — иначе вторая страница каталога перезаписала бы первую
+    if _keep_query(parsed.query):
+        base = re.sub(r"\.html?$", "", segments[-1], flags=re.I)
+        segments[-1] = f"{base}~{_BAD_SEG.sub('_', parsed.query)}"
     # Страница без расширения — доклеиваем .html, иначе файл не откроется
     if _ext(segments[-1]) not in (".html", ".htm"):
         segments[-1] += ".html"
@@ -342,8 +357,11 @@ def run(
                 if tag != "a" or depth >= max_depth:
                     continue
                 # Ссылки с запросом пропускаем: на Joomla это ленты и
-                # сортировки — тот же контент под другим адресом.
-                if urlparse(nxt).query or nxt in seen:
+                # сортировки — тот же контент под другим адресом. Исключение
+                # только для пагинации: за ней лежат карточки, которых больше
+                # нигде нет.
+                q = urlparse(nxt).query
+                if (q and not _keep_query(q)) or nxt in seen:
                     continue
                 seen.add(nxt)
                 queue.append((nxt, depth + 1))
