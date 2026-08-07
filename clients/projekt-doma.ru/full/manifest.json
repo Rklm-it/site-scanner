@@ -1,0 +1,873 @@
+{
+  "domain": "projekt-doma.ru",
+  "collected": "2026-08-07 21:34",
+  "pages": 108,
+  "assets": 403,
+  "stopped_by": "done",
+  "index": [
+    {
+      "url": "https://projekt-doma.ru/",
+      "file": "index.html",
+      "title": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону | projekt-doma.ru",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 33878
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty",
+      "file": "gotovye-proekty.html",
+      "title": "Каталог проектов",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 53589
+    },
+    {
+      "url": "https://projekt-doma.ru/individualnoe-proektirovanie",
+      "file": "individualnoe-proektirovanie.html",
+      "title": "Индивидуальное проектирование",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 18924
+    },
+    {
+      "url": "https://projekt-doma.ru/informacziya",
+      "file": "informacziya.html",
+      "title": "Реализованные проекты",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 44634
+    },
+    {
+      "url": "https://projekt-doma.ru/stroitelstvo",
+      "file": "stroitelstvo.html",
+      "title": "Строительство",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 12921
+    },
+    {
+      "url": "https://projekt-doma.ru/obo-mne",
+      "file": "obo-mne.html",
+      "title": "О нас",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 11778
+    },
+    {
+      "url": "https://projekt-doma.ru/contacts",
+      "file": "contacts.html",
+      "title": "Андрей Витальевич",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 11029
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/220-k-531-dvuxetazhnyj-dom-s-besedkoj-i-krytym-bassejnom",
+      "file": "gotovye-proekty/300-i-bolee/220-k-531-dvuxetazhnyj-dom-s-besedkoj-i-krytym-bassejnom.html",
+      "title": "К-531 Двухэтажный дом с беседкой и крытым бассейном",
+      "h1": "",
+      "description": "Проект К-504. Особняк в Английском стиле",
+      "bytes": 13909
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/220-k-531-dvuxetazhnyj-dom-s-besedkoj-i-krytym-bassejnom",
+      "file": "gotovye-proekty/300/220-k-531-dvuxetazhnyj-dom-s-besedkoj-i-krytym-bassejnom.html",
+      "title": "К-531 Двухэтажный дом с беседкой и крытым бассейном",
+      "h1": "",
+      "description": "Проект К-504. Особняк в Английском стиле",
+      "bytes": 13936
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/250-300/229-proekt-k-282",
+      "file": "gotovye-proekty/250-300/229-proekt-k-282.html",
+      "title": "Проект К-282. Дом в бельгийском стиле",
+      "h1": "",
+      "description": "Проект К-332. Двухэтажный дом с гаражом в подвале",
+      "bytes": 14107
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/219-proekt-k-342-odnoetazhnyj-dom-v-stile-provans",
+      "file": "gotovye-proekty/300-i-bolee/219-proekt-k-342-odnoetazhnyj-dom-v-stile-provans.html",
+      "title": "Проект К-342 Одноэтажный дом в стиле прованс",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13794
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/219-proekt-k-342-odnoetazhnyj-dom-v-stile-provans",
+      "file": "gotovye-proekty/300/219-proekt-k-342-odnoetazhnyj-dom-v-stile-provans.html",
+      "title": "Проект К-342 Одноэтажный дом в стиле прованс",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13821
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/209-proekt-k-170-odnoetazhnyj-dom-v-stile-kantri",
+      "file": "gotovye-proekty/150-200/209-proekt-k-170-odnoetazhnyj-dom-v-stile-kantri.html",
+      "title": "Проект К-170 Одноэтажный дом в стиле кантри",
+      "h1": "",
+      "description": "Проект К-169. Одноэтажный дом в викторианском стиле",
+      "bytes": 13346
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/224-proekt-k-342-odnoetazhnyj-dom-v-stile-kantri",
+      "file": "gotovye-proekty/300-i-bolee/224-proekt-k-342-odnoetazhnyj-dom-v-stile-kantri.html",
+      "title": "Проект К-302 Одноэтажный дом в стиле кантри",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13778
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/224-proekt-k-302-odnoetazhnyj-dom-v-stile-kantri",
+      "file": "gotovye-proekty/300/224-proekt-k-302-odnoetazhnyj-dom-v-stile-kantri.html",
+      "title": "Проект К-302 Одноэтажный дом в стиле кантри",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13805
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/223-proekt-k-410",
+      "file": "gotovye-proekty/300-i-bolee/223-proekt-k-410.html",
+      "title": "Проект К-410. Дом в современном стиле",
+      "h1": "",
+      "description": "Проект К-332. Двухэтажный дом с гаражом в подвале",
+      "bytes": 13905
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/225-proekt-k-250-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/200-250/225-proekt-k-250-odnoetazhnyj-dom.html",
+      "title": "Проект К-250 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13442
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/226-proekt-k-331-dvuxetazhnyj-dom-v-stile-prerij",
+      "file": "gotovye-proekty/300-i-bolee/226-proekt-k-331-dvuxetazhnyj-dom-v-stile-prerij.html",
+      "title": "Проект К-331 Двухэтажный дом в стиле прерий",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13835
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/226-proekt-k-331-dvuxetazhnyj-dom-v-stile-prerij",
+      "file": "gotovye-proekty/300/226-proekt-k-331-dvuxetazhnyj-dom-v-stile-prerij.html",
+      "title": "Проект К-331 Двухэтажный дом в стиле прерий",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13862
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/238-proekt-k-431",
+      "file": "gotovye-proekty/300-i-bolee/238-proekt-k-431.html",
+      "title": "Проект К-431. Дом в стиле хай тек",
+      "h1": "",
+      "description": "Проект К-332. Двухэтажный дом с гаражом в подвале",
+      "bytes": 14011
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150",
+      "file": "gotovye-proekty/80-150.html",
+      "title": "80-150",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 20651
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200",
+      "file": "gotovye-proekty/150-200.html",
+      "title": "150-200",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 19720
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250",
+      "file": "gotovye-proekty/200-250.html",
+      "title": "200-250",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 22399
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/250-300",
+      "file": "gotovye-proekty/250-300.html",
+      "title": "250-300",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 13913
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee",
+      "file": "gotovye-proekty/300-i-bolee.html",
+      "title": "300 и более",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 23054
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/156-proekt-k-090-odnoetazhnyj-v-yuzhnom-stile-dom",
+      "file": "gotovye-proekty/80-150/156-proekt-k-090-odnoetazhnyj-v-yuzhnom-stile-dom.html",
+      "title": "Проект К-090. Одноэтажный в южном стиле дом",
+      "h1": "",
+      "description": "Проект К-090. Одноэтажный в южном стиле дом",
+      "bytes": 13263
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/169-proekt-k-119-banya-s-bassejnom",
+      "file": "gotovye-proekty/80-150/169-proekt-k-119-banya-s-bassejnom.html",
+      "title": "Проект К-119. Баня с бассейном",
+      "h1": "",
+      "description": "Проект К-119. Баня с бассейном",
+      "bytes": 13325
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/237-proekt-k-136-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/80-150/237-proekt-k-136-odnoetazhnyj-dom.html",
+      "title": "Проект К-136 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13614
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/237-proekt-k-136%201-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/100-150/237-proekt-k-136_201-odnoetazhnyj-dom.html",
+      "title": "Проект К-136 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13652
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/89-proekt-k-148-dom-v-anglijskom-stile",
+      "file": "gotovye-proekty/80-150/89-proekt-k-148-dom-v-anglijskom-stile.html",
+      "title": "Проект К-148. Дом в Английском стиле",
+      "h1": "",
+      "description": "Проект К-148. Дом в Английском стиле",
+      "bytes": 13388
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/124-proekt-k-152-dvuxetazhnyj-dom-v-klassicheskom-stile",
+      "file": "gotovye-proekty/150-200/124-proekt-k-152-dvuxetazhnyj-dom-v-klassicheskom-stile.html",
+      "title": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13455
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/154-proekt-k-163-dvuxetazhnyj-dom-v-stile-shale-s-mansardoj",
+      "file": "gotovye-proekty/150-200/154-proekt-k-163-dvuxetazhnyj-dom-v-stile-shale-s-mansardoj.html",
+      "title": "Проект К-163. Двухэтажный дом в стиле шале с мансардой",
+      "h1": "",
+      "description": "Проект К-163. Двухэтажный дом в стиле шале с мансардой",
+      "bytes": 13488
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/214-proekt-k-169-odnoetazhnyj-dom-v-viktorianskom-stile",
+      "file": "gotovye-proekty/150-200/214-proekt-k-169-odnoetazhnyj-dom-v-viktorianskom-stile.html",
+      "title": "Проект К-169 Одноэтажный дом в викторианском стиле",
+      "h1": "",
+      "description": "Проект К-169 Одноэтажный дом в викторианском стиле",
+      "bytes": 13606
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/146-proekt-k-177-dvuxetazhnyj-dom-v-evropejskom-stile",
+      "file": "gotovye-proekty/150-200/146-proekt-k-177-dvuxetazhnyj-dom-v-evropejskom-stile.html",
+      "title": "Проект К-177. Двухэтажный дом в европейском стиле",
+      "h1": "",
+      "description": "Проект К-177. Двухэтажный дом в европейском стиле",
+      "bytes": 13585
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/179-proekt-k-209-dvuxetazhnyj-kamennyj-dom",
+      "file": "gotovye-proekty/200-250/179-proekt-k-209-dvuxetazhnyj-kamennyj-dom.html",
+      "title": "Проект К-209. Двухэтажный каменный дом",
+      "h1": "",
+      "description": "Проект К-151.  Двухэтажный кирпичный дом",
+      "bytes": 13442
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/231-proekt-k-212-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/200-250/231-proekt-k-212-odnoetazhnyj-dom.html",
+      "title": "Проект К-212 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13284
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/215-proekt-k-217-dvuxetazhnyj-dom-v-stile-rajta",
+      "file": "gotovye-proekty/200-250/215-proekt-k-217-dvuxetazhnyj-dom-v-stile-rajta.html",
+      "title": "Проект К-217 Двухэтажный дом в стиле Райта",
+      "h1": "",
+      "description": "Проект К-151.  Двухэтажный кирпичный дом",
+      "bytes": 13558
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/190-proekt-k-223-dvuxetazhnyj-zagorodnyj-dom-s-navesom",
+      "file": "gotovye-proekty/200-250/190-proekt-k-223-dvuxetazhnyj-zagorodnyj-dom-s-navesom.html",
+      "title": "Проект К-223. Двухэтажный загородный дом с навесом",
+      "h1": "",
+      "description": "Проект К-222. Двухэтажный загородный дом с мансардой",
+      "bytes": 13548
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/170-proekt-k-244-mansardnyj-zhiloj-dom-s-garazhom",
+      "file": "gotovye-proekty/200-250/170-proekt-k-244-mansardnyj-zhiloj-dom-s-garazhom.html",
+      "title": "Проект К-244. Мансардный жилой дом с гаражом",
+      "h1": "",
+      "description": "Проект К-244. Мансардный жилой дом с гаражом",
+      "bytes": 13422
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/250-300/103-proekt-k-270-dom-v-stile-russkaya-usadba",
+      "file": "gotovye-proekty/250-300/103-proekt-k-270-dom-v-stile-russkaya-usadba.html",
+      "title": "Проект К-270. Дом в стиле Русская усадьба",
+      "h1": "",
+      "description": "Проект К-270. Дом в стиле Русская усадьба",
+      "bytes": 13372
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/186-proekt-k-301-dvuxetazhnyj-dom-s-garazhom-i-terrasoj",
+      "file": "gotovye-proekty/300-i-bolee/186-proekt-k-301-dvuxetazhnyj-dom-s-garazhom-i-terrasoj.html",
+      "title": "Проект К-301. Двухэтажный дом с гаражом и террасой",
+      "h1": "",
+      "description": "Проект К-301. Двухэтажный дом с гаражом и террасой",
+      "bytes": 13929
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/186-proekt-k-301-dvuxetazhnyj-dom-s-garazhom-i-terrasoj",
+      "file": "gotovye-proekty/300/186-proekt-k-301-dvuxetazhnyj-dom-s-garazhom-i-terrasoj.html",
+      "title": "Проект К-301. Двухэтажный дом с гаражом и террасой",
+      "h1": "",
+      "description": "Проект К-301. Двухэтажный дом с гаражом и террасой",
+      "bytes": 13956
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/217-proekt-k-312-dvuxetazhnyj-dom-na-sklone",
+      "file": "gotovye-proekty/300-i-bolee/217-proekt-k-312-dvuxetazhnyj-dom-na-sklone.html",
+      "title": "Проект К-312 Двухэтажный дом на склоне",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13779
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/217-proekt-k-312-dvuxetazhnyj-dom-na-sklone",
+      "file": "gotovye-proekty/300/217-proekt-k-312-dvuxetazhnyj-dom-na-sklone.html",
+      "title": "Проект К-312 Двухэтажный дом на склоне",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13806
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/106-proekt-k-369-dvuxetazhnyj-dom-s-podvalom-i-garazhom",
+      "file": "gotovye-proekty/300-i-bolee/106-proekt-k-369-dvuxetazhnyj-dom-s-podvalom-i-garazhom.html",
+      "title": "Проект К-369. Двухэтажный дом с подвалом и гаражом",
+      "h1": "",
+      "description": "Проект К-369. Двухэтажный дом с подвалом и гаражом",
+      "bytes": 13811
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/157-proekt-k-081-odnoetazhnyj-dom-s-zakrytoj-terrasoj",
+      "file": "gotovye-proekty/80-150/157-proekt-k-081-odnoetazhnyj-dom-s-zakrytoj-terrasoj.html",
+      "title": "Проект К-081. Одноэтажный дом с закрытой террасой",
+      "h1": "",
+      "description": "Проект К-081. Одноэтажный дом с закрытой террасой",
+      "bytes": 13217
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/234-proekt-k-103-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/80-150/234-proekt-k-103-odnoetazhnyj-dom.html",
+      "title": "Проект К-103 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12883
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/234-proekt-k-103%201-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/100-150/234-proekt-k-103_201-odnoetazhnyj-dom.html",
+      "title": "Проект К-103 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12921
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/194-proekt-k-128-dvuxetazhnyj-mansardnyj-dom",
+      "file": "gotovye-proekty/80-150/194-proekt-k-128-dvuxetazhnyj-mansardnyj-dom.html",
+      "title": "Проект К-128. Двухэтажный мансардный дом",
+      "h1": "",
+      "description": "Проект К-139. Двухэтажный дом с мансардой",
+      "bytes": 13332
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/194-proekt-k-128-dvuxetazhnyj-mansardnyj-dom",
+      "file": "gotovye-proekty/100-150/194-proekt-k-128-dvuxetazhnyj-mansardnyj-dom.html",
+      "title": "Проект К-128. Двухэтажный мансардный дом",
+      "h1": "",
+      "description": "Проект К-139. Двухэтажный дом с мансардой",
+      "bytes": 13368
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/191-proekt-k-137-odnoetazhnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/80-150/191-proekt-k-137-odnoetazhnyj-dom-s-mansardoj.html",
+      "title": "Проект К-137. Одноэтажный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-193. Двухэтажный дом с гаражом",
+      "bytes": 13453
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/191-proekt-k-137-odnoetazhnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/100-150/191-proekt-k-137-odnoetazhnyj-dom-s-mansardoj.html",
+      "title": "Проект К-137. Одноэтажный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-193. Двухэтажный дом с гаражом",
+      "bytes": 13489
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/239-proekt-k-149",
+      "file": "gotovye-proekty/150-200/239-proekt-k-149.html",
+      "title": "Проект К-149 Двухэтажный дом в европейском стиле",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13837
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/239-proekt-k-149%201",
+      "file": "gotovye-proekty/150-200/239-proekt-k-149_201.html",
+      "title": "Проект К-149 Двухэтажный дом в европейском стиле",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13839
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/187-proekt-k-157-dvuxetazhnyj-dom-v-sovremennom-stile",
+      "file": "gotovye-proekty/150-200/187-proekt-k-157-dvuxetazhnyj-dom-v-sovremennom-stile.html",
+      "title": "Проект К-157 Двухэтажный дом в современном стиле",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13406
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/213-proekt-k-167-dvuxetazhnyj-kompaktnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/150-200/213-proekt-k-167-dvuxetazhnyj-kompaktnyj-dom-s-mansardoj.html",
+      "title": "Проект К-167 Двухэтажный компактный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-124. Одноэтажный кирпичный дом",
+      "bytes": 13969
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/145-proekt-k-205-dvuxetazhnyj-dom-v-klassicheskom-stile",
+      "file": "gotovye-proekty/200-250/145-proekt-k-205-dvuxetazhnyj-dom-v-klassicheskom-stile.html",
+      "title": "Проект К-205. Двухэтажный дом в классическом стиле",
+      "h1": "",
+      "description": "Проект К-205. Двухэтажный дом в классическом стиле",
+      "bytes": 13610
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/180-proekt-k-210-dvuxetazhnyj-mansrdnij-dom-s-podvalom",
+      "file": "gotovye-proekty/200-250/180-proekt-k-210-dvuxetazhnyj-mansrdnij-dom-s-podvalom.html",
+      "title": "Проект К-210. Двухэтажный мансардный дом с подвалом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13818
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/211-proekt-k-214-dvuxetazhnyj-dom-v-evropejskom-stile",
+      "file": "gotovye-proekty/200-250/211-proekt-k-214-dvuxetazhnyj-dom-v-evropejskom-stile.html",
+      "title": "Проект К-214 Двухэтажный дом в европейском стиле",
+      "h1": "",
+      "description": "Проект К-151.  Двухэтажный кирпичный дом",
+      "bytes": 13551
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/222-proekt-k-219-dvuxetazhnyj-dom-v-stile-prerij",
+      "file": "gotovye-proekty/200-250/222-proekt-k-219-dvuxetazhnyj-dom-v-stile-prerij.html",
+      "title": "Проект К-219 Двухэтажный дом в стиле прерий",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13532
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/216-proekt-k-232-dvuxetazhnyj-dom-v-stile-prerij",
+      "file": "gotovye-proekty/200-250/216-proekt-k-232-dvuxetazhnyj-dom-v-stile-prerij.html",
+      "title": "Проект К-232 Двухэтажный дом в стиле прерий",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13881
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/159-proekt-k-319-dvuxetazhnyj-dom-v-sovremennom-stile",
+      "file": "gotovye-proekty/300-i-bolee/159-proekt-k-319-dvuxetazhnyj-dom-v-sovremennom-stile.html",
+      "title": "Проект К-319. Двухэтажный дом в современном стиле",
+      "h1": "",
+      "description": "Проект К-319. Двухэтажный дом в современном стиле",
+      "bytes": 13794
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/109-proekt-k-319-dvuxetazhnyj-dom-v-sovremennom-stile",
+      "file": "gotovye-proekty/300-i-bolee/109-proekt-k-319-dvuxetazhnyj-dom-v-sovremennom-stile.html",
+      "title": "Проект К-353. Двухэтажный дом в современном стиле",
+      "h1": "",
+      "description": "Проект К-353. Двухэтажный дом в современном стиле",
+      "bytes": 13723
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/182-proekt-k-352-dvuxetazhnyj-mansardnyj-dom",
+      "file": "gotovye-proekty/300-i-bolee/182-proekt-k-352-dvuxetazhnyj-mansardnyj-dom.html",
+      "title": "Проект К-352. Двухэтажный мансардный дом",
+      "h1": "",
+      "description": "Проект К-151.  Двухэтажный кирпичный дом",
+      "bytes": 13425
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/182-proekt-k-352-dvuxetazhnyj-mansardnyj-dom",
+      "file": "gotovye-proekty/300/182-proekt-k-352-dvuxetazhnyj-mansardnyj-dom.html",
+      "title": "Проект К-352. Двухэтажный мансардный дом",
+      "h1": "",
+      "description": "Проект К-151.  Двухэтажный кирпичный дом",
+      "bytes": 13452
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/189-proekt-k-395-dvuxetazhnyj-dom-s-terrasami",
+      "file": "gotovye-proekty/300-i-bolee/189-proekt-k-395-dvuxetazhnyj-dom-s-terrasami.html",
+      "title": "Проект К-395. Двухэтажный дом с террасами",
+      "h1": "",
+      "description": "Проект К-369. Двухэтажный дом с подвалом и гаражом",
+      "bytes": 13569
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/189-proekt-k-395-dvuxetazhnyj-dom-s-terrasami",
+      "file": "gotovye-proekty/300/189-proekt-k-395-dvuxetazhnyj-dom-s-terrasami.html",
+      "title": "Проект К-395. Двухэтажный дом с террасами",
+      "h1": "",
+      "description": "Проект К-369. Двухэтажный дом с подвалом и гаражом",
+      "bytes": 13596
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/193-proekt-k-459-dvuxetazhnyj-dom-v-sredizemnomorskom-stile",
+      "file": "gotovye-proekty/300-i-bolee/193-proekt-k-459-dvuxetazhnyj-dom-v-sredizemnomorskom-stile.html",
+      "title": "Проект К-459. Двухэтажный дом в средиземноморском стиле",
+      "h1": "",
+      "description": "Проект К-369. Двухэтажный дом с подвалом и гаражом",
+      "bytes": 14063
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300/193-proekt-k-459-dvuxetazhnyj-dom-v-sredizemnomorskom-stile",
+      "file": "gotovye-proekty/300/193-proekt-k-459-dvuxetazhnyj-dom-v-sredizemnomorskom-stile.html",
+      "title": "Проект К-459. Двухэтажный дом в средиземноморском стиле",
+      "h1": "",
+      "description": "Проект К-369. Двухэтажный дом с подвалом и гаражом",
+      "bytes": 14090
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/151-proekt-k-089-odnoetazhnyj-uyutnyj-dom",
+      "file": "gotovye-proekty/80-150/151-proekt-k-089-odnoetazhnyj-uyutnyj-dom.html",
+      "title": "Проект К-089. Одноэтажный уютный дом",
+      "h1": "",
+      "description": "Проект К-089. Одноэтажный уютный дом ",
+      "bytes": 13134
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/236-proekt-k-111-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/80-150/236-proekt-k-111-odnoetazhnyj-dom.html",
+      "title": "Проект К-111 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12883
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/236-proekt-k-111%201-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/100-150/236-proekt-k-111_201-odnoetazhnyj-dom.html",
+      "title": "Проект К-111 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12921
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/192-proekt-k-132-odnoetazhnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/80-150/192-proekt-k-132-odnoetazhnyj-dom-s-mansardoj.html",
+      "title": "Проект К-132. Одноэтажный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-193. Двухэтажный дом с гаражом",
+      "bytes": 13375
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/192-proekt-k-132-odnoetazhnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/100-150/192-proekt-k-132-odnoetazhnyj-dom-s-mansardoj.html",
+      "title": "Проект К-132. Одноэтажный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-193. Двухэтажный дом с гаражом",
+      "bytes": 13411
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/149-proekt-k-142-dvuxetazhnyj-dom-v-anglijskom-stile",
+      "file": "gotovye-proekty/80-150/149-proekt-k-142-dvuxetazhnyj-dom-v-anglijskom-stile.html",
+      "title": "Проект К-142. Двухэтажный дом в английском стиле",
+      "h1": "",
+      "description": "Проект К-142. Двухэтажный дом в английском стиле",
+      "bytes": 13572
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/112-proekt-k-150-odnoetazhnyj-krasivyj-dom",
+      "file": "gotovye-proekty/150-200/112-proekt-k-150-odnoetazhnyj-krasivyj-dom.html",
+      "title": "Проект К-150. Одноэтажный красивый дом",
+      "h1": "",
+      "description": "Проект К-150. Одноэтажный красивый дом",
+      "bytes": 13092
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/188-proekt-k-159-odnoetazhnyj-kirpichnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/150-200/188-proekt-k-159-odnoetazhnyj-kirpichnyj-dom-s-mansardoj.html",
+      "title": "Проект К-159 Одноэтажный кирпичный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13363
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/165-proekt-k-168-dvuxetazhnyj-dom-v-stile-shale",
+      "file": "gotovye-proekty/150-200/165-proekt-k-168-dvuxetazhnyj-dom-v-stile-shale.html",
+      "title": "Проект К-168. Двухэтажный дом в стиле Шале",
+      "h1": "",
+      "description": "Проект К-168. Двухэтажный дом в стиле Шале",
+      "bytes": 13528
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/150-200/178-proekt-k-175-dvuxetazhnyj-dom-s-podvalom",
+      "file": "gotovye-proekty/150-200/178-proekt-k-175-dvuxetazhnyj-dom-s-podvalom.html",
+      "title": "Проект К-175. Двухэтажный дом с подвалом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13671
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/210-proekt-k-208-krasivyj-odnoetazhnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/200-250/210-proekt-k-208-krasivyj-odnoetazhnyj-dom-s-mansardoj.html",
+      "title": "Проект К-208 Красивый одноэтажный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-152 Двухэтажный дом в классическом стиле",
+      "bytes": 13458
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/230-proekt-k-211-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/200-250/230-proekt-k-211-odnoetazhnyj-dom.html",
+      "title": "Проект К-211 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13618
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/230-proekt-k-211%201-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/200-250/230-proekt-k-211_201-odnoetazhnyj-dom.html",
+      "title": "Проект К-211 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13620
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/117-proekt-k-215-odnoetazhnyj-uyutnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/200-250/117-proekt-k-215-odnoetazhnyj-uyutnyj-dom-s-mansardoj.html",
+      "title": "Проект К-215. Одноэтажный уютный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-215. Одноэтажный уютный дом с мансардой",
+      "bytes": 13970
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/147-proekt-k-222-dvuxetazhnyj-zagorodnyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/200-250/147-proekt-k-222-dvuxetazhnyj-zagorodnyj-dom-s-mansardoj.html",
+      "title": "Проект К-222. Двухэтажный загородный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-222. Двухэтажный загородный дом с мансардой",
+      "bytes": 13949
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/200-250/152-proekt-k-240-trexetazhnyj-osobnyak-so-vtorym-svetom",
+      "file": "gotovye-proekty/200-250/152-proekt-k-240-trexetazhnyj-osobnyak-so-vtorym-svetom.html",
+      "title": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 14159
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/250-300/105-proekt-k-269-dvuextazhnyj-dom-v-stile-shale",
+      "file": "gotovye-proekty/250-300/105-proekt-k-269-dvuextazhnyj-dom-v-stile-shale.html",
+      "title": "Проект К-269. Двуэхтажный дом в стиле шале",
+      "h1": "",
+      "description": "Проект К-269. Двуэхтажный дом в стиле шале",
+      "bytes": 13623
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/250-300/212-proekt-k-297-mansardnyj-dom-s-podvalom",
+      "file": "gotovye-proekty/250-300/212-proekt-k-297-mansardnyj-dom-s-podvalom.html",
+      "title": "Проект К-297 Мансардный дом с подвалом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 13692
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/153-proekt-k-305-dvuxetazhnyj-dom-s-balkonom-i-terrasoj",
+      "file": "gotovye-proekty/300-i-bolee/153-proekt-k-305-dvuxetazhnyj-dom-s-balkonom-i-terrasoj.html",
+      "title": "Проект К-305. Двухэтажный дом с балконом и террасой",
+      "h1": "",
+      "description": "Проект К-305. Двухэтажный дом с балконом и террасой",
+      "bytes": 13948
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/250-300/153-proekt-k-305-dvuxetazhnyj-dom-s-balkonom-i-terrasoj",
+      "file": "gotovye-proekty/250-300/153-proekt-k-305-dvuxetazhnyj-dom-s-balkonom-i-terrasoj.html",
+      "title": "Проект К-305. Двухэтажный дом с балконом и террасой",
+      "h1": "",
+      "description": "Проект К-305. Двухэтажный дом с балконом и террасой",
+      "bytes": 13930
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/109-proekt-k-353-dvuxetazhnyj-dom-v-sovremennom-stile",
+      "file": "gotovye-proekty/300-i-bolee/109-proekt-k-353-dvuxetazhnyj-dom-v-sovremennom-stile.html",
+      "title": "Проект К-353. Двухэтажный дом в современном стиле",
+      "h1": "",
+      "description": "Проект К-353. Двухэтажный дом в современном стиле",
+      "bytes": 13723
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/227-proekt-k-484-dom-v-stile-prerii",
+      "file": "gotovye-proekty/300-i-bolee/227-proekt-k-484-dom-v-stile-prerii.html",
+      "title": "Проект К-484. Дом стиле прерий",
+      "h1": "",
+      "description": "Проект К-332. Двухэтажный дом с гаражом в подвале",
+      "bytes": 13789
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty?start=60",
+      "file": "gotovye-proekty~start_60.html",
+      "title": "Каталог проектов",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 13467
+    },
+    {
+      "url": "https://projekt-doma.ru/individualnoe-proektirovanie/126-primer-rabochego-proekta-individualnogo-zhilogo-doma",
+      "file": "individualnoe-proektirovanie/126-primer-rabochego-proekta-individualnogo-zhilogo-doma.html",
+      "title": "Пример рабочего проекта индивидуального жилого дома",
+      "h1": "",
+      "description": "Пример рабочего проекта индивидуального жилого дома",
+      "bytes": 18687
+    },
+    {
+      "url": "https://projekt-doma.ru/individualnoe-proektirovanie/85-rabochij-proekt-individualnogo-zhilogo-doma-kottedzha",
+      "file": "individualnoe-proektirovanie/85-rabochij-proekt-individualnogo-zhilogo-doma-kottedzha.html",
+      "title": "Рабочий проект индивидуального жилого дома, коттеджа",
+      "h1": "",
+      "description": "Рабочий проект индивидуального жилого дома, коттеджа",
+      "bytes": 12813
+    },
+    {
+      "url": "https://projekt-doma.ru/individualnoe-proektirovanie/86-eskiznyj-proekt-individualnogo-zhilogo-doma-kottedzha",
+      "file": "individualnoe-proektirovanie/86-eskiznyj-proekt-individualnogo-zhilogo-doma-kottedzha.html",
+      "title": "Эскизный проект индивидуального жилого дома , коттеджа",
+      "h1": "",
+      "description": "Эскизный проект индивидуального жилого дома , коттеджа",
+      "bytes": 12997
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/191-proekt-k-137-odnoetazhnyj-oshtukaturennyj-dom-s-mansardoj",
+      "file": "gotovye-proekty/100-150/191-proekt-k-137-odnoetazhnyj-oshtukaturennyj-dom-s-mansardoj.html",
+      "title": "Проект К-137. Одноэтажный дом с мансардой",
+      "h1": "",
+      "description": "Проект К-193. Двухэтажный дом с гаражом",
+      "bytes": 13505
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/300-i-bolee/107-proekt-k-504-osobnyak-v-anglijskom-stile",
+      "file": "gotovye-proekty/300-i-bolee/107-proekt-k-504-osobnyak-v-anglijskom-stile.html",
+      "title": "Проект К-504. Особняк в Английском стиле",
+      "h1": "",
+      "description": "Проект К-504. Особняк в Английском стиле",
+      "bytes": 13692
+    },
+    {
+      "url": "https://projekt-doma.ru/stroitelstvo/12-stroitelstvo/195-proekt-k-395",
+      "file": "stroitelstvo/12-stroitelstvo/195-proekt-k-395.html",
+      "title": "Проект K-395",
+      "h1": "",
+      "description": "Проект K-210",
+      "bytes": 14778
+    },
+    {
+      "url": "https://projekt-doma.ru/stroitelstvo/12-stroitelstvo/172-proekt-k-119",
+      "file": "stroitelstvo/12-stroitelstvo/172-proekt-k-119.html",
+      "title": "Проект K-119",
+      "h1": "",
+      "description": "Проект K-119",
+      "bytes": 16277
+    },
+    {
+      "url": "https://projekt-doma.ru/stroitelstvo/12-stroitelstvo/184-proekt-k-248",
+      "file": "stroitelstvo/12-stroitelstvo/184-proekt-k-248.html",
+      "title": "Проект K-248",
+      "h1": "",
+      "description": "Проект K-210",
+      "bytes": 12315
+    },
+    {
+      "url": "https://projekt-doma.ru/stroitelstvo/12-stroitelstvo/185-proekt-k-210",
+      "file": "stroitelstvo/12-stroitelstvo/185-proekt-k-210.html",
+      "title": "Проект K-210",
+      "h1": "",
+      "description": "Проект K-210",
+      "bytes": 13955
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/5-300-i-bolee",
+      "file": "gotovye-proekty/5-300-i-bolee.html",
+      "title": "300 и более",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 23687
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/235-proekt-k-91-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/80-150/235-proekt-k-91-odnoetazhnyj-dom.html",
+      "title": "Проект К-91 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12872
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/235-proekt-k-91%201-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/100-150/235-proekt-k-91_201-odnoetazhnyj-dom.html",
+      "title": "Проект К-91 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12910
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/80-150/233-proekt-k-92-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/80-150/233-proekt-k-92-odnoetazhnyj-dom.html",
+      "title": "Проект К-92 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12873
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/100-150/233-proekt-k-92%201-odnoetazhnyj-dom",
+      "file": "gotovye-proekty/100-150/233-proekt-k-92_201-odnoetazhnyj-dom.html",
+      "title": "Проект К-92 Одноэтажный дом",
+      "h1": "",
+      "description": "Проект К-240. Трехэтажный особняк со вторым светом",
+      "bytes": 12911
+    },
+    {
+      "url": "https://projekt-doma.ru/gotovye-proekty/1-80-150",
+      "file": "gotovye-proekty/1-80-150.html",
+      "title": "80-150",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 21175
+    },
+    {
+      "url": "https://projekt-doma.ru/stroitelstvo/12-stroitelstvo",
+      "file": "stroitelstvo/12-stroitelstvo.html",
+      "title": "Строительство",
+      "h1": "",
+      "description": "Проекты домов в Ростове-на-Дону, проектирование домов в Ростове-на-Дону",
+      "bytes": 13222
+    }
+  ]
+}
