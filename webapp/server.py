@@ -578,6 +578,7 @@ class DumpJob:
     archive: str | None = None
     archive_bytes: int = 0
     stopped_by: str | None = None
+    title: str = ""                  # заголовок главной — чей сайт скачали
     error: str | None = None
     errors: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.time)
@@ -587,8 +588,8 @@ class DumpJob:
             "id": self.id, "domain": self.domain, "status": self.status,
             "pages": self.pages, "assets": self.assets, "bytes": self.bytes,
             "archive": self.archive, "archive_bytes": self.archive_bytes,
-            "stopped_by": self.stopped_by, "error": self.error,
-            "errors": self.errors[:10],
+            "stopped_by": self.stopped_by, "title": self.title,
+            "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
 
@@ -612,6 +613,12 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes
         job.stopped_by = stats.stopped_by
         job.errors = stats.errors
+        # Заголовок главной показываем в итоге: домен легко набрать с опечаткой
+        # (project-doma.ru вместо projekt-doma.ru — реальный случай), выгрузка
+        # честно скачает чужой сайт, и заметить это можно было бы только по
+        # числу страниц. Заголовок отвечает прямо: чей сайт в архиве.
+        if stats.pages_index:
+            job.title = stats.pages_index[0].get("title", "")
         if not stats.pages:
             raise RuntimeError(
                 "не удалось скачать ни одной страницы — сайт недоступен "
