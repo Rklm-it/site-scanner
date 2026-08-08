@@ -18,9 +18,10 @@ set -euo pipefail
 NAME="${1:-}"
 REPO="${2:-}"
 BRANCH="${3:-main}"
-# Сеть compose-проекта сканера: имя папки + _default. Переименуете каталог —
-# поменяется и оно, как и имя тома (об этом же предупреждает CLAUDE.md).
-NETWORK="${PROTO_NETWORK:-site-scanner-main_default}"
+# Сеть стека прототипов: у compose-проекта задано имя `prototypes`
+# (см. docker-compose.yml рядом), поэтому сеть называется предсказуемо и не
+# зависит от того, как называется каталог на диске.
+NETWORK="${PROTO_NETWORK:-prototypes_default}"
 WORKDIR="${PROTO_DIR:-/root/prototypes}"
 
 if [[ -z "$NAME" || -z "$REPO" ]]; then

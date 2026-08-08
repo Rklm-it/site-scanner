@@ -1,0 +1,30 @@
+# Стек прототипов клиентов. Живёт на ОТДЕЛЬНОМ сервере, не на том, где сканер.
+#
+# Причина простая: сборка Vite-проекта требует памяти, а сервер сканера — это
+# 961 МБ и одно ядро на четыре контейнера. Первая же сборка там получила
+# SIGKILL от OOM-killer после 796 секунд свопинга. Держать сборки рядом с
+# базой лидов вредно и без этого: упавший по памяти хост уронит и панель.
+#
+# Здесь только Caddy. Сами прототипы поднимает deploy/prototype/deploy.sh —
+# отдельными контейнерами в сети этого же compose-проекта, по одному на
+# клиента. Так добавление клиента не требует правки этого файла.
+#
+# Запуск:
+#   cd deploy/prototype && docker compose up -d
+name: prototypes
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data      # сертификаты; потеряете — Let's Encrypt упрётся в лимит
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:
