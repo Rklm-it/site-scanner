@@ -5,9 +5,9 @@
 # SIGKILL от OOM-killer после 796 секунд свопинга. Держать сборки рядом с
 # базой лидов вредно и без этого: упавший по памяти хост уронит и панель.
 #
-# Здесь только Caddy. Сами прототипы поднимает deploy/prototype/deploy.sh —
-# отдельными контейнерами в сети этого же compose-проекта, по одному на
-# клиента. Так добавление клиента не требует правки этого файла.
+# Здесь только Caddy, и больше ничего не нужно: прототипы статические.
+# Собранные файлы приносит deploy/prototype/sync.sh в /root/prototypes-static,
+# оттуда Caddy их и отдаёт. Ни node, ни контейнера на клиента.
 #
 # Запуск:
 #   cd deploy/prototype && docker compose up -d
@@ -22,6 +22,8 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Собранные прототипы: подпапка на клиента, только чтение
+      - /root/prototypes-static:/srv:ro
       - caddy-data:/data      # сертификаты; потеряете — Let's Encrypt упрётся в лимит
       - caddy-config:/config
 
