@@ -356,6 +356,42 @@ def test_dump_rejects_bad_domain(client, bad):
     assert c.post("/api/dump", json={"domain": bad}).status_code in (400, 422)
 
 
+@pytest.mark.parametrize("raw,expect", [
+    ("https://www.jetzt-gesund-leben.de/", "www.jetzt-gesund-leben.de"),
+    ("http://example.com", "example.com"),
+    ("EXAMPLE.COM", "example.com"),
+    ("example.com/catalog/page?a=1", "example.com"),
+    ("  example.com  ", "example.com"),
+    ("example.com.", "example.com"),
+])
+def test_dump_accepts_any_url_form(client, raw, expect, monkeypatch):
+    """Адрес вставляют из адресной строки целиком — со схемой, www, путём и
+    слешем. Инструмент нужен не только под лидов, так что принимаем всё это
+    и приводим к домену сами, а не заставляем чистить руками."""
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen["domain"] = domain
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+    r = c.post("/api/dump", json={"domain": raw})
+    assert r.status_code == 200, r.text
+    for _ in range(50):
+        if c.get(f"/api/dump/{r.json()['dump_id']}").json()["status"] != "running":
+            break
+        time.sleep(0.05)
+    assert seen["domain"] == expect
+
+
 def test_dump_list_reads_from_disk(client, tmp_path):
     """Список архивов читается с тома, а не из памяти процесса: задачи
     перезапуск контейнера не переживают, а собранные архивы обязаны."""

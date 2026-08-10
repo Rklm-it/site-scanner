@@ -617,9 +617,23 @@ let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 // другое — и выгрузка молча приезжала без картинок.
 const DUMP_FORM = { domain: "", pages: 150, depth: 3, robots: true };
 
+/** Из чего угодно — в домен. Люди вставляют адрес из адресной строки
+ *  целиком: со схемой, www, путём и слешем на конце. Сервер это и так
+ *  разбирает, но поле показывало сырую строку — и предупреждение об
+ *  опечатке сравнивало с базой лидов полный URL, а не домен. */
+function cleanDomain(v) {
+  return (v || "").trim().toLowerCase()
+    .replace(/^[a-z][a-z0-9+.\-]*:\/\//, "")   // схема
+    .replace(/^[^@/]*@/, "")                     // логин:пароль, если вставили
+    .split(/[/?#]/)[0]                           // путь, запрос, якорь
+    .replace(/\.+$/, "");                        // точка на конце
+}
+
 function readDumpForm() {
   if (!$("dmp-domain")) return;
-  DUMP_FORM.domain = $("dmp-domain").value.trim();
+  const cleaned = cleanDomain($("dmp-domain").value);
+  if (cleaned !== $("dmp-domain").value) $("dmp-domain").value = cleaned;
+  DUMP_FORM.domain = cleaned;
   DUMP_FORM.pages = +$("dmp-pages").value || 150;
   DUMP_FORM.depth = +$("dmp-depth").value || 3;
   DUMP_FORM.robots = $("dmp-robots").checked;
@@ -673,11 +687,13 @@ function renderDumps() {
   // Домена нет среди найденных лидов — почти всегда опечатка. Не запрещаем
   // (сайт клиента мог прийти не из скана), но говорим об этом ДО запуска:
   // «project-doma.ru» вместо «projekt-doma.ru» трижды уехал молча.
+  // Подсказку про опечатку показываем, только если нашёлся ПОХОЖИЙ домен из
+  // базы. Просто «нет в базе» — не новость: выгружать можно любой сайт, и
+  // ругаться на это значит мешать работать.
   const near = nearestDomain(DUMP_FORM.domain, known);
-  const unknown = DUMP_FORM.domain && known.length && !known.includes(DUMP_FORM.domain)
-    ? `<div class="warn">Домена <b>${escHtml(DUMP_FORM.domain)}</b> нет в базе лидов.` +
-      (near ? ` Возможно, имелся в виду <b>${escHtml(near)}</b>.` : " Проверьте опечатку.") +
-      `</div>` : "";
+  const unknown = near
+    ? `<div class="warn">Домена <b>${escHtml(DUMP_FORM.domain)}</b> нет в базе лидов —
+        возможно, опечатка и имелся в виду <b>${escHtml(near)}</b>.</div>` : "";
   const list = DUMPS.length ? DUMPS.map(d => `<div class="dumprow">
       <span class="dname">${escHtml(d.domain)}
         <span class="dmeta">${escHtml(d.created)} · ${fmtMB(d.bytes)}</span></span>
@@ -691,7 +707,7 @@ function renderDumps() {
       <h2>Выгрузить сайт клиента</h2>
       <div class="dumpform">
         <div><label>Домен</label>
-          <input type="text" id="dmp-domain" list="dmp-domains" placeholder="начни печатать — подставится из базы"
+          <input type="text" id="dmp-domain" list="dmp-domains" placeholder="example.com или адрес целиком"
                  value="${escHtml(DUMP_FORM.domain)}">
           <datalist id="dmp-domains">${known.map(d => `<option value="${escHtml(d)}">`).join("")}</datalist></div>
         <div><label title="Сколько страниц скачивать максимум">Страниц</label>
@@ -706,7 +722,8 @@ function renderDumps() {
       </div>
       ${unknown}
       <div id="dmp-progress"></div>
-      <div class="hint">Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
+      <div class="hint">Любой сайт, не только из базы лидов — адрес можно вставить
+        целиком, лишнее отрежется. Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
         равно не нужны для разбора и раздувают репозиторий. Страницы приводятся к UTF-8,
         внутри архива есть <code>manifest.json</code> с картой сайта.</div>
     </div>
