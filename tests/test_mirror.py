@@ -43,7 +43,15 @@ PAGES = {
                 "<a href='/katalog/dom-3'>Дом 3</a></body></html>",
     "/katalog/dom-3": "<html><head><title>Дом 3</title></head><body>Дом 3</body></html>",
     "/administrator/index.php": "<html><title>Админка</title><body>секрет</body></html>",
+    # Страница, на которую нет ни одной ссылки — только в карте сайта
+    "/tajnaya": "<html><head><title>Тайная</title></head><body>Тайная</body></html>",
 }
+SITEMAP = b"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>http://SITE/</loc></url>
+  <url><loc>http://SITE/tajnaya</loc></url>
+  <url><loc>http://SITE/prays.pdf</loc></url>
+</urlset>"""
 CSS = b"body { background: url('/images/fon.png') repeat; }"
 
 
@@ -63,6 +71,9 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             return self._send(b"%PDF-1.4" + b"0" * 500, "application/pdf")
         if path == "/robots.txt":
             return self._send(b"User-agent: *\nDisallow: /administrator/\n", "text/plain")
+        if path == "/sitemap.xml":
+            host = self.headers.get("Host", "")
+            return self._send(SITEMAP.replace(b"SITE", host.encode()), "application/xml")
         if path in PAGES:
             # Кириллица в windows-1251 и без charset в заголовке — так отдаёт
             # добрая половина старых сайтов рунета.
@@ -154,6 +165,23 @@ def test_paginaciya_kataloga_ne_teryaetsya(site, tmp_path):
     assert "katalog~start_60.html" in files      # сама страница пагинации
     assert "katalog/dom-3.html" in files         # и карточка, доступная только с неё
     assert not any("sort" in f for f in files)   # а сортировка по-прежнему мимо
+
+
+def test_karta_sajta_nahodit_nesvyazannye_stranicy(site, tmp_path):
+    """В меню попадает не всё: у блогов и каталогов часть страниц не
+    прилинкована ниоткуда. Карта сайта перечисляет их явно — без неё выгрузка
+    молча возвращает неполный сайт, а понять это по числу страниц нельзя."""
+    stats = _run(site, tmp_path / "d")
+    files = {p.relative_to(tmp_path / "d").as_posix()
+             for p in (tmp_path / "d").rglob("*") if p.is_file()}
+    assert "tajnaya.html" in files                       # только из карты
+    assert "prays.pdf" not in files                      # тяжёлое отсекается и здесь
+    assert any(p["title"] == "Тайная" for p in stats.pages_index)
+
+
+def test_karta_sajta_otklyuchaema(site, tmp_path):
+    stats = _run(site, tmp_path / "d", use_sitemap=False)
+    assert all(p["title"] != "Тайная" for p in stats.pages_index)
 
 
 def test_musor_ne_kachaetsya(site, tmp_path):

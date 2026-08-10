@@ -210,6 +210,60 @@ def _get(url: str, *, timeout: float, max_bytes: int,
     return resp.status_code, ctype, bytes(buf), resp.url
 
 
+_LOC = re.compile(rb"<loc>\s*([^<\s]+)\s*</loc>", re.I)
+_ROBOTS_SITEMAP = re.compile(r"^\s*sitemap:\s*(\S+)", re.I | re.M)
+
+
+def _sitemap_urls(root: str, session: requests.Session, timeout: float,
+                  limit: int) -> list[str]:
+    """Адреса страниц из карты сайта.
+
+    Обход идёт по ссылкам, а в меню попадает не всё: у блогов и каталогов
+    половина страниц доступна только через пагинацию или вообще ниоткуда не
+    прилинкована. Карта сайта перечисляет их явно — это самый дешёвый способ
+    не пропустить содержимое, и делают её почти все CMS.
+
+    Разбираем и индексные карты (карта из карт), но на один уровень вглубь:
+    дальше начинаются многотысячные простыни новостных сайтов, а у нас на
+    выгрузку есть бюджет.
+    """
+    seen: list[str] = []
+    candidates = [urljoin(root, p) for p in
+                  ("/sitemap.xml", "/sitemap_index.xml", "/wp-sitemap.xml", "/sitemap/sitemap.xml")]
+    # robots.txt часто указывает карту прямо, включая нестандартные пути
+    try:
+        r = session.get(urljoin(root, "/robots.txt"), headers=DEFAULT_HEADERS, timeout=timeout)
+        if r.status_code < 400:
+            candidates += [m.strip() for m in _ROBOTS_SITEMAP.findall(r.text)]
+    except requests.RequestException:
+        pass
+
+    queue = list(dict.fromkeys(candidates))
+    nested_left = 1
+    while queue and len(seen) < limit:
+        url = queue.pop(0)
+        try:
+            r = session.get(url, headers=DEFAULT_HEADERS, timeout=timeout)
+        except requests.RequestException:
+            continue
+        if r.status_code >= 400 or b"<loc" not in r.content[:200_000]:
+            continue
+        locs = [m.decode("utf-8", "replace") for m in _LOC.findall(r.content)]
+        is_index = b"<sitemapindex" in r.content[:2000].lower()
+        if is_index and nested_left > 0:
+            nested_left -= 1
+            queue += locs[:20]
+            continue
+        for loc in locs:
+            if loc not in seen:
+                seen.append(loc)
+            if len(seen) >= limit:
+                break
+    if seen:
+        log.info("Карта сайта: %d адресов", len(seen))
+    return seen
+
+
 def _pick_root(domain: str, session: requests.Session, timeout: float) -> str:
     """Выбирает рабочую схему для стартовой страницы.
 
@@ -252,6 +306,7 @@ def run(
     max_file_bytes: int = 15 * 1024 * 1024,
     timeout: float = 15.0,
     scheme: str | None = None,
+    use_sitemap: bool = True,
     on_progress=None,
 ) -> MirrorStats:
     """Обходит сайт вширь и складывает страницы и картинки в `dest_dir`.
@@ -277,6 +332,22 @@ def run(
 
     queue: deque[tuple[str, int]] = deque([(root, 0)])
     seen: set[str] = {root}
+
+    # Карта сайта — до обхода: в меню попадает не всё, а страницы из карты
+    # надо взять раньше, чем упрёмся в потолок по числу страниц.
+    if use_sitemap:
+        try:
+            for url in _sitemap_urls(root, session, timeout, max_pages):
+                url = url.split("#")[0]
+                if (_same_site(url, host) and url not in seen
+                        and not SKIP_PATH.search(urlparse(url).path)
+                        and _ext(urlparse(url).path) not in SKIP_EXT | ASSET_EXT):
+                    seen.add(url)
+                    queue.append((url, 0))
+        except Exception as exc:  # noqa: BLE001
+            # Карта — приятное дополнение, а не условие работы: кривой XML
+            # или редирект в никуда не должны ронять всю выгрузку.
+            log.warning("Карта сайта не разобрана: %s", exc)
     assets: list[str] = []
     site_encoding: str | None = None      # определяется на первой же странице
 

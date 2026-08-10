@@ -565,6 +565,7 @@ class DumpRequest(BaseModel):
     max_pages: int = 150
     max_depth: int = 3
     respect_robots: bool = True
+    use_sitemap: bool = True
 
 
 @dataclass
@@ -610,6 +611,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             max_pages=max(1, min(req.max_pages, 600)),
             max_depth=max(1, min(req.max_depth, 6)),
             respect_robots=req.respect_robots,
+            use_sitemap=req.use_sitemap,
             on_progress=on_progress,
         )
         job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes

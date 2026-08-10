@@ -615,7 +615,7 @@ let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 // умолчанию: снятая галочка robots.txt снова оказывалась поставленной, а
 // «Страниц» и «Глубина» сбрасывались. На экране было одно, применялось
 // другое — и выгрузка молча приезжала без картинок.
-const DUMP_FORM = { domain: "", pages: 150, depth: 3, robots: true };
+const DUMP_FORM = { domain: "", pages: 150, depth: 3, robots: true, sitemap: true };
 
 /** Из чего угодно — в домен. Люди вставляют адрес из адресной строки
  *  целиком: со схемой, www, путём и слешем на конце. Сервер это и так
@@ -637,6 +637,7 @@ function readDumpForm() {
   DUMP_FORM.pages = +$("dmp-pages").value || 150;
   DUMP_FORM.depth = +$("dmp-depth").value || 3;
   DUMP_FORM.robots = $("dmp-robots").checked;
+  DUMP_FORM.sitemap = $("dmp-sitemap").checked;
 }
 
 /** Ближайший по написанию домен из базы — чтобы поймать опечатку до запуска.
@@ -719,6 +720,8 @@ function renderDumps() {
       <div class="checks">
         <label title="Снимать только для сайта клиента, который сам попросил его переделать: robots.txt на Joomla часто закрывает папку с картинками, и выгрузка приезжает без единой фотографии">
           <input type="checkbox" id="dmp-robots" ${DUMP_FORM.robots ? "checked" : ""}> уважать robots.txt</label>
+        <label title="Взять адреса из sitemap.xml. В меню попадает не всё: у блогов и каталогов часть страниц не прилинкована ниоткуда">
+          <input type="checkbox" id="dmp-sitemap" ${DUMP_FORM.sitemap ? "checked" : ""}> по карте сайта</label>
       </div>
       ${unknown}
       <div id="dmp-progress"></div>
@@ -734,7 +737,7 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-pages", "dmp-depth", "dmp-robots"].forEach(
+  ["dmp-pages", "dmp-depth", "dmp-robots", "dmp-sitemap"].forEach(
     id => $(id).addEventListener("change", readDumpForm));
   // Домен перерисовывает секцию: предупреждение про опечатку должно появиться
   // до запуска, а не после того, как выгрузился чужой сайт.
@@ -793,6 +796,7 @@ async function startDump() {
         max_pages: DUMP_FORM.pages,
         max_depth: DUMP_FORM.depth,
         respect_robots: DUMP_FORM.robots,
+        use_sitemap: DUMP_FORM.sitemap,
       }),
     });
     data = await res.json();
