@@ -31,6 +31,12 @@ import re
 import signal
 import sqlite3
 import sys
+import time
+
+# Проверка телефона — та же, что в движке, а не своя копия: правило про коды
+# 3/4/8/9 должно жить в одном месте. Скрипт всё равно запускается внутри
+# контейнера, где ``scanner`` лежит рядом.
+from scanner.contacts import _plausible_phone
 
 # Вывод почти всегда уходит в head/less/tee — без этого питон валится
 # трейсбеком BrokenPipeError вместо тихого выхода.
@@ -47,6 +53,21 @@ CLOSED = {"мусор", "отказ", "клиент", "интерес", "нап�
 SHOP = re.compile(
     r"интернет-магазин|магазин|купить|каталог товаров|прайс-лист|оптом|доставка по росс",
     re.I)
+
+# Заглушки хостеров и парковки доменов: сайта нет вообще, а балл старости у них
+# высокий (пустая страница — древняя разметка). Дорого узнать это в трубку.
+STUB = re.compile(
+    r"домен (?:не )?прилинкован|домен успешно привязан|почти готово|"
+    r"сайт (?:находится )?в разработке|коммерческое предложение хостинг|"
+    r"страница не найдена|index of /|добро пожаловать на .{0,20}nginx|apache2 debian",
+    re.I)
+
+# Стационарные коды Ростовской области: Ростов-на-Дону 863, Таганрог 8634,
+# Шахты 8635, Волгодонск 8639, Батайск 86354 — в 11-значном виде все начинаются
+# на 863. Мобильные к региону не привязаны, федеральные 800/804 тоже, поэтому их
+# не режем, а помечаем: у --city есть слепое пятно — «Ростов» в поисковом
+# запросе не значит, что фирма ростовская.
+ROSTOV_LANDLINE = "863"
 
 
 def arg(name: str, default):
@@ -91,10 +112,16 @@ def load() -> list[dict]:
     except sqlite3.OperationalError:
         pass  # старая база без части колонок — статусы просто не покажем
     rows = []
-    for (data,) in conn.execute("SELECT data FROM leads ORDER BY outreach_score DESC"):
+    now = time.time()
+    for data, last in conn.execute(
+            "SELECT data, last_seen FROM leads ORDER BY outreach_score DESC"):
         r = json.loads(data)
         st, note, cb = states.get(r.get("domain", ""), ("", "", ""))
         r["_status"], r["_note"], r["_callback"] = st, note, cb
+        # Возраст строки: база накопительная, и часть лидов сканировалась до
+        # правок в движке. По старой строке нельзя судить ни о контактах, ни о
+        # том, жив ли ещё сайт.
+        r["_age"] = int((now - (last or now)) / 86400)
         rows.append(r)
     conn.close()
     return rows
@@ -112,6 +139,29 @@ def tech(r: dict) -> str:
     return ",".join(flags)
 
 
+def phone_info(raw: str) -> tuple[str, str]:
+    """Телефон и пометка о нём: годен ли и что за регион.
+
+    Проверять на печати обязательно: база накапливается между прогонами, а
+    проверку номеров движок получил только 6 августа 2026 (ab7262f). Всё, что
+    отсканировано раньше и с тех пор не пересканено, до сих пор лежит с
+    мусорными номерами вида +7 028… — по такому набирают вслепую.
+    """
+    phone = clean(raw).split(",")[0].strip()
+    if not phone:
+        return "", "нет"
+    if not _plausible_phone(phone):
+        return phone, "мусор"
+    code = re.sub(r"\D", "", phone)[1:4]
+    if code.startswith("9"):
+        return phone, "моб"
+    if code in ("800", "804"):
+        return phone, "федер"
+    if code.startswith(ROSTOV_LANDLINE):
+        return phone, "863"
+    return phone, f"чужой:{code}"
+
+
 def main() -> None:
     limit = int(arg("--limit", 60))
     lo = int(arg("--min-outdated", 40))
@@ -119,8 +169,9 @@ def main() -> None:
     city = clean(arg("--city", ""))
 
     rows = load()
-    skip = {"уже трогали": 0, "нет телефона": 0, "сайт не старый": 0,
-            "балл выше потолка": 0, "не тот город": 0, "ошибка скана": 0}
+    skip = {"уже трогали": 0, "нет телефона": 0, "телефон мусорный": 0,
+            "заглушка хостера": 0, "сайт не старый": 0, "балл выше потолка": 0,
+            "не тот город": 0, "ошибка скана": 0}
     touched: list[dict] = []
     good: list[dict] = []
 
@@ -132,8 +183,16 @@ def main() -> None:
             skip["уже трогали"] += 1
             touched.append(r)
             continue
-        if not clean(r.get("phones")):
+        phone, mark = phone_info(r.get("phones"))
+        if mark == "нет":
             skip["нет телефона"] += 1          # звонить нечем — это про обзвон
+            continue
+        if mark == "мусор":
+            skip["телефон мусорный"] += 1      # старая строка до правки движка
+            continue
+        r["_phone"], r["_reg"] = phone, mark
+        if STUB.search(clean(r.get("title"))):
+            skip["заглушка хостера"] += 1      # сайта нет, а балл старости высокий
             continue
         outdated = int(r.get("outdated_score") or 0)
         if outdated < lo:
@@ -165,9 +224,9 @@ def main() -> None:
     print("запросы, давшие годных: "
           + ", ".join(f"{q} — {n}" for q, n in top if q), file=out)
 
-    cols = ["домен", "тир", "аут", "стар", "ИНН", "компания", "оборот_млн", "форма",
-            "орг", "почта", "реклама", "CMS", "год", "тех", "телефон", "магаз",
-            "запрос", "сигналы"]
+    cols = ["домен", "тир", "аут", "стар", "дней", "ИНН", "компания", "оборот_млн",
+            "форма", "орг", "почта", "реклама", "CMS", "год", "тех", "телефон",
+            "рег", "магаз", "запрос", "сигналы"]
     print("\n=== ЛИДЫ ===", file=out)
     print("\t".join(cols), file=out)
 
@@ -177,26 +236,37 @@ def main() -> None:
             rev = f"{int(revenue) / 1_000_000:.1f}"
         except (TypeError, ValueError):
             rev = ""
-        status = clean(r.get("company_status"), 12).lower()
+        # Статус приходит и по-русски, и латиницей (ACTIVE/LIQUIDATING).
+        # Ликвидацию пишем капсом: это стоп-сигнал, а не оттенок — таких в
+        # срезе уже двое, и один чуть не уехал в партию звонков.
+        raw_status = clean(r.get("company_status")).lower()
+        if "ликвид" in raw_status or "liquidat" in raw_status:
+            status = "ЛИКВИД"
+        elif "действ" in raw_status or "active" in raw_status:
+            status = "действ"
+        else:
+            status = clean(raw_status, 8)
         title_q = clean(r.get("title")) + " " + clean(r.get("source_query"))
         print("\t".join([
             clean(r.get("domain"), 34),
             clean(r.get("priority"), 1),
             str(r.get("outreach_score") or ""),
             str(r.get("outdated_score") or ""),
+            str(r["_age"]),
             # Пусто = ИНН на сайте не нашёлся, компания подтянута по названию.
             # Тогда оборот и директор могут быть от чужой фирмы — не верить.
             "да" if clean(r.get("inn")) else "",
             clean(r.get("company"), 40),
             rev,
             "ИП" if r.get("is_individual") == "да" else "",
-            "действ" if "действ" in status else clean(status, 8),
+            status,
             "да" if r.get("corp_email") == "да" else "",
             clean(r.get("marketing"), 24),
             clean(r.get("cms"), 20),
             str(r.get("copyright_year") or ""),
             tech(r),
-            clean(r.get("phones")).split(",")[0],
+            r["_phone"],
+            r["_reg"],
             "да" if SHOP.search(title_q) else "",
             clean(r.get("source_query"), 32),
             clean(r.get("signals"), 80),
