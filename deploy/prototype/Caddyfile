@@ -41,3 +41,25 @@ projekt-review.nexus-flow.ru {
 	header @static Cache-Control "public, max-age=2592000, immutable"
 	header /index.html Cache-Control "no-cache"
 }
+
+# tort-v-rostove.ru — ИП Мкртичян Наталья Сергеевна, кондитерский дом
+# «Медовый». Прототип витрины, показывается клиенту в MAX.
+medoviy-review.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	root * /srv/medoviy
+	file_server
+
+	try_files {path} {path}/ /index.html
+
+	@static path /assets/*
+	header @static Cache-Control "public, max-age=2592000, immutable"
+	header /index.html Cache-Control "no-cache"
+}
