@@ -74,11 +74,39 @@ GitHub с правами **Contents: Read**. Один раз выполните
 
 ```bash
 cd /root/site-scanner/deploy/prototype
-docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
-docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+docker compose up -d --force-recreate caddy
 ```
 
-Сначала `validate`: если Caddy не примет конфиг, `reload` не тронет рабочий.
+**Именно пересоздать контейнер, а не `reload`.** Caddyfile смонтирован как
+отдельный файл, а `git pull` и `git checkout` не правят файл на месте: git
+пишет новый и переименовывает его поверх. Инод меняется, бинд-маунт остаётся
+на старом — контейнер продолжает видеть прежний конфиг.
+
+Коварство в том, что всё выглядит успешно: `validate` отвечает
+`Valid configuration`, `reload` молчит без ошибок, и оба честно работают —
+просто со старым файлом. Новый домен при этом не поднимается, в логах ни
+строчки про него, и непонятно, куда смотреть. На этом потеряли полчаса при
+выкладке прототипа кондитерской.
+
+Проверить, что контейнер видит свежий файл:
+
+```bash
+grep -c <новый-поддомен> Caddyfile
+docker compose exec caddy grep -c <новый-поддомен> /etc/caddy/Caddyfile
+```
+
+Разные числа — маунт устарел, нужен `--force-recreate`.
+
+`validate` перед пересозданием всё равно полезен: если конфиг сломан, лучше
+узнать до того, как контейнер уйдёт в перезапуск.
+
+```bash
+docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+```
+
+Сертификат для нового домена выпускается за секунды после старта, в логах
+появляется `certificate obtained successfully`. Если вместо этого ошибки
+ACME — A-запись ещё не разошлась.
 
 ## Почему так, а не иначе
 
