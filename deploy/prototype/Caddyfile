@@ -41,3 +41,29 @@ projekt-review.nexus-flow.ru {
 	header @static Cache-Control "public, max-age=2592000, immutable"
 	header /index.html Cache-Control "no-cache"
 }
+
+# rgz61.ru — ООО «РГЗ», Ростовский гибочный завод. Прототип к согласованию.
+#
+# Этот собран кодом, а не в Lovable: сайт клиента стоит на конструкторе
+# «Пульс цен» и выгрузке не поддаётся (см. clients/rgz61.ru/README.md), а
+# содержимое для прототипа взято со скриншотов и карточки лида. Значит и
+# ветки `deploy` под него нет — страница одна, кладётся руками:
+#
+#   mkdir -p /root/prototypes-static/rgz61
+#   cp .../clients/rgz61.ru/prototype/index.html /root/prototypes-static/rgz61/
+rgz-review.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	root * /srv/rgz61
+	file_server
+
+	try_files {path} {path}/ /index.html
+	header /index.html Cache-Control "no-cache"
+}

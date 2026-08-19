@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ростовский гибочный завод — анкерные болты и металлоконструкции по ГОСТ, Ростов-на-Дону</title>
+<meta name="description" content="Производство анкерных болтов, закладных деталей и металлоконструкций по ГОСТ с 2014 года. Лазерная резка ЧПУ, гибка, порошковая окраска. Доставка по всей России.">
+<!--
+  Прототип нового сайта ООО «РГЗ» (rgz61.ru). Показывается клиенту.
+
+  Всё содержимое взято с действующего сайта: разделы, категории каталога,
+  позиции с ценами, текст «О компании», этапы работы, контакты. Ничего не
+  придумано — то, чего мы не знаем, стоит [в квадратных скобках] и
+  заполняется со слов клиента. Правило из СХЕМА.md: увидит услугу, которой
+  у него нет, — разговор закончится.
+-->
+<style>
+:root{
+  --red:#E4322B; --red-dark:#C4241D;
+  --ink:#14171A; --steel:#1E2328; --steel-2:#2A3037;
+  --muted:#6B7280; --line:#E5E7EB; --bg:#fff; --bg-soft:#F4F5F7;
+  --wrap:1200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+h1,h2,h3{line-height:1.15;letter-spacing:-.02em}
+h2{font-size:clamp(28px,4vw,42px);font-weight:800}
+.lead{color:var(--muted);font-size:18px}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border:0;
+  border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;
+  background:var(--red);color:#fff;transition:background .15s;
+}
+.btn:hover{background:var(--red-dark)}
+.btn--ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
+.btn--ghost:hover{background:rgba(255,255,255,.1)}
+.btn--dark{background:var(--steel)}
+.btn--dark:hover{background:#000}
+
+/* --- верхняя строка и шапка --- */
+.topbar{background:var(--steel);color:#9AA3AD;font-size:14px;padding:10px 0}
+.topbar .wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:center}
+.topbar b{color:#fff;font-weight:600}
+.header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+.header .wrap{display:flex;align-items:center;gap:32px;padding-top:16px;padding-bottom:16px}
+.logo{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.logo__mark{width:44px;height:44px;flex-shrink:0}
+.logo__name{font-weight:800;font-size:17px;line-height:1.15;letter-spacing:-.01em}
+.logo__note{font-size:12px;color:var(--muted);font-weight:500}
+.nav{display:flex;gap:26px;margin-left:auto;font-weight:600;font-size:15px}
+.nav a:hover{color:var(--red)}
+.header__phone{font-weight:800;font-size:18px;white-space:nowrap}
+.header__phone span{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.burger{display:none;margin-left:auto;background:none;border:0;padding:8px;cursor:pointer}
+.burger span{display:block;width:24px;height:2px;background:var(--ink);margin:5px 0}
+
+/* --- первый экран --- */
+.hero{
+  background:
+    linear-gradient(rgba(20,23,26,.86),rgba(20,23,26,.92)),
+    repeating-linear-gradient(135deg,#2A3037 0 18px,#232930 18px 36px);
+  color:#fff;padding:96px 0 0;
+}
+.hero h1{font-size:clamp(30px,5.6vw,62px);font-weight:900;text-transform:uppercase;overflow-wrap:break-word}
+.hero h1 em{color:var(--red);font-style:normal}
+.hero p{margin-top:24px;max-width:56ch;font-size:19px;color:#C7CDD4}
+.hero__btns{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
+.hero__facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.12);margin-top:72px}
+.hero__fact{background:#191D21;padding:26px 24px}
+.hero__fact b{display:block;font-size:30px;font-weight:900;color:#fff}
+.hero__fact span{font-size:14px;color:#9AA3AD}
+
+/* --- секции --- */
+section{padding:88px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:40px;flex-wrap:wrap}
+.section-head p{color:var(--muted);margin-top:10px;max-width:60ch}
+
+/* --- каталог --- */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.cat{
+  border:1px solid var(--line);border-radius:6px;padding:28px 24px;
+  transition:border-color .15s,transform .15s;background:#fff;
+}
+.cat:hover{border-color:var(--red);transform:translateY(-2px)}
+.cat svg{width:44px;height:44px;color:var(--red);margin-bottom:18px}
+.cat b{display:block;font-size:17px;font-weight:700;margin-bottom:6px}
+.cat span{font-size:14px;color:var(--muted)}
+
+/* --- позиции --- */
+.goods{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.good{border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.good__ph{
+  aspect-ratio:4/3;background:var(--bg-soft);display:flex;align-items:center;
+  justify-content:center;color:#B6BCC4;font-size:13px;text-align:center;padding:16px;
+  border-bottom:1px solid var(--line);
+}
+.good__body{padding:20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.good__name{font-weight:700;font-size:16px;flex:1}
+.good__price{font-size:22px;font-weight:900;color:var(--red)}
+.good__price small{font-size:13px;font-weight:600;color:var(--muted)}
+
+/* --- услуги --- */
+.services{background:var(--bg-soft)}
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.svc__item{background:#fff;border-radius:6px;padding:30px 26px;border:1px solid var(--line)}
+.svc__item b{display:block;font-size:18px;margin-bottom:10px}
+.svc__item p{color:var(--muted);font-size:15px}
+
+/* --- этапы --- */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;counter-reset:s}
+.step{position:relative;padding-top:52px}
+.step:before{
+  counter-increment:s;content:counter(s);position:absolute;top:0;left:0;
+  width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:800;
+}
+.step b{display:block;font-size:15px;font-weight:700}
+
+/* --- о компании --- */
+.about{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center}
+.about p{margin-bottom:16px;font-size:17px;color:#3A424B}
+.cert{
+  border:1px solid var(--line);border-radius:6px;padding:32px;text-align:center;background:var(--bg-soft);
+}
+.cert b{display:block;font-size:20px;margin:14px 0 6px}
+.cert span{color:var(--muted);font-size:14px}
+
+/* --- заявка --- */
+.cta{background:var(--steel);color:#fff}
+.cta__grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.cta h2{color:#fff}
+.cta p{color:#AEB6BF;margin-top:14px;font-size:17px}
+.form{background:#fff;border-radius:6px;padding:32px;color:var(--ink)}
+.form label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.form input,.form textarea{
+  width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:4px;
+  font:inherit;margin-bottom:18px;background:#fff;
+}
+.form input:focus,.form textarea:focus{outline:2px solid var(--red);border-color:transparent}
+.form .agree{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin-bottom:20px}
+.form .agree input{width:auto;margin:3px 0 0}
+.form .btn{width:100%;justify-content:center}
+.form__ok{display:none;background:#F0FDF4;border:1px solid #86EFAC;color:#166534;padding:14px;border-radius:4px;font-size:15px}
+
+/* --- контакты --- */
+.contacts{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.contacts dl{display:grid;grid-template-columns:auto 1fr;gap:14px 28px;font-size:17px}
+.contacts dt{color:var(--muted)}
+.contacts dd{font-weight:600}
+.map{
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:6px;min-height:320px;
+  display:flex;align-items:center;justify-content:center;color:#B6BCC4;text-align:center;padding:24px;
+}
+
+/* --- подвал --- */
+.footer{background:var(--ink);color:#8B939C;padding:56px 0 32px;font-size:15px}
+.footer__top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;padding-bottom:32px;border-bottom:1px solid #2A3037}
+.footer__nav{display:flex;gap:24px;flex-wrap:wrap}
+.footer a:hover{color:#fff}
+.footer__bottom{padding-top:24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px}
+.wa{
+  position:fixed;right:24px;bottom:24px;width:58px;height:58px;border-radius:50%;
+  background:#25D366;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:60;
+}
+.wa svg{width:30px;height:30px;color:#fff}
+
+@media (max-width:1000px){
+  .cats,.goods,.svc{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(3,1fr)}
+  .hero__facts{grid-template-columns:repeat(2,1fr)}
+  .about,.cta__grid,.contacts{grid-template-columns:1fr;gap:32px}
+  .nav{display:none}
+  .nav.open{
+    display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;
+    background:#fff;padding:20px 24px;gap:16px;border-bottom:1px solid var(--line);
+  }
+  .burger{display:block}
+  .header__phone{display:none}
+}
+@media (max-width:640px){
+  /* «МЕТАЛЛОКОНСТРУКЦИИ» — 18 букв заглавными: на узком экране слово шире
+     вьюпорта, и страница начинает ездить вбок. Уменьшаем кегль вместо
+     overflow:hidden, чтобы не прятать симптом. */
+  .hero h1{font-size:26px}
+  /* Логотип не даёт кнопке меню поместиться: у него flex-shrink:0, и на
+     узком экране шапка вылезает за край вместе со всей страницей. */
+  .header .wrap{gap:12px}
+  .logo{flex-shrink:1;min-width:0}
+  .logo__name{font-size:15px}
+  .logo__note{display:none}
+  section{padding:56px 0}
+  .cats,.goods,.svc,.steps{grid-template-columns:1fr}
+  .hero{padding-top:56px}
+  .topbar .wrap{gap:12px;font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span>г. Ростов-на-Дону, ул. Монтажная, 6</span>
+    <span>пн–пт <b>7:00–16:00</b></span>
+    <span><a href="mailto:rvrs@rambler.ru">rvrs@rambler.ru</a></span>
+  </div>
+</div>
+
+<header class="header">
+  <div class="wrap">
+    <a href="#" class="logo">
+      <svg class="logo__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M8 34c0-10 8-18 18-18h14" stroke="#E4322B" stroke-width="5" stroke-linecap="square"/>
+        <path d="M8 34h10" stroke="#14171A" stroke-width="5" stroke-linecap="square"/>
+        <circle cx="40" cy="16" r="4" fill="#14171A"/>
+      </svg>
+      <span>
+        <span class="logo__name">Ростовский<br>гибочный завод</span>
+        <span class="logo__note">производство с 2014 года</span>
+      </span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="#catalog">Каталог</a>
+      <a href="#services">Услуги</a>
+      <a href="#steps">Как работаем</a>
+      <a href="#about">О заводе</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+
+    <a class="header__phone" href="tel:+79287771888">
+      +7 928 777-18-88
+      <span>звоните: пн–пт, 7:00–16:00</span>
+    </a>
+
+    <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Анкерные болты<br>и <em>металлоконструкции</em><br>по ГОСТ</h1>
+    <p>
+      Собственное производство в Ростове-на-Дону: лазерная резка с ЧПУ, гибка на
+      листогибочных прессах, сварка и порошковая окраска. Изготовим по вашему
+      чертежу. Доставка по всей России.
+    </p>
+    <div class="hero__btns">
+      <a class="btn" href="#zayavka">Рассчитать по чертежу</a>
+      <a class="btn btn--ghost" href="#catalog">Смотреть каталог</a>
+    </div>
+
+    <div class="hero__facts">
+      <div class="hero__fact"><b>12 лет</b><span>работаем с 2014 года</span></div>
+      <div class="hero__fact"><b>Свой парк</b><span>станки ЧПУ, прессы, покраска</span></div>
+      <div class="hero__fact"><b>По России</b><span>доставка в любой регион</span></div>
+      <div class="hero__fact"><b>2020</b><span>«Лучшее предприятие отрасли»</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="catalog">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Что мы производим</h2>
+        <p>Изготавливаем по ГОСТ и по чертежам заказчика — от одиночных деталей до партий на объект.</p>
+      </div>
+      <a class="btn btn--dark" href="#zayavka">Запросить прайс</a>
+    </div>
+
+    <div class="cats">
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v14M8 20h8M9 6h6M9 9h6M9 12h6"/><path d="M12 16a4 4 0 0 0-4 4"/></svg>
+        <b>Анкерные болты</b><span>фундаментные, по ГОСТ 24379.1-2012</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4v16M9 4v16M14 4v16M19 4v16M2 8h20M2 16h20"/></svg>
+        <b>Блоки анкерных болтов</b><span>в сборе, готовые к монтажу</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 20L12 4l9 16M6 20l6-11 6 11M3 20h18"/></svg>
+        <b>Металлоконструкции</b><span>фермы, балки, каркасы</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="10"/><path d="M7 7V4M17 17v3M7 12h10"/></svg>
+        <b>Закладные детали</b><span>стальные МН, по чертежу</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 16c6 0 8-10 18-10"/><path d="M3 20h18"/></svg>
+        <b>Гибка листового металла</b><span>листогибочные прессы</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v9"/><path d="M9 11h6l-3 11z"/><path d="M4 6l3 2M20 6l-3 2"/></svg>
+        <b>Резка металла</b><span>лазерные станки с ЧПУ</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>
+        <b>Другие товары</b><span>метизная продукция</span>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 18h16M6 18V9l6-5 6 5v9"/><path d="M10 18v-5h4v5"/></svg>
+        <b>Изделия по чертежу</b><span>пришлите эскиз — посчитаем</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Производство</h2>
+        <p>
+          Лазерные станки с ЧПУ, листогибочные прессы, сварочные аппараты и камеры
+          полимерного напыления от ведущих мировых производителей.
+        </p>
+      </div>
+    </div>
+    <div class="svc">
+      <div class="svc__item"><b>Лазерная резка</b><p>Раскрой листа на станках с ЧПУ — точная геометрия, чистый рез, повторяемость в партии.</p></div>
+      <div class="svc__item"><b>Гибка</b><p>Листогибочные прессы: гнутые профили и детали по вашим размерам.</p></div>
+      <div class="svc__item"><b>Сварка</b><p>Сборка конструкций и блоков анкерных болтов в готовые узлы.</p></div>
+      <div class="svc__item"><b>Порошковая окраска</b><p>Камеры полимерного напыления — защита металла и цвет по каталогу RAL.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Популярные позиции</h2>
+        <p>Цены — от, окончательная зависит от объёма, марки стали и покрытия.</p>
+      </div>
+      <a class="btn btn--dark" href="#zayavka">Весь каталог с ценами</a>
+    </div>
+    <div class="goods">
+      <div class="good">
+        <div class="good__ph">[фото: фундаментные болты]</div>
+        <div class="good__body">
+          <span class="good__name">Изготовление фундаментных болтов ГОСТ 24379.1-2012</span>
+          <span class="good__price">от 150 ₽ <small>/ шт.</small></span>
+          <a class="btn" href="#zayavka">Заказать</a>
+        </div>
+      </div>
+      <div class="good">
+        <div class="good__ph">[фото: закладные детали]</div>
+        <div class="good__body">
+          <span class="good__name">Изготовление закладных деталей стальных МН</span>
+          <span class="good__price">от 100 ₽ <small>/ шт.</small></span>
+          <a class="btn" href="#zayavka">Заказать</a>
+        </div>
+      </div>
+      <div class="good">
+        <div class="good__ph">[фото: фундаментная шпилька]</div>
+        <div class="good__body">
+          <span class="good__name">Фундаментная шпилька ГОСТ 24379.1-2012</span>
+          <span class="good__price">от 357 ₽ <small>/ шт.</small></span>
+          <a class="btn" href="#zayavka">Заказать</a>
+        </div>
+      </div>
+      <div class="good">
+        <div class="good__ph">[фото: скоба накладная]</div>
+        <div class="good__body">
+          <span class="good__name">Скоба накладная ГОСТ 14098-91</span>
+          <span class="good__price">от 35 ₽ <small>/ шт.</small></span>
+          <a class="btn" href="#zayavka">Заказать</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="steps" class="services">
+  <div class="wrap">
+    <div class="section-head"><div><h2>Как проходит заказ</h2></div></div>
+    <div class="steps">
+      <div class="step"><b>Заявка с чертежом</b></div>
+      <div class="step"><b>Согласование работ</b></div>
+      <div class="step"><b>Выставление счёта</b></div>
+      <div class="step"><b>Заключение договора</b></div>
+      <div class="step"><b>Изготовление</b></div>
+      <div class="step"><b>Доставка и отгрузка</b></div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about">
+    <div>
+      <h2>О заводе</h2>
+      <p style="margin-top:24px">
+        ООО «Ростовский гибочный завод» с 2014 года занимается производством и
+        продажей металлоконструкций, анкерных болтов и метизной продукции.
+      </p>
+      <p>
+        Для изготовления используются лазерные станки с ЧПУ, листогибочные прессы,
+        сварочные аппараты и камеры для нанесения полимерного напыления от ведущих
+        мировых производителей. Компания предлагает услуги по гибке, резке и
+        порошковой окраске металла.
+      </p>
+      <p>Доставка производится по всей России.</p>
+      <p style="color:var(--muted);font-size:15px">
+        [Здесь добавим: площадь производства, число сотрудников, крупные объекты —
+        со слов клиента.]
+      </p>
+    </div>
+    <div class="cert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.4" style="width:56px;height:56px;margin:0 auto">
+        <circle cx="12" cy="9" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/>
+      </svg>
+      <b>Лучшее предприятие<br>отрасли — 2020</b>
+      <span>Национальный сертификат<br>[скан сертификата]</span>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="zayavka">
+  <div class="wrap cta__grid">
+    <div>
+      <h2>Пришлите чертёж — посчитаем</h2>
+      <p>
+        Ответим в рабочее время: пн–пт с 7:00 до 16:00. Если удобнее голосом —
+        звоните на <a href="tel:+79287771888" style="color:#fff;text-decoration:underline">+7 928 777-18-88</a>
+        или пишите в WhatsApp.
+      </p>
+      <p style="font-size:15px">[Срок ответа и минимальный объём заказа — уточнить у клиента.]</p>
+    </div>
+
+    <form class="form" id="form">
+      <div class="form__ok" id="ok">Заявка отправлена. Перезвоним в рабочее время.</div>
+      <label for="n">Как к вам обращаться</label>
+      <input id="n" name="name" required placeholder="Имя">
+      <label for="p">Телефон</label>
+      <input id="p" name="phone" type="tel" required placeholder="+7 ___ ___-__-__">
+      <label for="t">Что нужно изготовить</label>
+      <textarea id="t" name="text" rows="3" placeholder="Например: анкерные болты М24×800, 120 шт."></textarea>
+      <label class="agree"><input type="checkbox" required>
+        Согласен на обработку персональных данных</label>
+      <button class="btn" type="submit">Отправить заявку</button>
+    </form>
+  </div>
+</section>
+
+<section id="contacts">
+  <div class="wrap contacts">
+    <div>
+      <h2>Контакты</h2>
+      <dl style="margin-top:28px">
+        <dt>Адрес</dt><dd>г. Ростов-на-Дону, ул. Монтажная, 6, офис 19</dd>
+        <dt>Телефоны</dt><dd>
+          <a href="tel:+79287771888">+7 928 777-18-88</a><br>
+          <a href="tel:+79081709954">+7 908 170-99-54</a>
+        </dd>
+        <dt>Почта</dt><dd><a href="mailto:rvrs@rambler.ru">rvrs@rambler.ru</a></dd>
+        <dt>Режим</dt><dd>пн–пт, 7:00–16:00</dd>
+        <dt>Реквизиты</dt><dd style="font-weight:400;color:var(--muted)">[ИНН, ОГРН, расчётный счёт — со слов клиента]</dd>
+      </dl>
+    </div>
+    <div class="map">[карта проезда: Монтажная, 6 — поставим Яндекс.Карту]</div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div>
+        <div style="color:#fff;font-weight:800;font-size:18px">Ростовский гибочный завод</div>
+        <div style="margin-top:8px">Анкерные болты, закладные детали, металлоконструкции</div>
+      </div>
+      <nav class="footer__nav">
+        <a href="#catalog">Каталог</a><a href="#services">Услуги</a>
+        <a href="#steps">Как работаем</a><a href="#about">О заводе</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+    </div>
+    <div class="footer__bottom">
+      <span>© ООО «РГЗ», 2014–2026</span>
+      <span>[политика обработки персональных данных]</span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/79287771888" aria-label="Написать в WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7 1-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.1 0-.3 0-.4l-.7-1.6c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3A3 3 0 0 0 7 10.7a5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c2.1.8 2.1.6 2.5.5a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c0-.1-.2-.2-.4-.3z"/></svg>
+</a>
+
+<script>
+  // Мобильное меню
+  document.getElementById("burger").onclick = () =>
+    document.getElementById("nav").classList.toggle("open");
+  document.querySelectorAll("#nav a").forEach(a =>
+    a.onclick = () => document.getElementById("nav").classList.remove("open"));
+
+  // Форма — заглушка: приёмник заявок на сервере ещё не готов (см. СХЕМА.md).
+  // Ничего никуда не уходит, просто показываем, как это будет выглядеть.
+  document.getElementById("form").onsubmit = e => {
+    e.preventDefault();
+    document.getElementById("ok").style.display = "block";
+    e.target.querySelectorAll("input,textarea").forEach(i => {
+      if (i.type !== "checkbox") i.value = "";
+    });
+  };
+</script>
+</body>
+</html>
