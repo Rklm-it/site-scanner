@@ -4,202 +4,303 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ростовский гибочный завод — анкерные болты и металлоконструкции по ГОСТ, Ростов-на-Дону</title>
-<meta name="description" content="Производство анкерных болтов, закладных деталей и металлоконструкций по ГОСТ с 2014 года. Лазерная резка ЧПУ, гибка, порошковая окраска. Доставка по всей России.">
+<meta name="description" content="Производство анкерных болтов, закладных деталей и металлоконструкций по ГОСТ с 2014 года. Лазерная резка ЧПУ, гибка, порошковая окраска. Расчёт по чертежу, доставка по всей России.">
 <!--
-  Прототип нового сайта ООО «РГЗ» (rgz61.ru). Показывается клиенту.
+  Прототип нового сайта ООО «РГЗ» (rgz61.ru), версия 2.
 
-  Всё содержимое взято с действующего сайта: разделы, категории каталога,
-  позиции с ценами, текст «О компании», этапы работы, контакты. Ничего не
-  придумано — то, чего мы не знаем, стоит [в квадратных скобках] и
-  заполняется со слов клиента. Правило из СХЕМА.md: увидит услугу, которой
-  у него нет, — разговор закончится.
+  Всё содержимое — с их действующего сайта: категории, позиции с ценами,
+  текст «О компании», этапы, контакты. Чего мы не знаем — [в квадратных
+  скобках]. Правило из СХЕМА.md: выдуманная услуга на показе заканчивает
+  разговор.
+
+  Что добавлено во второй версии и зачем:
+  * калькулятор на первом экране — считает по их же ценам «от», без
+    выдуманных коэффициентов. Главный крючок: на старом сайте цену узнают
+    только звонком;
+  * отправка чертежа перетаскиванием — заводу это ближе, чем «оставьте
+    телефон»: заявка начинается с чертежа, это первый шаг их же схемы;
+  * изделия нарисованы SVG вместо серых прямоугольников — фотографий у нас
+    нет, а пустые заглушки выглядели как незавёрстанный сайт;
+  * липкая панель на телефоне: позвонить и отправить чертёж всегда под рукой.
 -->
 <style>
 :root{
-  --red:#E4322B; --red-dark:#C4241D;
-  --ink:#14171A; --steel:#1E2328; --steel-2:#2A3037;
-  --muted:#6B7280; --line:#E5E7EB; --bg:#fff; --bg-soft:#F4F5F7;
-  --wrap:1200px;
+  --red:#E8362C; --red-dk:#C4241D; --red-soft:rgba(232,54,44,.1);
+  --ink:#0F1214; --steel:#171B1F; --steel-2:#22282E;
+  --muted:#69737D; --line:#E4E7EA; --line-dk:rgba(255,255,255,.1);
+  --bg:#fff; --bg-soft:#F5F6F8;
+  --wrap:1180px; --r:6px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  font:16px/1.6 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;
+  font-feature-settings:"kern","liga";
 }
-img{max-width:100%;display:block}
+img,svg{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
-h1,h2,h3{line-height:1.15;letter-spacing:-.02em}
-h2{font-size:clamp(28px,4vw,42px);font-weight:800}
-.lead{color:var(--muted);font-size:18px}
-.btn{
-  display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border:0;
-  border-radius:4px;font-size:16px;font-weight:700;cursor:pointer;
-  background:var(--red);color:#fff;transition:background .15s;
+h1,h2,h3{line-height:1.08;letter-spacing:-.03em;font-weight:800}
+h2{font-size:clamp(30px,3.6vw,46px)}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:14px;
 }
-.btn:hover{background:var(--red-dark)}
-.btn--ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.35)}
-.btn--ghost:hover{background:rgba(255,255,255,.1)}
-.btn--dark{background:var(--steel)}
-.btn--dark:hover{background:#000}
+.eyebrow:before{content:"";width:24px;height:2px;background:var(--red)}
+.lead{color:var(--muted);font-size:18px;max-width:62ch}
 
-/* --- верхняя строка и шапка --- */
-.topbar{background:var(--steel);color:#9AA3AD;font-size:14px;padding:10px 0}
-.topbar .wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:16px 26px;border:0;border-radius:var(--r);font:inherit;font-weight:700;
+  cursor:pointer;background:var(--red);color:#fff;transition:.15s;white-space:nowrap;
+}
+.btn:hover{background:var(--red-dk);transform:translateY(-1px)}
+.btn--ghost{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px var(--line-dk)}
+.btn--ghost:hover{background:rgba(255,255,255,.08)}
+.btn--dark{background:var(--ink)}
+.btn--dark:hover{background:#000}
+.btn--wide{width:100%}
+
+/* появление секций при прокрутке */
+.rise{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+.rise.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;transition:none}}
+
+/* --- шапка --- */
+.topbar{background:var(--ink);color:#8D959D;font-size:13.5px;padding:9px 0}
+.topbar .wrap{display:flex;gap:26px;flex-wrap:wrap;align-items:center}
 .topbar b{color:#fff;font-weight:600}
-.header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
-.header .wrap{display:flex;align-items:center;gap:32px;padding-top:16px;padding-bottom:16px}
-.logo{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.logo__mark{width:44px;height:44px;flex-shrink:0}
-.logo__name{font-weight:800;font-size:17px;line-height:1.15;letter-spacing:-.01em}
-.logo__note{font-size:12px;color:var(--muted);font-weight:500}
-.nav{display:flex;gap:26px;margin-left:auto;font-weight:600;font-size:15px}
-.nav a:hover{color:var(--red)}
-.header__phone{font-weight:800;font-size:18px;white-space:nowrap}
-.header__phone span{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.topbar .tb-right{margin-left:auto;display:flex;gap:20px}
+.header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header .wrap{display:flex;align-items:center;gap:30px;padding:14px 24px}
+.logo{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.logo__name{display:block;font-weight:800;font-size:16.5px;line-height:1.12;letter-spacing:-.02em}
+.logo__note{display:block;font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.nav{display:flex;gap:20px;margin-left:auto;font-weight:600;font-size:15px}
+.nav a{position:relative;padding:4px 0;white-space:nowrap}
+.nav a:after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--red);transition:right .2s}
+.nav a:hover:after{right:0}
+.header__cta{display:flex;align-items:center;gap:16px}
+.header__phone{font-weight:800;font-size:17px;white-space:nowrap}
+.header__phone span{display:block;font-size:11.5px;font-weight:600;color:var(--muted)}
 .burger{display:none;margin-left:auto;background:none;border:0;padding:8px;cursor:pointer}
-.burger span{display:block;width:24px;height:2px;background:var(--ink);margin:5px 0}
+.burger span{display:block;width:24px;height:2px;background:var(--ink);margin:5px 0;transition:.2s}
 
 /* --- первый экран --- */
 .hero{
+  position:relative;color:#fff;padding:76px 0 0;overflow:hidden;
   background:
-    linear-gradient(rgba(20,23,26,.86),rgba(20,23,26,.92)),
-    repeating-linear-gradient(135deg,#2A3037 0 18px,#232930 18px 36px);
-  color:#fff;padding:96px 0 0;
+    radial-gradient(1200px 500px at 15% -10%,rgba(232,54,44,.22),transparent 60%),
+    linear-gradient(rgba(15,18,20,.93),rgba(15,18,20,.97)),
+    repeating-linear-gradient(115deg,#22282E 0 14px,#1B2126 14px 28px);
 }
-.hero h1{font-size:clamp(30px,5.6vw,62px);font-weight:900;text-transform:uppercase;overflow-wrap:break-word}
+.hero__grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:start}
+.hero h1{font-size:clamp(32px,4.9vw,58px);font-weight:900;text-transform:uppercase;overflow-wrap:break-word}
 .hero h1 em{color:var(--red);font-style:normal}
-.hero p{margin-top:24px;max-width:56ch;font-size:19px;color:#C7CDD4}
-.hero__btns{display:flex;gap:16px;flex-wrap:wrap;margin-top:36px}
-.hero__facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.12);margin-top:72px}
-.hero__fact{background:#191D21;padding:26px 24px}
-.hero__fact b{display:block;font-size:30px;font-weight:900;color:#fff}
-.hero__fact span{font-size:14px;color:#9AA3AD}
+.hero__sub{margin-top:22px;font-size:18px;color:#B9C1C9;max-width:52ch}
+.hero__btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.hero__trust{display:flex;gap:26px;flex-wrap:wrap;margin-top:34px;font-size:14px;color:#8D959D}
+.hero__trust b{color:#fff;display:block;font-size:22px;font-weight:800;letter-spacing:-.02em}
+
+/* калькулятор */
+.calc{background:#fff;color:var(--ink);border-radius:10px;padding:26px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.calc h3{font-size:20px;margin-bottom:4px}
+.calc__note{font-size:13px;color:var(--muted);margin-bottom:18px}
+.calc label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+.calc select,.calc input{
+  width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:var(--r);
+  font:inherit;background:#fff;
+}
+.calc select:focus,.calc input:focus{outline:2px solid var(--red);border-color:transparent}
+.calc__opts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.calc__opt{
+  flex:1 1 0;min-width:0;font-size:12.5px;font-weight:600;text-align:center;padding:10px 6px;
+  border:1px solid var(--line);border-radius:var(--r);cursor:pointer;user-select:none;
+}
+.calc__opt input{display:none}
+.calc__opt.on{border-color:var(--red);background:var(--red-soft);color:var(--red-dk)}
+.calc__out{
+  margin-top:20px;padding:16px;background:var(--bg-soft);border-radius:var(--r);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.calc__out b{font-size:28px;font-weight:900;color:var(--red);letter-spacing:-.02em}
+.calc__out span{font-size:13px;color:var(--muted)}
+.calc .btn{margin-top:14px}
+
+.hero__strip{
+  margin-top:64px;border-top:1px solid var(--line-dk);
+  display:grid;grid-template-columns:repeat(4,1fr);
+}
+.hero__strip div{padding:22px 24px 26px;border-right:1px solid var(--line-dk)}
+.hero__strip div:last-child{border-right:0}
+.hero__strip b{display:block;font-size:15px;font-weight:700}
+.hero__strip span{font-size:13.5px;color:#8D959D}
 
 /* --- секции --- */
-section{padding:88px 0}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:40px;flex-wrap:wrap}
-.section-head p{color:var(--muted);margin-top:10px;max-width:60ch}
+section{padding:84px 0}
+.head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:38px;flex-wrap:wrap}
 
-/* --- каталог --- */
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+/* каталог */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .cat{
-  border:1px solid var(--line);border-radius:6px;padding:28px 24px;
-  transition:border-color .15s,transform .15s;background:#fff;
+  position:relative;border:1px solid var(--line);border-radius:var(--r);padding:24px 22px 26px;
+  background:#fff;transition:.18s;overflow:hidden;
 }
-.cat:hover{border-color:var(--red);transform:translateY(-2px)}
-.cat svg{width:44px;height:44px;color:var(--red);margin-bottom:18px}
-.cat b{display:block;font-size:17px;font-weight:700;margin-bottom:6px}
-.cat span{font-size:14px;color:var(--muted)}
+.cat:after{content:"";position:absolute;left:0;top:0;height:3px;width:0;background:var(--red);transition:width .25s}
+.cat:hover{border-color:#CBD1D7;box-shadow:0 12px 30px rgba(15,18,20,.07);transform:translateY(-2px)}
+.cat:hover:after{width:100%}
+.cat svg{width:40px;height:40px;color:var(--red);margin-bottom:16px}
+.cat b{display:block;font-size:16.5px;margin-bottom:5px}
+.cat span{font-size:13.5px;color:var(--muted)}
 
-/* --- позиции --- */
-.goods{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.good{border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
-.good__ph{
-  aspect-ratio:4/3;background:var(--bg-soft);display:flex;align-items:center;
-  justify-content:center;color:#B6BCC4;font-size:13px;text-align:center;padding:16px;
-  border-bottom:1px solid var(--line);
+/* позиции */
+.goods{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.good{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;background:#fff;transition:.18s}
+.good:hover{box-shadow:0 12px 30px rgba(15,18,20,.08);transform:translateY(-2px)}
+.good__art{
+  aspect-ratio:4/3;background:linear-gradient(160deg,#F7F8FA,#EDEFF2);
+  border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:22px;
 }
-.good__body{padding:20px;display:flex;flex-direction:column;gap:12px;flex:1}
-.good__name{font-weight:700;font-size:16px;flex:1}
-.good__price{font-size:22px;font-weight:900;color:var(--red)}
-.good__price small{font-size:13px;font-weight:600;color:var(--muted)}
+.good__art svg{width:100%;height:100%;color:#5C666F}
+.good__body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.good__name{font-weight:700;font-size:15.5px;flex:1;line-height:1.35}
+.good__gost{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.good__price{font-size:21px;font-weight:900;letter-spacing:-.02em}
+.good__price small{font-size:12.5px;font-weight:600;color:var(--muted)}
 
-/* --- услуги --- */
-.services{background:var(--bg-soft)}
-.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.svc__item{background:#fff;border-radius:6px;padding:30px 26px;border:1px solid var(--line)}
-.svc__item b{display:block;font-size:18px;margin-bottom:10px}
-.svc__item p{color:var(--muted);font-size:15px}
+/* производство */
+.services{background:var(--ink);color:#fff}
+.services .lead{color:#9AA2AA}
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-dk);border:1px solid var(--line-dk)}
+.svc__i{background:var(--steel);padding:28px 24px 30px}
+.svc__i b{display:block;font-size:17px;margin-bottom:9px}
+.svc__i p{color:#9AA2AA;font-size:14.5px}
 
-/* --- этапы --- */
-.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;counter-reset:s}
-.step{position:relative;padding-top:52px}
+/* почему */
+.why{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.why__i{border:1px solid var(--line);border-left:3px solid var(--red);border-radius:var(--r);padding:22px 24px;background:var(--bg-soft)}
+.why__i b{display:block;font-size:16.5px;margin-bottom:6px}
+.why__i span{font-size:14.5px;color:var(--muted)}
+
+/* этапы */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;counter-reset:s}
+.step{position:relative;padding-top:48px;font-size:14.5px;font-weight:700}
 .step:before{
-  counter-increment:s;content:counter(s);position:absolute;top:0;left:0;
-  width:40px;height:40px;border-radius:50%;background:var(--red);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-weight:800;
+  counter-increment:s;content:counter(s);position:absolute;top:0;left:0;width:36px;height:36px;
+  border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:15px;
 }
-.step b{display:block;font-size:15px;font-weight:700}
+.step:after{content:"";position:absolute;top:18px;left:44px;right:-14px;height:1px;background:var(--line)}
+.step:last-child:after{display:none}
 
-/* --- о компании --- */
-.about{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center}
-.about p{margin-bottom:16px;font-size:17px;color:#3A424B}
-.cert{
-  border:1px solid var(--line);border-radius:6px;padding:32px;text-align:center;background:var(--bg-soft);
-}
-.cert b{display:block;font-size:20px;margin:14px 0 6px}
-.cert span{color:var(--muted);font-size:14px}
+/* о заводе */
+.about{display:grid;grid-template-columns:1.15fr .85fr;gap:52px;align-items:center}
+.about p{margin-bottom:15px;font-size:17px;color:#39424B}
+.cert{border:1px solid var(--line);border-radius:var(--r);padding:30px;text-align:center;background:var(--bg-soft)}
+.cert b{display:block;font-size:19px;margin:12px 0 6px}
+.cert span{color:var(--muted);font-size:13.5px}
 
-/* --- заявка --- */
+/* вопросы */
+.faq{max-width:820px}
+.faq details{border-bottom:1px solid var(--line);padding:20px 0}
+.faq summary{font-weight:700;font-size:17.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";color:var(--red);font-weight:800;font-size:22px;line-height:1}
+.faq details[open] summary:after{content:"–"}
+.faq p{color:var(--muted);margin-top:12px;font-size:16px}
+
+/* заявка */
 .cta{background:var(--steel);color:#fff}
-.cta__grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.cta__grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:52px;align-items:center}
 .cta h2{color:#fff}
-.cta p{color:#AEB6BF;margin-top:14px;font-size:17px}
-.form{background:#fff;border-radius:6px;padding:32px;color:var(--ink)}
-.form label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.cta p{color:#A7AFB7;margin-top:14px;font-size:17px}
+.form{background:#fff;border-radius:10px;padding:30px;color:var(--ink)}
+.form__row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
 .form input,.form textarea{
-  width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:4px;
-  font:inherit;margin-bottom:18px;background:#fff;
+  width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:var(--r);
+  font:inherit;margin-bottom:14px;
 }
 .form input:focus,.form textarea:focus{outline:2px solid var(--red);border-color:transparent}
-.form .agree{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin-bottom:20px}
-.form .agree input{width:auto;margin:3px 0 0}
-.form .btn{width:100%;justify-content:center}
-.form__ok{display:none;background:#F0FDF4;border:1px solid #86EFAC;color:#166534;padding:14px;border-radius:4px;font-size:15px}
+.drop{
+  border:1.5px dashed #C6CCD2;border-radius:var(--r);padding:22px;text-align:center;
+  color:var(--muted);font-size:14.5px;cursor:pointer;margin-bottom:14px;transition:.15s;
+}
+.drop:hover,.drop.over{border-color:var(--red);background:var(--red-soft);color:var(--red-dk)}
+.drop b{display:block;color:var(--ink);font-size:15.5px;margin-bottom:4px}
+.drop input{display:none}
+.agree{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.agree input{width:auto;margin:3px 0 0}
+.form__ok{display:none;background:#F0FDF4;border:1px solid #86EFAC;color:#166534;padding:13px;border-radius:var(--r);font-size:15px;margin-bottom:14px}
 
-/* --- контакты --- */
-.contacts{display:grid;grid-template-columns:1fr 1fr;gap:56px}
-.contacts dl{display:grid;grid-template-columns:auto 1fr;gap:14px 28px;font-size:17px}
+/* контакты */
+.contacts{display:grid;grid-template-columns:1fr 1fr;gap:52px}
+.contacts dl{display:grid;grid-template-columns:auto 1fr;gap:13px 26px;font-size:17px;margin-top:26px}
 .contacts dt{color:var(--muted)}
 .contacts dd{font-weight:600}
-.map{
-  background:var(--bg-soft);border:1px solid var(--line);border-radius:6px;min-height:320px;
-  display:flex;align-items:center;justify-content:center;color:#B6BCC4;text-align:center;padding:24px;
+.mapcard{
+  border:1px solid var(--line);border-radius:var(--r);background:var(--bg-soft);padding:28px;
+  display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:300px;
 }
+.mapcard__ph{flex:1;border:1px dashed #C6CCD2;border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:#A3ABB3;font-size:13.5px;text-align:center;padding:16px}
 
-/* --- подвал --- */
-.footer{background:var(--ink);color:#8B939C;padding:56px 0 32px;font-size:15px}
-.footer__top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;padding-bottom:32px;border-bottom:1px solid #2A3037}
-.footer__nav{display:flex;gap:24px;flex-wrap:wrap}
+/* подвал */
+.footer{background:var(--ink);color:#828A92;padding:52px 0 28px;font-size:14.5px}
+.footer__top{display:flex;justify-content:space-between;gap:36px;flex-wrap:wrap;padding-bottom:28px;border-bottom:1px solid var(--line-dk)}
+.footer__nav{display:flex;gap:22px;flex-wrap:wrap}
 .footer a:hover{color:#fff}
-.footer__bottom{padding-top:24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:14px}
-.wa{
-  position:fixed;right:24px;bottom:24px;width:58px;height:58px;border-radius:50%;
-  background:#25D366;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:60;
-}
-.wa svg{width:30px;height:30px;color:#fff}
+.footer__bottom{padding-top:22px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:13.5px}
 
+/* плавающие кнопки */
+.wa{position:fixed;right:22px;bottom:22px;width:56px;height:56px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(0,0,0,.25);z-index:70}
+.wa svg{width:29px;height:29px;color:#fff}
+.bar{display:none}
+
+/* Между 1000 и 1200 в шапку не влезают сразу меню, телефон и кнопка —
+   она вылезала за край и тянула вбок всю страницу. Кнопка уходит первой:
+   телефон для завода важнее, а «прислать чертёж» есть в первом экране. */
+@media (max-width:1300px){
+  .header .wrap{gap:18px}
+  .nav{gap:17px;font-size:14.5px}
+  .header__cta .btn{display:none}
+}
+@media (max-width:1080px){
+  .header__phone span{display:none}
+}
 @media (max-width:1000px){
+  .hero__grid,.about,.cta__grid,.contacts{grid-template-columns:1fr;gap:32px}
   .cats,.goods,.svc{grid-template-columns:repeat(2,1fr)}
+  .why{grid-template-columns:1fr}
   .steps{grid-template-columns:repeat(3,1fr)}
-  .hero__facts{grid-template-columns:repeat(2,1fr)}
-  .about,.cta__grid,.contacts{grid-template-columns:1fr;gap:32px}
+  .step:after{display:none}
+  .hero__strip{grid-template-columns:repeat(2,1fr)}
+  .hero__strip div{border-bottom:1px solid var(--line-dk)}
   .nav{display:none}
-  .nav.open{
-    display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;
-    background:#fff;padding:20px 24px;gap:16px;border-bottom:1px solid var(--line);
-  }
+  .nav.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:#fff;padding:20px 24px;gap:16px;border-bottom:1px solid var(--line)}
+  .header__cta{display:none}
   .burger{display:block}
-  .header__phone{display:none}
+  /* Липкая панель на телефоне: позвонить и отправить чертёж — всегда под
+     большим пальцем. На заводском сайте это две единственные цели. */
+  .bar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;gap:1px;background:var(--line);
+    box-shadow:0 -6px 24px rgba(0,0,0,.12);
+  }
+  .bar a{flex:1;padding:15px;text-align:center;font-weight:700;background:#fff;font-size:15px}
+  .bar a.red{background:var(--red);color:#fff}
+  .wa{bottom:76px;width:50px;height:50px}
+  body{padding-bottom:56px}
 }
 @media (max-width:640px){
-  /* «МЕТАЛЛОКОНСТРУКЦИИ» — 18 букв заглавными: на узком экране слово шире
-     вьюпорта, и страница начинает ездить вбок. Уменьшаем кегль вместо
-     overflow:hidden, чтобы не прятать симптом. */
-  .hero h1{font-size:26px}
-  /* Логотип не даёт кнопке меню поместиться: у него flex-shrink:0, и на
-     узком экране шапка вылезает за край вместе со всей страницей. */
+  .hero h1{font-size:27px}
   .header .wrap{gap:12px}
   .logo{flex-shrink:1;min-width:0}
   .logo__name{font-size:15px}
   .logo__note{display:none}
-  section{padding:56px 0}
+  section{padding:54px 0}
   .cats,.goods,.svc,.steps{grid-template-columns:1fr}
-  .hero{padding-top:56px}
-  .topbar .wrap{gap:12px;font-size:13px}
+  .form__row{grid-template-columns:1fr}
+  .hero{padding-top:44px}
 }
 </style>
 </head>
@@ -209,36 +310,38 @@ section{padding:88px 0}
   <div class="wrap">
     <span>г. Ростов-на-Дону, ул. Монтажная, 6</span>
     <span>пн–пт <b>7:00–16:00</b></span>
-    <span><a href="mailto:rvrs@rambler.ru">rvrs@rambler.ru</a></span>
+    <span class="tb-right"><a href="mailto:rvrs@rambler.ru">rvrs@rambler.ru</a></span>
   </div>
 </div>
 
 <header class="header">
   <div class="wrap">
     <a href="#" class="logo">
-      <svg class="logo__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-        <path d="M8 34c0-10 8-18 18-18h14" stroke="#E4322B" stroke-width="5" stroke-linecap="square"/>
-        <path d="M8 34h10" stroke="#14171A" stroke-width="5" stroke-linecap="square"/>
-        <circle cx="40" cy="16" r="4" fill="#14171A"/>
+      <svg width="42" height="42" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M7 35c0-11 8-19 19-19h13" stroke="#E8362C" stroke-width="5"/>
+        <path d="M7 35h11" stroke="#0F1214" stroke-width="5"/>
+        <circle cx="39" cy="16" r="4.5" fill="#0F1214"/>
       </svg>
       <span>
         <span class="logo__name">Ростовский<br>гибочный завод</span>
-        <span class="logo__note">производство с 2014 года</span>
+        <span class="logo__note">с 2014 года</span>
       </span>
     </a>
 
     <nav class="nav" id="nav">
       <a href="#catalog">Каталог</a>
-      <a href="#services">Услуги</a>
+      <a href="#services">Производство</a>
       <a href="#steps">Как работаем</a>
       <a href="#about">О заводе</a>
+      <a href="#faq">Вопросы</a>
       <a href="#contacts">Контакты</a>
     </nav>
 
-    <a class="header__phone" href="tel:+79287771888">
-      +7 928 777-18-88
-      <span>звоните: пн–пт, 7:00–16:00</span>
-    </a>
+    <div class="header__cta">
+      <a class="header__phone" href="tel:+79287771888">+7 928 777-18-88
+        <span>пн–пт, 7:00–16:00</span></a>
+      <a class="btn" href="#zayavka">Прислать чертёж</a>
+    </div>
 
     <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
   </div>
@@ -246,175 +349,214 @@ section{padding:88px 0}
 
 <section class="hero">
   <div class="wrap">
-    <h1>Анкерные болты<br>и <em>металлоконструкции</em><br>по ГОСТ</h1>
-    <p>
-      Собственное производство в Ростове-на-Дону: лазерная резка с ЧПУ, гибка на
-      листогибочных прессах, сварка и порошковая окраска. Изготовим по вашему
-      чертежу. Доставка по всей России.
-    </p>
-    <div class="hero__btns">
-      <a class="btn" href="#zayavka">Рассчитать по чертежу</a>
-      <a class="btn btn--ghost" href="#catalog">Смотреть каталог</a>
+    <div class="hero__grid">
+      <div>
+        <span class="eyebrow">Собственное производство · Ростов-на-Дону</span>
+        <h1>Анкерные болты и<br><em>металлоконструкции</em><br>по ГОСТ</h1>
+        <p class="hero__sub">
+          Лазерная резка с ЧПУ, гибка на листогибочных прессах, сварка и порошковая
+          окраска. Изготовим по вашему чертежу — от одной детали до партии на объект.
+          Доставка по всей России.
+        </p>
+        <div class="hero__btns">
+          <a class="btn" href="#zayavka">Прислать чертёж на расчёт</a>
+          <a class="btn btn--ghost" href="#catalog">Каталог и цены</a>
+        </div>
+        <div class="hero__trust">
+          <span><b>12 лет</b>работаем с 2014 года</span>
+          <span><b>ГОСТ</b>по стандарту и по чертежу</span>
+          <span><b>2020</b>«Лучшее предприятие отрасли»</span>
+        </div>
+      </div>
+
+      <!-- Крючок: цену на старом сайте можно узнать только звонком. -->
+      <form class="calc" id="calc">
+        <h3>Прикинуть стоимость</h3>
+        <p class="calc__note">По ценам прайса. Точную сумму посчитаем по чертежу.</p>
+
+        <label for="c-item">Что нужно</label>
+        <select id="c-item">
+          <option value="150">Фундаментные болты ГОСТ 24379.1-2012 — от 150 ₽/шт.</option>
+          <option value="357">Фундаментная шпилька ГОСТ 24379.1-2012 — от 357 ₽/шт.</option>
+          <option value="100">Закладные детали стальные МН — от 100 ₽/шт.</option>
+          <option value="35">Скоба накладная ГОСТ 14098-91 — от 35 ₽/шт.</option>
+        </select>
+
+        <label for="c-qty">Количество, шт.</label>
+        <input id="c-qty" type="number" min="1" value="100" inputmode="numeric">
+
+        <label>Покрытие</label>
+        <div class="calc__opts" id="c-cover">
+          <label class="calc__opt on"><input type="radio" name="cov" value="" checked>Без покрытия</label>
+          <label class="calc__opt"><input type="radio" name="cov" value="оцинковка">Оцинковка</label>
+          <label class="calc__opt"><input type="radio" name="cov" value="порошковая окраска">Порошковая окраска</label>
+        </div>
+
+        <div class="calc__out">
+          <b id="c-sum">от 15 000 ₽</b>
+          <span id="c-hint">100 шт. × от 150 ₽</span>
+        </div>
+        <a class="btn btn--wide" href="#zayavka">Уточнить по чертежу</a>
+      </form>
     </div>
 
-    <div class="hero__facts">
-      <div class="hero__fact"><b>12 лет</b><span>работаем с 2014 года</span></div>
-      <div class="hero__fact"><b>Свой парк</b><span>станки ЧПУ, прессы, покраска</span></div>
-      <div class="hero__fact"><b>По России</b><span>доставка в любой регион</span></div>
-      <div class="hero__fact"><b>2020</b><span>«Лучшее предприятие отрасли»</span></div>
+    <div class="hero__strip">
+      <div><b>Свой парк станков</b><span>ЧПУ, прессы, сварка, покраска</span></div>
+      <div><b>Работаем по договору</b><span>счёт и договор для юрлиц</span></div>
+      <div><b>Доставка по России</b><span>отгрузка в любой регион</span></div>
+      <div><b>Расчёт по чертежу</b><span>пришлите эскиз — посчитаем</span></div>
     </div>
   </div>
 </section>
 
 <section id="catalog">
   <div class="wrap">
-    <div class="section-head">
+    <div class="head rise">
       <div>
+        <span class="eyebrow">Каталог</span>
         <h2>Что мы производим</h2>
-        <p>Изготавливаем по ГОСТ и по чертежам заказчика — от одиночных деталей до партий на объект.</p>
+        <p class="lead" style="margin-top:14px">Изготавливаем по ГОСТ и по чертежам заказчика — от одиночных деталей до партий на объект.</p>
       </div>
       <a class="btn btn--dark" href="#zayavka">Запросить прайс</a>
     </div>
 
-    <div class="cats">
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v14M8 20h8M9 6h6M9 9h6M9 12h6"/><path d="M12 16a4 4 0 0 0-4 4"/></svg>
-        <b>Анкерные болты</b><span>фундаментные, по ГОСТ 24379.1-2012</span>
+    <div class="cats rise">
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v13M9 6h6M9 9h6M9 12h6"/><path d="M12 16c-2.2 0-4 1.8-4 4h8c0-2.2-1.8-4-4-4z"/></svg><b>Анкерные болты</b><span>фундаментные, ГОСТ 24379.1-2012</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 4v16M10 4v16M15 4v16M20 4v16M3 8h18M3 16h18"/></svg><b>Блоки анкерных болтов</b><span>в сборе, готовые к монтажу</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 20L12 4l10 16M6 20l6-10 6 10M2 20h20"/></svg><b>Металлоконструкции</b><span>фермы, балки, каркасы</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="8" width="18" height="8"/><path d="M7 8V4M17 16v4M7 12h10"/></svg><b>Закладные детали</b><span>стальные МН, по чертежу</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 15c7 0 8-9 18-9"/><path d="M3 20h18"/></svg><b>Гибка листового металла</b><span>листогибочные прессы</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v8"/><path d="M9 10h6l-3 12z"/><path d="M4 5l3 3M20 5l-3 3"/></svg><b>Резка металла</b><span>лазерные станки с ЧПУ</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg><b>Метизная продукция</b><span>шпильки, скобы, крепёж</span></div>
+      <div class="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5"/><path d="M8 13h8M8 17h5"/></svg><b>Изделия по чертежу</b><span>пришлите эскиз — посчитаем</span></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="head rise">
+      <div>
+        <span class="eyebrow">Прайс</span>
+        <h2>Популярные позиции</h2>
+        <p class="lead" style="margin-top:14px">Цена «от» — окончательная зависит от объёма, марки стали и покрытия.</p>
       </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4v16M9 4v16M14 4v16M19 4v16M2 8h20M2 16h20"/></svg>
-        <b>Блоки анкерных болтов</b><span>в сборе, готовые к монтажу</span>
+      <a class="btn btn--dark" href="#zayavka">Весь каталог с ценами</a>
+    </div>
+
+    <div class="goods rise">
+      <div class="good">
+        <div class="good__art"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M30 12v52"/><path d="M30 64c-9 0-16 7-16 16"/><path d="M22 18h16M22 26h16M22 34h16M22 42h16"/><path d="M70 12v52"/><path d="M70 64c-9 0-16 7-16 16"/><path d="M62 18h16M62 26h16M62 34h16M62 42h16"/><path d="M96 20v46" stroke-dasharray="4 6"/></svg></div>
+        <div class="good__body">
+          <span class="good__gost">ГОСТ 24379.1-2012</span>
+          <span class="good__name">Изготовление фундаментных болтов</span>
+          <span class="good__price">от 150 ₽ <small>/ шт.</small></span>
+          <a class="btn btn--wide" href="#zayavka">Заказать</a>
+        </div>
       </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 20L12 4l9 16M6 20l6-11 6 11M3 20h18"/></svg>
-        <b>Металлоконструкции</b><span>фермы, балки, каркасы</span>
+      <div class="good">
+        <div class="good__art"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="18" y="30" width="84" height="14"/><path d="M30 44v18M52 44v18M74 44v18M96 44v18"/><path d="M26 30V18M60 30V18M94 30V18"/><path d="M22 62h16M44 62h16M66 62h16M88 62h16"/></svg></div>
+        <div class="good__body">
+          <span class="good__gost">Стальные МН</span>
+          <span class="good__name">Изготовление закладных деталей</span>
+          <span class="good__price">от 100 ₽ <small>/ шт.</small></span>
+          <a class="btn btn--wide" href="#zayavka">Заказать</a>
+        </div>
       </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="10"/><path d="M7 7V4M17 17v3M7 12h10"/></svg>
-        <b>Закладные детали</b><span>стальные МН, по чертежу</span>
+      <div class="good">
+        <div class="good__art"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M16 45h88"/><path d="M20 38v14M28 38v14M36 38v14M84 38v14M92 38v14M100 38v14"/><path d="M46 40v10M58 40v10M70 40v10" stroke-dasharray="3 5"/></svg></div>
+        <div class="good__body">
+          <span class="good__gost">ГОСТ 24379.1-2012</span>
+          <span class="good__name">Фундаментная шпилька</span>
+          <span class="good__price">от 357 ₽ <small>/ шт.</small></span>
+          <a class="btn btn--wide" href="#zayavka">Заказать</a>
+        </div>
       </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 16c6 0 8-10 18-10"/><path d="M3 20h18"/></svg>
-        <b>Гибка листового металла</b><span>листогибочные прессы</span>
-      </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v9"/><path d="M9 11h6l-3 11z"/><path d="M4 6l3 2M20 6l-3 2"/></svg>
-        <b>Резка металла</b><span>лазерные станки с ЧПУ</span>
-      </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>
-        <b>Другие товары</b><span>метизная продукция</span>
-      </div>
-      <div class="cat">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 18h16M6 18V9l6-5 6 5v9"/><path d="M10 18v-5h4v5"/></svg>
-        <b>Изделия по чертежу</b><span>пришлите эскиз — посчитаем</span>
+      <div class="good">
+        <div class="good__art"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M24 66V34c0-6 5-11 11-11h50c6 0 11 5 11 11v32"/><path d="M24 66h16M80 66h16"/><path d="M42 34h36" stroke-dasharray="4 6"/></svg></div>
+        <div class="good__body">
+          <span class="good__gost">ГОСТ 14098-91</span>
+          <span class="good__name">Скоба накладная</span>
+          <span class="good__price">от 35 ₽ <small>/ шт.</small></span>
+          <a class="btn btn--wide" href="#zayavka">Заказать</a>
+        </div>
       </div>
     </div>
+    <p style="margin-top:18px;color:var(--muted);font-size:14px">[Фотографии изделий заменим на настоящие — из каталога клиента.]</p>
   </div>
 </section>
 
 <section class="services" id="services">
   <div class="wrap">
-    <div class="section-head">
+    <div class="head rise">
       <div>
-        <h2>Производство</h2>
-        <p>
+        <span class="eyebrow">Производство</span>
+        <h2>Всё делаем у себя</h2>
+        <p class="lead" style="margin-top:14px">
           Лазерные станки с ЧПУ, листогибочные прессы, сварочные аппараты и камеры
           полимерного напыления от ведущих мировых производителей.
         </p>
       </div>
     </div>
-    <div class="svc">
-      <div class="svc__item"><b>Лазерная резка</b><p>Раскрой листа на станках с ЧПУ — точная геометрия, чистый рез, повторяемость в партии.</p></div>
-      <div class="svc__item"><b>Гибка</b><p>Листогибочные прессы: гнутые профили и детали по вашим размерам.</p></div>
-      <div class="svc__item"><b>Сварка</b><p>Сборка конструкций и блоков анкерных болтов в готовые узлы.</p></div>
-      <div class="svc__item"><b>Порошковая окраска</b><p>Камеры полимерного напыления — защита металла и цвет по каталогу RAL.</p></div>
+    <div class="svc rise">
+      <div class="svc__i"><b>Лазерная резка</b><p>Раскрой листа на станках с ЧПУ: точная геометрия, чистый рез, повторяемость в партии.</p></div>
+      <div class="svc__i"><b>Гибка</b><p>Листогибочные прессы: гнутые профили и детали по вашим размерам.</p></div>
+      <div class="svc__i"><b>Сварка</b><p>Сборка конструкций и блоков анкерных болтов в готовые узлы.</p></div>
+      <div class="svc__i"><b>Порошковая окраска</b><p>Камеры полимерного напыления: защита металла и цвет по каталогу RAL.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Популярные позиции</h2>
-        <p>Цены — от, окончательная зависит от объёма, марки стали и покрытия.</p>
-      </div>
-      <a class="btn btn--dark" href="#zayavka">Весь каталог с ценами</a>
-    </div>
-    <div class="goods">
-      <div class="good">
-        <div class="good__ph">[фото: фундаментные болты]</div>
-        <div class="good__body">
-          <span class="good__name">Изготовление фундаментных болтов ГОСТ 24379.1-2012</span>
-          <span class="good__price">от 150 ₽ <small>/ шт.</small></span>
-          <a class="btn" href="#zayavka">Заказать</a>
-        </div>
-      </div>
-      <div class="good">
-        <div class="good__ph">[фото: закладные детали]</div>
-        <div class="good__body">
-          <span class="good__name">Изготовление закладных деталей стальных МН</span>
-          <span class="good__price">от 100 ₽ <small>/ шт.</small></span>
-          <a class="btn" href="#zayavka">Заказать</a>
-        </div>
-      </div>
-      <div class="good">
-        <div class="good__ph">[фото: фундаментная шпилька]</div>
-        <div class="good__body">
-          <span class="good__name">Фундаментная шпилька ГОСТ 24379.1-2012</span>
-          <span class="good__price">от 357 ₽ <small>/ шт.</small></span>
-          <a class="btn" href="#zayavka">Заказать</a>
-        </div>
-      </div>
-      <div class="good">
-        <div class="good__ph">[фото: скоба накладная]</div>
-        <div class="good__body">
-          <span class="good__name">Скоба накладная ГОСТ 14098-91</span>
-          <span class="good__price">от 35 ₽ <small>/ шт.</small></span>
-          <a class="btn" href="#zayavka">Заказать</a>
-        </div>
-      </div>
+    <div class="head rise"><div><span class="eyebrow">Почему к нам</span><h2>Что получает заказчик</h2></div></div>
+    <div class="why rise">
+      <div class="why__i"><b>Завод, а не посредник</b><span>Режем, гнём, варим и красим сами — без наценки перекупщика и без «ждём от поставщика».</span></div>
+      <div class="why__i"><b>Работа по документам</b><span>Счёт, договор, отгрузочные — как в вашей же схеме заказа.</span></div>
+      <div class="why__i"><b>По ГОСТ и по чертежу</b><span>Стандартные позиции и нестандарт по вашему эскизу.</span></div>
+      <div class="why__i"><b>Доставка по России</b><span>Отгружаем в любой регион.</span></div>
+      <div class="why__i"><b>12 лет и награда отрасли</b><span>С 2014 года, «Лучшее предприятие отрасли — 2020».</span></div>
+      <div class="why__i"><b>[Сроки изготовления]</b><span>[Уточнить у клиента: типовой срок по партии и по нестандарту.]</span></div>
     </div>
   </div>
 </section>
 
-<section id="steps" class="services">
+<section id="steps" style="background:var(--bg-soft)">
   <div class="wrap">
-    <div class="section-head"><div><h2>Как проходит заказ</h2></div></div>
-    <div class="steps">
-      <div class="step"><b>Заявка с чертежом</b></div>
-      <div class="step"><b>Согласование работ</b></div>
-      <div class="step"><b>Выставление счёта</b></div>
-      <div class="step"><b>Заключение договора</b></div>
-      <div class="step"><b>Изготовление</b></div>
-      <div class="step"><b>Доставка и отгрузка</b></div>
+    <div class="head rise"><div><span class="eyebrow">Порядок работы</span><h2>Как проходит заказ</h2></div></div>
+    <div class="steps rise">
+      <div class="step">Заявка с чертежом</div>
+      <div class="step">Согласование работ</div>
+      <div class="step">Выставление счёта</div>
+      <div class="step">Заключение договора</div>
+      <div class="step">Изготовление</div>
+      <div class="step">Доставка и отгрузка</div>
     </div>
   </div>
 </section>
 
 <section id="about">
-  <div class="wrap about">
+  <div class="wrap about rise">
     <div>
-      <h2>О заводе</h2>
-      <p style="margin-top:24px">
-        ООО «Ростовский гибочный завод» с 2014 года занимается производством и
-        продажей металлоконструкций, анкерных болтов и метизной продукции.
+      <span class="eyebrow">О заводе</span>
+      <h2>Ростовский гибочный завод</h2>
+      <p style="margin-top:22px">
+        ООО «Ростовский гибочный завод» с 2014 года занимается производством и продажей
+        металлоконструкций, анкерных болтов и метизной продукции.
       </p>
       <p>
         Для изготовления используются лазерные станки с ЧПУ, листогибочные прессы,
         сварочные аппараты и камеры для нанесения полимерного напыления от ведущих
-        мировых производителей. Компания предлагает услуги по гибке, резке и
-        порошковой окраске металла.
+        мировых производителей. Компания предлагает услуги по гибке, резке и порошковой
+        окраске металла.
       </p>
       <p>Доставка производится по всей России.</p>
-      <p style="color:var(--muted);font-size:15px">
-        [Здесь добавим: площадь производства, число сотрудников, крупные объекты —
-        со слов клиента.]
+      <p style="color:var(--muted);font-size:14.5px">
+        [Добавим: площадь производства, число сотрудников, крупные объекты — со слов клиента.]
       </p>
     </div>
     <div class="cert">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.4" style="width:56px;height:56px;margin:0 auto">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.3" style="width:54px;height:54px;margin:0 auto">
         <circle cx="12" cy="9" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/>
       </svg>
       <b>Лучшее предприятие<br>отрасли — 2020</b>
@@ -423,49 +565,77 @@ section{padding:88px 0}
   </div>
 </section>
 
+<section id="faq" style="background:var(--bg-soft)">
+  <div class="wrap">
+    <div class="head rise"><div><span class="eyebrow">Вопросы</span><h2>Коротко о главном</h2></div></div>
+    <div class="faq rise">
+      <details open><summary>Изготовите по нашему чертежу?</summary>
+        <p>Да. Заказ и начинается с чертежа: вы присылаете, мы согласовываем работы и выставляем счёт.</p></details>
+      <details><summary>Работаете с юридическими лицами?</summary>
+        <p>Да, по договору и счёту — это штатный порядок: счёт, договор, изготовление, отгрузка.</p></details>
+      <details><summary>Доставляете в другой регион?</summary>
+        <p>Доставка производится по всей России. [Транспортные компании и условия — уточнить у клиента.]</p></details>
+      <details><summary>Какое покрытие можно нанести?</summary>
+        <p>Порошковая окраска в собственных камерах полимерного напыления, цвет по каталогу RAL. [Оцинковка — уточнить.]</p></details>
+      <details><summary>Сколько ждать заказ?</summary>
+        <p>[Срок изготовления — уточнить у клиента: типовые позиции и нестандарт.]</p></details>
+    </div>
+  </div>
+</section>
+
 <section class="cta" id="zayavka">
   <div class="wrap cta__grid">
-    <div>
+    <div class="rise">
+      <span class="eyebrow">Заявка</span>
       <h2>Пришлите чертёж — посчитаем</h2>
       <p>
-        Ответим в рабочее время: пн–пт с 7:00 до 16:00. Если удобнее голосом —
-        звоните на <a href="tel:+79287771888" style="color:#fff;text-decoration:underline">+7 928 777-18-88</a>
+        Ответим в рабочее время: пн–пт с 7:00 до 16:00. Если удобнее голосом — звоните на
+        <a href="tel:+79287771888" style="color:#fff;text-decoration:underline">+7 928 777-18-88</a>
         или пишите в WhatsApp.
       </p>
       <p style="font-size:15px">[Срок ответа и минимальный объём заказа — уточнить у клиента.]</p>
     </div>
 
-    <form class="form" id="form">
+    <form class="form rise" id="form">
       <div class="form__ok" id="ok">Заявка отправлена. Перезвоним в рабочее время.</div>
-      <label for="n">Как к вам обращаться</label>
-      <input id="n" name="name" required placeholder="Имя">
-      <label for="p">Телефон</label>
-      <input id="p" name="phone" type="tel" required placeholder="+7 ___ ___-__-__">
+
+      <label class="drop" id="drop">
+        <input type="file" id="file" multiple>
+        <b id="drop-title">Перетащите чертёж сюда</b>
+        <span id="drop-sub">или нажмите, чтобы выбрать файл — PDF, DWG, JPG</span>
+      </label>
+
+      <div class="form__row">
+        <div><label for="n">Как к вам обращаться</label><input id="n" required placeholder="Имя"></div>
+        <div><label for="p">Телефон</label><input id="p" type="tel" required placeholder="+7 ___ ___-__-__"></div>
+      </div>
       <label for="t">Что нужно изготовить</label>
-      <textarea id="t" name="text" rows="3" placeholder="Например: анкерные болты М24×800, 120 шт."></textarea>
-      <label class="agree"><input type="checkbox" required>
-        Согласен на обработку персональных данных</label>
-      <button class="btn" type="submit">Отправить заявку</button>
+      <textarea id="t" rows="3" placeholder="Например: анкерные болты М24×800, 120 шт., с покрытием"></textarea>
+      <label class="agree"><input type="checkbox" required> Согласен на обработку персональных данных</label>
+      <button class="btn btn--wide" type="submit">Отправить заявку</button>
     </form>
   </div>
 </section>
 
 <section id="contacts">
-  <div class="wrap contacts">
+  <div class="wrap contacts rise">
     <div>
-      <h2>Контакты</h2>
-      <dl style="margin-top:28px">
+      <span class="eyebrow">Контакты</span>
+      <h2>Приезжайте или звоните</h2>
+      <dl>
         <dt>Адрес</dt><dd>г. Ростов-на-Дону, ул. Монтажная, 6, офис 19</dd>
         <dt>Телефоны</dt><dd>
           <a href="tel:+79287771888">+7 928 777-18-88</a><br>
-          <a href="tel:+79081709954">+7 908 170-99-54</a>
-        </dd>
+          <a href="tel:+79081709954">+7 908 170-99-54</a></dd>
         <dt>Почта</dt><dd><a href="mailto:rvrs@rambler.ru">rvrs@rambler.ru</a></dd>
         <dt>Режим</dt><dd>пн–пт, 7:00–16:00</dd>
         <dt>Реквизиты</dt><dd style="font-weight:400;color:var(--muted)">[ИНН, ОГРН, расчётный счёт — со слов клиента]</dd>
       </dl>
     </div>
-    <div class="map">[карта проезда: Монтажная, 6 — поставим Яндекс.Карту]</div>
+    <div class="mapcard">
+      <div class="mapcard__ph">[карта проезда: ул. Монтажная, 6 — поставим Яндекс.Карту]</div>
+      <a class="btn btn--dark btn--wide" href="https://yandex.ru/maps/?text=Ростов-на-Дону, улица Монтажная, 6">Построить маршрут</a>
+    </div>
   </div>
 </section>
 
@@ -473,13 +643,13 @@ section{padding:88px 0}
   <div class="wrap">
     <div class="footer__top">
       <div>
-        <div style="color:#fff;font-weight:800;font-size:18px">Ростовский гибочный завод</div>
-        <div style="margin-top:8px">Анкерные болты, закладные детали, металлоконструкции</div>
+        <div style="color:#fff;font-weight:800;font-size:17px">Ростовский гибочный завод</div>
+        <div style="margin-top:7px">Анкерные болты, закладные детали, металлоконструкции</div>
       </div>
       <nav class="footer__nav">
-        <a href="#catalog">Каталог</a><a href="#services">Услуги</a>
+        <a href="#catalog">Каталог</a><a href="#services">Производство</a>
         <a href="#steps">Как работаем</a><a href="#about">О заводе</a>
-        <a href="#contacts">Контакты</a>
+        <a href="#faq">Вопросы</a><a href="#contacts">Контакты</a>
       </nav>
     </div>
     <div class="footer__bottom">
@@ -493,22 +663,64 @@ section{padding:88px 0}
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7 1-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2.1-.1 0-.3 0-.4l-.7-1.6c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3A3 3 0 0 0 7 10.7a5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c2.1.8 2.1.6 2.5.5a2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2c0-.1-.2-.2-.4-.3z"/></svg>
 </a>
 
-<script>
-  // Мобильное меню
-  document.getElementById("burger").onclick = () =>
-    document.getElementById("nav").classList.toggle("open");
-  document.querySelectorAll("#nav a").forEach(a =>
-    a.onclick = () => document.getElementById("nav").classList.remove("open"));
+<div class="bar">
+  <a href="tel:+79287771888">Позвонить</a>
+  <a class="red" href="#zayavka">Прислать чертёж</a>
+</div>
 
-  // Форма — заглушка: приёмник заявок на сервере ещё не готов (см. СХЕМА.md).
-  // Ничего никуда не уходит, просто показываем, как это будет выглядеть.
-  document.getElementById("form").onsubmit = e => {
-    e.preventDefault();
-    document.getElementById("ok").style.display = "block";
-    e.target.querySelectorAll("input,textarea").forEach(i => {
-      if (i.type !== "checkbox") i.value = "";
-    });
-  };
+<script>
+// Меню
+const nav = document.getElementById("nav");
+document.getElementById("burger").onclick = () => nav.classList.toggle("open");
+nav.querySelectorAll("a").forEach(a => a.onclick = () => nav.classList.remove("open"));
+
+// Калькулятор. Считает по ценам «от» из их прайса и ничего не выдумывает:
+// коэффициентов за покрытие и объём мы не знаем, поэтому покрытие уходит в
+// текст заявки, а не в сумму.
+const item = document.getElementById("c-item"), qty = document.getElementById("c-qty");
+const sum = document.getElementById("c-sum"), hint = document.getElementById("c-hint");
+function recalc() {
+  const price = +item.value, n = Math.max(1, +qty.value || 1);
+  sum.textContent = "от " + (price * n).toLocaleString("ru-RU") + " ₽";
+  const cov = document.querySelector('input[name=cov]:checked').value;
+  hint.textContent = n.toLocaleString("ru-RU") + " шт. × от " + price + " ₽" + (cov ? " · " + cov + " по прайсу" : "");
+}
+item.onchange = qty.oninput = recalc;
+document.querySelectorAll("#c-cover .calc__opt").forEach(l => l.onclick = () => {
+  document.querySelectorAll("#c-cover .calc__opt").forEach(x => x.classList.remove("on"));
+  l.classList.add("on"); setTimeout(recalc);
+});
+recalc();
+
+// Чертёж перетаскиванием
+const drop = document.getElementById("drop"), file = document.getElementById("file");
+["dragenter","dragover"].forEach(e => drop.addEventListener(e, ev => {
+  ev.preventDefault(); drop.classList.add("over");
+}));
+["dragleave","drop"].forEach(e => drop.addEventListener(e, ev => {
+  ev.preventDefault(); drop.classList.remove("over");
+}));
+drop.addEventListener("drop", ev => { file.files = ev.dataTransfer.files; showFiles(); });
+file.onchange = showFiles;
+function showFiles() {
+  const n = file.files.length;
+  if (!n) return;
+  document.getElementById("drop-title").textContent = n === 1 ? file.files[0].name : "Файлов: " + n;
+  document.getElementById("drop-sub").textContent = "нажмите, чтобы заменить";
+}
+
+// Форма — заглушка: приёмник заявок на сервере владельца ещё не написан.
+document.getElementById("form").onsubmit = e => {
+  e.preventDefault();
+  document.getElementById("ok").style.display = "block";
+  e.target.querySelectorAll("input,textarea").forEach(i => { if (i.type !== "checkbox") i.value = ""; });
+};
+
+// Появление секций при прокрутке
+const io = new IntersectionObserver(es => es.forEach(x => {
+  if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); }
+}), {rootMargin: "-40px"});
+document.querySelectorAll(".rise").forEach(el => io.observe(el));
 </script>
 </body>
 </html>
