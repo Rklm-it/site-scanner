@@ -576,6 +576,7 @@ class DumpJob:
     pages: int = 0
     assets: int = 0
     bytes: int = 0
+    statuses: dict[int, int] = field(default_factory=dict)
     archive: str | None = None
     archive_bytes: int = 0
     stopped_by: str | None = None
@@ -589,6 +590,7 @@ class DumpJob:
         return {
             "id": self.id, "domain": self.domain, "status": self.status,
             "pages": self.pages, "assets": self.assets, "bytes": self.bytes,
+            "statuses": {str(k): v for k, v in self.statuses.items()},
             "archive": self.archive, "archive_bytes": self.archive_bytes,
             "stopped_by": self.stopped_by, "title": self.title,
             "robots": self.robots,
@@ -605,6 +607,10 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
     try:
         def on_progress(st: mirror.MirrorStats) -> None:
             job.pages, job.assets, job.bytes = st.pages, st.assets, st.bytes
+            # Ответы сайта показываем в ходе выгрузки: «страниц 0, файлов 0»
+            # само по себе не отличает медленный сайт от закрытого антиботом,
+            # и на rgz61.ru это стоило часа разбирательств.
+            job.statuses = dict(st.statuses)
 
         stats = mirror.run(
             job.domain, work,
@@ -615,6 +621,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             on_progress=on_progress,
         )
         job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes
+        job.statuses = dict(stats.statuses)
         job.stopped_by = stats.stopped_by
         job.errors = stats.errors
         # Заголовок главной показываем в итоге: домен легко набрать с опечаткой
@@ -624,9 +631,21 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         if stats.pages_index:
             job.title = stats.pages_index[0].get("title", "")
         if not stats.pages:
+            # Причину называем конкретную: раньше на все случаи было одно
+            # сообщение, и robots путали с антиботом и с лежащим сайтом.
+            if any(int(code) >= 400 for code in stats.statuses):
+                codes = ", ".join(f"{c}×{n}" for c, n in sorted(stats.statuses.items()))
+                raise RuntimeError(
+                    f"сайт отвечает отказом на все адреса ({codes}) — это не "
+                    f"robots.txt, а защита сайта; снять его обходом не выйдет"
+                )
+            if stats.errors:
+                raise RuntimeError(
+                    f"сайт не отвечает: {stats.errors[0]}"
+                )
             raise RuntimeError(
-                "не удалось скачать ни одной страницы — сайт недоступен "
-                "или закрыт в robots.txt (снимите галочку)"
+                "не удалось скачать ни одной страницы — скорее всего закрыт "
+                "в robots.txt (снимите галочку и повторите)"
             )
         name = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}.zip"
         job.archive_bytes = mirror.pack(work, DUMPS_DIR / name)

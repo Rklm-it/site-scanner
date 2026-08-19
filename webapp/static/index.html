@@ -750,6 +750,16 @@ function renderDumps() {
   renderDumpProgress();
 }
 
+// Ответы сайта в строке прогресса: без них выгрузка, которой сайт отдаёт
+// одни отказы, десять минут выглядит как зависшая — «страниц 0, файлов 0».
+function dumpCodes(j) {
+  const codes = Object.entries(j.statuses || {});
+  if (!codes.length) return "";
+  const shown = codes.map(([code, n]) => `${code}×${n}`).join(", ");
+  const bad = codes.every(([code]) => Number(code) >= 400);
+  return ` · ответы: ${escHtml(shown)}${bad ? " — сайт отказывает, выгрузка будет пустой" : ""}`;
+}
+
 function renderDumpProgress() {
   const box = $("dmp-progress");
   if (!box || !DUMP_JOB) return;
@@ -757,7 +767,7 @@ function renderDumpProgress() {
   if (j.status === "running") {
     box.innerHTML = `<div class="progress"><i style="width:${Math.min(95, j.pages)}%"></i></div>
       <div class="hint">Качаю ${escHtml(j.domain)}: страниц ${j.pages}, файлов ${j.assets},
-        ${fmtMB(j.bytes)} · ${j.elapsed}с</div>`;
+        ${fmtMB(j.bytes)} · ${j.elapsed}с${dumpCodes(j)}</div>`;
   } else if (j.status === "error") {
     box.innerHTML = `<div class="warn bad">Не вышло: ${escHtml(j.error || "")}</div>`;
   } else {

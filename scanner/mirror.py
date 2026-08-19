@@ -137,6 +137,10 @@ class MirrorStats:
     assets: int = 0
     bytes: int = 0
     skipped: int = 0
+    # Сколько каких ответов пришло: {503: 400} сразу объясняет пустую выгрузку,
+    # а без этого «страниц 0» одинаково выглядит и при заглушке антибота, и
+    # при недоступном сайте — час уходит на выяснение, что именно.
+    statuses: dict[int, int] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
     pages_index: list[dict] = field(default_factory=list)
     archive: str | None = None
@@ -272,6 +276,7 @@ def _pick_root(domain: str, session: requests.Session, timeout: float) -> str:
     вообще — с жёстко зашитым https выгрузка такого сайта вернула бы ноль
     страниц, а причина была бы неочевидна.
     """
+    answered: str | None = None      # схема, которая хоть как-то ответила
     for scheme in ("https", "http"):
         url = f"{scheme}://{domain}/"
         try:
@@ -279,6 +284,7 @@ def _pick_root(domain: str, session: requests.Session, timeout: float) -> str:
                                 allow_redirects=True)
             if resp.status_code < 400:
                 return resp.url
+            answered = answered or resp.url
         except requests.RequestException:
             continue
         # HEAD поддерживают не все старые сайты — пробуем обычным запросом
@@ -288,9 +294,14 @@ def _pick_root(domain: str, session: requests.Session, timeout: float) -> str:
             resp.close()
             if resp.status_code < 400:
                 return resp.url
+            answered = answered or resp.url
         except requests.RequestException:
             continue
-    return f"https://{domain}/"
+    # Никто не ответил успехом. Берём схему, которая хотя бы отозвалась: сайт
+    # за антиботом отдаёт 503 по http и не слушает https, и с жёстким https
+    # выгрузка заканчивалась SSL-ошибкой вместо честного «сайт отвечает
+    # отказом» — причина видна совсем не та.
+    return answered or f"https://{domain}/"
 
 
 def run(
@@ -380,12 +391,20 @@ def run(
             got = _get(url, timeout=timeout, max_bytes=max_file_bytes, session=session)
         except requests.RequestException as exc:
             stats.errors.append(f"{url}: {type(exc).__name__}")
+            # Прогресс сообщаем и на неудаче: иначе выгрузка сайта, который
+            # отвечает одними отказами, выглядит как зависшая — «страниц 0,
+            # файлов 0» и ни строчки движения. Так и было на rgz61.ru.
+            if on_progress:
+                on_progress(stats)
             continue
         if not got:
             continue
         status, ctype, raw, final_url = got
+        stats.statuses[status] = stats.statuses.get(status, 0) + 1
         if status >= 400 or "html" not in ctype:
             stats.skipped += 1
+            if on_progress:
+                on_progress(stats)
             continue
 
         # Перекодируем в UTF-8 сразу: windows-1251 в репозитории читается как
@@ -458,12 +477,17 @@ def run(
             got = _get(url, timeout=timeout, max_bytes=max_file_bytes, session=session)
         except requests.RequestException as exc:
             stats.errors.append(f"{url}: {type(exc).__name__}")
+            if on_progress:
+                on_progress(stats)
             continue
         if not got:
             continue
         status, ctype, raw, final_url = got
+        stats.statuses[status] = stats.statuses.get(status, 0) + 1
         if status >= 400 or not raw:
             stats.skipped += 1
+            if on_progress:
+                on_progress(stats)
             continue
         rel = _local_path(final_url)
         save(rel, raw)
@@ -495,8 +519,9 @@ def run(
         }, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    log.info("Выгрузка %s: страниц %d, файлов %d, %.1f МБ (%s)",
-             domain, stats.pages, stats.assets, stats.bytes / 1048576, stats.stopped_by)
+    log.info("Выгрузка %s: страниц %d, файлов %d, %.1f МБ, ответы %s (%s)",
+             domain, stats.pages, stats.assets, stats.bytes / 1048576,
+             stats.statuses or "нет", stats.stopped_by)
     return stats
 
 

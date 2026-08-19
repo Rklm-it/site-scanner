@@ -257,3 +257,64 @@ def test_domen_ochischaetsya():
     assert mirror._same_site("https://site.ru/a", "www.site.ru")
     assert not mirror._same_site("https://shop.site.ru/a", "site.ru")
     assert not mirror._same_site("https://site.ru.evil.com/a", "site.ru")
+
+
+class _OtkazHandler(http.server.BaseHTTPRequestHandler):
+    """Сайт, закрытый защитой платформы: 503 со страницей проверки на всё.
+
+    Так ведёт себя `rgz61.ru` на конструкторе «Пульс цен» — и с сервера, и с
+    машины владельца выгрузка получает не сайт, а заглушку.
+    """
+
+    def log_message(self, *a):
+        pass
+
+    def do_GET(self):  # noqa: N802
+        body = ("<html><head><meta charset='utf-8'>"
+                "<title>Проверка безопасности</title></head><body>стоп</body></html>"
+                ).encode("utf-8")
+        self.send_response(503)
+        self.send_header("Content-Type", "text/html")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    do_HEAD = do_GET
+
+
+@pytest.fixture()
+def otkaz_site():
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _OtkazHandler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    yield f"127.0.0.1:{srv.server_address[1]}"
+    srv.shutdown()
+
+
+def test_statusy_otvetov_popadayut_v_statistiku(site, tmp_path):
+    """Счётчик ответов — единственное, что отличает медленный сайт от
+    закрытого: «страниц 0» одинаково выглядит в обоих случаях."""
+    stats = _run(site, tmp_path / "d")
+    assert stats.statuses[200] >= stats.pages
+
+
+def test_progress_soobshchaetsya_i_pri_otkaze(otkaz_site, tmp_path):
+    """Выгрузка сайта, отвечающего одними отказами, десять минут выглядела
+    зависшей: on_progress звали только после удачно скачанной страницы, и в
+    интерфейсе висело «страниц 0, файлов 0» без единого движения."""
+    seen: list[tuple[int, dict]] = []
+    stats = _run(otkaz_site, tmp_path / "d", use_sitemap=False,
+                 on_progress=lambda st: seen.append((st.pages, dict(st.statuses))))
+
+    assert stats.pages == 0
+    assert seen, "о неудачных ответах прогресс тоже обязан сообщать"
+    assert stats.statuses == {503: 1}
+
+
+def test_shema_beryotsya_ta_chto_otvetila(otkaz_site):
+    """Сайт за защитой отвечает 503 по http и не слушает https. Раньше в
+    таком случае корень откатывался на https, и выгрузка падала с SSL-ошибкой
+    вместо честного «сайт отвечает отказом» — причина видна совсем не та."""
+    import requests
+
+    root = mirror._pick_root(otkaz_site, requests.Session(), timeout=5)
+    assert root.startswith("http://")
