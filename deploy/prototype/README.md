@@ -100,6 +100,25 @@ grep -rniE 'lovable|gpteng|gptengineer' /root/prototypes-static/<имя> \
 
 ```bash
 cd /root/site-scanner/deploy/prototype
+docker compose up -d --force-recreate caddy
+docker compose exec caddy grep -c <домен> /etc/caddy/Caddyfile   # проверка: 1
+```
+
+**Почему пересоздание, а не `reload`.** В контейнер примонтирован один файл
+(`./Caddyfile:/etc/caddy/Caddyfile`), а `git pull` не правит файл на месте: он
+пишет новый и переименовывает. Inode меняется, bind-mount продолжает
+указывать на старый — контейнер видит **прежний** конфиг. `reload` при этом
+честно отвечает `config is unchanged` и выглядит как успех, а домена в
+конфиге нет: браузер получает `tlsv1 alert internal error`, потому что Caddy
+не знает имени и сертификат не запрашивает. На rgz61 это стоило получаса.
+
+`restart` не помогает — нужен именно `--force-recreate`. Простой пара секунд,
+остальные прототипы переживают.
+
+Если правите Caddyfile прямо на сервере (файл меняется на месте, inode тот
+же), достаточно обычной пары:
+
+```bash
 docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
 ```
