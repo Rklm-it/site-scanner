@@ -52,7 +52,7 @@ projekt-review.nexus-flow.ru {
 # для него собрано вручную из скриншотов и карточки лида: сайт клиента стоит
 # на конструкторе «Пульс цен» и выгрузке не поддаётся — см.
 # clients/rgz61.ru/README.md.
-rgz-review.nexus-flow.ru {
+rgz61.nexus-flow.ru {
 	encode gzip
 
 	header {

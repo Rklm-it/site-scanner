@@ -78,7 +78,7 @@ cd /root/site-scanner/deploy/prototype
 ./sync.sh rgz61 https://github.com/Rklm-it/rostov-steel-forge.git
 ```
 
-Блок `rgz-review.nexus-flow.ru` в `Caddyfile` уже есть — нужна только
+Блок `rgz61.nexus-flow.ru` в `Caddyfile` уже есть — нужна только
 A-запись поддомена на IP сервера прототипов.
 
 ## Домен: whois и DNS на 19.08.2026
