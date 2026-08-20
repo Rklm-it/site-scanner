@@ -25,7 +25,11 @@
 -->
 <style>
 :root{
-  --red:#E8362C; --red-dk:#C4241D; --red-soft:rgba(232,54,44,.1);
+  /* Акцент «чертёжный» синий: красного выходило слишком много, страница
+     читалась как распродажа, а не как завод. Светлый тон — для тёмных
+     секций, на графите основной почти не читается. */
+  --red:#1D5EA8; --red-dk:#17497F; --red-soft:rgba(29,94,168,.1);
+  --red-light:#5B9BE0;
   --ink:#0F1214; --steel:#171B1F; --steel-2:#22282E;
   --muted:#69737D; --line:#E4E7EA; --line-dk:rgba(255,255,255,.1);
   --bg:#fff; --bg-soft:#F5F6F8;
@@ -97,7 +101,7 @@ h2{font-size:clamp(30px,3.6vw,46px)}
 }
 .hero__grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:start}
 .hero h1{font-size:clamp(32px,4.9vw,58px);font-weight:900;text-transform:uppercase;overflow-wrap:break-word}
-.hero h1 em{color:var(--red);font-style:normal}
+.hero h1 em{color:var(--red-light);font-style:normal}
 .hero__sub{margin-top:22px;font-size:18px;color:#B9C1C9;max-width:52ch}
 .hero__btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
 .hero__trust{display:flex;gap:26px;flex-wrap:wrap;margin-top:34px;font-size:14px;color:#8D959D}
@@ -166,7 +170,7 @@ section{padding:84px 0}
 .good__body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
 .good__name{font-weight:700;font-size:15.5px;flex:1;line-height:1.35}
 .good__gost{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em}
-.good__price{font-size:21px;font-weight:900;letter-spacing:-.02em}
+.good__price{font-size:21px;font-weight:900;letter-spacing:-.02em;color:var(--ink)}
 .good__price small{font-size:12.5px;font-weight:600;color:var(--muted)}
 
 /* производство */
