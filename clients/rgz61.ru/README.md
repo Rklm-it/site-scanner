@@ -57,6 +57,30 @@ prettier. Прогнан `bunx prettier --write`, дальше держать е
 страницу лучше не пересобирать промптами: он перепишет файл целиком и
 изменения разойдутся.
 
+### Выложить превью на сервер прототипов
+
+Сборка идёт **вне сервера** (на VPS прототипов 961 МБ и OOM), результат лежит
+в ветке `deploy` того же репозитория. Пересобрать её после правок:
+
+```bash
+cd /workspace/rostov-steel-forge
+NITRO_PRESET=node-server bun run build          # cloudflare-пресет не годится
+node .output/server/index.mjs &                  # снять готовую разметку
+curl -s http://127.0.0.1:3000/ > /tmp/index.html
+# следы Lovable: favicon и window.__lovable* в бандле — чистить обязательно
+```
+
+Дальше содержимое `.output/public` плюс снятый `index.html` уезжают в ветку
+`deploy` принудительным пушем, а на сервере:
+
+```bash
+cd /root/site-scanner/deploy/prototype
+./sync.sh rgz61 https://github.com/Rklm-it/rostov-steel-forge.git
+```
+
+Блок `rgz-review.nexus-flow.ru` в `Caddyfile` уже есть — нужна только
+A-запись поддомена на IP сервера прототипов.
+
 ## Домен: whois и DNS на 19.08.2026
 
 ```

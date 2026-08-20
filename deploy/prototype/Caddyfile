@@ -44,13 +44,14 @@ projekt-review.nexus-flow.ru {
 
 # rgz61.ru — ООО «РГЗ», Ростовский гибочный завод. Прототип к согласованию.
 #
-# Этот собран кодом, а не в Lovable: сайт клиента стоит на конструкторе
-# «Пульс цен» и выгрузке не поддаётся (см. clients/rgz61.ru/README.md), а
-# содержимое для прототипа взято со скриншотов и карточки лида. Значит и
-# ветки `deploy` под него нет — страница одна, кладётся руками:
+# Выкладка как у projekt-doma, готовой сборкой из ветки `deploy`:
 #
-#   mkdir -p /root/prototypes-static/rgz61
-#   cp .../clients/rgz61.ru/prototype/index.html /root/prototypes-static/rgz61/
+#   ./sync.sh rgz61 https://github.com/Rklm-it/rostov-steel-forge.git
+#
+# Проект собран в Lovable, репозиторий Rklm-it/rostov-steel-forge. Содержимое
+# для него собрано вручную из скриншотов и карточки лида: сайт клиента стоит
+# на конструкторе «Пульс цен» и выгрузке не поддаётся — см.
+# clients/rgz61.ru/README.md.
 rgz-review.nexus-flow.ru {
 	encode gzip
 
@@ -65,5 +66,10 @@ rgz-review.nexus-flow.ru {
 	file_server
 
 	try_files {path} {path}/ /index.html
+
+	# Бандл именован с хешем — кэшируется надолго; разметка меняется на каждом
+	# обновлении прототипа, её кэшировать нельзя.
+	@static path /assets/*
+	header @static Cache-Control "public, max-age=2592000, immutable"
 	header /index.html Cache-Control "no-cache"
 }
