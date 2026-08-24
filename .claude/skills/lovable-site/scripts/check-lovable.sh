@@ -16,9 +16,18 @@ report() {  # report <что нашли> <как чинить> <вывод grep>
 }
 
 # --include не нужен: в бандле следы попадают и в .js, и в .json карт исходников
-scan() { grep -rniE "$1" "$TARGET" \
-    --include='*.html' --include='*.js' --include='*.mjs' \
-    --include='*.json' --include='*.webmanifest' 2>/dev/null | cut -c1-160; }
+# awk и cut режут по байтам и рвут многобайтные символы; питон в проекте есть всегда
+trunc() { python3 -c "
+import sys
+for line in sys.stdin:
+    print(line.rstrip()[:160])"; }
+
+INC=(--include='*.html' --include='*.js' --include='*.mjs'
+     --include='*.json' --include='*.webmanifest')
+scan() {
+  if [ -d "$TARGET" ]; then (cd "$TARGET" && grep -rniE "$1" . "${INC[@]}" 2>/dev/null) | trunc
+  else grep -niE "$1" "$TARGET" 2>/dev/null | trunc; fi
+}
 
 report "скрипт конструктора" \
        "убрать <script src=\"https://cdn.gpteng.co/gptengineer.js\"> из index.html" \
