@@ -64,7 +64,7 @@ Generated Project», `<meta name="generator">` и og:image на чужом до�
 **`/web-design-engineer`** — как это сделать руками. Три части, ради которых
 он и взят:
 
-- `references/style-recipes/` — 19 названных видов с готовыми палитрами,
+- `references/style-recipes/` — 25 названных видов с готовыми палитрами,
   шрифтами, радиусами и шагом сетки: Stripe Press, Linear, Raycast, Aesop,
   Muji, Braun Дитера Рамса, Apple HIG, Tufte и другие. Годится как меню для
   разговора с клиентом: не «сделаем красиво», а «вот три направления».
