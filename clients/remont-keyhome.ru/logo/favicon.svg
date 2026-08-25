@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Key Home">
+  <!-- Фавикон: тот же ключ, но крупным планом — головка и обрубок стержня с
+       пузырьком. Полный знак в 16 пикселей превращается в закорючку: стержень
+       длинный, и всё сжимается в нечитаемую полоску. Здесь работает даже во
+       вкладке браузера. -->
+  <rect width="64" height="64" rx="12" fill="#1C1F24"/>
+  <circle cx="26" cy="32" r="10" fill="none" stroke="#F4F3F0" stroke-width="7"/>
+  <rect x="34" y="28.5" width="22" height="7" rx="3.5" fill="#F4F3F0"/>
+  <rect x="47" y="35.5" width="6" height="9" rx="2" fill="#F4F3F0"/>
+  <circle cx="41" cy="32" r="3.1" fill="#16C172"/>
+</svg>
