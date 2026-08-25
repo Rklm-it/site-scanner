@@ -1,0 +1,17 @@
+{
+  "domain": "reklamabataysk.ru",
+  "collected": "2026-08-25 21:32",
+  "pages": 1,
+  "assets": 26,
+  "stopped_by": "done",
+  "index": [
+    {
+      "url": "https://reklamabataysk.ru/",
+      "file": "index.html",
+      "title": "Рекламное агенство ПОКОТИЛОВ",
+      "h1": "",
+      "description": "",
+      "bytes": 10501
+    }
+  ]
+}

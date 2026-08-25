@@ -1,0 +1,364 @@
+/*------------------------------------*\
+    #BASIC STYLES
+\*------------------------------------*/
+
+* {
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+body,
+html {
+	height: 100%;
+	background: #FFF;
+	color: #000;
+	font: 400 14px 'pt_sans', Tahoma, Arial, Verdana, sans-serif;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	outline: none;
+}
+a:hover,
+a:focus {
+	text-decoration: none;
+	outline: none;
+}
+
+strong {
+	font-weight: 700;
+}
+
+.link {
+	color: #c81d47;
+	text-decoration: underline;
+	cursor: pointer;
+	-webkit-transition: all 0.12s ease;
+	transition: all 0.12s ease;
+}
+.link:hover,
+.link:focus,
+.link_active {
+	color: #ff4200;
+	text-decoration: underline;
+}
+
+
+
+
+
+/*------------------------------------*\
+    #SPECIAL STYLES
+\*------------------------------------*/
+
+.clear {
+    display: block;
+    clear: both;
+    overflow: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+/* border radius */
+.phones,
+.header__mail,
+.header__mail__button {
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+}
+
+
+
+
+
+/*------------------------------------*\
+    #PAGE STRUCTURE
+\*------------------------------------*/
+
+.page {
+	position: relative;
+	min-width: 1020px;
+	width: 100%;	
+}
+.left-side,
+.right-side {
+	width: 50%;
+	overflow: hidden;
+}
+
+
+
+
+
+/*------------------------------------*\
+    #LEFT SIDE
+\*------------------------------------*/
+
+.left-side {
+	padding-bottom: 250px;
+	border-right: 1px solid #f1f1f1;
+	background: url(../images/bg.jpg) no-repeat right top,
+				url(../images/bottom-bg.jpg) no-repeat center bottom #fff;
+}
+@media screen and (min-width: 1437px) {
+	.left-side {
+	    background-size: 100%, auto;
+	}
+}
+
+/* content */
+.content {
+	float: right;
+	width: 500px;
+	padding-right: 35px;
+}
+
+.phones {
+	float: left;
+	width: 179px;
+	padding: 10px 0;
+	border: 3px dashed #fcc3c9;
+	font: 400 16px/20px 'etelka_pro', Tahoma, Arial, Verdana, sans-serif;
+	color: #c81d47;
+	text-align: center;
+}
+.phones.two-phones {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+.phones.two-phones span {
+	display: block;
+    font-size: 12px;
+    line-height: 1em;
+}
+.phones.two-phones span:not(:first-child) {
+    padding: 8px 0 0;
+}
+
+/* header */
+.header {
+	padding-top: 35px;
+	margin-bottom: 50px;
+	overflow: hidden;
+}
+
+.header__logo {
+	display: block;
+	float: left;
+	margin: 33px 34px 30px 0;
+}
+.header__logo img {
+	vertical-align: middle;
+}
+
+.header__billboard {
+	float: left;
+	width: 122px;
+	height: 149px;
+	padding-top: 27px;
+	background: url(../images/header-billboard.png) no-repeat 0 0;
+	font: 700 11px/14px 'etelka_pro', Tahoma, Arial, Verdana, sans-serif;
+	color: #000;
+	text-align: center;
+	text-transform: uppercase;
+	text-shadow: 0 1px 0 #fff;
+}
+
+.header__mail {
+	display: block;
+	float: left;
+	width: 180px;
+	padding-top: 4px;
+	margin-left: 26px;
+	line-height: 22px;
+	background-color: #ececec;
+	text-align: center;
+}
+
+.header__mail__button {
+	display: block;
+	padding: 10px 40px;
+	line-height: 18px;
+	background-color: #ffbf00;
+	font: 700 15px 'etelka_pro', Tahoma, Arial, Verdana, sans-serif;
+	color: #000;
+	-webkit-transition: all 0.15s ease-in-out;
+	transition: all 0.15s ease-in-out;
+}
+.header__mail:hover .header__mail__button,
+.header__mail:focus .header__mail__button {
+	background-color: #ffa700;
+}
+.header__mail:hover .link,
+.header__mail:focus .link {
+	color: #ff4200;
+}
+
+/* content-text */
+.content-text {
+	background: url(../images/lemon.png) no-repeat 285px 135px;
+	margin-bottom: 30px;
+}
+
+.content-text h2 {
+	margin-bottom: 0.8em;
+	font: 700 21px/18px 'etelka_pro', Tahoma, Arial, Verdana, sans-serif;
+	color: #000;
+	text-transform: uppercase;
+}
+
+.content-text ul {
+	margin-bottom: 60px;
+}
+.content-text ul li {
+	padding-bottom: 8px;
+	font: 400 17px/22px 'pt_sans', Tahoma, Arial, Verdana, sans-serif;
+}
+.content-text span.board-prizm {
+	padding-left: 17px;
+	padding-bottom: 2px;
+	background: url(../images/prizma-i.png) no-repeat left 7px;
+}
+
+/* accordion */
+.accordion {
+	margin-bottom: 40px;
+	font-family: 'etelka_pro', Tahoma, Arial, Verdana, sans-serif;
+}
+
+.accordion__title {
+	margin-top: 25px;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+.accordion__content {
+	padding-top: 5px;
+	font-size: 14px;
+	line-height: 18px;
+}
+
+/* border list */
+.border-list {
+	margin-bottom: 40px;
+	border-collapse: collapse;
+	font-size: 1.1em;
+	line-height: 1.25em;
+}
+.border-list li {
+	padding-bottom: 0.6em;
+	cursor: pointer;
+	-webkit-transition: all 0.08s ease;
+	transition: all 0.08s ease;
+}
+.border-list li.free-billboard {
+	color: green;
+}
+.border-list li:hover {
+	color: #ff4200;
+}
+
+
+/* footer */
+.footer__links {
+	float: left;
+	width: 250px;
+	padding-top: 7px;
+	margin-left: 18px;
+	line-height: 20px;
+}
+.footer__links .link {
+	display: inline-block;
+	padding-left: 25px;
+	margin-bottom: 5px;
+}
+.link_hostel {
+	background: url(../images/hostel-i.jpg) no-repeat left center;
+}
+.link_isidea {
+	background: url(../images/isidea-i.jpg) no-repeat left center;
+}
+
+
+
+
+
+/*------------------------------------*\
+    #RIGHT SIDE
+\*------------------------------------*/
+
+.right-side {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 50%;
+	border-left: 1px solid #d4d4d4;
+}
+
+/* map */
+.map {
+	height: 100%;
+	width: 100%;
+}
+body .ymaps-2-1-22-balloon {
+	padding: 0;
+	
+	-webkit-box-shadow: 0px 0px 5px 0px #777;
+	-moz-box-shadow:    0px 0px 5px 0px #777;
+	box-shadow:         0px 0px 5px 0px #777;
+}
+body .ymaps-2-1-22-balloon__layout {
+	width: 217px;
+	padding-bottom: 5px;
+	border: 1px solid #999999;
+	overflow: visible;
+}
+body .ymaps-2-1-22-balloon__content {
+	padding: 9px;
+	font: 400 14px/18px 'pt_sans', Tahoma, Arial, Verdana, sans-serif;
+	overflow: hidden;
+}
+body .ymaps-2-1-22-balloon__content p {
+	padding-bottom: 0.2em; 
+}
+body .right-side p.baloon__board-prizm {
+	padding-left: 17px;
+	padding-bottom: 2px;
+	background: url(../images/prizma-i.png) no-repeat left 4px;
+}
+body .right-side p.baloon__free-date {
+	font-weight: bold;
+	color: green;
+}
+body .right-side p.baloon__board-prizm
+body .right-side p:last-child {
+	padding-bottom: 0; 
+}
+body .ymaps-2-1-22-balloon__close+.ymaps-2-1-22-balloon__content {
+	margin: 0;
+}
+body .ymaps-2-1-22-balloon__close {
+	background-color: #fff; 
+	border: 1px solid #999999;
+	top: -1px;
+	right: -30px;
+	-webkit-box-shadow: 0px 0px 5px 0px #777;
+	-moz-box-shadow:    0px 0px 5px 0px #777;
+	box-shadow:         0px 0px 5px 0px #777;
+}
+body .ymaps-2-1-22-balloon__close-button {
+	width: 23px;
+	height: 23px;
+	margin: 0;
+}
+body .ymaps-2-1-22-balloon_to_top .ymaps-2-1-22-balloon__tail,
+body .ymaps-2-1-22-balloon_to_top .ymaps-2-1-22-balloon__tail:after {
+	background-color: #777;
+}
+body .ymaps-2-1-22-balloon_to_top .ymaps-2-1-22-balloon__tail {
+	left: 100px;
+}
