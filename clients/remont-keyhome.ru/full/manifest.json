@@ -1,0 +1,23 @@
+{
+  "domain": "remont-keyhome.ru",
+  "collected": "2026-08-25 08:52",
+  "pages": 1,
+  "assets": 71,
+  "stopped_by": "imported",
+  "source": {
+    "kind": "import",
+    "archive": "3ab1ac2d-webtozip_botprojecttildaws.zip"
+  },
+  "index": [
+    {
+      "url": "https://remont-keyhome.ru/",
+      "file": "index.html",
+      "title": "Баланс",
+      "h1": "",
+      "description": "Студия ремонта и дизайна",
+      "bytes": 106429,
+      "text_len": 2409,
+      "encoding": "utf-8"
+    }
+  ]
+}
