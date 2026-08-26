@@ -181,6 +181,9 @@ h1,h2,h3{{font-family:Bitter,Georgia,serif;font-weight:700;line-height:1.15;marg
 a{{color:inherit}}
 img{{max-width:100%;display:block}}
 .обёртка{{max-width:1180px;margin:0 auto;padding:0 24px}}
+/* Прилипшая доска перекрывает всё, к чему ведёт якорь: без этого «Что
+   привозим» прокручивает так, что сам заголовок оказывается под ней. */
+section[id],div[id]{{scroll-margin-top:96px}}
 .пропустить{{position:absolute;left:-9999px}}
 .пропустить:focus{{position:static;display:inline-block;margin:8px 24px;padding:8px 14px;
   background:var(--форель);color:#fff}}
