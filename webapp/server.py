@@ -562,8 +562,9 @@ def send_status(send_id: str) -> dict:
 # --------------------------------------------------------------------------- #
 class DumpRequest(BaseModel):
     domain: str
-    max_pages: int = 150
-    max_depth: int = 3
+    max_pages: int = 1500
+    max_depth: int = 5
+    minutes: int = 30
     respect_robots: bool = True
     use_sitemap: bool = True
 
@@ -580,6 +581,8 @@ class DumpJob:
     archive: str | None = None
     archive_bytes: int = 0
     stopped_by: str | None = None
+    pages_left: int = 0              # осталось в очереди, когда время вышло
+    assets_left: int = 0
     title: str = ""                  # заголовок главной — чей сайт скачали
     robots: bool = True              # с какой галочкой реально прошла выгрузка
     error: str | None = None
@@ -593,6 +596,7 @@ class DumpJob:
             "statuses": {str(k): v for k, v in self.statuses.items()},
             "archive": self.archive, "archive_bytes": self.archive_bytes,
             "stopped_by": self.stopped_by, "title": self.title,
+            "pages_left": self.pages_left, "assets_left": self.assets_left,
             "robots": self.robots,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
@@ -614,8 +618,12 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
 
         stats = mirror.run(
             job.domain, work,
-            max_pages=max(1, min(req.max_pages, 600)),
-            max_depth=max(1, min(req.max_depth, 6)),
+            # Потолки подняты сознательно: выгрузка делается ради разбора, а
+            # неполная выгрузка стоит второго захода к клиенту. Время — главный
+            # ограничитель, оно же и видно в форме.
+            max_pages=max(1, min(req.max_pages, 5000)),
+            max_depth=max(1, min(req.max_depth, 8)),
+            time_budget=max(60, min(req.minutes, 90) * 60),
             respect_robots=req.respect_robots,
             use_sitemap=req.use_sitemap,
             on_progress=on_progress,
@@ -623,6 +631,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes
         job.statuses = dict(stats.statuses)
         job.stopped_by = stats.stopped_by
+        job.pages_left, job.assets_left = stats.pages_left, stats.assets_left
         job.errors = stats.errors
         # Заголовок главной показываем в итоге: домен легко набрать с опечаткой
         # (project-doma.ru вместо projekt-doma.ru — реальный случай), выгрузка

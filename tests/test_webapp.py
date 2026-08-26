@@ -392,6 +392,48 @@ def test_dump_accepts_any_url_form(client, raw, expect, monkeypatch):
     assert seen["domain"] == expect
 
 
+def test_dump_minuty_dohodyat_do_obhoda(client, monkeypatch):
+    """«Минут» из формы обязано доехать до обхода и упереться в потолок.
+
+    Поле, которое рисуется на экране и молча теряется по дороге, — уже
+    случавшаяся здесь ошибка: выгрузка приезжала не той, что заказывали, и
+    выяснялось это только по содержимому архива.
+    """
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen.update(kw)
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+
+    def dump(payload):
+        r = c.post("/api/dump", json=payload)
+        assert r.status_code == 200, r.text
+        for _ in range(50):
+            if c.get(f"/api/dump/{r.json()['dump_id']}").json()["status"] != "running":
+                break
+            time.sleep(0.05)
+
+    dump({"domain": "example.ru", "minutes": 12})
+    assert seen["time_budget"] == 12 * 60
+
+    dump({"domain": "example.ru"})                       # по умолчанию — полная
+    assert seen["time_budget"] == 30 * 60
+    assert seen["max_pages"] == 1500
+
+    dump({"domain": "example.ru", "minutes": 999})       # потолок, а не «сколько попросили»
+    assert seen["time_budget"] == 90 * 60
+
+
 def test_dump_list_reads_from_disk(client, tmp_path):
     """Список архивов читается с тома, а не из памяти процесса: задачи
     перезапуск контейнера не переживают, а собранные архивы обязаны."""

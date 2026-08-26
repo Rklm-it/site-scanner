@@ -214,6 +214,36 @@ def test_limit_stranic_ostanavlivaet(site, tmp_path):
     stats = _run(site, tmp_path / "d", max_pages=2)
     assert stats.pages == 2
     assert stats.stopped_by == "limit"
+    # Сколько именно не добрали — иначе «выгрузка неполная» выясняется через
+    # неделю, когда сайт уже разобран не весь.
+    assert stats.pages_left > 0
+
+
+def test_kartinkam_ostayotsya_vremya_kogda_stranicy_ne_uspeli(site, tmp_path):
+    """Картинки качаются последними и раньше оставались без бюджета совсем.
+
+    На papinalavka.ru выгрузка выглядела успешной — 500 страниц, — а картинок
+    приехало 76 из 850: страницы по 0,7 секунды съели семь минут целиком.
+    Теперь доля времени под картинки удержана заранее.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0.2, time_budget=1.0)
+    assert stats.pages_left > 0        # страницам времени не хватило
+    assert stats.assets >= 1           # но картинки всё равно приехали
+    assert stats.stopped_by == "deadline"
+
+
+def test_ostatok_vremeni_vozvrashaetsya_stranicam(site, tmp_path):
+    """Доля под картинки не должна сгорать на сайте, где картинок мало.
+
+    Страницам отдано всего 20% бюджета — за это время сайт не обойти. Но
+    картинки заканчиваются быстро, и остаток возвращается страницам: выгрузка
+    приезжает полной, а не обрезанной по искусственной границе фаз.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0.2, time_budget=3.0, assets_share=0.8)
+    assert stats.pages_left == 0
+    assert stats.stopped_by == "done"
 
 
 def test_manifest_i_arhiv(site, tmp_path):

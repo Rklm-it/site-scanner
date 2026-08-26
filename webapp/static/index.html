@@ -615,7 +615,7 @@ let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 // умолчанию: снятая галочка robots.txt снова оказывалась поставленной, а
 // «Страниц» и «Глубина» сбрасывались. На экране было одно, применялось
 // другое — и выгрузка молча приезжала без картинок.
-const DUMP_FORM = { domain: "", pages: 150, depth: 3, robots: true, sitemap: true };
+const DUMP_FORM = { domain: "", pages: 1500, depth: 5, minutes: 30, robots: true, sitemap: true };
 
 /** Из чего угодно — в домен. Люди вставляют адрес из адресной строки
  *  целиком: со схемой, www, путём и слешем на конце. Сервер это и так
@@ -634,8 +634,9 @@ function readDumpForm() {
   const cleaned = cleanDomain($("dmp-domain").value);
   if (cleaned !== $("dmp-domain").value) $("dmp-domain").value = cleaned;
   DUMP_FORM.domain = cleaned;
-  DUMP_FORM.pages = +$("dmp-pages").value || 150;
-  DUMP_FORM.depth = +$("dmp-depth").value || 3;
+  DUMP_FORM.pages = +$("dmp-pages").value || 1500;
+  DUMP_FORM.depth = +$("dmp-depth").value || 5;
+  DUMP_FORM.minutes = +$("dmp-minutes").value || 30;
   DUMP_FORM.robots = $("dmp-robots").checked;
   DUMP_FORM.sitemap = $("dmp-sitemap").checked;
 }
@@ -715,6 +716,8 @@ function renderDumps() {
           <input type="number" id="dmp-pages" value="${DUMP_FORM.pages}"></div>
         <div><label title="Как глубоко уходить по ссылкам от главной">Глубина</label>
           <input type="number" id="dmp-depth" value="${DUMP_FORM.depth}"></div>
+        <div><label title="Сколько всего минут на выгрузку. Обход ждёт 0,7 секунды между запросами, так что 1000 адресов это примерно 12 минут. Меньшая часть времени удержана под картинки: они качаются последними">Минут</label>
+          <input type="number" id="dmp-minutes" value="${DUMP_FORM.minutes}"></div>
         <div><button id="dmp-run" class="primary" style="width:auto" ${busy ? "disabled" : ""}>Выгрузить сайт</button></div>
       </div>
       <div class="checks">
@@ -726,7 +729,9 @@ function renderDumps() {
       ${unknown}
       <div id="dmp-progress"></div>
       <div class="hint">Любой сайт, не только из базы лидов — адрес можно вставить
-        целиком, лишнее отрежется. Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
+        целиком, лишнее отрежется. По умолчанию выгрузка полная: 1500 страниц и
+        30 минут, из них меньшая часть удержана под картинки — они качаются
+        последними и без этой доли не доставались вовсе. Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
         равно не нужны для разбора и раздувают репозиторий. Страницы приводятся к UTF-8,
         внутри архива есть <code>manifest.json</code> с картой сайта.</div>
     </div>
@@ -737,7 +742,7 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-pages", "dmp-depth", "dmp-robots", "dmp-sitemap"].forEach(
+  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap"].forEach(
     id => $(id).addEventListener("change", readDumpForm));
   // Домен перерисовывает секцию: предупреждение про опечатку должно появиться
   // до запуска, а не после того, как выгрузился чужой сайт.
@@ -748,6 +753,16 @@ function renderDumps() {
     await loadDumps(); renderDumps();
   });
   renderDumpProgress();
+}
+
+/** Склонение после числа: «41 страница», а не «41 страниц». Мелочь, но
+ *  сообщение об итогах читают каждый раз, и корявая строка в своём же
+ *  инструменте раздражает сильнее, чем стоило бы. */
+function plural(n, one, few, many) {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5) return few;
+  return b === 1 ? one : many;
 }
 
 // Ответы сайта в строке прогресса: без них выгрузка, которой сайт отдаёт
@@ -771,9 +786,18 @@ function renderDumpProgress() {
   } else if (j.status === "error") {
     box.innerHTML = `<div class="warn bad">Не вышло: ${escHtml(j.error || "")}</div>`;
   } else {
-    const cut = j.stopped_by === "limit" ? " — упёрлись в лимит страниц или объёма, подними «Страниц» и повтори"
-              : j.stopped_by === "deadline" ? " — кончился бюджет времени, часть страниц могла не попасть"
-              : "";
+    // Раньше здесь было «упёрлись в лимит» без числа, и понять, чего именно
+    // не хватило, можно было только разбирая архив. Теперь обход считает, что
+    // осталось в очередях, и это единственное, что человеку нужно знать:
+    // повторять выгрузку или идти разбирать.
+    const left = [];
+    if (j.pages_left) left.push(`${j.pages_left} ${plural(j.pages_left, "страница", "страницы", "страниц")}`);
+    if (j.assets_left) left.push(`${j.assets_left} ${plural(j.assets_left, "файл", "файла", "файлов")}`);
+    const why = { limit: ["упёрлись в лимит страниц", "поднимите «Страниц» и повторите"],
+                  bytes: ["сайт тяжелее 200 МБ", "выгружайте разделами"],
+                  deadline: ["кончилось время", "поднимите «Минут» и повторите"] }[j.stopped_by]
+             || ["обход остановился", "повторите выгрузку"];
+    const cut = left.length ? ` — не добрано ${left.join(" и ")}: ${why[0]}, ${why[1]}` : "";
     // Заголовок главной — проверка «тот ли сайт скачали»: опечатка в домене
     // даёт чужой сайт, и без этой строки промах виден только по числу страниц.
     const who = j.title ? `<div class="hint">Скачан сайт: <b>${escHtml(j.title)}</b>
@@ -805,6 +829,7 @@ async function startDump() {
         domain,
         max_pages: DUMP_FORM.pages,
         max_depth: DUMP_FORM.depth,
+        minutes: DUMP_FORM.minutes,
         respect_robots: DUMP_FORM.robots,
         use_sitemap: DUMP_FORM.sitemap,
       }),
