@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 92" role="img"
+     aria-label="Рекламное агентство ПОКОТИЛОВ">
+  <title>Рекламное агентство ПОКОТИЛОВ</title>
+  <!-- Знак: щит 3×6 на опоре. Пропорция полотна ровно 2:1 — тот формат,
+       которым агентство торгует. В прежнем знаке была оранжевая плашка с
+       белым столбиком; форма сохранена, смысл назван вслух. -->
+  <g fill="#FF4200">
+    <rect x="0" y="2" width="80" height="40"/>
+    <rect x="35" y="42" width="10" height="44"/>
+  </g>
+  <!-- Надстрочная строка: у них она есть, и она объясняет, кто это. -->
+  <text x="94" y="20" font-family="'PT Sans',sans-serif" font-size="14"
+        letter-spacing="1.2" fill="currentColor" opacity=".68">рекламное агентство</text>
+  <!-- Имя чёрным на оранжевой плашке — это их узнаваемое, трогать нельзя. -->
+  <rect x="94" y="30" width="236" height="52" fill="#FF4200"/>
+  <text x="212" y="70" text-anchor="middle" font-family="'PT Sans Narrow',sans-serif"
+        font-weight="700" font-size="42" letter-spacing="1" fill="#1C1E20">ПОКОТИЛОВ</text>
+</svg>
