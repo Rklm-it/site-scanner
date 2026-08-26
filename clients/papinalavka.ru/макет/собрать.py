@@ -150,216 +150,239 @@ def товар(pid: str) -> dict | None:
     }
 
 
-СТИЛЬ = """
-:root{
+# Палитры. Тёплая взята из их собственного логотипа — гравюра напечатана
+# сепией, и сайт вокруг неё собирается сам. Холодная («лёд и форель») была
+# первой версией: она свежее для рыбы, но со знаком спорит. Держим обе, чтобы
+# показать клиенту выбор, а не единственный вариант.
+ПАЛИТРЫ = {
+ "тёплая": """
+  --вода:#3B2621; --лёд:#F1EFEA; --прилавок:#fff; --форель:#E4674A;
+  --форель-тёмная:#CE5940; --зелень:#2F6B4F; --текст:#2C1E1A; --тихий:#7A6A60;
+  --край:#E2DCD2; --на-тёмном:#F5EFE9; --подпись:#B39B8C; --строка:#D9CCC1;
+  --линия-тёмная:#5A423A; --поле:#2E1D19; --поле-край:#5A423A; --подсказка:#A8907F;
+  --вода-светлее:#4C332C; --текст-мягкий:#5C4A42; --успех:#8FD3A6;
+ """,
+ "холодная": """
   --вода:#0E2E38; --лёд:#EEF3F5; --прилавок:#fff; --форель:#E4674A;
-  --зелень:#2F6B4F; --текст:#14343E; --тихий:#5B7280; --край:#DCE5E9;
+  --форель-тёмная:#CE5940; --зелень:#2F6B4F; --текст:#14343E; --тихий:#5B7280;
+  --край:#DCE5E9; --на-тёмном:#EAF2F5; --подпись:#7FA6B2; --строка:#B9D2DA;
+  --линия-тёмная:#24505E; --поле:#0A242C; --поле-край:#2A5666; --подсказка:#6F97A4;
+  --вода-светлее:#16414F; --текст-мягкий:#3A5A66; --успех:#8FD3A6;
+ """,
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--лёд);color:var(--текст);
-  font:16px/1.55 "Golos Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:Bitter,Georgia,serif;font-weight:700;line-height:1.15;margin:0}
-a{color:inherit}
-img{max-width:100%;display:block}
-.обёртка{max-width:1180px;margin:0 auto;padding:0 24px}
-.пропустить{position:absolute;left:-9999px}
-.пропустить:focus{position:static;display:inline-block;margin:8px 24px;padding:8px 14px;
-  background:var(--форель);color:#fff}
+ПАЛИТРА = ["тёплая"]
+
+СТИЛЬ = """
+:root{{{палитра}}}
+*{{box-sizing:border-box}}
+body{{margin:0;background:var(--лёд);color:var(--текст);
+  font:16px/1.55 "Golos Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}}
+h1,h2,h3{{font-family:Bitter,Georgia,serif;font-weight:700;line-height:1.15;margin:0}}
+a{{color:inherit}}
+img{{max-width:100%;display:block}}
+.обёртка{{max-width:1180px;margin:0 auto;padding:0 24px}}
+.пропустить{{position:absolute;left:-9999px}}
+.пропустить:focus{{position:static;display:inline-block;margin:8px 24px;padding:8px 14px;
+  background:var(--форель);color:#fff}}
 
 /* шапка */
-.шапка{background:var(--прилавок);border-bottom:1px solid var(--край)}
-.шапка .обёртка{display:flex;align-items:center;gap:24px;padding-top:18px;padding-bottom:18px}
-.лого{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;letter-spacing:-.01em;
-  text-decoration:none;color:inherit;display:block}
-.лого img{height:46px;width:auto}
-.лого-подвал{height:38px;width:auto;margin-bottom:10px;opacity:.9}
-.лого span{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--тихий);margin-top:3px}
-.шапка nav{margin-left:auto;display:flex;align-items:center;gap:22px;font-size:15px}
-.шапка nav a{text-decoration:none;color:var(--тихий)}
-.шапка nav a:hover{color:var(--текст)}
-.тел{font-family:Bitter,Georgia,serif;font-size:19px;font-weight:700;text-decoration:none!important;color:var(--текст)!important}
+.шапка{{background:var(--прилавок);border-bottom:1px solid var(--край)}}
+.шапка .обёртка{{display:flex;align-items:center;gap:24px;padding-top:18px;padding-bottom:18px}}
+.лого{{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;letter-spacing:-.01em;
+  text-decoration:none;color:inherit;display:block}}
+.лого img{{height:68px;width:auto;display:block}}
+section.тьма{{position:relative;overflow:hidden}}
+.гравюра{{position:absolute;right:-40px;bottom:-30px;width:420px;height:310px;
+  background-size:contain;background-repeat:no-repeat;background-position:right bottom;
+  filter:invert(1);opacity:.09;pointer-events:none}}
+@media (max-width:900px){{.гравюра{{display:none}}}}
+.лого span{{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--тихий);margin-top:3px}}
+.шапка nav{{margin-left:auto;display:flex;align-items:center;gap:22px;font-size:15px}}
+.шапка nav a{{text-decoration:none;color:var(--тихий)}}
+.шапка nav a:hover{{color:var(--текст)}}
+.тел{{font-family:Bitter,Georgia,serif;font-size:19px;font-weight:700;text-decoration:none!important;color:var(--текст)!important}}
 
 /* доска поставок — фирменный элемент */
-.доска{position:sticky;top:0;z-index:20;background:var(--вода);color:#EAF2F5;
-  transition:padding .18s ease}
-.доска .обёртка{display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;
-  padding-top:16px;padding-bottom:16px;transition:padding .18s ease}
-.доска.сжата .обёртка{padding-top:8px;padding-bottom:8px}
-.дата{font-family:Bitter,Georgia,serif;font-size:26px;font-weight:700;white-space:nowrap;
-  transition:font-size .18s ease}
-.доска.сжата .дата{font-size:19px}
-.дата small{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
-  letter-spacing:.09em;text-transform:uppercase;color:#7FA6B2;margin-bottom:2px}
-.доска.сжата .дата small{display:none}
-.везём{font-size:14px;color:#B9D2DA;max-height:44px;overflow:hidden}
-.доска.сжата .везём{max-height:22px}
-.срок{text-align:right;font-size:14px;white-space:nowrap;border-left:1px solid #24505E;padding-left:24px}
-.срок b{display:block;font-family:Bitter,Georgia,serif;font-size:18px}
+.доска{{position:sticky;top:0;z-index:20;background:var(--вода);color:var(--на-тёмном);
+  transition:padding .18s ease}}
+.доска .обёртка{{display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;
+  padding-top:16px;padding-bottom:16px;transition:padding .18s ease}}
+.доска.сжата .обёртка{{padding-top:8px;padding-bottom:8px}}
+.дата{{font-family:Bitter,Georgia,serif;font-size:26px;font-weight:700;white-space:nowrap;
+  transition:font-size .18s ease}}
+.доска.сжата .дата{{font-size:19px}}
+.дата small{{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--подпись);margin-bottom:2px}}
+.доска.сжата .дата small{{display:none}}
+.везём{{font-size:14px;color:var(--строка);max-height:44px;overflow:hidden}}
+.доска.сжата .везём{{max-height:22px}}
+.срок{{text-align:right;font-size:14px;white-space:nowrap;border-left:1px solid var(--линия-тёмная);padding-left:24px}}
+.срок b{{display:block;font-family:Bitter,Georgia,serif;font-size:18px}}
 
 /* первый экран */
-.экран{padding:64px 0 56px}
-.экран .обёртка{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
-.экран h1{font-size:46px;letter-spacing:-.02em}
-.экран p{font-size:18px;color:#3A5A66;max-width:34em;margin:20px 0 28px}
-.кнопки{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.кнопка{display:inline-block;background:var(--форель);color:#fff;text-decoration:none;
+.экран{{padding:64px 0 56px}}
+.экран .обёртка{{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}}
+.экран h1{{font-size:46px;letter-spacing:-.02em}}
+.экран p{{font-size:18px;color:var(--текст-мягкий);max-width:34em;margin:20px 0 28px}}
+.кнопки{{display:flex;align-items:center;gap:20px;flex-wrap:wrap}}
+.кнопка{{display:inline-block;background:var(--форель);color:#fff;text-decoration:none;
   padding:14px 26px;border-radius:2px;font-weight:600;border:0;cursor:pointer;font-size:16px;
-  font-family:inherit}
-.кнопка:hover{background:#CE5940}
-.ссылка{color:var(--вода);text-underline-offset:4px}
-.плитки{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}
-.плитки img{width:100%;height:100%;aspect-ratio:1;object-fit:cover;border-radius:2px}
+  font-family:inherit}}
+.кнопка:hover{{background:var(--форель-тёмная)}}
+.ссылка{{color:var(--вода);text-underline-offset:4px}}
+.плитки{{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px}}
+.плитки img{{width:100%;height:100%;aspect-ratio:1;object-fit:cover;border-radius:2px}}
 
 /* секции */
-section{padding:56px 0}
-section.бел{background:var(--прилавок);border-top:1px solid var(--край);border-bottom:1px solid var(--край)}
-.заг{display:flex;align-items:baseline;gap:16px;margin-bottom:28px;flex-wrap:wrap}
-.заг h2{font-size:30px}
-.заг span{color:var(--тихий);font-size:15px}
+section{{padding:56px 0}}
+section.бел{{background:var(--прилавок);border-top:1px solid var(--край);border-bottom:1px solid var(--край)}}
+.заг{{display:flex;align-items:baseline;gap:16px;margin-bottom:28px;flex-wrap:wrap}}
+.заг h2{{font-size:30px}}
+.заг span{{color:var(--тихий);font-size:15px}}
 
 /* разделы каталога — список-прайс, не крупные плитки: фото у клиента мелкие */
-.разделы{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 28px}
-.раздел{display:flex;align-items:center;gap:14px;padding:9px 10px;text-decoration:none;
-  border-bottom:1px solid var(--край)}
-.раздел:hover{background:var(--лёд)}
-.раздел img{width:56px;height:56px;object-fit:cover;border-radius:2px;flex:0 0 56px}
-.раздел b{font-weight:500;font-size:15px}
-.раздел i{margin-left:auto;font-style:normal;color:var(--тихий);font-size:13px}
-.раздел.ядро{background:var(--прилавок);border-left:3px solid var(--форель);padding-left:12px}
+.разделы{{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 28px}}
+.раздел{{display:flex;align-items:center;gap:14px;padding:9px 10px;text-decoration:none;
+  border-bottom:1px solid var(--край)}}
+.раздел:hover{{background:var(--лёд)}}
+.раздел img{{width:56px;height:56px;object-fit:cover;border-radius:2px;flex:0 0 56px}}
+.раздел b{{font-weight:500;font-size:15px}}
+.раздел i{{margin-left:auto;font-style:normal;color:var(--тихий);font-size:13px}}
+.раздел.ядро{{background:var(--прилавок);border-left:3px solid var(--форель);padding-left:12px}}
 
 /* товары */
-.товары{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
-.товар{position:relative;background:var(--прилавок);border:1px solid var(--край);
-  border-radius:2px;overflow:hidden;display:flex;flex-direction:column}
-.товар .фото{height:190px;background:var(--лёд);display:flex;align-items:center;justify-content:center}
-.товар .фото img{max-height:190px;width:auto;object-fit:contain}
-.товар .низ{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
-.взаказ{align-self:flex-start;background:none;border:1px solid var(--край);color:var(--вода);
-  font:inherit;font-size:14px;padding:8px 16px;border-radius:2px;cursor:pointer;margin-top:2px}
-.взаказ:hover{border-color:var(--форель);color:var(--форель)}
-.товар .имя{font-size:15px;line-height:1.35;flex:1}
-.цена{font-family:Bitter,Georgia,serif;font-size:21px;font-weight:700}
-.цена s{font-family:"Golos Text",sans-serif;font-size:14px;font-weight:400;color:var(--тихий);
-  margin-left:8px}
-.цена em{font-style:normal;font-family:"Golos Text",sans-serif;font-size:13px;font-weight:400;
-  color:var(--тихий)}
-.метка{position:absolute;margin:10px;background:var(--зелень);color:#fff;font-size:11px;
-  letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:2px}
-.метка.акция{background:var(--форель)}
-.сноска{color:var(--тихий);font-size:13px;margin-top:22px}
+.товары{{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}}
+.товар{{position:relative;background:var(--прилавок);border:1px solid var(--край);
+  border-radius:2px;overflow:hidden;display:flex;flex-direction:column}}
+.товар .фото{{height:190px;background:var(--лёд);display:flex;align-items:center;justify-content:center}}
+.товар .фото img{{max-height:190px;width:auto;object-fit:contain}}
+.товар .низ{{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}}
+.взаказ{{align-self:flex-start;background:none;border:1px solid var(--край);color:var(--вода);
+  font:inherit;font-size:14px;padding:8px 16px;border-radius:2px;cursor:pointer;margin-top:2px}}
+.взаказ:hover{{border-color:var(--форель);color:var(--форель)}}
+.товар .имя{{font-size:15px;line-height:1.35;flex:1}}
+.цена{{font-family:Bitter,Georgia,serif;font-size:21px;font-weight:700}}
+.цена s{{font-family:"Golos Text",sans-serif;font-size:14px;font-weight:400;color:var(--тихий);
+  margin-left:8px}}
+.цена em{{font-style:normal;font-family:"Golos Text",sans-serif;font-size:13px;font-weight:400;
+  color:var(--тихий)}}
+.метка{{position:absolute;margin:10px;background:var(--зелень);color:#fff;font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:2px}}
+.метка.акция{{background:var(--форель)}}
+.сноска{{color:var(--тихий);font-size:13px;margin-top:22px}}
 
 /* как это работает */
-.шаги{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:30px}
-.шаг{padding:22px 26px 22px 0;position:relative}
-.шаг:not(:last-child)::after{content:"";position:absolute;right:16px;top:30px;width:9px;height:9px;
-  border-top:2px solid var(--форель);border-right:2px solid var(--форель);transform:rotate(45deg)}
-.шаг b{display:block;font-family:Bitter,Georgia,serif;font-size:17px;margin-bottom:6px}
-.шаг span{color:var(--тихий);font-size:14px}
-.правила{border-top:1px solid var(--край);display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding-top:24px}
-.правила p{margin:0;font-size:14.5px;color:#3A5A66}
-.правила b{font-family:Bitter,Georgia,serif}
+.шаги{{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:30px}}
+.шаг{{padding:22px 26px 22px 0;position:relative}}
+.шаг:not(:last-child)::after{{content:"";position:absolute;right:16px;top:30px;width:9px;height:9px;
+  border-top:2px solid var(--форель);border-right:2px solid var(--форель);transform:rotate(45deg)}}
+.шаг b{{display:block;font-family:Bitter,Georgia,serif;font-size:17px;margin-bottom:6px}}
+.шаг span{{color:var(--тихий);font-size:14px}}
+.правила{{border-top:1px solid var(--край);display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding-top:24px}}
+.правила p{{margin:0;font-size:14.5px;color:var(--текст-мягкий)}}
+.правила b{{font-family:Bitter,Georgia,serif}}
 
 /* расписание поставок */
-.график{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--край)}
-.день{padding:20px 24px 20px 0;border-right:1px solid var(--край)}
-.день:last-child{border-right:0}
-.день b{display:block;font-family:Bitter,Georgia,serif;font-size:20px}
-.день u{display:block;text-decoration:none;color:var(--форель);font-size:12px;
-  letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
-.день span{color:var(--тихий);font-size:14px}
+.график{{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--край)}}
+.день{{padding:20px 24px 20px 0;border-right:1px solid var(--край)}}
+.день:last-child{{border-right:0}}
+.день b{{display:block;font-family:Bitter,Georgia,serif;font-size:20px}}
+.день u{{display:block;text-decoration:none;color:var(--форель);font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}}
+.день span{{color:var(--тихий);font-size:14px}}
 
 /* тёмная полоса: ломает чередование «белое — ледяное» и держит главное */
-section.тьма{background:var(--вода);color:#EAF2F5;border:0}
-section.тьма h2{color:#fff}
-section.тьма .шаг span,section.тьма .правила p{color:#B9D2DA}
-section.тьма .правила{border-top-color:#24505E}
-section.тьма .шаг b,section.тьма .правила b{color:#fff}
-section.тьма .график{border-top-color:#24505E}
-section.тьма .день{border-right-color:#24505E}
-section.тьма .день span{color:#B9D2DA}
+section.тьма{{background:var(--вода);color:var(--на-тёмном);border:0}}
+section.тьма h2{{color:#fff}}
+section.тьма .шаг span,section.тьма .правила p{{color:var(--строка)}}
+section.тьма .правила{{border-top-color:var(--линия-тёмная)}}
+section.тьма .шаг b,section.тьма .правила b{{color:#fff}}
+section.тьма .график{{border-top-color:var(--линия-тёмная)}}
+section.тьма .день{{border-right-color:var(--линия-тёмная)}}
+section.тьма .день span{{color:var(--строка)}}
 
 /* гарантия — одна строка во всю ширину, без карточки */
-.гарантия{font-family:Bitter,Georgia,serif;font-size:22px;line-height:1.4;max-width:30em}
-.гарантия+p{color:var(--тихий);margin-top:14px;max-width:36em}
+.гарантия{{font-family:Bitter,Georgia,serif;font-size:22px;line-height:1.4;max-width:30em}}
+.гарантия+p{{color:var(--тихий);margin-top:14px;max-width:36em}}
 
 /* подписка на поставки */
-.подписка{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;max-width:640px}
-.подписка input{flex:1;min-width:280px;background:var(--прилавок);border:1px solid var(--край);
-  color:var(--текст)}
+.подписка{{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;max-width:640px}}
+.подписка input{{flex:1;min-width:280px;background:var(--прилавок);border:1px solid var(--край);
+  color:var(--текст)}}
 /* Оранжевый бережём для одного действия на экран — здесь кнопка тише */
-.подписка .кнопка{background:var(--вода)}
-.подписка .кнопка:hover{background:#16414F}
-.подписка input::placeholder{color:var(--тихий)}
+.подписка .кнопка{{background:var(--вода)}}
+.подписка .кнопка:hover{{background:var(--вода-светлее)}}
+.подписка input::placeholder{{color:var(--тихий)}}
 
 /* фермеры */
-.фермеры{display:grid;grid-template-columns:1fr 1fr;gap:8px 40px}
-.фермер{display:flex;gap:18px;padding:16px 0;border-bottom:1px solid var(--край);align-items:flex-start}
-.вензель{flex:0 0 60px;height:60px;border-radius:50%;background:var(--вода);color:#EAF2F5;
-  display:flex;align-items:center;justify-content:center;font-family:Bitter,Georgia,serif;font-size:20px}
-.фермер b{font-size:15.5px}
-.фермер span{display:block;color:var(--тихий);font-size:13.5px;margin-top:3px}
-.фермер i{margin-left:auto;font-style:normal;color:var(--тихий);font-size:13px;white-space:nowrap}
+.фермеры{{display:grid;grid-template-columns:1fr 1fr;gap:8px 40px}}
+.фермер{{display:flex;gap:18px;padding:16px 0;border-bottom:1px solid var(--край);align-items:flex-start}}
+.вензель{{flex:0 0 60px;height:60px;border-radius:50%;background:var(--вода);color:var(--на-тёмном);
+  display:flex;align-items:center;justify-content:center;font-family:Bitter,Georgia,serif;font-size:20px}}
+.фермер b{{font-size:15.5px}}
+.фермер span{{display:block;color:var(--тихий);font-size:13.5px;margin-top:3px}}
+.фермер i{{margin-left:auto;font-style:normal;color:var(--тихий);font-size:13px;white-space:nowrap}}
 
 /* отзывы */
-.отзывы{display:grid;grid-template-columns:1fr 1fr;gap:34px 48px}
-.отзыв p{font-family:Bitter,Georgia,serif;font-size:18px;line-height:1.45;margin:0 0 12px}
-.отзыв cite{font-style:normal;color:var(--тихий);font-size:14px}
-.отзыв::before{content:"";display:block;width:34px;height:2px;background:var(--форель);margin-bottom:16px}
+.отзывы{{display:grid;grid-template-columns:1fr 1fr;gap:34px 48px}}
+.отзыв p{{font-family:Bitter,Georgia,serif;font-size:18px;line-height:1.45;margin:0 0 12px}}
+.отзыв cite{{font-style:normal;color:var(--тихий);font-size:14px}}
+.отзыв::before{{content:"";display:block;width:34px;height:2px;background:var(--форель);margin-bottom:16px}}
 
 /* лавки */
-table{width:100%;border-collapse:collapse;font-size:15px}
-th{text-align:left;font-weight:500;color:var(--тихий);font-size:12px;letter-spacing:.07em;
-  text-transform:uppercase;padding:0 14px 10px 0;border-bottom:1px solid var(--край)}
-td{padding:14px 14px 14px 0;border-bottom:1px solid var(--край);vertical-align:top}
-td:first-child{font-weight:500}
-td small{display:block;color:var(--тихий);font-weight:400}
+table{{width:100%;border-collapse:collapse;font-size:15px}}
+th{{text-align:left;font-weight:500;color:var(--тихий);font-size:12px;letter-spacing:.07em;
+  text-transform:uppercase;padding:0 14px 10px 0;border-bottom:1px solid var(--край)}}
+td{{padding:14px 14px 14px 0;border-bottom:1px solid var(--край);vertical-align:top}}
+td:first-child{{font-weight:500}}
+td small{{display:block;color:var(--тихий);font-weight:400}}
 
 /* заявка */
-.заявка{background:var(--вода);color:#EAF2F5}
-.заявка .обёртка{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
-.заявка h2{font-size:30px;color:#fff}
-.заявка p{color:#B9D2DA}
-form{display:grid;gap:12px}
-input,textarea{font:inherit;padding:13px 15px;border:1px solid #2A5666;background:#0A242C;
-  color:#EAF2F5;border-radius:2px;width:100%}
-input::placeholder,textarea::placeholder{color:#6F97A4}
-textarea{min-height:88px;resize:vertical}
-form small{color:#7FA6B2;font-size:12.5px}
-.готово{color:#8FD3A6;font-size:14px;min-height:20px}
+.заявка{{background:var(--вода);color:var(--на-тёмном)}}
+.заявка .обёртка{{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}}
+.заявка h2{{font-size:30px;color:#fff}}
+.заявка p{{color:var(--строка)}}
+form{{display:grid;gap:12px}}
+input,textarea{{font:inherit;padding:13px 15px;border:1px solid var(--поле-край);background:var(--поле);
+  color:var(--на-тёмном);border-radius:2px;width:100%}}
+input::placeholder,textarea::placeholder{{color:var(--подсказка)}}
+textarea{{min-height:88px;resize:vertical}}
+form small{{color:var(--подпись);font-size:12.5px}}
+.готово{{color:var(--успех);font-size:14px;min-height:20px}}
 
-footer{background:var(--вода);color:#7FA6B2;font-size:13.5px;padding:26px 0 40px}
-footer .обёртка{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
-:focus-visible{outline:2px solid var(--форель);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+footer{{background:var(--вода);color:var(--подпись);font-size:13.5px;padding:26px 0 40px}}
+footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}}
+:focus-visible{{outline:2px solid var(--форель);outline-offset:2px}}
+@media (prefers-reduced-motion:reduce){{*{{transition:none!important}}}}
 
-@media (max-width:900px){
-  .экран .обёртка,.заявка .обёртка{grid-template-columns:1fr;gap:32px}
-  .экран h1{font-size:32px}
-  .разделы,.товары,.шаги,.правила,.фермеры,.отзывы{grid-template-columns:1fr 1fr}
-  .доска .обёртка{grid-template-columns:1fr;gap:6px;text-align:left}
-  .везём{display:none}
-  .срок{text-align:left;border-left:0;padding-left:0;font-size:13px}
-  .срок b{display:inline}
-  .шапка nav a:not(.тел){display:none}
-  .тел{font-size:16px;white-space:nowrap}
-  .лого img{height:36px}
-  .шапка .обёртка{gap:12px}
-  .срок b{display:inline;margin-left:6px}
-}
-@media (max-width:600px){
+@media (max-width:900px){{
+  .экран .обёртка,.заявка .обёртка{{grid-template-columns:1fr;gap:32px}}
+  .экран h1{{font-size:32px}}
+  .разделы,.товары,.шаги,.правила,.фермеры,.отзывы{{grid-template-columns:1fr 1fr}}
+  .доска .обёртка{{grid-template-columns:1fr;gap:6px;text-align:left}}
+  .везём{{display:none}}
+  .срок{{text-align:left;border-left:0;padding-left:0;font-size:13px}}
+  .срок b{{display:inline}}
+  .шапка nav a:not(.тел){{display:none}}
+  .тел{{font-size:16px;white-space:nowrap}}
+  .лого img{{height:52px}}
+  .шапка .обёртка{{gap:12px}}
+  .срок b{{display:inline;margin-left:6px}}
+}}
+@media (max-width:600px){{
   /* Палец — не мышь: цели меньше 44 px промахиваются, а половина заказов
      идёт с телефона. Касается телефонов лавок, карт и кнопок в карточках. */
-  td a,.шапка nav a,.ссылка,.взаказ{display:inline-block;min-height:44px;
-    line-height:28px;padding:8px 0}
-  .взаказ{padding:10px 18px;line-height:1.2}
-  td small a{padding-top:0}
-  .разделы,.товары,.шаги,.правила,.фермеры,.отзывы{grid-template-columns:1fr}
-  .шаг:not(:last-child)::after{display:none}
-  .шаг{padding:14px 0;border-bottom:1px solid var(--край)}
-  section{padding:38px 0}
-  .экран{padding:36px 0}
-}
+  td a,.шапка nav a,.ссылка,.взаказ{{display:inline-block;min-height:44px;
+    line-height:28px;padding:8px 0}}
+  .взаказ{{padding:10px 18px;line-height:1.2}}
+  td small a{{padding-top:0}}
+  .разделы,.товары,.шаги,.правила,.фермеры,.отзывы{{grid-template-columns:1fr}}
+  .шаг:not(:last-child)::after{{display:none}}
+  .шаг{{padding:14px 0;border-bottom:1px solid var(--край)}}
+  section{{padding:38px 0}}
+  .экран{{padding:36px 0}}
+}}
 """
 
 
@@ -465,15 +488,20 @@ def разметка_поиска() -> str:
 
 
 def собрать() -> str:
+    стиль = СТИЛЬ.format(палитра=ПАЛИТРЫ[ПАЛИТРА[0]])
     знак, знак_тёмный = логотип("logo1.png"), логотип("logo2.png")
     шапка_лого = (
-        f'<a class="лого" href="/"><img src="{знак}" alt="Папина лавка">'
-        f'<span>натуральные продукты экоферм · Воронеж</span></a>'
+        f'<a class="лого" href="/"><img src="{знак}" alt="Папина лавка — '
+        f'натуральные продукты с доставкой"></a>'
         if знак else
         '<div class="лого">Папина лавка'
         '<span>натуральные продукты экоферм · Воронеж</span></div>')
-    подвал_лого = (f'<img class="лого-подвал" src="{знак_тёмный or знак}" alt="">'
-                   if (знак_тёмный or знак) else "")
+    # Гравюра из второго файла — в тёмную полосу фоном. Она штриховая, в
+    # инверсии даёт светлые линии и работает как фирменная текстура, а не как
+    # ещё одна картинка. Их собственный мотив: у конкурентов такого нет.
+    гравюра = (f'<div class="гравюра" style="background-image:url({знак_тёмный})"></div>'
+               if знак_тёмный else "")
+    подвал_лого = ""
     разметка = разметка_поиска()
     значок = data_uri(os.path.join(ВЫГРУЗКА, "favicon.png"))
     вшитые = шрифты()
@@ -541,7 +569,7 @@ def собрать() -> str:
 Шесть лавок в Воронеже и доставка. Заказ принимаем до среды.">
 <meta property="og:locale" content="ru_RU">
 {ссылка}
-<style>{вшитые}{СТИЛЬ}</style>
+<style>{вшитые}{стиль}</style>
 <script type="application/ld+json">{разметка}</script>
 </head><body>
 <a class="пропустить" href="#каталог">Перейти к каталогу</a>
@@ -589,7 +617,7 @@ def собрать() -> str:
      они меняются от сезонности продукта и отдалённости фермера.</p>
 </div></section>
 
-<section class="тьма" id="как"><div class="обёртка">
+<section class="тьма" id="как">{гравюра}<div class="обёртка">
   <div class="заг"><h2>Как это работает</h2></div>
   <div class="шаги">{шаги}</div>
   <div class="правила">
@@ -670,6 +698,8 @@ addEventListener("scroll", () => document.getElementById("доска")
 if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     куда = args[0] if args else os.path.join(ЗДЕСЬ, "index.html")
+    if "--холодная" in sys.argv:
+        ПАЛИТРА[0] = "холодная"
     if "--файлами" in sys.argv:
         РЯДОМ["папка"] = os.path.dirname(os.path.abspath(куда))
     html = собрать()
