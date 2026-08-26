@@ -224,13 +224,11 @@ section.тьма{{position:relative;overflow:hidden}}
   text-decoration:none!important;color:var(--текст)!important}}
 
 /* доска поставок — фирменный элемент */
-.доска{{position:sticky;top:0;z-index:20;background:var(--вода);color:var(--на-тёмном);
-  transition:padding .18s ease}}
+.доска{{position:sticky;top:0;z-index:20;background:var(--вода);color:var(--на-тёмном)}}
 .доска .обёртка{{display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;
-  padding-top:16px;padding-bottom:16px;transition:padding .18s ease}}
+  padding-top:16px;padding-bottom:16px}}
 .доска.сжата .обёртка{{padding-top:8px;padding-bottom:8px}}
-.дата{{font-family:Bitter,Georgia,serif;font-size:26px;font-weight:700;white-space:nowrap;
-  transition:font-size .18s ease}}
+.дата{{font-family:Bitter,Georgia,serif;font-size:26px;font-weight:700;white-space:nowrap}}
 .доска.сжата .дата{{font-size:19px}}
 .дата small{{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
   letter-spacing:.09em;text-transform:uppercase;color:var(--подпись);margin-bottom:2px}}
@@ -436,15 +434,6 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
 .кнопка,.взаказ{{transition:background .15s ease,border-color .15s ease,color .15s ease}}
 .фермер .вензель{{transition:transform .25s ease}}
 .фермер:hover .вензель{{transform:scale(1.06)}}
-
-/* Один оркестрованный момент на всю страницу: плитки первого экрана
-   проявляются по очереди. Не «каждая секция выезжает при прокрутке» — этот
-   приём нейросети ставят везде, и он читается как шаблон. */
-@keyframes проявиться{{from{{opacity:0;transform:translateY(10px)}}to{{opacity:1;transform:none}}}}
-.плитки img{{animation:проявиться .5s ease backwards}}
-.плитки img:nth-child(2){{animation-delay:.08s}}
-.плитки img:nth-child(3){{animation-delay:.16s}}
-.плитки img:nth-child(4){{animation-delay:.24s}}
 
 /* Гравюра в тёмной полосе чуть смещается при прокрутке — не эффект ради
    эффекта, а глубина: полоса перестаёт быть плоской заливкой. */
