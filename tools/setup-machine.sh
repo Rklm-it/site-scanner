@@ -1,8 +1,12 @@
 #!/bin/bash
-# Подключает скилы студии на всей машине разом: пишет объявление плагина в
-# ~/.claude/settings.json. После этого любой репозиторий на этой машине —
-# сканер, проект клиента, что угодно — открывается со скилами, и класть файл
-# в каждый репозиторий не нужно.
+# Подключает плагины студии на всей машине разом: пишет объявление маркетплейса
+# в ~/.claude/settings.json. После этого любой репозиторий на этой машине —
+# сканер, проект клиента, что угодно — открывается со скилами и инструментами,
+# и класть файл в каждый репозиторий не нужно.
+#
+# Включаются три: studio (скилы), playwright (браузер), context7 (документация
+# библиотек). Два последних поднимают MCP-серверы через npx, поэтому на машине
+# нужен Node.js; подробности и как выключить лишнее — в plugins/README.md.
 #
 # Выполнить один раз на каждой машине: на маке владельца и на сервере.
 #   ./tools/setup-machine.sh
@@ -30,7 +34,9 @@ if os.path.exists(path):
 
 data.setdefault('extraKnownMarketplaces', {})['rklm'] = {
     'source': {'source': 'github', 'repo': 'Rklm-it/site-scanner'}}
-data.setdefault('enabledPlugins', {})['studio@rklm'] = True
+plugins = data.setdefault('enabledPlugins', {})
+for name in ('studio@rklm', 'playwright@rklm', 'context7@rklm'):
+    plugins[name] = True
 
 with open(path, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
@@ -41,7 +47,8 @@ PY
 cat <<'TXT'
 
 Проверить: открыть Клода в любой папке и набрать /skills — в списке должен
-появиться studio, а среди команд /lovable-site.
+появиться studio, а среди команд /lovable-site. Команда /mcp покажет
+playwright и context7: первый запуск дольше, npx тянет серверы.
 
 Репозиторий сканера приватный, поэтому машине нужен доступ к нему по git.
 На сервере он уже настроен (им пользуется sync.sh); на маке при первом запуске
@@ -55,7 +62,11 @@ git спросит логин и токен.
     "extraKnownMarketplaces": {
       "rklm": { "source": { "source": "github", "repo": "Rklm-it/site-scanner" } }
     },
-    "enabledPlugins": { "studio@rklm": true }
+    "enabledPlugins": {
+      "studio@rklm": true,
+      "playwright@rklm": true,
+      "context7@rklm": true
+    }
   }
   JSON
 

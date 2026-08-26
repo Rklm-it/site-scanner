@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Скилы студии для работы над сайтами клиентов",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "plugins": [
     {
@@ -13,6 +13,16 @@
       "description": "Цикл сайта клиента: разбор выгрузки, промпты для Lovable, дизайн без шаблонности, проверка качества перед сдачей",
       "source": "./",
       "skills": ["./.claude/skills/"]
+    },
+    {
+      "name": "playwright",
+      "description": "Браузер как инструмент: открыть страницу, прокликать, снять скриншот, прочитать консоль. MCP-сервер Playwright",
+      "source": "./plugins/playwright"
+    },
+    {
+      "name": "context7",
+      "description": "Свежая документация библиотек по запросу: React, Vite, Nuxt, Tailwind, shadcn, FastAPI — вместо памяти модели",
+      "source": "./plugins/context7"
     }
   ]
 }

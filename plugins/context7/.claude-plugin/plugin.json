@@ -1,0 +1,12 @@
+{
+  "name": "context7",
+  "description": "Свежая документация библиотек по запросу: React, Vite, Nuxt, Tailwind, shadcn, FastAPI — вместо памяти модели",
+  "version": "1.0.0",
+  "author": { "name": "Rklm-it" },
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    }
+  }
+}

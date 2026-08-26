@@ -1,0 +1,19 @@
+{
+  "name": "playwright",
+  "description": "Браузер как инструмент: открыть страницу, прокликать, снять скриншот, прочитать консоль. MCP-сервер Playwright",
+  "version": "1.0.0",
+  "author": { "name": "Rklm-it" },
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless",
+        "--isolated",
+        "--viewport-size",
+        "1280x800"
+      ]
+    }
+  }
+}
