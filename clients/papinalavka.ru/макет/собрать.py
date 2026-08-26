@@ -90,6 +90,19 @@ def шрифты() -> str:
         return ""
 
 
+def логотип(имя: str) -> str | None:
+    """Логотип клиента, если он лежит в `макет/лого/`.
+
+    На сайте он подключён фоном из CSS и в выгрузку не попадает — файлы
+    забираются отдельно (команда в `ФОТО.md`). Логотип узнают, шрифтовую
+    надпись нет, поэтому он важнее любой типографики в шапке. Нет файла —
+    честно возвращаем None и оставляем название текстом, а не рисуем
+    самодельный знак: подделка хуже отсутствия.
+    """
+    путь = os.path.join(ЗДЕСЬ, "лого", имя)
+    return data_uri(путь) if os.path.exists(путь) else None
+
+
 def разделы() -> dict[str, str]:
     """id раздела → заглавная картинка (у каждого раздела она своя)."""
     корень = os.path.join(ВЫГРУЗКА, "content", "sections")
@@ -156,7 +169,10 @@ img{max-width:100%;display:block}
 /* шапка */
 .шапка{background:var(--прилавок);border-bottom:1px solid var(--край)}
 .шапка .обёртка{display:flex;align-items:center;gap:24px;padding-top:18px;padding-bottom:18px}
-.лого{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;letter-spacing:-.01em}
+.лого{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;letter-spacing:-.01em;
+  text-decoration:none;color:inherit;display:block}
+.лого img{height:46px;width:auto}
+.лого-подвал{height:38px;width:auto;margin-bottom:10px;opacity:.9}
 .лого span{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
   letter-spacing:.08em;text-transform:uppercase;color:var(--тихий);margin-top:3px}
 .шапка nav{margin-left:auto;display:flex;align-items:center;gap:22px;font-size:15px}
@@ -327,6 +343,7 @@ footer .обёртка{display:flex;gap:24px;flex-wrap:wrap;justify-content:spac
   .срок b{display:inline}
   .шапка nav a:not(.тел){display:none}
   .тел{font-size:16px;white-space:nowrap}
+  .лого img{height:36px}
   .шапка .обёртка{gap:12px}
   .срок b{display:inline;margin-left:6px}
 }
@@ -448,6 +465,15 @@ def разметка_поиска() -> str:
 
 
 def собрать() -> str:
+    знак, знак_тёмный = логотип("logo1.png"), логотип("logo2.png")
+    шапка_лого = (
+        f'<a class="лого" href="/"><img src="{знак}" alt="Папина лавка">'
+        f'<span>натуральные продукты экоферм · Воронеж</span></a>'
+        if знак else
+        '<div class="лого">Папина лавка'
+        '<span>натуральные продукты экоферм · Воронеж</span></div>')
+    подвал_лого = (f'<img class="лого-подвал" src="{знак_тёмный or знак}" alt="">'
+                   if (знак_тёмный or знак) else "")
     разметка = разметка_поиска()
     значок = data_uri(os.path.join(ВЫГРУЗКА, "favicon.png"))
     вшитые = шрифты()
@@ -521,7 +547,7 @@ def собрать() -> str:
 <a class="пропустить" href="#каталог">Перейти к каталогу</a>
 
 <header class="шапка"><div class="обёртка">
-  <div class="лого">Папина лавка<span>натуральные продукты экоферм · Воронеж</span></div>
+  {шапка_лого}
   <nav>
     <a href="#каталог">Что привозим</a><a href="#фермеры">Фермеры</a>
     <a href="#лавки">Где забрать</a>
@@ -627,7 +653,7 @@ def собрать() -> str:
 </div></section>
 
 <footer><div class="обёртка">
-  <div>«Папина лавка» · натуральные продукты с доставкой, Воронеж<br>
+  <div>{подвал_лого}«Папина лавка» · натуральные продукты с доставкой, Воронеж<br>
      ИП Папин М.А., ОГРН 310366828700143</div>
   <div>+7 929 009-50-55 · papinalavka@gmail.com</div>
 </div></footer>
