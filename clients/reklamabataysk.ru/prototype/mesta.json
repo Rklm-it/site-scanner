@@ -1,0 +1,492 @@
+[
+ {
+  "n": 1,
+  "kind": "ekran",
+  "address": "ул.Куйбышева 7",
+  "lat": 47.153239,
+  "lon": 39.737821,
+  "free": true,
+  "until": null,
+  "photo": "ekran-ul-kuybysheva-7.jpg"
+ },
+ {
+  "n": 2,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1610 м по ходу километража, справа",
+  "lat": 47.1573,
+  "lon": 39.739,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1610-m-po-hodu-.jpg"
+ },
+ {
+  "n": 3,
+  "kind": "ekran",
+  "address": "ул.Максима Горького-1-й Пятилетки 354",
+  "lat": 47.13872,
+  "lon": 39.721795,
+  "free": true,
+  "until": null,
+  "photo": "ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg"
+ },
+ {
+  "n": 4,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1650 м по ходу километража, справа",
+  "lat": 47.1569,
+  "lon": 39.7382,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1650-m-po-hodu-.jpg"
+ },
+ {
+  "n": 5,
+  "kind": "ekran",
+  "address": "ул.Максима Горького -Луначарского 117",
+  "lat": 47.140945,
+  "lon": 39.736689,
+  "free": true,
+  "until": null,
+  "photo": "ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg"
+ },
+ {
+  "n": 6,
+  "kind": "ekran",
+  "address": "ул.Энгельса-Крупская 172",
+  "lat": 47.140424,
+  "lon": 39.749957,
+  "free": true,
+  "until": null,
+  "photo": "ekran-ul-engelsa-krupskaya-172.jpg"
+ },
+ {
+  "n": 7,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1650 м по ходу километража, слева",
+  "lat": 47.1567,
+  "lon": 39.73953,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1650-m-po-hodu--2.jpg"
+ },
+ {
+  "n": 8,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1690 м по ходу километража, справа",
+  "lat": 47.1563,
+  "lon": 39.73755,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1690-m-po-hodu-.jpg"
+ },
+ {
+  "n": 9,
+  "kind": "ekran",
+  "address": "ул.Энгельса-Ленинградская 46",
+  "lat": 47.151492,
+  "lon": 39.747199,
+  "free": true,
+  "until": null,
+  "photo": "ekran-ul-engelsa-leningradskaya-46.jpg"
+ },
+ {
+  "n": 10,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1700 м по ходу километража, слева",
+  "lat": 47.1569,
+  "lon": 39.73953,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1700-m-po-hodu-.jpg"
+ },
+ {
+  "n": 11,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1730 м по ходу километража, справа",
+  "lat": 47.156019,
+  "lon": 39.738414,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1730-m-po-hodu-.jpg"
+ },
+ {
+  "n": 12,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1750 м по ходу километража, слева",
+  "lat": 47.156506,
+  "lon": 39.738525,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1750-m-po-hodu-.jpg"
+ },
+ {
+  "n": 13,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1770 м по ходу километража, справа",
+  "lat": 47.15576,
+  "lon": 39.737645,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1770-m-po-hodu-.jpg"
+ },
+ {
+  "n": 14,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1800 м по ходу километража, слева",
+  "lat": 47.1564,
+  "lon": 39.73873,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1800-m-po-hodu-.jpg"
+ },
+ {
+  "n": 15,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1810 м по ходу километража, справа",
+  "lat": 47.155775,
+  "lon": 39.737817,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1810-m-po-hodu-.jpg"
+ },
+ {
+  "n": 16,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1885 м по ходу километража, справа",
+  "lat": 47.155761,
+  "lon": 39.737646,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1885-m-po-hodu-.jpg"
+ },
+ {
+  "n": 17,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1890 м по ходу километража, слева",
+  "lat": 47.156091,
+  "lon": 39.738429,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1890-m-po-hodu-.jpg"
+ },
+ {
+  "n": 18,
+  "kind": "schit",
+  "address": "Северный подъезд к Батайску 1980 м по ходу километража, слева",
+  "lat": 47.156653,
+  "lon": 39.739083,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-severnyy-podezd-k-bataysku-1980-m-po-hodu-.jpg"
+ },
+ {
+  "n": 19,
+  "kind": "prizmatron",
+  "address": "Куйбышева/Огородная",
+  "lat": 47.15369,
+  "lon": 39.73743,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "prizma-kuybysheva-ogorodnaya.jpg"
+ },
+ {
+  "n": 20,
+  "kind": "prizmatron",
+  "address": "Куйбышева, 2а",
+  "lat": 47.15307,
+  "lon": 39.7365,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "prizma-kuybysheva-2a.jpg"
+ },
+ {
+  "n": 21,
+  "kind": "schit",
+  "address": "Куйбышева 35/Морской",
+  "lat": 47.1463,
+  "lon": 39.73839,
+  "free": false,
+  "until": "02.01.2027",
+  "photo": "schit-kuybysheva-35-morskoy.jpg"
+ },
+ {
+  "n": 22,
+  "kind": "schit",
+  "address": "Куйбышева, 61",
+  "lat": 47.14762,
+  "lon": 39.73839,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-kuybysheva-61.jpg"
+ },
+ {
+  "n": 23,
+  "kind": "schit",
+  "address": "ул.Куйбышева 104",
+  "lat": 47.143366,
+  "lon": 39.738764,
+  "free": true,
+  "until": null,
+  "photo": "schit-ul-kuybysheva-104.jpg"
+ },
+ {
+  "n": 24,
+  "kind": "schit",
+  "address": "Куйбышева 114 А",
+  "lat": 47.14263,
+  "lon": 39.738998,
+  "free": true,
+  "until": null,
+  "photo": "schit-kuybysheva-114-a.jpg"
+ },
+ {
+  "n": 25,
+  "kind": "prizmatron",
+  "address": "Куйбышева, 118",
+  "lat": 47.142134,
+  "lon": 39.7386,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "prizma-kuybysheva-118.jpg"
+ },
+ {
+  "n": 26,
+  "kind": "schit",
+  "address": "Куйбышева/Заводская (сторона А)",
+  "lat": 47.142134,
+  "lon": 39.7398,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-kuybysheva-zavodskaya-storona-a.jpg"
+ },
+ {
+  "n": 27,
+  "kind": "schit",
+  "address": "Куйбышева/Заводская (сторона В)",
+  "lat": 47.142134,
+  "lon": 39.7407,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-kuybysheva-zavodskaya-storona-v.jpg"
+ },
+ {
+  "n": 28,
+  "kind": "schit",
+  "address": "Куйбышева,136 ЦГБ справа",
+  "lat": 47.139309,
+  "lon": 39.739438,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-kuybysheva-136-cgb-sprava.jpg"
+ },
+ {
+  "n": 29,
+  "kind": "schit",
+  "address": "ул. Куйбышева, 161, слева",
+  "lat": 47.13767,
+  "lon": 39.74084,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-kuybysheva-161-sleva.jpg"
+ },
+ {
+  "n": 30,
+  "kind": "schit",
+  "address": "ул. М.Горького 137",
+  "lat": 47.140022,
+  "lon": 39.735449,
+  "free": false,
+  "until": "20.09.2026",
+  "photo": "schit-ul-m-gorkogo-137.jpg"
+ },
+ {
+  "n": 31,
+  "kind": "schit",
+  "address": "Максима Горького 281 а",
+  "lat": 47.137825,
+  "lon": 39.7205,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-maksima-gorkogo-281-a.jpg"
+ },
+ {
+  "n": 32,
+  "kind": "schit",
+  "address": "Максима Горького 281 в",
+  "lat": 47.137825,
+  "lon": 39.722,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-maksima-gorkogo-281-v.jpg"
+ },
+ {
+  "n": 33,
+  "kind": "schit",
+  "address": "ул.М.Горького 281 Б",
+  "lat": 47.138429,
+  "lon": 39.721115,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-m-gorkogo-281-b.jpg"
+ },
+ {
+  "n": 34,
+  "kind": "schit",
+  "address": "ул.М.Горького 281 В",
+  "lat": 47.138429,
+  "lon": 39.721115,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-m-gorkogo-281-v.jpg"
+ },
+ {
+  "n": 35,
+  "kind": "prizmatron",
+  "address": "ул. М. Горького № 285 (Сторона A)",
+  "lat": 47.137996,
+  "lon": 39.718573,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "prizma-ul-m-gorkogo-285-storona-a.jpg"
+ },
+ {
+  "n": 36,
+  "kind": "schit",
+  "address": "Максима Горького, 358 (сторона А)",
+  "lat": 47.13851,
+  "lon": 39.7171,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-maksima-gorkogo-358-storona-a.jpg"
+ },
+ {
+  "n": 37,
+  "kind": "schit",
+  "address": "Максима Горького, 358 (сторона B)",
+  "lat": 47.13851,
+  "lon": 39.71651,
+  "free": true,
+  "until": null,
+  "photo": "schit-maksima-gorkogo-358-storona-b.jpg"
+ },
+ {
+  "n": 38,
+  "kind": "prizmatron",
+  "address": "ул. 1-й Пятилетки и М.Горького 356 (сторона B)",
+  "lat": 47.138698,
+  "lon": 39.721302,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "prizma-ul-1-y-pyatiletki-i-m-gorkogo-356-storona.jpg"
+ },
+ {
+  "n": 39,
+  "kind": "schit",
+  "address": "Энгельса /Кирова 18 универмаг",
+  "lat": 47.138363,
+  "lon": 39.750755,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-engelsa-kirova-18-univermag.jpg"
+ },
+ {
+  "n": 40,
+  "kind": "schit",
+  "address": "ул.Энгельса-Садовая,51",
+  "lat": 47.157145,
+  "lon": 39.750973,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-engelsa-sadovaya-51.jpg"
+ },
+ {
+  "n": 41,
+  "kind": "schit",
+  "address": "ул.Энгельса-Фрунзе,109",
+  "lat": 47.146201,
+  "lon": 39.743159,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-engelsa-frunze-109.jpg"
+ },
+ {
+  "n": 42,
+  "kind": "schit",
+  "address": "Ул. Энгельса -Заводская 130",
+  "lat": 47.143976,
+  "lon": 39.748895,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-engelsa-zavodskaya-130.jpg"
+ },
+ {
+  "n": 43,
+  "kind": "schit",
+  "address": "ул.Энгельса 134",
+  "lat": 47.143421,
+  "lon": 39.749122,
+  "free": true,
+  "until": null,
+  "photo": "schit-ul-engelsa-134.jpg"
+ },
+ {
+  "n": 44,
+  "kind": "schit",
+  "address": "ул.Энгельса-Половинко,45",
+  "lat": 47.152301,
+  "lon": 39.747627,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-engelsa-polovinko-45.jpg"
+ },
+ {
+  "n": 45,
+  "kind": "schit",
+  "address": "ул.Энгельса 53",
+  "lat": 47.15186,
+  "lon": 39.747936,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-ul-engelsa-53.jpg"
+ },
+ {
+  "n": 46,
+  "kind": "schit",
+  "address": "ул.Энгельса 40 слева",
+  "lat": 47.152081,
+  "lon": 39.747047,
+  "free": true,
+  "until": null,
+  "photo": "schit-ul-engelsa-40-sleva.jpg"
+ },
+ {
+  "n": 47,
+  "kind": "schit",
+  "address": "ул.Заводская 45",
+  "lat": 47.143531,
+  "lon": 39.748583,
+  "free": true,
+  "until": null,
+  "photo": "schit-ul-zavodskaya-45.jpg"
+ },
+ {
+  "n": 48,
+  "kind": "schit",
+  "address": "Выезд из города Батайска, Северный 16",
+  "lat": 47.156658,
+  "lon": 39.743475,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-vyezd-iz-goroda-batayska-severnyy-16.jpg"
+ },
+ {
+  "n": 49,
+  "kind": "schit",
+  "address": "Выезд из города Батайска, Северный 35",
+  "lat": 47.157268,
+  "lon": 39.742988,
+  "free": false,
+  "until": "01.01.2027",
+  "photo": "schit-vyezd-iz-goroda-batayska-severnyy-35.jpg"
+ }
+]

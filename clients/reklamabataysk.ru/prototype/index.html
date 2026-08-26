@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Рекламные щиты 3×6 и светодиодные экраны в Батайске — агентство ПОКОТИЛОВ</title>
+<meta name="description" content="Аренда рекламных щитов 3×6, призматронов и светодиодных экранов в Батайске. Свободно 11 мест из 49. Печать баннеров, монтаж, изготовление конструкций.">
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --grafit:#1C1E20; --beton:#EDEFF0; --ogon:#FF4200; --doroga:#6B7076; --belyy:#fff;
+  --step:clamp(3.5rem,7vw,6.5rem);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--beton);color:var(--grafit);
+  font:400 17px/1.55 'PT Sans',system-ui,sans-serif;}
+img{max-width:100%;display:block}
+h1,h2,h3{font-family:'Unbounded','PT Sans',sans-serif;font-weight:700;
+  letter-spacing:-.02em;line-height:1.02;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.1rem,5.4vw,4rem)}
+h2{font-size:clamp(1.6rem,3.4vw,2.6rem)}
+h3{font-size:1.05rem;letter-spacing:-.01em;line-height:1.25}
+p{margin:0}
+a{color:inherit}
+.wrap{width:min(1180px,100% - 2.5rem);margin-inline:auto}
+.sect{padding-block:var(--step)}
+.sect__head{margin-bottom:2.2rem;max-width:46ch}
+.sect__sub{margin-top:.9rem;color:var(--doroga);font-size:1.05rem}
+
+/* шапка */
+.top{border-bottom:1px solid rgba(28,30,32,.12)}
+.top__in{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding-block:1rem}
+.top__logo{height:38px;width:auto}
+.tels{display:flex;gap:1.4rem;font-size:.95rem}
+.tel{text-decoration:none;white-space:nowrap}
+.tel b{display:block;font-size:1.06rem;letter-spacing:.01em;font-family:'PT Mono',monospace}
+.tel span{color:var(--doroga);font-size:.82rem}
+
+/* первый экран */
+.hero{padding-block:clamp(2.4rem,5vw,4.4rem) var(--step)}
+.hero__in{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.6rem,3.4vw,3.4rem);
+  align-items:center}
+.hero__shot{aspect-ratio:2/1;object-fit:cover;object-position:22% 34%;width:100%;
+  border:6px solid var(--grafit)}
+.hero__free{margin-top:1.6rem;font-size:clamp(1.15rem,1.9vw,1.5rem);line-height:1.3}
+.hero__free b{font-family:'Unbounded',sans-serif;color:var(--ogon);
+  font-size:clamp(2.6rem,5.4vw,4.2rem);line-height:.9;display:inline-block;
+  vertical-align:-.09em;margin-inline:.06em}
+.hero__meta{margin-top:1.5rem;color:var(--doroga);font-size:.95rem;max-width:34ch}
+.btn{display:inline-block;margin-top:1.8rem;background:var(--ogon);color:var(--belyy);
+  text-decoration:none;font-weight:700;padding:1rem 1.9rem;border:0;cursor:pointer;
+  font-family:'PT Sans',sans-serif;font-size:1.02rem}
+.btn:hover{background:#e03a00}
+.btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid var(--grafit);outline-offset:3px}
+
+/* карточки */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1.6rem}
+.card{background:var(--belyy);display:flex;flex-direction:column}
+.card__photo{aspect-ratio:2/1;object-fit:cover;width:100%}
+.card__body{padding:1.05rem 1.15rem 1.3rem;flex:1;display:flex;flex-direction:column;align-items:flex-start}
+.card__addr{margin-bottom:.7rem;min-height:2.6em}
+.tag{display:inline-block;font-family:'PT Mono',monospace;font-size:.8rem;
+  padding:.34rem .6rem;background:rgba(107,112,118,.14);color:var(--doroga)}
+.tag--free{background:var(--ogon);color:var(--belyy)}
+.card__price{margin-top:auto;padding-top:.7rem;color:var(--doroga);font-size:.9rem}
+
+/* лента трассы */
+.trassa{background:var(--grafit);color:var(--beton)}
+.trassa .sect__sub{color:rgba(237,239,240,.62)}
+.lenta{margin:2.2rem auto 0;max-width:560px}
+.lenta__sides{display:grid;grid-template-columns:1fr 1fr;gap:5rem;max-width:560px;margin:.7rem auto -.2rem;font-family:'PT Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(237,239,240,.45)}
+.lenta__sides span:first-child{text-align:right;padding-right:.4rem}
+.lenta__sides span:last-child{padding-left:.4rem}
+.lenta__cap{font-family:'PT Mono',monospace;font-size:.8rem;text-align:center;
+  color:rgba(237,239,240,.55);letter-spacing:.08em;text-transform:uppercase}
+.mark{display:grid;grid-template-columns:1fr 72px 1fr;align-items:center;
+  column-gap:.6rem;min-height:56px;position:relative}
+.mark::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;
+  margin-left:-1px;background:rgba(237,239,240,.3)}
+.mark__side{display:flex;align-items:center;min-height:38px}
+.mark__side--l{justify-content:flex-end}
+.mark__box{display:block;width:100%;max-width:172px;height:48px;background:var(--doroga);
+  border:2px solid rgba(237,239,240,.3)}
+.mark__km{font-family:'PT Mono',monospace;font-size:.9rem;text-align:center;
+  position:relative;z-index:1;background:var(--grafit);padding-block:.3rem;
+  color:rgba(237,239,240,.8)}
+.trassa__note{margin:2.6rem auto 0;max-width:44ch;text-align:center}
+.trassa__note strong{font-family:'Unbounded',sans-serif;font-size:1.3rem;
+  display:block;line-height:1.2;margin-bottom:.8rem}
+.trassa__note span{color:rgba(237,239,240,.62)}
+.vyezd{margin:2.2rem auto 0;max-width:560px;display:grid;grid-template-columns:1fr 1fr;
+  gap:1rem;font-family:'PT Mono',monospace;font-size:.86rem;
+  color:rgba(237,239,240,.62);text-align:center}
+.vyezd div{border:1px solid rgba(237,239,240,.22);padding:.8rem}
+
+/* все места */
+.filter{display:flex;align-items:center;gap:.7rem;margin-bottom:2rem;
+  font-family:'PT Mono',monospace;font-size:.9rem;cursor:pointer}
+.street{margin-bottom:2.4rem}
+.street__name{display:flex;flex-wrap:wrap;align-items:baseline;gap:.8rem;
+  padding-bottom:.7rem;border-bottom:2px solid var(--grafit)}
+.street__count{font-family:'PT Mono',monospace;font-size:.8rem;font-weight:400;
+  color:var(--doroga)}
+.street__list{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:1fr 8rem 11rem;gap:1rem;align-items:baseline;
+  padding:.62rem 0;border-bottom:1px solid rgba(28,30,32,.1);font-size:.96rem}
+.row__kind,.row__st{font-family:'PT Mono',monospace;font-size:.82rem;color:var(--doroga)}
+.row--free .row__st{color:var(--ogon);font-weight:700}
+.row--free .row__addr{font-weight:700}
+
+/* услуги */
+.uslugi{background:var(--grafit);color:var(--beton)}
+.uslugi__list{list-style:none;margin:2.4rem 0 0;padding:0;
+  display:grid;grid-template-columns:1fr 1fr;gap:0 3rem}
+.uslugi__list li{font-family:'Unbounded',sans-serif;font-size:clamp(1rem,1.7vw,1.35rem);
+  line-height:1.25;padding-block:1.5rem;border-top:1px solid rgba(237,239,240,.2)}
+
+/* партнёрам + форма */
+.dva{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.6rem,3vw,3.4rem);
+  align-items:start}
+.partner p{margin-top:1.1rem;max-width:42ch}
+.form{background:var(--belyy);padding:clamp(1.4rem,2.6vw,2.2rem)}
+.form label{display:block;margin-bottom:1.1rem;font-size:.86rem;
+  font-family:'PT Mono',monospace;color:var(--doroga)}
+.form input,.form select{display:block;width:100%;margin-top:.42rem;padding:.85rem .9rem;
+  border:1px solid rgba(28,30,32,.28);background:var(--belyy);color:var(--grafit);
+  font:400 1rem 'PT Sans',sans-serif;border-radius:0}
+.form .btn{margin-top:.4rem;width:100%}
+.form__ok{display:none;margin-top:1rem;color:var(--ogon);font-weight:700}
+
+/* подвал */
+.foot{background:var(--grafit);color:rgba(237,239,240,.72);padding-block:2.6rem;
+  font-size:.92rem}
+.foot__in{display:flex;flex-wrap:wrap;gap:1rem 2.4rem;justify-content:space-between}
+.foot a{color:var(--beton)}
+
+@media (max-width:900px){
+  .hero__in,.dva,.uslugi__list{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr auto;row-gap:.2rem}
+  .row__kind{grid-column:2;text-align:right}
+  .row__st{grid-column:1/-1}
+  .tels{flex-direction:column;gap:.3rem;text-align:right}
+  .top__logo{height:30px}
+  .mark{grid-template-columns:1fr 62px 1fr}
+  .mark__box{width:100%;max-width:120px;height:38px}
+  .uslugi__list li{padding-block:1.15rem}
+}
+
+/* движение — только лента */
+@media (prefers-reduced-motion:no-preference){
+  .lenta.is-armed .mark__box,.lenta.is-armed .mark__km{opacity:0}
+  .lenta.is-on .mark__box,.lenta.is-on .mark__km{
+    animation:pop .5s ease-out forwards;animation-delay:var(--d,0ms)}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top__in">
+    <img class="top__logo" src="images/logo.png" alt="Рекламное агентство ПОКОТИЛОВ">
+    <div class="tels">
+      <a class="tel" href="tel:+79185246060"><span>Марина</span><b>8 918 524-60-60</b></a>
+      <a class="tel" href="tel:+79185549401"><span>Виктор</span><b>8 918 554-94-01</b></a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero__in">
+    <img class="hero__shot" src="images/schit-ul-zavodskaya-45.jpg"
+         alt="Пустой рекламный щит 3×6 на улице Заводская в Батайске">
+    <div>
+      <h1>Рекламные щиты 3×6 в Батайске</h1>
+      <p class="hero__free">Свободно <b>11</b> мест из 49</p>
+      <p class="hero__meta">Батайск и Северный подъезд. Щиты 3×6, призматроны, светодиодные экраны.</p>
+      <a class="btn" href="#svobodno">Показать свободные</a>
+    </div>
+  </div>
+</section>
+
+<section class="sect" id="svobodno">
+  <div class="wrap">
+    <div class="sect__head">
+      <h2>Пять светодиодных экранов</h2>
+      <p class="sect__sub">Экран показывает ролик в цикле — картинку можно менять хоть каждый день, печатать баннер не нужно. Свободны все пять.</p>
+    </div>
+    <div class="grid"><article class="card">
+  <img class="card__photo" src="images/ekran-ul-kuybysheva-7.jpg" alt="Рекламное место: ул. Куйбышева 7, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Куйбышева 7</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg" alt="Рекламное место: ул. Максима Горького-1-й Пятилетки 354, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Максима Горького-1-й Пятилетки 354</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg" alt="Рекламное место: ул. Максима Горького -Луначарского 117, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Максима Горького -Луначарского 117</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/ekran-ul-engelsa-krupskaya-172.jpg" alt="Рекламное место: ул. Энгельса-Крупская 172, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Энгельса-Крупская 172</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/ekran-ul-engelsa-leningradskaya-46.jpg" alt="Рекламное место: ул. Энгельса-Ленинградская 46, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Энгельса-Ленинградская 46</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article></div>
+  </div>
+</section>
+
+<section class="sect">
+  <div class="wrap">
+    <div class="sect__head">
+      <h2>Свободные щиты 3×6</h2>
+      <p class="sect__sub">Шесть мест в городе, готовы к размещению.</p>
+    </div>
+    <div class="grid"><article class="card">
+  <img class="card__photo" src="images/schit-ul-kuybysheva-104.jpg" alt="Рекламное место: ул. Куйбышева 104, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Куйбышева 104</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/schit-kuybysheva-114-a.jpg" alt="Рекламное место: Куйбышева 114 А, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">Куйбышева 114 А</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/schit-maksima-gorkogo-358-storona-b.jpg" alt="Рекламное место: Максима Горького, 358 (сторона B), Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">Максима Горького, 358 (сторона B)</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/schit-ul-engelsa-134.jpg" alt="Рекламное место: ул. Энгельса 134, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Энгельса 134</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/schit-ul-engelsa-40-sleva.jpg" alt="Рекламное место: ул. Энгельса 40 слева, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Энгельса 40 слева</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article><article class="card">
+  <img class="card__photo" src="images/schit-ul-zavodskaya-45.jpg" alt="Рекламное место: ул. Заводская 45, Батайск" loading="lazy">
+  <div class="card__body">
+    <h3 class="card__addr">ул. Заводская 45</h3>
+    <span class="tag tag--free">Свободен</span>
+    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+  </div>
+</article></div>
+  </div>
+</section>
+
+<section class="sect trassa">
+  <div class="wrap">
+    <div class="sect__head">
+      <h2>Щиты на въезде в город</h2>
+      <p class="sect__sub">Северный подъезд к Батайску. Отметки — метры по ходу километража, как их считает агентство.</p>
+    </div>
+    <p class="lenta__cap">въезд в Батайск</p>
+    <div class="lenta__sides"><span>слева от дороги</span><span>справа от дороги</span></div>
+    <div class="lenta"><div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1610</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1610 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1650</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1650 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"><span class="mark__box" title="Северный подъезд к Батайску 1650 м по ходу километража, слева"></span></div>
+  <div class="mark__km">1650</div>
+  <div class="mark__side mark__side--r"></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1690</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1690 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"><span class="mark__box" title="Северный подъезд к Батайску 1700 м по ходу километража, слева"></span></div>
+  <div class="mark__km">1700</div>
+  <div class="mark__side mark__side--r"></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1730</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1730 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"><span class="mark__box" title="Северный подъезд к Батайску 1750 м по ходу километража, слева"></span></div>
+  <div class="mark__km">1750</div>
+  <div class="mark__side mark__side--r"></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1770</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1770 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"><span class="mark__box" title="Северный подъезд к Батайску 1800 м по ходу километража, слева"></span></div>
+  <div class="mark__km">1800</div>
+  <div class="mark__side mark__side--r"></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1810</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1810 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"></div>
+  <div class="mark__km">1885</div>
+  <div class="mark__side mark__side--r"><span class="mark__box" title="Северный подъезд к Батайску 1885 м по ходу километража, справа"></span></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"><span class="mark__box" title="Северный подъезд к Батайску 1890 м по ходу километража, слева"></span></div>
+  <div class="mark__km">1890</div>
+  <div class="mark__side mark__side--r"></div>
+</div>
+<div class="mark">
+  <div class="mark__side mark__side--l"><span class="mark__box" title="Северный подъезд к Батайску 1980 м по ходу километража, слева"></span></div>
+  <div class="mark__km">1980</div>
+  <div class="mark__side mark__side--r"></div>
+</div></div>
+    <p class="lenta__cap">выезд на Ростов</p>
+    <div class="vyezd">
+      <div>Выезд, Северный 16</div>
+      <div>Выезд, Северный 35</div>
+    </div>
+    <p class="trassa__note">
+      <strong>Тринадцать щитов подряд на въезде и ещё два на выезде. Все пятнадцать выкуплены до января 2027 года.</strong>
+      <span>Машина видит их один за другим — поэтому места на подъезде разбирают на год вперёд.</span>
+    </p>
+  </div>
+</section>
+
+<section class="sect">
+  <div class="wrap">
+    <div class="sect__head">
+      <h2>Все 49 мест</h2>
+      <p class="sect__sub">Полный список конструкций агентства по улицам Батайска.</p>
+    </div>
+    <label class="filter"><input type="checkbox" id="only-free"> Только свободные</label>
+    <div class="street">
+  <h3 class="street__name">Северный подъезд и выезды <span class="street__count">15 мест · свободно 0</span></h3>
+  <ul class="street__list"><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1610 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1650 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1650 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1690 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1700 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1730 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1750 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1770 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1800 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1810 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1885 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1890 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Северный подъезд к Батайску 1980 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Выезд из города Батайска, Северный 16</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Выезд из города Батайска, Северный 35</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li></ul>
+</div><div class="street">
+  <h3 class="street__name">Куйбышева <span class="street__count">12 мест · свободно 3</span></h3>
+  <ul class="street__list"><li class="row row--free" data-free="1"><span class="row__addr">ул. Куйбышева 7</span><span class="row__kind">экран</span><span class="row__st">Свободен</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева/Огородная</span><span class="row__kind">призматрон</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева, 2а</span><span class="row__kind">призматрон</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева 35/Морской</span><span class="row__kind">щит 3×6</span><span class="row__st">до 02.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева, 61</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row row--free" data-free="1"><span class="row__addr">ул. Куйбышева 104</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li><li class="row row--free" data-free="1"><span class="row__addr">Куйбышева 114 А</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева, 118</span><span class="row__kind">призматрон</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева/Заводская (сторона А)</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева/Заводская (сторона В)</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Куйбышева,136 ЦГБ справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. Куйбышева, 161, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li></ul>
+</div><div class="street">
+  <h3 class="street__name">Максима Горького <span class="street__count">11 мест · свободно 3</span></h3>
+  <ul class="street__list"><li class="row row--free" data-free="1"><span class="row__addr">ул. Максима Горького-1-й Пятилетки 354</span><span class="row__kind">экран</span><span class="row__st">Свободен</span></li><li class="row row--free" data-free="1"><span class="row__addr">ул. Максима Горького -Луначарского 117</span><span class="row__kind">экран</span><span class="row__st">Свободен</span></li><li class="row" data-free="0"><span class="row__addr">ул. М.Горького 137</span><span class="row__kind">щит 3×6</span><span class="row__st">до 20.09.2026</span></li><li class="row" data-free="0"><span class="row__addr">Максима Горького 281 а</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Максима Горького 281 в</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. М.Горького 281 Б</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. М.Горького 281 В</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. М. Горького № 285 (Сторона A)</span><span class="row__kind">призматрон</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Максима Горького, 358 (сторона А)</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row row--free" data-free="1"><span class="row__addr">Максима Горького, 358 (сторона B)</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li><li class="row" data-free="0"><span class="row__addr">ул. 1-й Пятилетки и М.Горького 356 (сторона B)</span><span class="row__kind">призматрон</span><span class="row__st">до 01.01.2027</span></li></ul>
+</div><div class="street">
+  <h3 class="street__name">Энгельса <span class="street__count">10 мест · свободно 4</span></h3>
+  <ul class="street__list"><li class="row row--free" data-free="1"><span class="row__addr">ул. Энгельса-Крупская 172</span><span class="row__kind">экран</span><span class="row__st">Свободен</span></li><li class="row row--free" data-free="1"><span class="row__addr">ул. Энгельса-Ленинградская 46</span><span class="row__kind">экран</span><span class="row__st">Свободен</span></li><li class="row" data-free="0"><span class="row__addr">Энгельса /Кирова 18 универмаг</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. Энгельса-Садовая,51</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. Энгельса-Фрунзе,109</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">Ул. Энгельса -Заводская 130</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row row--free" data-free="1"><span class="row__addr">ул. Энгельса 134</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li><li class="row" data-free="0"><span class="row__addr">ул. Энгельса-Половинко,45</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0"><span class="row__addr">ул. Энгельса 53</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row row--free" data-free="1"><span class="row__addr">ул. Энгельса 40 слева</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li></ul>
+</div><div class="street">
+  <h3 class="street__name">Заводская <span class="street__count">1 мест · свободно 1</span></h3>
+  <ul class="street__list"><li class="row row--free" data-free="1"><span class="row__addr">ул. Заводская 45</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li></ul>
+</div>
+  </div>
+</section>
+
+<section class="sect uslugi">
+  <div class="wrap">
+    <h2>Печать и монтаж</h2>
+    <ul class="uslugi__list">
+      <li>Печать баннеров, интерьерная и широкоформатная печать</li>
+      <li>Монтажные работы любой сложности</li>
+      <li>Изготовление, установка рекламных конструкций</li>
+      <li>Продажа б/у баннеров</li>
+    </ul>
+  </div>
+</section>
+
+<section class="sect">
+  <div class="wrap dva">
+    <div class="partner">
+      <h2>Партнёрам</h2>
+      <p>Рекламному агентству, менеджеру отдела маркетинга или тому, кто знает,
+         кому сдать в аренду рекламный щит: свяжитесь с нами — обсудим детали
+         партнёрства и размер вашего вознаграждения.</p>
+      <a class="btn" href="tel:+79185246060">Позвонить Марине</a>
+    </div>
+    <form class="form">
+      <h2>Оставить заявку</h2>
+      <label>Как вас зовут<input type="text" name="name" required></label>
+      <label>Телефон<input type="tel" name="phone" required></label>
+      <label>Какое место интересует
+        <select name="mesto"><option>Пока не выбрал</option><option>ул. Куйбышева 7</option><option>ул. Максима Горького-1-й Пятилетки 354</option><option>ул. Максима Горького -Луначарского 117</option><option>ул. Энгельса-Крупская 172</option><option>ул. Энгельса-Ленинградская 46</option><option>ул. Куйбышева 104</option><option>Куйбышева 114 А</option><option>Максима Горького, 358 (сторона B)</option><option>ул. Энгельса 134</option><option>ул. Энгельса 40 слева</option><option>ул. Заводская 45</option></select>
+      </label>
+      <button class="btn" type="submit">Отправить заявку</button>
+      <p class="form__ok">Заявка отправлена. Перезвоним в течение дня.</p>
+    </form>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div>Рекламное агентство ПОКОТИЛОВ · Батайск</div>
+    <div>
+      <a href="tel:+79185246060">8 918 524-60-60</a> ·
+      <a href="tel:+79185549401">8 918 554-94-01</a> ·
+      <a href="mailto:Marina.stolyar@list.ru">Marina.stolyar@list.ru</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const lenta=document.querySelector('.lenta');
+if(lenta){
+  lenta.classList.add('is-armed');
+  [...lenta.querySelectorAll('.mark')].forEach((m,i)=>{
+    m.querySelectorAll('.mark__box,.mark__km').forEach(el=>el.style.setProperty('--d',(i*55)+'ms'));
+  });
+  new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('is-on');o.disconnect();}})},
+    {threshold:.15}).observe(lenta);
+}
+const f=document.getElementById('only-free');
+if(f) f.addEventListener('change',()=>{
+  document.querySelectorAll('.street__list .row').forEach(r=>{
+    r.style.display=(f.checked && r.dataset.free==='0')?'none':'';
+  });
+});
+const form=document.querySelector('.form');
+if(form) form.addEventListener('submit',e=>{
+  e.preventDefault();
+  form.querySelector('.form__ok').style.display='block';
+});
+</script>
+</body>
+</html>
