@@ -31,6 +31,33 @@ def text(s: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(s)).strip()
 
 
+def склон(n: int, один: str, два: str, много: str) -> str:
+    """«403 товара», а не «403 товаров»: файл читает живой человек."""
+    a, b = abs(n) % 100, abs(n) % 10
+    if 10 < a < 20:
+        return много
+    return два if 1 < b < 5 else (один if b == 1 else много)
+
+
+def между(h: str, начало: str, конец: str, предел: int = 20000) -> str:
+    """Кусок разметки между двумя метками — поиском по строке, не регуляркой.
+
+    Здесь была настоящая засада: `<div class="...".*?>(.*?)<div class="clear"`
+    с двумя ленивыми группами на странице, где закрывающей метки нет, уходит в
+    перебор всех позиций. На карточке с длинным описанием это 45 секунд на файл
+    — на полутора тысячах карточек скрипт выглядел зависшим и был убит по
+    Ctrl+C. `str.find` делает то же самое за один проход.
+    """
+    i = h.find(начало)
+    if i < 0:
+        return ""
+    j = h.find(">", i)
+    if j < 0:
+        return ""
+    k = h.find(конец, j)
+    return h[j + 1:k if 0 <= k <= j + предел else j + предел]
+
+
 def read(root: str, rel: str) -> str:
     with open(os.path.join(root, rel), encoding="utf-8", errors="replace") as f:
         return f.read()
@@ -57,12 +84,14 @@ def карточки(root: str) -> list[dict]:
         cat = re.search(r'/shop/products/index/(\d+)">(.*?)</a>', h, re.S)
         price = re.search(r'itemprop="price"\s*>\s*([\d\s]+)', h)
         summ = re.search(r'class="summ[^"]*"[^>]*>\s*([\d\s]+)', h)
-        old = re.search(r'class="obsoletePrice".*?<span>\s*([\d\s]+)', h, re.S)
+        # Окно в 300 символов вместо `.*?` через всю страницу: обе метки лежат
+        # рядом, а поиск по всему файлу — тот же перебор, что и с описанием.
+        old = re.search(r"<span>\s*([\d\s]+)", между(h, 'class="obsoletePrice"', "</div>", 300))
         unit = re.search(r'class="valute"[^>]*>(.*?)</div>', h, re.S)
         img = re.search(r"href='(/content/catalog_image/[^']+)'", h)
         hit = re.search(r'class="hit_name">\s*(.*?)\s*</div>', h, re.S)
         supply = re.search(r"Ближайшая поставка[^<]*", h)
-        body = re.search(r'(?s)<div class="text_content content_sryle".*?>(.*?)<div class="clear"', h)
+        body = между(h, '<div class="text_content content_sryle', '<div class="clear"')
         число = lambda m: int(re.sub(r"\s", "", m.group(1))) if m and m.group(1).strip() else None
         цена = число(price) or число(summ)
         out.append({
@@ -76,7 +105,7 @@ def карточки(root: str) -> list[dict]:
             "img": img.group(1) if img else "",
             "hit": text(hit.group(1)) if hit else "",
             "supply": text(supply.group(0)) if supply else "",
-            "desc": text(body.group(1))[:600] if body else "",
+            "desc": text(body)[:600],
         })
     return out
 
@@ -86,7 +115,9 @@ def каталог(prods: list[dict]) -> str:
     for p in prods:
         by[p["cat"] or "— без раздела"].append(p)
     L = ["# Каталог papinalavka.ru", "",
-         f"Собрано разбором выгрузки: **{len(prods)} товаров** в {len(by)} разделах.",
+         f"Собрано разбором выгрузки: **{len(prods)} "
+         f"{склон(len(prods), 'товар', 'товара', 'товаров')}** в {len(by)} "
+         f"{склон(len(by), 'разделе', 'разделах', 'разделах')}.",
          "Цены — на день выгрузки. На сайте прямо написано, что они зависят от",
          "сезона и фермера и не являются офертой: в новом сайте их надо либо",
          "тянуть из их базы, либо не показывать вовсе.", "",
@@ -217,6 +248,9 @@ def main() -> int:
           f"файлов {man.get('assets')}, не добрано страниц {man.get('pages_left', 0)}, "
           f"файлов {man.get('assets_left', 0)}")
     print(f"Товаров разобрано: {len(prods)} (без цены {без_цены})")
+    if без_цены > len(prods) // 10:
+        print("  ВНИМАНИЕ: много позиций без цены — вёрстка сайта могла "
+              "поменяться, разбор цен надо проверить глазами.")
     print(f"Списки фото: фермеры и разделы {мелкие}, товары {товары}")
     print("Готово. В git идут только КАТАЛОГ.md, ФЕРМЕРЫ.md, ОТЗЫВЫ.md и фото/*.txt")
     return 0
