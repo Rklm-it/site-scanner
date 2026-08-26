@@ -303,6 +303,29 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
 .правила p{{margin:0;font-size:14.5px;color:var(--текст-мягкий)}}
 .правила b{{font-family:Bitter,Georgia,serif}}
 
+/* советы: список, а не карточки — это тексты, а не товары */
+.советы{{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}}
+.совет{{display:flex;gap:16px;align-items:baseline;padding:16px 0;
+  border-bottom:1px solid var(--край);text-decoration:none;color:inherit}}
+.совет:hover b{{color:var(--форель)}}
+.совет b{{font-family:Bitter,Georgia,serif;font-size:17px;white-space:nowrap;
+  transition:color .15s ease}}
+.совет span{{color:var(--тихий);font-size:14px}}
+
+/* фильтры витрины — их же деления на главной */
+.фильтры{{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}}
+.фильтры button{{font:inherit;font-size:14px;padding:7px 14px;border-radius:2px;
+  border:1px solid var(--край);background:var(--прилавок);color:var(--текст);
+  cursor:pointer;transition:border-color .15s ease,color .15s ease}}
+.фильтры button:hover{{border-color:var(--форель)}}
+.фильтры button[aria-pressed="true"]{{background:var(--вода);color:var(--на-тёмном);
+  border-color:var(--вода)}}
+
+/* переезд филиала — их новость, людям это важнее любого баннера */
+.переезд{{border-left:3px solid var(--форель);padding:2px 0 2px 16px;margin-bottom:22px;
+  font-size:15px}}
+.переезд b{{font-family:Bitter,Georgia,serif}}
+
 /* расписание поставок */
 .график{{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--край)}}
 .день{{padding:20px 24px 20px 0;border-right:1px solid var(--край)}}
@@ -488,6 +511,20 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
     ("Большое спасибо за рыбку! Забрал непотрошёную форель, и рыбка порадовала "
      "икрой. Приятный бонус", "Сергей"),
 ]
+# Их же материалы из раздела «Это интересно». Написаны в 2019-м, но не
+# устаревают, а страх «я не умею разделывать рыбу» снимают лучше любой
+# скидки — и приводят людей из поиска.
+СОВЕТЫ = [
+    ("Как разделать форель", "Пошагово: от целой рыбы до стейков и филе"),
+    ("Дефрост — что это?", "Почему «охлаждённая из дефростированного сырья» — "
+     "это размороженная рыба"),
+    ("А лосось есть?", "Рыбы «лосось» не существует: разбираемся в семействе "
+     "лососёвых"),
+    ("Солим форель", "Три способа слабосолёной форели — выбирайте по вкусу"),
+    ("Запекаем рыбу", "Шпаргалка для хозяйки: время, температура, специи"),
+    ("Рыба детям", "С какого возраста, какая и сколько"),
+]
+
 ЛАВКИ = [
     ("ул. Карла Маркса, 94", "вход у арт-объекта «Царь-Рыба»", "9:00–20:00", "+7 950 758-55-05"),
     ("ул. Загоровского, 1", "ТЦ «Пять столиц», вход со стороны Шишкова", "9:00–22:00", "+7 929 009-40-11"),
@@ -590,7 +627,7 @@ def собрать() -> str:
         метка = (f'<span class="метка{акция}">{т["метка"]}</span>' if т["метка"] else "")
         было = f'<s>{т["было"]} ₽</s>' if т["было"] else ""
         карточки.append(
-            f'<article class="товар">{метка}<div class="фото">'
+            f'<article class="товар" data-метка="{т["метка"]}">{метка}<div class="фото">'
             f'<img src="{т["фото"]}" alt="{т["имя"]}"></div><div class="низ">'
             f'<div class="имя">{т["имя"]}</div>'
             f'<div class="цена">{т["цена"]} ₽{было} <em>{т["ед"]}</em></div>'
@@ -610,6 +647,8 @@ def собрать() -> str:
                     for а, о, ч, т in ЛАВКИ)
     города = "".join(f'<option data-где="{где}"{" selected" if г == "Воронеж" else ""}>'
                      f'{г}</option>' for г, где in ГОРОДА)
+    советы = "".join(f'<a class="совет" href="#"><b>{з}</b><span>{о}</span></a>'
+                     for з, о in СОВЕТЫ)
     график = "".join(f'<div class="день"><u>{д}</u><b>{дата}</b><span>{что}</span></div>'
                      for дата, д, что in РАСПИСАНИЕ)
     шаги = "".join(f'<div class="шаг"><b>{б}</b><span>{с}</span></div>' for б, с in [
@@ -680,7 +719,12 @@ def собрать() -> str:
 </div></section>
 
 <section><div class="обёртка">
-  <div class="заг"><h2>На этой неделе</h2><span>привозим в четверг, 27 августа</span></div>
+  <div class="заг"><h2>На этой неделе</h2><span>привозим в четверг, 27 августа</span>
+    <div class="фильтры">
+      <button aria-pressed="true" data-метка="">Всё</button>
+      <button aria-pressed="false" data-метка="товар дня">Товар дня</button>
+      <button aria-pressed="false" data-метка="новинка">Новинки</button>
+    </div></div>
   <div class="товары">{"".join(карточки)}</div>
   <p class="сноска">Цены указаны в информационных целях и не являются публичной офертой:
      они меняются от сезонности продукта и отдалённости фермера.</p>
@@ -696,8 +740,16 @@ def собрать() -> str:
        500 ₽ по городу независимо от суммы.</p>
     <p><b>По четвергам от 5000 ₽ — бесплатно.</b> Иначе 400 ₽ по Воронежу,
        Нововоронеж и Липецк — 450 ₽.</p>
+    <p><b>Оплата при получении.</b> Наличными или картой курьеру, в лавке — картой
+       или наличными. Предоплату не берём.</p>
   </div>
   <div class="график">{график}</div>
+</div></section>
+
+<section class="бел"><div class="обёртка">
+  <div class="заг"><h2>Как выбрать и приготовить</h2>
+    <span>наши памятки — их пишем сами, а не переписываем из интернета</span></div>
+  <div class="советы">{советы}</div>
 </div></section>
 
 <section id="фермеры"><div class="обёртка">
@@ -727,6 +779,8 @@ def собрать() -> str:
 <section id="лавки"><div class="обёртка">
   <div class="заг"><h2 id="где-забрать">Лавки в Воронеже</h2>
     <span>заказы операторы принимают с 9:00 до 19:00, пн–пт</span></div>
+  <p class="переезд"><b>Филиал с Перевёрткина, 24 переехал.</b> Ждём вас на
+     улице Старых Большевиков, 2 — телефон прежний, +7 929 009-50-23.</p>
   <table><thead><tr><th>Адрес</th><th>Часы</th><th>Телефон</th></tr></thead>
   <tbody>{лавки}</tbody></table>
   <p class="сноска" id="другой-город" hidden>Адреса и телефоны в этом городе
@@ -769,6 +823,20 @@ document.getElementById("город").addEventListener("change", e => {{
     `Лавки в ${{выбран.dataset.где}}`;
   document.querySelector("#лавки table").hidden = !свой;
   document.getElementById("другой-город").hidden = свой;
+}});
+
+// Деления витрины у них на сайте есть («новинки», «хиты», «товар дня»), и в
+// макете они работают: кнопка, которая ничего не делает, злит сильнее, чем её
+// отсутствие.
+document.querySelectorAll(".фильтры button").forEach(кнопка => {{
+  кнопка.addEventListener("click", () => {{
+    document.querySelectorAll(".фильтры button").forEach(
+      к => к.setAttribute("aria-pressed", String(к === кнопка)));
+    const метка = кнопка.dataset.метка;
+    document.querySelectorAll(".товар").forEach(карточка => {{
+      карточка.hidden = Boolean(метка) && карточка.dataset.метка !== метка;
+    }});
+  }});
 }});
 
 // Доска поставок сжимается при прокрутке: дата и срок заказа должны остаться
