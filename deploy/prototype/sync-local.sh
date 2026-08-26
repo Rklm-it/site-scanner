@@ -37,9 +37,18 @@ DEST="$ROOT/$NAME"
 mkdir -p "$DEST"
 
 echo "==> Копирую $SRC в $DEST"
-# --delete: папка на сервере должна быть точной копией, иначе удалённая
-# картинка продолжит отдаваться и прототип будет врать.
-rsync -a --delete --exclude='*.md' --exclude='.git' "$SRC/" "$DEST/"
+# Папка на сервере должна быть точной копией, иначе удалённая картинка
+# продолжит отдаваться и прототип будет врать. rsync есть не на каждой машине
+# (в минимальном Debian его нет), поэтому запасной путь — снести и положить
+# заново: прототип маленький, разницы в скорости нет.
+if command -v rsync >/dev/null; then
+    rsync -a --delete --exclude='*.md' --exclude='.git' "$SRC/" "$DEST/"
+else
+    rm -rf "${DEST:?}"/*
+    cp -a "$SRC"/. "$DEST"/
+    find "$DEST" -name '*.md' -delete
+    rm -rf "$DEST/.git"
+fi
 
 echo "    файлов: $(find "$DEST" -type f | wc -l), объём: $(du -sh "$DEST" | cut -f1)"
 echo "    коммит: $(git -C "$REPO_ROOT" log --oneline -1)"
