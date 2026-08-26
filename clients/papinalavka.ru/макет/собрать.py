@@ -17,6 +17,7 @@ import json
 import os
 import re
 import sys
+from urllib.parse import quote
 
 ЗДЕСЬ = os.path.dirname(os.path.abspath(__file__))
 ВЫГРУЗКА = os.path.join(os.path.dirname(ЗДЕСЬ), "full")
@@ -27,7 +28,23 @@ def текст(s: str) -> str:
     return re.sub(r"\s+", " ", html_mod.unescape(s)).strip()
 
 
+# Куда класть картинки. Пусто — вшиваем в HTML (файл уходит клиенту одним
+# вложением). Заполнено ключом `--файлами` — кладём рядом отдельными файлами:
+# на сервере так страница открывается заметно быстрее, картинки кэшируются
+# браузером и не тащатся заново при каждом заходе.
+РЯДОМ: dict[str, str | None] = {"папка": None}
+
+
 def data_uri(путь: str) -> str:
+    if РЯДОМ["папка"]:
+        каталог = os.path.join(РЯДОМ["папка"], "img")
+        os.makedirs(каталог, exist_ok=True)
+        # Имя из пути внутри выгрузки: у сайта файлы зовутся `1.jpg` в разных
+        # папках, и по одному имени они бы затёрли друг друга.
+        имя = os.path.relpath(путь, ВЫГРУЗКА).replace(os.sep, "-").replace("content-", "")
+        with open(путь, "rb") as f, open(os.path.join(каталог, имя), "wb") as g:
+            g.write(f.read())
+        return f"img/{имя}"
     with open(путь, "rb") as f:
         b = base64.b64encode(f.read()).decode()
     тип = "image/png" if путь.lower().endswith(".png") else "image/jpeg"
@@ -132,6 +149,9 @@ h1,h2,h3{font-family:Bitter,Georgia,serif;font-weight:700;line-height:1.15;margi
 a{color:inherit}
 img{max-width:100%;display:block}
 .обёртка{max-width:1180px;margin:0 auto;padding:0 24px}
+.пропустить{position:absolute;left:-9999px}
+.пропустить:focus{position:static;display:inline-block;margin:8px 24px;padding:8px 14px;
+  background:var(--форель);color:#fff}
 
 /* шапка */
 .шапка{background:var(--прилавок);border-bottom:1px solid var(--край)}
@@ -224,6 +244,38 @@ section.бел{background:var(--прилавок);border-top:1px solid var(--к�
 .правила p{margin:0;font-size:14.5px;color:#3A5A66}
 .правила b{font-family:Bitter,Georgia,serif}
 
+/* расписание поставок */
+.график{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--край)}
+.день{padding:20px 24px 20px 0;border-right:1px solid var(--край)}
+.день:last-child{border-right:0}
+.день b{display:block;font-family:Bitter,Georgia,serif;font-size:20px}
+.день u{display:block;text-decoration:none;color:var(--форель);font-size:12px;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.день span{color:var(--тихий);font-size:14px}
+
+/* тёмная полоса: ломает чередование «белое — ледяное» и держит главное */
+section.тьма{background:var(--вода);color:#EAF2F5;border:0}
+section.тьма h2{color:#fff}
+section.тьма .шаг span,section.тьма .правила p{color:#B9D2DA}
+section.тьма .правила{border-top-color:#24505E}
+section.тьма .шаг b,section.тьма .правила b{color:#fff}
+section.тьма .график{border-top-color:#24505E}
+section.тьма .день{border-right-color:#24505E}
+section.тьма .день span{color:#B9D2DA}
+
+/* гарантия — одна строка во всю ширину, без карточки */
+.гарантия{font-family:Bitter,Georgia,serif;font-size:22px;line-height:1.4;max-width:30em}
+.гарантия+p{color:var(--тихий);margin-top:14px;max-width:36em}
+
+/* подписка на поставки */
+.подписка{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;max-width:640px}
+.подписка input{flex:1;min-width:280px;background:var(--прилавок);border:1px solid var(--край);
+  color:var(--текст)}
+/* Оранжевый бережём для одного действия на экран — здесь кнопка тише */
+.подписка .кнопка{background:var(--вода)}
+.подписка .кнопка:hover{background:#16414F}
+.подписка input::placeholder{color:var(--тихий)}
+
 /* фермеры */
 .фермеры{display:grid;grid-template-columns:1fr 1fr;gap:8px 40px}
 .фермер{display:flex;gap:18px;padding:16px 0;border-bottom:1px solid var(--край);align-items:flex-start}
@@ -279,6 +331,12 @@ footer .обёртка{display:flex;gap:24px;flex-wrap:wrap;justify-content:spac
   .срок b{display:inline;margin-left:6px}
 }
 @media (max-width:600px){
+  /* Палец — не мышь: цели меньше 44 px промахиваются, а половина заказов
+     идёт с телефона. Касается телефонов лавок, карт и кнопок в карточках. */
+  td a,.шапка nav a,.ссылка,.взаказ{display:inline-block;min-height:44px;
+    line-height:28px;padding:8px 0}
+  .взаказ{padding:10px 18px;line-height:1.2}
+  td small a{padding-top:0}
   .разделы,.товары,.шаги,.правила,.фермеры,.отзывы{grid-template-columns:1fr}
   .шаг:not(:last-child)::after{display:none}
   .шаг{padding:14px 0;border-bottom:1px solid var(--край)}
@@ -340,9 +398,58 @@ footer .обёртка{display:flex;gap:24px;flex-wrap:wrap;justify-content:spac
 ]
 ПОСТАВКА = ("Охлаждённая форель из Осетии и Карелии, молоко, творог, сметана, сыры, "
             "домашняя птица, крольчатина, колбасы, мёд, малина и голубика")
+# Расписание с их же страницы «Ближайшие поставки». Три даты вперёд — это и есть
+# доказательство, что сайт живой: у конкурентов на этом месте «широкий ассортимент».
+РАСПИСАНИЕ = [
+    ("27 августа", "четверг", "Охлаждённая форель из Осетии и Карелии, мясо-молочная "
+     "поставка, ягода"),
+    ("1 сентября", "понедельник", "Молочная поставка с Большой Трещёвской фермы и малина"),
+    ("3 сентября", "среда", "Охлаждённая морская форель и сёмга из Мурманска"),
+]
+# Города — из переключателя в шапке их сайта. Проверить у хозяина, где свои
+# точки, а где партнёрские: на сайте это одним списком.
+ГОРОДА = ("Нововоронеж · Россошь · Липецк · Анна · Борисоглебск · Лиски · "
+          "Бобров и Бутурлиновка · Москва · Минск")
+
+
+def разметка_поиска() -> str:
+    """JSON-LD про сеть лавок: адреса, часы, телефоны.
+
+    У старого сайта размечены только карточки товаров, а сеть из шести точек в
+    выдаче не видна вовсе. Для местного бизнеса это дороже любых ключевых слов:
+    по запросу «фермерские продукты рядом» показывают то, что размечено.
+    """
+    точки = []
+    for адрес, ориентир, часы, тел in ЛАВКИ:
+        нач, кон = часы.split("–")
+        точки.append({
+            "@type": "Store",
+            "name": f"Папина лавка — {адрес}",
+            "address": {"@type": "PostalAddress", "addressLocality": "Воронеж",
+                        "streetAddress": адрес, "addressCountry": "RU"},
+            "telephone": тел,
+            "openingHoursSpecification": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday",
+                              "Friday", "Saturday", "Sunday"],
+                "opens": нач, "closes": кон},
+        })
+    return json.dumps({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Папина лавка",
+        "description": "Натуральные продукты с экоферм под заказ: поставка каждый четверг, "
+                       "шесть лавок в Воронеже и доставка.",
+        "telephone": "+7 929 009-50-55",
+        "email": "papinalavka@gmail.com",
+        "areaServed": "Воронеж и Воронежская область",
+        "department": точки,
+    }, ensure_ascii=False, indent=1)
 
 
 def собрать() -> str:
+    разметка = разметка_поиска()
+    значок = data_uri(os.path.join(ВЫГРУЗКА, "favicon.png"))
     вшитые = шрифты()
     ссылка = "" if вшитые else (
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -375,9 +482,15 @@ def собрать() -> str:
         f'<span>{про}</span></div><i>{n} поз.</i></div>' for в, имя, про, n in ФЕРМЕРЫ)
     отз = "".join(f'<blockquote class="отзыв"><p>«{т}»</p><cite>{кто}</cite></blockquote>'
                   for т, кто in ОТЗЫВЫ)
+    def карта(адрес: str) -> str:
+        точка = quote(f"Воронеж {адрес}" if not адрес.startswith("Новая") else адрес)
+        return f'<a href="https://yandex.ru/maps/?text={точка}" target="_blank" rel="noopener">на карте</a>'
+
     лавки = "".join(f'<tr><td>{а}<small>{о}</small></td><td>{ч}</td>'
-                    f'<td><a href="tel:{т.replace(" ", "")}">{т}</a></td></tr>'
+                    f'<td><a href="tel:{т.replace(" ", "")}">{т}</a><small>{карта(а)}</small></td></tr>'
                     for а, о, ч, т in ЛАВКИ)
+    график = "".join(f'<div class="день"><u>{д}</u><b>{дата}</b><span>{что}</span></div>'
+                     for дата, д, что in РАСПИСАНИЕ)
     шаги = "".join(f'<div class="шаг"><b>{б}</b><span>{с}</span></div>' for б, с in [
         ("Выбираете продукты", "на сайте или по телефону"),
         ("Передаём заказ фермеру", "он собирает его лично для вас"),
@@ -392,9 +505,20 @@ def собрать() -> str:
 <title>Папина лавка — натуральные продукты экоферм с доставкой в Воронеже</title>
 <meta name="description" content="Фермерские продукты под заказ: свежая поставка каждый четверг,
 шесть лавок в Воронеже и доставка. Форель из Карелии, молоко с фермы, сыры, мясо, ягоды.">
+<link rel="icon" href="{значок}">
+<!-- Ссылку на макет отправляют в мессенджере, и без этих трёх строк там
+     показывается голый адрес. Картинку превью подставим, когда клиент даст
+     нормальное фото: рисовать её из мелких снимков с их сайта нельзя. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Папина лавка — натуральные продукты экоферм, Воронеж">
+<meta property="og:description" content="Свежая поставка от фермеров каждый четверг.
+Шесть лавок в Воронеже и доставка. Заказ принимаем до среды.">
+<meta property="og:locale" content="ru_RU">
 {ссылка}
 <style>{вшитые}{СТИЛЬ}</style>
+<script type="application/ld+json">{разметка}</script>
 </head><body>
+<a class="пропустить" href="#каталог">Перейти к каталогу</a>
 
 <header class="шапка"><div class="обёртка">
   <div class="лого">Папина лавка<span>натуральные продукты экоферм · Воронеж</span></div>
@@ -439,8 +563,8 @@ def собрать() -> str:
      они меняются от сезонности продукта и отдалённости фермера.</p>
 </div></section>
 
-<section class="бел" id="как"><div class="обёртка">
-  <div class="заг"><h2>Как это работает</h2><span>совместная закупка, а не магазин у полки</span></div>
+<section class="тьма" id="как"><div class="обёртка">
+  <div class="заг"><h2>Как это работает</h2></div>
   <div class="шаги">{шаги}</div>
   <div class="правила">
     <p><b>Охлаждённое — до среды.</b> Приём заказов закрывается за сутки до поставки,
@@ -450,6 +574,7 @@ def собрать() -> str:
     <p><b>По четвергам от 5000 ₽ — бесплатно.</b> Иначе 400 ₽ по Воронежу,
        Нововоронеж и Липецк — 450 ₽.</p>
   </div>
+  <div class="график">{график}</div>
 </div></section>
 
 <section id="фермеры"><div class="обёртка">
@@ -457,15 +582,31 @@ def собрать() -> str:
   <div class="фермеры">{ферм}</div>
 </div></section>
 
+<section><div class="обёртка">
+  <p class="гарантия">Не понравился продукт — заменим или вернём деньги.
+     Разберёмся с производителем сами.</p>
+  <p>Это правило работает с 2010 года и записано у нас на странице «О нас».
+     Пробовать новое не страшно.</p>
+  <form class="подписка" onsubmit="event.preventDefault();
+      this.querySelector('.готово').textContent='Подписали — напишем, когда назначим поставку.';">
+    <input type="tel" placeholder="Телефон для смс о поставке"
+           aria-label="Телефон для смс о ближайшей поставке" required>
+    <button class="кнопка" type="submit">Подписаться</button>
+    <div class="готово" style="color:var(--зелень);flex-basis:100%"></div>
+  </form>
+</div></section>
+
 <section class="бел"><div class="обёртка">
-  <div class="заг"><h2>Что о нас говорят</h2><span>отзывы покупателей с сайта</span></div>
+  <div class="заг"><h2>Что о нас говорят</h2></div>
   <div class="отзывы">{отз}</div>
 </div></section>
 
 <section id="лавки"><div class="обёртка">
-  <div class="заг"><h2>Где забрать</h2><span>шесть лавок · заказы операторы принимают с 9:00 до 19:00, пн–пт</span></div>
+  <div class="заг"><h2>Где забрать</h2><span>заказы операторы принимают с 9:00 до 19:00, пн–пт</span></div>
   <table><thead><tr><th>Адрес</th><th>Часы</th><th>Телефон</th></tr></thead>
   <tbody>{лавки}</tbody></table>
+  <p class="сноска">Кроме Воронежа лавки работают в {ГОРОДА}. Стоимость доставки
+     в свой город уточняйте по телефону.</p>
 </div></section>
 
 <section class="заявка" id="заявка"><div class="обёртка">
@@ -476,9 +617,9 @@ def собрать() -> str:
   </div>
   <form onsubmit="event.preventDefault();this.querySelector('.готово').textContent=
       'Заявка принята — перезвоним в рабочее время.';">
-    <input type="text" placeholder="Как вас зовут" required>
-    <input type="tel" placeholder="Телефон" required>
-    <textarea placeholder="Что нужно привезти"></textarea>
+    <input type="text" placeholder="Как вас зовут" aria-label="Как вас зовут" required>
+    <input type="tel" placeholder="Телефон" aria-label="Телефон" required>
+    <textarea placeholder="Что нужно привезти" aria-label="Что нужно привезти"></textarea>
     <button class="кнопка" type="submit">Отправить заявку</button>
     <small>Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</small>
     <div class="готово"></div>
@@ -501,7 +642,12 @@ addEventListener("scroll", () => document.getElementById("доска")
 
 
 if __name__ == "__main__":
-    куда = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ЗДЕСЬ, "index.html")
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    куда = args[0] if args else os.path.join(ЗДЕСЬ, "index.html")
+    if "--файлами" in sys.argv:
+        РЯДОМ["папка"] = os.path.dirname(os.path.abspath(куда))
     html = собрать()
     open(куда, "w", encoding="utf-8").write(html)
-    print(f"Макет собран: {куда} ({len(html.encode('utf-8')) / 1048576:.1f} МБ)")
+    вес = len(html.encode("utf-8")) / 1048576
+    где = " + картинки в img/ рядом" if РЯДОМ["папка"] else " (картинки внутри файла)"
+    print(f"Макет собран: {куда} — {вес:.1f} МБ{где}")
