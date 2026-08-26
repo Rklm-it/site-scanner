@@ -306,11 +306,16 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
 /* Заказчики. Не стена логотипов «для веса»: сначала строка словами, потом
    приглушённая полоса знаков. Логотипы серые и оживают под курсором — так
    они не спорят с товаром, ради которого человек пришёл. */
-.заказчики{{display:flex;flex-wrap:wrap;gap:26px 40px;align-items:center;margin-top:22px}}
-.заказчики img{{height:34px;width:auto;filter:grayscale(1);opacity:.55;
-  transition:filter .2s ease,opacity .2s ease}}
-.заказчики a:hover img{{filter:none;opacity:1}}
-.заказчики b{{font-family:Bitter,Georgia,serif;font-size:16px;color:var(--тихий)}}
+.заказчики{{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:22px}}
+/* Белая плашка уравнивает знаки: часть из них с прозрачным фоном, часть —
+   JPEG с белым, и без подложки вторые выглядели бы белыми заплатками. */
+.заказчики span{{display:flex;align-items:center;justify-content:center;
+  width:118px;height:56px;background:var(--прилавок);border:1px solid var(--край);
+  border-radius:2px}}
+.заказчики img{{max-height:32px;max-width:92px;width:auto;opacity:.8;
+  transition:opacity .2s ease}}
+.заказчики span:hover img{{opacity:1}}
+.заказчики+p{{color:var(--тихий);font-size:14px;margin-top:16px}}
 
 /* советы: список, а не карточки — это тексты, а не товары */
 .советы{{display:grid;grid-template-columns:1fr 1fr;gap:0 48px}}
@@ -538,18 +543,19 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
 # разрешил показывать. Это не «логотипы для веса»: перечислены настоящие
 # компании со ссылками на их сайты, и для продуктовой доставки такой список
 # значит больше любых слов о качестве.
+# Знаком показываем только те, что читаются в полосе. У остальных внутри
+# квадрата 200×200 мелкий текст: на высоте 34 пикселя он превращается в
+# грязь и делает хуже всей полосе. Они остаются в списке словами — список от
+# этого не врёт, а выглядит опрятно.
 ЗАКАЗЧИКИ = [
     ("Сбербанк", "20_sber_logo_rus_h_wht_col_rgb01.png"),
     ("РЖД", "14_rzd_logo.png"),
     ("МегаФон", "16_megafonlogo.svg.png"),
     ("Росэнергоатом", "24_xr7k6xmaoyy.jpg"),
-    ("КидБург", "22_big0logo.png"),
-    ("Остров детства", "17_iland.png"),
     ("Здравгород", "25_ekb4h0wj67iu106qc5xkw5pkqk3ke.png"),
-    ("Интегра-РПК", "21_logo.png"),
-    ("Твоё развитие", "23_fkvozvafaus.jpg"),
-    ("ТМП-Пресс", "26_a66bcd4ecb6fb6abdc9c9cc978d41a58.png"),
 ]
+ЗАКАЗЧИКИ_СЛОВАМИ = ["КидБург", "«Остров детства»", "«Твоё развитие»",
+                     "«Интегра-РПК»", "ТМП-Пресс"]
 
 ЛАВКИ = [
     ("ул. Карла Маркса, 94", "вход у арт-объекта «Царь-Рыба»", "9:00–20:00", "+7 950 758-55-05"),
@@ -677,10 +683,11 @@ def собрать() -> str:
     # словами. Пустая строка вместо знака выглядит поломкой, подпись — нет.
     знаки = os.path.join(ЗДЕСЬ, "заказчики")
     заказчики = "".join(
-        (f'<a href="#" title="{имя}"><img src="{data_uri(os.path.join(знаки, файл))}" '
-         f'alt="{имя}"></a>')
-        if os.path.exists(os.path.join(знаки, файл)) else f"<b>{имя}</b>"
+        f'<span title="{имя}"><img src="{data_uri(os.path.join(знаки, файл))}" '
+        f'alt="{имя}"></span>'
+        if os.path.exists(os.path.join(знаки, файл)) else f"<span>{имя}</span>"
         for имя, файл in ЗАКАЗЧИКИ)
+    словами = ", ".join(ЗАКАЗЧИКИ_СЛОВАМИ)
     советы = "".join(f'<a class="совет" href="#"><b>{з}</b><span>{о}</span></a>'
                      for з, о in СОВЕТЫ)
     график = "".join(f'<div class="день"><u>{д}</u><b>{дата}</b><span>{что}</span></div>'
@@ -787,6 +794,7 @@ def собрать() -> str:
      привезём в офис, сделаем документы. Спросите по телефону
      <b>+7 929 009-50-55</b>.</p>
   <div class="заказчики">{заказчики}</div>
+  <p>А ещё {словами} — и десятки компаний поменьше.</p>
 </div></section>
 
 <section class="бел"><div class="обёртка">
