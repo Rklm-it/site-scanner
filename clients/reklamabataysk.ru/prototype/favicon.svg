@@ -1,8 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#1C1E20"/>
-  <g fill="#FF4200">
-    <rect x="8" y="14" width="48" height="24"/>
-    <rect x="27" y="38" width="10" height="14"/>
-    <rect x="18" y="52" width="28" height="6"/>
+  <!-- Чёрное на оранжевом — то, по чему агентство узнают в городе.
+       «П» набрана прямоугольниками, а не шрифтом: значку вкладки шрифты
+       страницы недоступны, и текст в нём превратился бы в квадратик. -->
+  <rect width="64" height="64" fill="#FF4200"/>
+  <g fill="#1C1E20">
+    <rect x="14" y="16" width="36" height="9"/>
+    <rect x="14" y="16" width="9" height="32"/>
+    <rect x="41" y="16" width="9" height="32"/>
   </g>
 </svg>

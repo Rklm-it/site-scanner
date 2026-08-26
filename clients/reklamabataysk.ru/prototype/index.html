@@ -33,8 +33,18 @@ a{color:inherit}
 .top{border-bottom:1px solid rgba(28,30,32,.12)}
 .top__in{display:flex;align-items:center;justify-content:space-between;gap:1rem;
   padding-block:1rem}
-.top__logo{display:block;color:var(--grafit)}
-.top__logo svg{height:44px;width:auto;display:block}
+.top__logo{display:block;color:inherit;text-decoration:none}
+/* Оранжевый прямоугольник — ровно 2:1, тот самый формат 3×6. Он стоит на
+   базовой линии как точка в конце имени: место под рекламу, а не картинка
+   щита. Размер привязан к кеглю, чтобы держаться при любой высоте логотипа. */
+.logo{display:flex;align-items:flex-end;gap:.34em;
+  font-family:'Unbounded',sans-serif;font-weight:700;font-size:var(--logo,26px);
+  letter-spacing:-.03em;line-height:.86}
+.logo__block{width:1.02em;height:.51em;background:var(--ogon);flex:none;
+  margin-bottom:.04em}
+.logo__desc{display:block;margin-top:.55em;font-family:'PT Sans',sans-serif;
+  font-weight:400;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--doroga);white-space:nowrap}
 .tels{display:flex;gap:1.4rem;font-size:.95rem}
 .tel{text-decoration:none;white-space:nowrap}
 .tel b{display:block;font-size:1.06rem;letter-spacing:.01em;font-family:'PT Mono',monospace}
@@ -148,18 +158,29 @@ a{color:inherit}
 /* подвал */
 .foot{background:var(--grafit);color:rgba(237,239,240,.72);padding-block:2.6rem;
   font-size:.92rem}
-.foot__logo{color:var(--beton);display:flex;align-items:center;gap:1rem}
-.foot__logo svg{height:58px;width:auto}
+.foot__logo{color:var(--beton);--logo:24px}
+.foot__logo .logo__desc{color:rgba(237,239,240,.5)}
+
 .foot__in{display:flex;flex-wrap:wrap;gap:1rem 2.4rem;justify-content:space-between}
 .foot a{color:var(--beton)}
 
+.tel-mob{display:none}
 @media (max-width:900px){
+  /* На узком экране в шапке помещается либо логотип с подписью и двумя
+     телефонами, либо логотип и одна кнопка. Второе полезнее: звонят с
+     телефона, а не читают реквизиты. */
+  .top{--logo:19px}
+  .top .logo__desc{display:none}
+  .tels{display:none}
+  .tel-mob{display:inline-block;background:var(--ogon);color:var(--belyy);
+    text-decoration:none;font-weight:700;padding:.62rem 1.1rem;font-size:.95rem;
+    white-space:nowrap}
   .hero__in,.dva,.uslugi__list{grid-template-columns:1fr}
   .row{grid-template-columns:1fr auto;row-gap:.2rem}
   .row__kind{grid-column:2;text-align:right}
   .row__st{grid-column:1/-1}
   .tels{flex-direction:column;gap:.3rem;text-align:right}
-  .top__logo svg{height:34px}
+  .top{--logo:22px}
   .mark{grid-template-columns:1fr 62px 1fr}
   .mark__box{width:100%;max-width:120px;height:38px}
   .uslugi__list li{padding-block:1.15rem}
@@ -178,25 +199,11 @@ a{color:inherit}
 
 <header class="top">
   <div class="wrap top__in">
-    <a class="top__logo" href="#" aria-label="Рекламное агентство ПОКОТИЛОВ"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 92" role="img"
-     aria-label="Рекламное агентство ПОКОТИЛОВ">
-  <title>Рекламное агентство ПОКОТИЛОВ</title>
-  <!-- Знак: щит 3×6 на опоре. Пропорция полотна ровно 2:1 — тот формат,
-       которым агентство торгует. В прежнем знаке была оранжевая плашка с
-       белым столбиком; форма сохранена, смысл назван вслух. -->
-  <g fill="#FF4200">
-    <rect x="0" y="2" width="80" height="40"/>
-    <rect x="35" y="42" width="10" height="44"/>
-  </g>
-  <!-- Надстрочная строка: у них она есть, и она объясняет, кто это. -->
-  <text x="94" y="20" font-family="'PT Sans',sans-serif" font-size="14"
-        letter-spacing="1.2" fill="currentColor" opacity=".68">рекламное агентство</text>
-  <!-- Имя чёрным на оранжевой плашке — это их узнаваемое, трогать нельзя. -->
-  <rect x="94" y="30" width="236" height="52" fill="#FF4200"/>
-  <text x="212" y="70" text-anchor="middle" font-family="'PT Sans Narrow',sans-serif"
-        font-weight="700" font-size="42" letter-spacing="1" fill="#1C1E20">ПОКОТИЛОВ</text>
-</svg>
-</a>
+    <a class="top__logo" href="#">
+      <span class="logo"><span class="logo__name">ПОКОТИЛОВ</span><span class="logo__block"></span></span>
+      <span class="logo__desc">рекламное агентство · батайск</span>
+    </a>
+    <a class="tel-mob" href="tel:+79185246060">Позвонить</a>
     <div class="tels">
       <a class="tel" href="tel:+79185246060"><span>Марина</span><b>8 918 524-60-60</b></a>
       <a class="tel" href="tel:+79185549401"><span>Виктор</span><b>8 918 554-94-01</b></a>
@@ -464,25 +471,10 @@ a{color:inherit}
 
 <footer class="foot">
   <div class="wrap foot__in">
-    <div class="foot__logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 92" role="img"
-     aria-label="Рекламное агентство ПОКОТИЛОВ">
-  <title>Рекламное агентство ПОКОТИЛОВ</title>
-  <!-- Знак: щит 3×6 на опоре. Пропорция полотна ровно 2:1 — тот формат,
-       которым агентство торгует. В прежнем знаке была оранжевая плашка с
-       белым столбиком; форма сохранена, смысл назван вслух. -->
-  <g fill="#FF4200">
-    <rect x="0" y="2" width="80" height="40"/>
-    <rect x="35" y="42" width="10" height="44"/>
-  </g>
-  <!-- Надстрочная строка: у них она есть, и она объясняет, кто это. -->
-  <text x="94" y="20" font-family="'PT Sans',sans-serif" font-size="14"
-        letter-spacing="1.2" fill="currentColor" opacity=".68">рекламное агентство</text>
-  <!-- Имя чёрным на оранжевой плашке — это их узнаваемое, трогать нельзя. -->
-  <rect x="94" y="30" width="236" height="52" fill="#FF4200"/>
-  <text x="212" y="70" text-anchor="middle" font-family="'PT Sans Narrow',sans-serif"
-        font-weight="700" font-size="42" letter-spacing="1" fill="#1C1E20">ПОКОТИЛОВ</text>
-</svg>
-<span>Батайск</span></div>
+    <div class="foot__logo">
+      <span class="logo"><span class="logo__name">ПОКОТИЛОВ</span><span class="logo__block"></span></span>
+      <span class="logo__desc">рекламное агентство · батайск</span>
+    </div>
     <div>
       <a href="tel:+79185246060">8 918 524-60-60</a> ·
       <a href="tel:+79185549401">8 918 554-94-01</a> ·
