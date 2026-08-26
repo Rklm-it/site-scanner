@@ -5,7 +5,7 @@ Desktop и Cowork не читают ни `~/.claude/skills/` на машине, 
 в репозитории: они берут скилы, включённые в аккаунте. Поэтому единственный
 способ получить их в Desktop — загрузить архивы руками один раз.
 
-    python3 tools/package_skills.py           # четыре основных
+    python3 tools/package_skills.py           # пять основных
     python3 tools/package_skills.py --all     # все
     python3 tools/package_skills.py seo       # выборочно
 
@@ -21,7 +21,10 @@ SKILLS = ROOT / ".claude" / "skills"
 OUT = ROOT / "out" / "skills"
 
 # Порядок работы: придумать → сделать → проверить, и сверху наш цикл.
-CORE = ["lovable-site", "frontend-design", "web-design-engineer", "web-quality-audit"]
+# web-animation пятым: движение просят почти на каждом сайте, а правила к нему
+# нужны раньше, чем библиотека, — в Desktop без него останутся одни библиотеки.
+CORE = ["lovable-site", "frontend-design", "web-design-engineer", "web-quality-audit",
+        "web-animation"]
 
 # Claude.ai принимает только эти ключи во фронт-маттере; остальные — отказ при
 # загрузке, причём сообщение приходит уже после выбора файла.
