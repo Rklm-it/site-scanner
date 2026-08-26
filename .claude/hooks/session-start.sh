@@ -27,6 +27,8 @@ echo "  • playwright — открыть страницу и посмотрет
 echo "    кнопки, узкий экран, консоль. Сдавать вслепую нельзя."
 echo "  • скилы: /lovable-site — весь цикл сайта клиента; вид доводить"
 echo "    /frontend-design → /web-design-engineer → /web-quality-audit."
+echo "    Просят оживить страницу — /web-animation (правила и проверка), и"
+echo "    только потом библиотека; первый экран не анимируем: это LCP."
 
 if ! command -v npx >/dev/null 2>&1; then
   echo "  ! npx на машине нет — MCP-серверы не поднимутся. Запасной путь:"
