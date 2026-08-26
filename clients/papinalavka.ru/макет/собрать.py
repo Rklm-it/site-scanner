@@ -188,20 +188,40 @@ img{{max-width:100%;display:block}}
 /* шапка */
 .шапка{{background:var(--прилавок);border-bottom:1px solid var(--край)}}
 .шапка .обёртка{{display:flex;align-items:center;gap:24px;padding-top:18px;padding-bottom:18px}}
-.лого{{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;letter-spacing:-.01em;
-  text-decoration:none;color:inherit;display:block}}
-.лого img{{height:68px;width:auto;display:block}}
+/* Лок-ап: их знак плюс имя шрифтом. В 58 пикселях плашка внутри знака
+   нечитаема, а имя рядом читается всегда — знак при этом остаётся ихним. */
+.лого{{text-decoration:none;color:inherit;display:grid;
+  grid-template-columns:auto auto;align-items:center;column-gap:12px}}
+.лого img{{height:58px;width:auto;grid-row:span 2;align-self:center}}
+.лого b{{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;
+  letter-spacing:-.01em;align-self:end;line-height:1.1}}
 section.тьма{{position:relative;overflow:hidden}}
 .гравюра{{position:absolute;right:-40px;bottom:-30px;width:420px;height:310px;
   background-size:contain;background-repeat:no-repeat;background-position:right bottom;
   filter:invert(1);opacity:.09;pointer-events:none}}
 @media (max-width:900px){{.гравюра{{display:none}}}}
-.лого span{{display:block;font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--тихий);margin-top:3px}}
+.лого span{{font-family:"Golos Text",sans-serif;font-size:11px;font-weight:400;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--тихий);align-self:start;
+  margin-top:3px}}
 .шапка nav{{margin-left:auto;display:flex;align-items:center;gap:22px;font-size:15px}}
-.шапка nav a{{text-decoration:none;color:var(--тихий)}}
+/* Город — не украшение: в каждом городе свои точки и свой телефон, и человек
+   первым делом смотрит, работает ли лавка у него. */
+.город{{display:flex;align-items:center;gap:8px;color:var(--тихий)}}
+.город span{{font-size:12px;letter-spacing:.07em;text-transform:uppercase}}
+.город select{{font:inherit;font-size:15px;padding:7px 10px;border:1px solid var(--край);
+  border-radius:2px;background:var(--прилавок);color:var(--текст);cursor:pointer;max-width:170px}}
+
+/* Шапка не должна переноситься в две строки: сначала уходит подпись под
+   именем, потом слово «Город» — телефон и переключатель остаются всегда. */
+@media (max-width:1150px){{
+  .лого span{{display:none}}
+  .шапка nav{{gap:16px}}
+  .город span{{display:none}}
+}}
+.шапка nav a{{text-decoration:none;color:var(--тихий);white-space:nowrap}}
 .шапка nav a:hover{{color:var(--текст)}}
-.тел{{font-family:Bitter,Georgia,serif;font-size:19px;font-weight:700;text-decoration:none!important;color:var(--текст)!important}}
+.тел{{font-family:Bitter,Georgia,serif;font-size:19px;font-weight:700;white-space:nowrap;
+  text-decoration:none!important;color:var(--текст)!important}}
 
 /* доска поставок — фирменный элемент */
 .доска{{position:sticky;top:0;z-index:20;background:var(--вода);color:var(--на-тёмном);
@@ -354,7 +374,44 @@ form small{{color:var(--подпись);font-size:12.5px}}
 footer{{background:var(--вода);color:var(--подпись);font-size:13.5px;padding:26px 0 40px}}
 footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}}
 :focus-visible{{outline:2px solid var(--форель);outline-offset:2px}}
-@media (prefers-reduced-motion:reduce){{*{{transition:none!important}}}}
+/* Движение. Три правила, по которым оно тут допущено: помогает понять
+   (карточка отзывается на курсор), длится меньше четверти секунды, и его нет
+   на телефоне, где половина заказов и где никакого наведения не существует.
+   Плавающая рыба и «выезжание» секций сюда не попали намеренно: они отвлекают
+   от товара и стареют быстрее, чем сайт окупится. */
+.товар{{transition:box-shadow .2s ease,transform .2s ease}}
+.товар:hover{{box-shadow:0 10px 28px rgba(0,0,0,.10);transform:translateY(-2px)}}
+.товар .фото img{{transition:transform .3s ease}}
+.товар:hover .фото img{{transform:scale(1.05)}}
+.раздел img{{transition:transform .25s ease}}
+.раздел:hover img{{transform:scale(1.06)}}
+.кнопка,.взаказ{{transition:background .15s ease,border-color .15s ease,color .15s ease}}
+.фермер .вензель{{transition:transform .25s ease}}
+.фермер:hover .вензель{{transform:scale(1.06)}}
+
+/* Один оркестрованный момент на всю страницу: плитки первого экрана
+   проявляются по очереди. Не «каждая секция выезжает при прокрутке» — этот
+   приём нейросети ставят везде, и он читается как шаблон. */
+@keyframes проявиться{{from{{opacity:0;transform:translateY(10px)}}to{{opacity:1;transform:none}}}}
+.плитки img{{animation:проявиться .5s ease backwards}}
+.плитки img:nth-child(2){{animation-delay:.08s}}
+.плитки img:nth-child(3){{animation-delay:.16s}}
+.плитки img:nth-child(4){{animation-delay:.24s}}
+
+/* Гравюра в тёмной полосе чуть смещается при прокрутке — не эффект ради
+   эффекта, а глубина: полоса перестаёт быть плоской заливкой. */
+.гравюра{{transition:transform .6s cubic-bezier(.2,.7,.3,1)}}
+
+@media (prefers-reduced-motion:reduce){{
+  *{{transition:none!important;animation:none!important}}
+  .товар:hover{{transform:none}}
+  .товар:hover .фото img,.раздел:hover img{{transform:none}}
+}}
+@media (hover:none){{
+  /* На телефоне наведения нет, а «залипший» ховер после тапа выглядит поломкой */
+  .товар:hover{{transform:none;box-shadow:none}}
+  .товар:hover .фото img,.раздел:hover img{{transform:none}}
+}}
 
 @media (max-width:900px){{
   .экран .обёртка,.заявка .обёртка{{grid-template-columns:1fr;gap:32px}}
@@ -366,7 +423,10 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
   .срок b{{display:inline}}
   .шапка nav a:not(.тел){{display:none}}
   .тел{{font-size:16px;white-space:nowrap}}
-  .лого img{{height:52px}}
+  .лого img{{height:44px}}
+  .лого b{{font-size:19px}}
+  .лого span{{display:none}}
+  .город span{{display:none}}
   .шапка .обёртка{{gap:12px}}
   .срок b{{display:inline;margin-left:6px}}
 }}
@@ -496,8 +556,8 @@ def собрать() -> str:
     стиль = СТИЛЬ.format(палитра=ПАЛИТРЫ[ПАЛИТРА[0]])
     знак, знак_тёмный = логотип("logo1.png"), логотип("logo2.png")
     шапка_лого = (
-        f'<a class="лого" href="/"><img src="{знак}" alt="Папина лавка — '
-        f'натуральные продукты с доставкой"></a>'
+        f'<a class="лого" href="/"><img src="{знак}" alt=""><b>Папина лавка</b>'
+        f'<span>натуральные продукты экоферм</span></a>'
         if знак else
         '<div class="лого">Папина лавка'
         '<span>натуральные продукты экоферм · Воронеж</span></div>')
@@ -713,8 +773,19 @@ document.getElementById("город").addEventListener("change", e => {{
 
 // Доска поставок сжимается при прокрутке: дата и срок заказа должны остаться
 // на экране всё время, а место занимать перестать.
-addEventListener("scroll", () => document.getElementById("доска")
-  .classList.toggle("сжата", scrollY > 120), {{passive:true}});
+const доска = document.getElementById("доска");
+const гравюра = document.querySelector(".гравюра");
+addEventListener("scroll", () => {{
+  доска.classList.toggle("сжата", scrollY > 120);
+  // Параллакс считаем от положения самой полосы, а не от общей прокрутки:
+  // иначе гравюра уезжает из блока задолго до того, как её увидят.
+  if (гравюра) {{
+    const полоса = гравюра.parentElement.getBoundingClientRect();
+    const доля = Math.max(-1, Math.min(1, (innerHeight / 2 - polosaCenter(полоса)) / innerHeight));
+    гравюра.style.transform = `translateY(${{доля * 26}}px)`;
+  }}
+}}, {{passive:true}});
+function polosaCenter(r) {{ return r.top + r.height / 2; }}
 </script>
 </body></html>"""
 
