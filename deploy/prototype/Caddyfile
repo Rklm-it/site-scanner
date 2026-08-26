@@ -113,3 +113,32 @@ lavka-review.nexus-flow.ru {
 	# правкой макета. Показ идёт живьём, устаревшая версия дороже трафика.
 	header Cache-Control "no-cache"
 }
+
+# reklamabataysk.ru — рекламное агентство «ПОКОТИЛОВ», Батайск. Прототип к звонку.
+#
+# Выкладка не как у соседей: страница собрана кодом и лежит в этом же
+# репозитории, ветки `deploy` и сборки нет вовсе.
+#
+#   ./sync-local.sh reklamabataysk clients/reklamabataysk.ru/prototype
+reklamabataysk.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	root * /srv/reklamabataysk
+	file_server
+
+	try_files {path} {path}/ /index.html
+
+	# Фотографии щитов и шрифты именами не хешируются, но и не меняются:
+	# кэшируем на неделю, а не на месяц, чтобы замена фотографии доехала до
+	# клиента, которому уже показывали ссылку.
+	@static path /images/* /fonts/*
+	header @static Cache-Control "public, max-age=604800"
+	header /index.html Cache-Control "no-cache"
+}
