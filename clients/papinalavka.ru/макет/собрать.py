@@ -304,6 +304,36 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
 .правила p{{margin:0;font-size:14.5px;color:var(--текст-мягкий)}}
 .правила b{{font-family:Bitter,Georgia,serif}}
 
+/* Цифры. Все настоящие и все проверяемые: год из ОГРНИП, лавки из контактов,
+   товары и хозяйства из каталога, отзывы посчитаны на их же странице. Ни одной
+   придуманной — такие спрашивают на первой же встрече. */
+.цифры{{background:var(--вода);color:var(--на-тёмном)}}
+.цифры .обёртка{{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;
+  padding-top:26px;padding-bottom:26px;text-align:center}}
+.цифры b{{display:block;font-family:Bitter,Georgia,serif;font-size:34px;line-height:1.1}}
+.цифры span{{font-size:13px;color:var(--строка)}}
+@media (max-width:900px){{.цифры .обёртка{{grid-template-columns:repeat(2,1fr);text-align:left}}
+  .цифры b{{font-size:26px}}}}
+
+/* Оффер — крупной строкой, а не сноской: это причина заказать сегодня */
+.оффер{{font-family:Bitter,Georgia,serif;font-size:21px;line-height:1.4;
+  border-left:4px solid var(--форель);padding:6px 0 6px 18px;margin:26px 0 0}}
+
+/* Выгода на карточке: цифру экономии видно раньше, чем цену */
+.выгода{{position:absolute;right:0;top:0;background:var(--форель);color:#fff;
+  font-family:Bitter,Georgia,serif;font-size:15px;padding:6px 10px;border-radius:0 0 0 2px}}
+
+/* Кнопка, которая всегда под большим пальцем: на телефоне человек читает
+   лёжа и не возвращается наверх ради заказа. */
+.липкая{{display:none}}
+@media (max-width:600px){{
+  .липкая{{display:block;position:fixed;left:12px;right:12px;bottom:12px;z-index:30;
+    text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25);
+    opacity:0;pointer-events:none;transition:opacity .2s ease}}
+  .липкая.видна{{opacity:1;pointer-events:auto}}
+  body{{padding-bottom:76px}}
+}}
+
 /* Фермер крупным планом: широкая полоса, а не ещё одна карточка в сетке.
    Их отличие от сетевого магазина — люди, и на них должно быть место. */
 .герой{{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start;
@@ -462,7 +492,17 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
   .срок{{text-align:left;border-left:0;padding-left:0;font-size:13px}}
   .срок b{{display:inline}}
   .шапка nav a:not(.тел){{display:none}}
-  .тел{{font-size:16px;white-space:nowrap}}
+  /* На 390 пикселях знак, город и телефон в одну строку не влезают: телефон
+     обрезался, а логотип выдавливало за край. Две строки — знак с телефоном,
+     под ними город во всю ширину. */
+  .шапка .обёртка{{display:grid;grid-template-columns:auto 1fr;row-gap:10px;
+    column-gap:12px;align-items:center;padding-top:12px;padding-bottom:12px}}
+  .шапка nav{{display:contents}}
+  /* Позиции задаём явно: в разметке город идёт раньше телефона, и без этого
+     телефон уезжал на третью строку, а шапка занимала пол-экрана. */
+  .тел{{font-size:17px;white-space:nowrap;justify-self:end;grid-row:1;grid-column:2}}
+  .город{{grid-row:2;grid-column:1 / -1}}
+  .город select{{width:100%;max-width:none}}
   .лого img{{height:44px}}
   .лого b{{font-size:19px}}
   .лого span{{display:none}}
@@ -475,9 +515,17 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
      идёт с телефона. Касается телефонов лавок, карт и кнопок в карточках. */
   td a,.шапка nav a,.ссылка,.взаказ{{display:inline-block;min-height:44px;
     line-height:28px;padding:8px 0}}
+  /* Кнопки-деления витрины тоже пальцем: 44 пикселя — минимум, ниже промах */
+  .фильтры button{{min-height:44px;padding:10px 16px}}
   .взаказ{{padding:10px 18px;line-height:1.2}}
   td small a{{padding-top:0}}
-  .разделы,.товары,.шаги,.правила,.фермеры,.отзывы{{grid-template-columns:1fr}}
+  .разделы,.товары,.шаги,.правила,.фермеры,.отзывы,.советы{{grid-template-columns:1fr}}
+  /* Заголовок памятки не переносится (nowrap), и вместе с описанием строка
+     вылезала за экран — на телефоне это горизонтальная прокрутка всей
+     страницы. Ставим их друг под друга. */
+  .совет{{flex-direction:column;gap:4px}}
+  .совет b{{white-space:normal}}
+  .день{{padding-right:16px}}
   .шаг:not(:last-child)::after{{display:none}}
   .шаг{{padding:14px 0;border-bottom:1px solid var(--край)}}
   section{{padding:38px 0}}
@@ -676,8 +724,13 @@ def собрать() -> str:
         акция = " акция" if т["было"] else ""
         метка = (f'<span class="метка{акция}">{т["метка"]}</span>' if т["метка"] else "")
         было = f'<s>{т["было"]} ₽</s>' if т["было"] else ""
+        выгода = ""
+        if т["было"] and т["цена"]:
+            разница = int(т["было"]) - int(т["цена"])
+            if разница > 0:
+                выгода = f'<div class="выгода">−{разница} ₽</div>'
         карточки.append(
-            f'<article class="товар" data-метка="{т["метка"]}">{метка}<div class="фото">'
+            f'<article class="товар" data-метка="{т["метка"]}">{метка}{выгода}<div class="фото">'
             f'<img src="{т["фото"]}" alt="{т["имя"]}"></div><div class="низ">'
             f'<div class="имя">{т["имя"]}</div>'
             f'<div class="цена">{т["цена"]} ₽{было} <em>{т["ед"]}</em></div>'
@@ -754,7 +807,7 @@ def собрать() -> str:
 <div class="доска" id="доска"><div class="обёртка">
   <div class="дата"><small>Ближайшая поставка</small>четверг, 27 августа</div>
   <div class="везём">{ПОСТАВКА}</div>
-  <div class="срок">Заказ принимаем<b>до среды, 13:00</b></div>
+  <div class="срок">До закрытия заказа<b id="осталось">считаем…</b></div>
 </div></div>
 
 <div class="экран"><div class="обёртка">
@@ -772,6 +825,14 @@ def собрать() -> str:
                                for p in НЕДЕЛЯ[:4] if товар(p))}</div>
 </div></div>
 
+<div class="цифры"><div class="обёртка">
+  <div><b>с 2010</b><span>года возим фермерское</span></div>
+  <div><b>6</b><span>лавок в Воронеже</span></div>
+  <div><b>538</b><span>продуктов в каталоге</span></div>
+  <div><b>12</b><span>проверенных хозяйств</span></div>
+  <div><b>231</b><span>отзыв покупателей</span></div>
+</div></div>
+
 <section class="бел" id="каталог"><div class="обёртка">
   <div class="заг"><h2>538 продуктов от проверенных фермеров</h2>
     <span>29 разделов · цены зависят от сезона и фермера</span></div>
@@ -786,6 +847,8 @@ def собрать() -> str:
       <button aria-pressed="false" data-метка="новинка">Новинки</button>
     </div></div>
   <div class="товары">{"".join(карточки)}</div>
+  <p class="оффер">По четвергам доставим бесплатно при заказе от 5000 ₽ —
+     это две форели или недельный набор молочного.</p>
   <p class="сноска">Цены указаны в информационных целях и не являются публичной офертой:
      они меняются от сезонности продукта и отдалённости фермера.</p>
 </div></section>
@@ -885,6 +948,8 @@ def собрать() -> str:
   </form>
 </div></section>
 
+<a class="кнопка липкая" href="#заявка">Заказать к четвергу</a>
+
 <footer><div class="обёртка">
   <div>{подвал_лого}«Папина лавка» · натуральные продукты с доставкой, Воронеж<br>
      ИП Папин М.А., ОГРН 310366828700143</div>
@@ -903,6 +968,38 @@ document.getElementById("город").addEventListener("change", e => {{
   document.querySelector("#лавки table").hidden = !свой;
   document.getElementById("другой-город").hidden = свой;
 }});
+
+// Счётчик до закрытия заказа. Срок не выдуман: по их правилам приём заказов на
+// охлаждённое закрывается в среду в 13:00, за сутки до четверговой поставки.
+// Это и есть причина заказать сегодня, а не «когда-нибудь».
+function досреды() {{
+  const сейчас = new Date();
+  const срок = new Date(сейчас);
+  // 3 — среда. Ищем ближайшую среду, 13:00 по местному времени покупателя.
+  срок.setDate(сейчас.getDate() + ((3 - сейчас.getDay() + 7) % 7));
+  срок.setHours(13, 0, 0, 0);
+  if (срок <= сейчас) срок.setDate(срок.getDate() + 7);
+  const минут = Math.floor((срок - сейчас) / 60000);
+  const д = Math.floor(минут / 1440), ч = Math.floor((минут % 1440) / 60), м = минут % 60;
+  const слово = (n, о, а, ов) => {{
+    const s = Math.abs(n) % 100, b = s % 10;
+    if (s > 10 && s < 20) return ов;
+    if (b > 1 && b < 5) return а;
+    return b === 1 ? о : ов;
+  }};
+  return д > 0 ? `${{д}} ${{слово(д, "день", "дня", "дней")}} ${{ч}} ${{слово(ч, "час", "часа", "часов")}}`
+               : `${{ч}} ${{слово(ч, "час", "часа", "часов")}} ${{м}} ${{слово(м, "минута", "минуты", "минут")}}`;
+}}
+// Липкая кнопка появляется, когда своя кнопка первого экрана ушла вверх:
+// две одинаковые кнопки на одном экране выглядят суетой.
+const липкая = document.querySelector(".липкая");
+addEventListener("scroll", () => липкая.classList.toggle("видна", scrollY > 620),
+                 {{passive:true}});
+
+const счётчик = document.getElementById("осталось");
+const тик = () => {{ счётчик.textContent = досреды(); }};
+тик();
+setInterval(тик, 30000);
 
 // Деления витрины у них на сайте есть («новинки», «хиты», «товар дня»), и в
 // макете они работают: кнопка, которая ничего не делает, злит сильнее, чем её
