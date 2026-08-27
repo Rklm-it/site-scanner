@@ -94,6 +94,7 @@ def main(argv: list[str]) -> int:
     m = re.match(r"([\w.-]+?\.[a-z]{2,})-\d{4}-\d{2}-\d{2}", src.name)
     host = m.group(1) if m else src.stem
     hosts, prichiny = Counter(), Counter()
+    unikalnye: dict[str, set[str]] = {}
     primery: dict[str, str] = {}
     stranic = refs = svoi = 0
 
@@ -104,9 +105,13 @@ def main(argv: list[str]) -> int:
             refs += 1
             # Страницы лежат в архиве плоско, поэтому относительные адреса
             # достраиваем от корня сайта — нам важен хост и расширение.
-            url = urljoin(f"https://{host}/", val)
+            # Якорь отрезаем: у lpgenerator один и тот же файл встречается как
+            # `plan.jpg#size_594x376`, и без этого «уникальных» вышло бы вдесятеро
+            # больше, чем файлов на самом деле.
+            url = urljoin(f"https://{host}/", val).split("#")[0]
             netloc = urlparse(url).netloc.lower()
             hosts[netloc] += 1
+            unikalnye.setdefault(netloc, set()).add(url)
             primery.setdefault(netloc, url)
             if not same_site(url, host):
                 prichiny[f"чужой хост {netloc}"] += 1
@@ -122,9 +127,19 @@ def main(argv: list[str]) -> int:
         print("\nАдресов картинок нет вовсе — их подставляет скрипт,"
               " а обход JavaScript не выполняет.")
     if hosts:
-        print("\nХосты:")
+        # Скачивать придётся уникальные, а не все упоминания: в шаблоне
+        # конструктора одна и та же картинка стоит на каждой странице.
+        print("\nХосты (упоминаний / уникальных адресов):")
         for netloc, n in hosts.most_common(15):
-            print(f"  {n:6d}  {netloc or '(относительный адрес)'}  ← {primery[netloc]}")
+            kartinok = sum(1 for u in unikalnye[netloc]
+                           if ext(urlparse(u).path) in ASSET_EXT)
+            print(f"  {n:6d} / {len(unikalnye[netloc]):5d}  "
+                  f"{netloc or '(относительный адрес)'}  "
+                  f"— из них файлов-картинок {kartinok}\n"
+                  f"          ← {primery[netloc]}")
+        vsego = sum(1 for us in unikalnye.values() for u in us
+                    if ext(urlparse(u).path) in ASSET_EXT)
+        print(f"\nВсего уникальных картинок к скачиванию: {vsego}")
     if prichiny:
         print("\nПочему не поехали:")
         for reason, n in prichiny.most_common(10):

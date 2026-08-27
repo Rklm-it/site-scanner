@@ -39,7 +39,9 @@ PAGES = {
         <picture><source srcset="/images/shirokaya.webp 2x, /images/uzkaya.webp 1x"></picture>
         <div style="background-image: url('/images/fon-sekcii.png')"></div>
         <img src="https://st.chuzhoy-cdn.example/foto.jpg">
-        <img src="/thumb.php?id=7"></body></html>""",
+        <img src="/thumb.php?id=7">
+        <img src="http://VNESHNIY_HOST/images/s-konstruktora.jpg#size_594x376">
+        </body></html>""",
     "/uslugi": "<html><head><title>Услуги</title></head><body><h1>Услуги</h1>"
                "<a href='/katalog/dom-2'>Дом 2</a></body></html>",
     "/katalog/dom-1": "<html><head><title>Дом 1</title></head><body>Дом 1</body></html>",
@@ -82,10 +84,16 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         if path == "/sitemap.xml":
             host = self.headers.get("Host", "")
             return self._send(SITEMAP.replace(b"SITE", host.encode()), "application/xml")
+        if path == "/images/s-konstruktora.jpg":
+            return self._send(b"\xff\xd8\xff" + b"0" * 300, "image/jpeg")
         if path in PAGES:
+            # Тот же сервер под другим именем хоста — так выглядит CDN
+            # конструктора: страницы на домене клиента, картинки на чужом.
+            port = self.headers.get("Host", "").split(":")[-1]
+            body = PAGES[path].replace("VNESHNIY_HOST", f"localhost:{port}")
             # Кириллица в windows-1251 и без charset в заголовке — так отдаёт
             # добрая половина старых сайтов рунета.
-            return self._send(PAGES[path].encode("windows-1251"), "text/html")
+            return self._send(body.encode("windows-1251"), "text/html")
         self.send_error(404)
 
     def _send(self, body: bytes, ctype: str) -> None:
@@ -232,13 +240,36 @@ def test_pochemu_kartinok_net_vidno_iz_vygruzki(site, tmp_path):
     """Ноль картинок в архиве — самая частая жалоба, и причину выясняли
     запросами к живому сайту. Теперь отказы посчитаны и лежат в манифесте:
     видно и чужой хост, и картинку, которую отдаёт скрипт."""
-    stats = _run(site, tmp_path / "d")
+    stats = _run(site, tmp_path / "d", external_images=False)
     assert stats.asset_refs >= 6
     prichiny = stats.asset_skipped
     assert any(k.startswith("чужой хост st.chuzhoy-cdn.example") for k in prichiny)
     assert any("без расширения" in k for k in prichiny)      # /thumb.php?id=7
     manifest = json.loads((tmp_path / "d" / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["asset_skipped"] == prichiny
+
+
+def test_kartinki_s_cdn_konstruktora_zabirayutsya(site, tmp_path):
+    """Сайт на конструкторе держит фотографии на чужом хосте.
+
+    У mebel-ryazane.ru все 23 тысячи адресов картинок вели на
+    media.lpgenerator.ru, и выгрузка приезжала с нулём файлов при 88
+    скачанных страницах. Для обхода это чужой хост, для клиента — его
+    собственное портфолио, ради которого выгрузка и делается.
+    """
+    stats = _run(site, tmp_path / "d")
+    nashli = list((tmp_path / "d" / "_vneshnie").rglob("s-konstruktora.jpg"))
+    assert nashli, "картинка с чужого хоста не скачана"
+    assert stats.assets_external >= 1
+    # Стили и скрипты с чужих хостов по-прежнему мимо: чужое оформление в
+    # разборе не нужно, а архив раздувает.
+    assert not list((tmp_path / "d" / "_vneshnie").rglob("*.js"))
+
+
+def test_chuzhie_kartinki_otklyuchaemy(site, tmp_path):
+    stats = _run(site, tmp_path / "d", external_images=False)
+    assert stats.assets_external == 0
+    assert not (tmp_path / "d" / "_vneshnie").exists()
 
 
 def test_robots_uvazhaetsya(site, tmp_path):

@@ -51,10 +51,8 @@ SKIP_EXT = {
     ".wav", ".exe", ".msi", ".apk", ".iso", ".dmg", ".woff", ".woff2", ".ttf",
     ".eot", ".otf",
 }
-ASSET_EXT = {
-    ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".bmp",
-    ".css", ".js",
-}
+IMAGE_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".bmp"}
+ASSET_EXT = IMAGE_EXT | {".css", ".js"}
 # Служебные ветки CMS: там нет содержимого, ради которого затевается разбор,
 # зато обход в них уходит охотно и тратит бюджет.
 SKIP_PATH = re.compile(
@@ -164,6 +162,7 @@ class MirrorStats:
     # отказы разложены по причинам («чужой хост st.example.ru» и подобным).
     asset_refs: int = 0
     asset_skipped: dict[str, int] = field(default_factory=dict)
+    assets_external: int = 0     # из них с чужих хостов — CDN конструктора
 
 
 def _same_site(url: str, host: str) -> bool:
@@ -363,6 +362,7 @@ def run(
     timeout: float = 15.0,
     scheme: str | None = None,
     use_sitemap: bool = True,
+    external_images: bool = True,
     on_progress=None,
 ) -> MirrorStats:
     """Обходит сайт вширь и складывает страницы и картинки в `dest_dir`.
@@ -386,6 +386,12 @@ def run(
     dest_dir.mkdir(parents=True, exist_ok=True)
     stats = MirrorStats()
     polite = Politeness(respect_robots=respect_robots, per_host_delay=per_host_delay)
+    # Картинки с чужого хоста качаем чаще, чем страницы сайта. Пауза в 0,7 с
+    # придумана для самописного сайта на слабом хостинге, а на той стороне
+    # обычно CDN конструктора: у mebel-ryazane.ru все 23 тысячи адресов ведут
+    # на media.lpgenerator.ru, и по 0,7 с выгрузка не уложилась бы в бюджет.
+    polite_cdn = Politeness(respect_robots=respect_robots,
+                            per_host_delay=min(per_host_delay, 0.25))
     session = requests.Session()
     # Бюджет делится на две части. Страницы качаются первыми и без границы
     # съели бы всё время: 500 страниц по 0,7 секунды это 350 секунд, и на
@@ -447,6 +453,15 @@ def run(
 
         ext = _ext(urlparse(url).path)
         if not _same_site(url, host):
+            # Сайт на конструкторе держит все фотографии на его CDN — для
+            # обхода это чужой хост, а для клиента его собственное портфолио.
+            # Поэтому картинки с чужих хостов забираем (стили и скрипты нет:
+            # чужое оформление в разборе не нужно и раздувает архив).
+            if external_images and ext in IMAGE_EXT:
+                if url not in seen:
+                    seen.add(url)
+                    assets.append(url)
+                return
             if image or ext in ASSET_EXT:
                 why(f"чужой хост {urlparse(url).netloc.lower()}")
             return
@@ -559,10 +574,12 @@ def run(
         assets.clear()
         while queue_assets and budget_left(until):
             url = queue_assets.popleft()
-            if not polite.allowed(url):
+            svoy = _same_site(url, host)
+            vezhlivost = polite if svoy else polite_cdn
+            if not vezhlivost.allowed(url):
                 stats.skipped += 1
                 continue
-            polite.wait(url)
+            vezhlivost.wait(url)
             try:
                 got = _get(url, timeout=timeout, max_bytes=max_file_bytes, session=session)
             except requests.RequestException as exc:
@@ -583,6 +600,13 @@ def run(
                     on_progress(stats)
                 continue
             rel = _local_path(final_url)
+            if not svoy:
+                # Чужие складываем отдельно и с хостом в пути: иначе два CDN
+                # с одинаковым `/images/1.jpg` затрут друг друга, а при разборе
+                # будет не видно, где своё, а где с конструктора.
+                chuzhoy = _BAD_SEG.sub("_", urlparse(final_url).netloc.lower())
+                rel = f"_vneshnie/{chuzhoy}/{rel}"
+                stats.assets_external += 1
             save(rel, raw)
             stats.assets += 1
             if on_progress:
@@ -635,6 +659,7 @@ def run(
             "assets_left": stats.assets_left,
             "asset_refs": stats.asset_refs,
             "asset_skipped": stats.asset_skipped,
+            "assets_external": stats.assets_external,
             "index": stats.pages_index,
         }, ensure_ascii=False, indent=2),
         encoding="utf-8",
