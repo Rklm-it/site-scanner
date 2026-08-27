@@ -139,6 +139,64 @@ a{color:inherit}
   .cell{width:26px;height:13px}
 }
 
+
+/* Тёмные секции задают ритм: светлая — тёмная — светлая. Без него страница
+   идёт одинаковыми блоками «заголовок и сетка карточек» и читается сухо. */
+.sect--dark{background:var(--grafit);color:var(--beton)}
+.sect--dark .sect__sub{color:rgba(237,239,240,.6)}
+
+/* Оранжевое поле 2:1 из логотипа — метка конца заголовка. Только на тёмных
+   секциях, иначе превратится в надзаголовок над каждым блоком. Имя не `mark`:
+   этот класс уже занят клетками ленты километража. */
+.h-mark{display:inline-block;width:.6em;height:.3em;background:var(--ogon);
+  margin-left:.34em;vertical-align:.14em}
+
+/* Барабан экранов. Светодиодный экран крутит ролик — блок делает то же самое
+   с их пятью местами. Это не украшение: так работает сам товар. */
+.reel{margin-top:2.4rem}
+.reel__stage{position:relative;aspect-ratio:2/1;background:#000;overflow:hidden}
+.reel__slide{position:absolute;inset:0;margin:0;opacity:0;
+  transition:opacity .5s ease;pointer-events:none}
+.reel__slide.is-on{opacity:1;pointer-events:auto}
+.reel__slide img{width:100%;height:100%;object-fit:cover}
+.reel__slide figcaption{position:absolute;left:0;bottom:0;right:0;
+  padding:clamp(1rem,2.4vw,1.8rem);
+  background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,0));
+  color:var(--belyy)}
+.reel__slide figcaption b{display:block;font-family:'Unbounded',sans-serif;
+  font-size:clamp(1rem,2vw,1.5rem);line-height:1.15;margin:.6rem 0 .3rem;
+  letter-spacing:-.02em}
+.reel__price{font-family:'PT Mono',monospace;font-size:.82rem;
+  color:rgba(255,255,255,.7)}
+.reel__nav{display:flex;gap:6px;margin-top:12px}
+.reel__dot{flex:1;height:6px;background:rgba(237,239,240,.22);border:0;padding:0;
+  cursor:pointer;position:relative}
+.reel__dot span{position:absolute;width:1px;height:1px;overflow:hidden;
+  clip:rect(0 0 0 0)}
+.reel__dot.is-on{background:var(--ogon)}
+.reel__dot:focus-visible{outline:2px solid var(--beton);outline-offset:3px}
+
+/* Кто просил меньше движения — получает все пять сразу, без барабана. */
+@media (prefers-reduced-motion:reduce){
+  .reel__stage{aspect-ratio:auto;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;background:none}
+  .reel__slide{position:static;opacity:1;pointer-events:auto}
+  .reel__slide img{aspect-ratio:2/1}
+  .reel__nav{display:none}
+}
+
+
+/* Номер на снимке — тот же, что у метки на карте. Связывает карточку с картой
+   без единого слова и заодно оживляет плоский белый прямоугольник. */
+.card{cursor:pointer}
+.card__shot{position:relative;overflow:hidden;aspect-ratio:2/1}
+.card__shot .card__photo{aspect-ratio:2/1;transition:transform .45s ease}
+.card:hover .card__shot .card__photo{transform:scale(1.05)}
+.card__n{position:absolute;left:0;top:0;background:var(--grafit);color:var(--beton);
+  font-family:'PT Mono',monospace;font-size:.82rem;padding:.34rem .6rem}
+.card{transition:transform .18s ease,box-shadow .18s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(28,30,32,.13)}
+
 /* карта */
 .map{height:min(62vh,560px);margin-bottom:2.6rem;background:#e2e5e7;
   display:flex;align-items:center;justify-content:center}
@@ -154,15 +212,18 @@ a{color:inherit}
 /* все места */
 .filter{display:flex;align-items:center;gap:.7rem;margin-bottom:2rem;
   font-family:'PT Mono',monospace;font-size:.9rem;cursor:pointer}
-.street{margin-bottom:2.4rem}
+.streets{display:grid;gap:0 3rem}
+@media (min-width:1000px){.streets{grid-template-columns:1fr 1fr}}
+.street{margin-bottom:2.4rem;break-inside:avoid}
 .street__name{display:flex;flex-wrap:wrap;align-items:baseline;gap:.8rem;
   padding-bottom:.7rem;border-bottom:2px solid var(--grafit)}
 .street__count{font-family:'PT Mono',monospace;font-size:.8rem;font-weight:400;
   color:var(--doroga)}
 .street__list{list-style:none;margin:0;padding:0}
-.row{display:grid;grid-template-columns:1fr 8rem 11rem;gap:1rem;align-items:baseline;
+.row{display:grid;grid-template-columns:1fr auto auto;gap:.4rem 1rem;align-items:baseline;
   padding:.62rem 0;border-bottom:1px solid rgba(28,30,32,.1);font-size:.96rem}
-.row__kind,.row__st{font-family:'PT Mono',monospace;font-size:.82rem;color:var(--doroga)}
+.row__kind,.row__st{font-family:'PT Mono',monospace;font-size:.78rem;color:var(--doroga);white-space:nowrap}
+.row__st{min-width:6.6rem;text-align:right}
 .row--free .row__st{color:var(--ogon);font-weight:700}
 .row--free .row__addr{font-weight:700}
 
@@ -258,28 +319,28 @@ a{color:inherit}
           <span class="brow__st">Куйбышева</span>
           <span class="brow__n">12 · <i>свободно 3</i></span>
         </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="1" type="button" title="ул.Куйбышева 7 — свободен"><span class="vh">ул.Куйбышева 7 — свободен</span></button><button class="cell" data-n="19" type="button" title="Куйбышева/Огородная — занят до 01.01.2027"><span class="vh">Куйбышева/Огородная — занят до 01.01.2027</span></button><button class="cell" data-n="20" type="button" title="Куйбышева, 2а — занят до 01.01.2027"><span class="vh">Куйбышева, 2а — занят до 01.01.2027</span></button><button class="cell" data-n="21" type="button" title="Куйбышева 35/Морской — занят до 02.01.2027"><span class="vh">Куйбышева 35/Морской — занят до 02.01.2027</span></button><button class="cell" data-n="22" type="button" title="Куйбышева, 61 — занят до 01.01.2027"><span class="vh">Куйбышева, 61 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="23" type="button" title="ул.Куйбышева 104 — свободен"><span class="vh">ул.Куйбышева 104 — свободен</span></button><button class="cell cell--free" data-n="24" type="button" title="Куйбышева 114 А — свободен"><span class="vh">Куйбышева 114 А — свободен</span></button><button class="cell" data-n="25" type="button" title="Куйбышева, 118 — занят до 01.01.2027"><span class="vh">Куйбышева, 118 — занят до 01.01.2027</span></button><button class="cell" data-n="26" type="button" title="Куйбышева/Заводская (сторона А) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона А) — занят до 01.01.2027</span></button><button class="cell" data-n="27" type="button" title="Куйбышева/Заводская (сторона В) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона В) — занят до 01.01.2027</span></button><button class="cell" data-n="28" type="button" title="Куйбышева,136 ЦГБ справа — занят до 01.01.2027"><span class="vh">Куйбышева,136 ЦГБ справа — занят до 01.01.2027</span></button><button class="cell" data-n="29" type="button" title="ул. Куйбышева, 161, слева — занят до 01.01.2027"><span class="vh">ул. Куйбышева, 161, слева — занят до 01.01.2027</span></button></div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="1" type="button" title="ул. Куйбышева 7 — свободен"><span class="vh">ул. Куйбышева 7 — свободен</span></button><button class="cell" data-n="19" type="button" title="Куйбышева/Огородная — занят до 01.01.2027"><span class="vh">Куйбышева/Огородная — занят до 01.01.2027</span></button><button class="cell" data-n="20" type="button" title="Куйбышева, 2а — занят до 01.01.2027"><span class="vh">Куйбышева, 2а — занят до 01.01.2027</span></button><button class="cell" data-n="21" type="button" title="Куйбышева 35/Морской — занят до 02.01.2027"><span class="vh">Куйбышева 35/Морской — занят до 02.01.2027</span></button><button class="cell" data-n="22" type="button" title="Куйбышева, 61 — занят до 01.01.2027"><span class="vh">Куйбышева, 61 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="23" type="button" title="ул. Куйбышева 104 — свободен"><span class="vh">ул. Куйбышева 104 — свободен</span></button><button class="cell cell--free" data-n="24" type="button" title="Куйбышева 114 А — свободен"><span class="vh">Куйбышева 114 А — свободен</span></button><button class="cell" data-n="25" type="button" title="Куйбышева, 118 — занят до 01.01.2027"><span class="vh">Куйбышева, 118 — занят до 01.01.2027</span></button><button class="cell" data-n="26" type="button" title="Куйбышева/Заводская (сторона А) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона А) — занят до 01.01.2027</span></button><button class="cell" data-n="27" type="button" title="Куйбышева/Заводская (сторона В) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона В) — занят до 01.01.2027</span></button><button class="cell" data-n="28" type="button" title="Куйбышева,136 ЦГБ справа — занят до 01.01.2027"><span class="vh">Куйбышева,136 ЦГБ справа — занят до 01.01.2027</span></button><button class="cell" data-n="29" type="button" title="ул. Куйбышева, 161, слева — занят до 01.01.2027"><span class="vh">ул. Куйбышева, 161, слева — занят до 01.01.2027</span></button></div>
       </div>
       <div class="brow">
         <div class="brow__head">
           <span class="brow__st">Максима Горького</span>
           <span class="brow__n">11 · <i>свободно 3</i></span>
         </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="3" type="button" title="ул.Максима Горького-1-й Пятилетки 354 — свободен"><span class="vh">ул.Максима Горького-1-й Пятилетки 354 — свободен</span></button><button class="cell cell--free" data-n="5" type="button" title="ул.Максима Горького -Луначарского 117 — свободен"><span class="vh">ул.Максима Горького -Луначарского 117 — свободен</span></button><button class="cell" data-n="30" type="button" title="ул. М.Горького 137 — занят до 20.09.2026"><span class="vh">ул. М.Горького 137 — занят до 20.09.2026</span></button><button class="cell" data-n="31" type="button" title="Максима Горького 281 а — занят до 01.01.2027"><span class="vh">Максима Горького 281 а — занят до 01.01.2027</span></button><button class="cell" data-n="32" type="button" title="Максима Горького 281 в — занят до 01.01.2027"><span class="vh">Максима Горького 281 в — занят до 01.01.2027</span></button><button class="cell" data-n="33" type="button" title="ул.М.Горького 281 Б — занят до 01.01.2027"><span class="vh">ул.М.Горького 281 Б — занят до 01.01.2027</span></button><button class="cell" data-n="34" type="button" title="ул.М.Горького 281 В — занят до 01.01.2027"><span class="vh">ул.М.Горького 281 В — занят до 01.01.2027</span></button><button class="cell" data-n="35" type="button" title="ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027"><span class="vh">ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027</span></button><button class="cell" data-n="36" type="button" title="Максима Горького, 358 (сторона А) — занят до 01.01.2027"><span class="vh">Максима Горького, 358 (сторона А) — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="37" type="button" title="Максима Горького, 358 (сторона B) — свободен"><span class="vh">Максима Горького, 358 (сторона B) — свободен</span></button><button class="cell" data-n="38" type="button" title="ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027"><span class="vh">ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027</span></button></div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="3" type="button" title="ул. Максима Горького-1-й Пятилетки 354 — свободен"><span class="vh">ул. Максима Горького-1-й Пятилетки 354 — свободен</span></button><button class="cell cell--free" data-n="5" type="button" title="ул. Максима Горького -Луначарского 117 — свободен"><span class="vh">ул. Максима Горького -Луначарского 117 — свободен</span></button><button class="cell" data-n="30" type="button" title="ул. М.Горького 137 — занят до 20.09.2026"><span class="vh">ул. М.Горького 137 — занят до 20.09.2026</span></button><button class="cell" data-n="31" type="button" title="Максима Горького 281 а — занят до 01.01.2027"><span class="vh">Максима Горького 281 а — занят до 01.01.2027</span></button><button class="cell" data-n="32" type="button" title="Максима Горького 281 в — занят до 01.01.2027"><span class="vh">Максима Горького 281 в — занят до 01.01.2027</span></button><button class="cell" data-n="33" type="button" title="ул. М.Горького 281 Б — занят до 01.01.2027"><span class="vh">ул. М.Горького 281 Б — занят до 01.01.2027</span></button><button class="cell" data-n="34" type="button" title="ул. М.Горького 281 В — занят до 01.01.2027"><span class="vh">ул. М.Горького 281 В — занят до 01.01.2027</span></button><button class="cell" data-n="35" type="button" title="ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027"><span class="vh">ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027</span></button><button class="cell" data-n="36" type="button" title="Максима Горького, 358 (сторона А) — занят до 01.01.2027"><span class="vh">Максима Горького, 358 (сторона А) — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="37" type="button" title="Максима Горького, 358 (сторона B) — свободен"><span class="vh">Максима Горького, 358 (сторона B) — свободен</span></button><button class="cell" data-n="38" type="button" title="ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027"><span class="vh">ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027</span></button></div>
       </div>
       <div class="brow">
         <div class="brow__head">
           <span class="brow__st">Энгельса</span>
           <span class="brow__n">10 · <i>свободно 4</i></span>
         </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="6" type="button" title="ул.Энгельса-Крупская 172 — свободен"><span class="vh">ул.Энгельса-Крупская 172 — свободен</span></button><button class="cell cell--free" data-n="9" type="button" title="ул.Энгельса-Ленинградская 46 — свободен"><span class="vh">ул.Энгельса-Ленинградская 46 — свободен</span></button><button class="cell" data-n="39" type="button" title="Энгельса /Кирова 18 универмаг — занят до 01.01.2027"><span class="vh">Энгельса /Кирова 18 универмаг — занят до 01.01.2027</span></button><button class="cell" data-n="40" type="button" title="ул.Энгельса-Садовая,51 — занят до 01.01.2027"><span class="vh">ул.Энгельса-Садовая,51 — занят до 01.01.2027</span></button><button class="cell" data-n="41" type="button" title="ул.Энгельса-Фрунзе,109 — занят до 01.01.2027"><span class="vh">ул.Энгельса-Фрунзе,109 — занят до 01.01.2027</span></button><button class="cell" data-n="42" type="button" title="Ул. Энгельса -Заводская 130 — занят до 01.01.2027"><span class="vh">Ул. Энгельса -Заводская 130 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="43" type="button" title="ул.Энгельса 134 — свободен"><span class="vh">ул.Энгельса 134 — свободен</span></button><button class="cell" data-n="44" type="button" title="ул.Энгельса-Половинко,45 — занят до 01.01.2027"><span class="vh">ул.Энгельса-Половинко,45 — занят до 01.01.2027</span></button><button class="cell" data-n="45" type="button" title="ул.Энгельса 53 — занят до 01.01.2027"><span class="vh">ул.Энгельса 53 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="46" type="button" title="ул.Энгельса 40 слева — свободен"><span class="vh">ул.Энгельса 40 слева — свободен</span></button></div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="6" type="button" title="ул. Энгельса-Крупская 172 — свободен"><span class="vh">ул. Энгельса-Крупская 172 — свободен</span></button><button class="cell cell--free" data-n="9" type="button" title="ул. Энгельса-Ленинградская 46 — свободен"><span class="vh">ул. Энгельса-Ленинградская 46 — свободен</span></button><button class="cell" data-n="39" type="button" title="Энгельса /Кирова 18 универмаг — занят до 01.01.2027"><span class="vh">Энгельса /Кирова 18 универмаг — занят до 01.01.2027</span></button><button class="cell" data-n="40" type="button" title="ул. Энгельса-Садовая,51 — занят до 01.01.2027"><span class="vh">ул. Энгельса-Садовая,51 — занят до 01.01.2027</span></button><button class="cell" data-n="41" type="button" title="ул. Энгельса-Фрунзе,109 — занят до 01.01.2027"><span class="vh">ул. Энгельса-Фрунзе,109 — занят до 01.01.2027</span></button><button class="cell" data-n="42" type="button" title="Ул. Энгельса -Заводская 130 — занят до 01.01.2027"><span class="vh">Ул. Энгельса -Заводская 130 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="43" type="button" title="ул. Энгельса 134 — свободен"><span class="vh">ул. Энгельса 134 — свободен</span></button><button class="cell" data-n="44" type="button" title="ул. Энгельса-Половинко,45 — занят до 01.01.2027"><span class="vh">ул. Энгельса-Половинко,45 — занят до 01.01.2027</span></button><button class="cell" data-n="45" type="button" title="ул. Энгельса 53 — занят до 01.01.2027"><span class="vh">ул. Энгельса 53 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="46" type="button" title="ул. Энгельса 40 слева — свободен"><span class="vh">ул. Энгельса 40 слева — свободен</span></button></div>
       </div>
       <div class="brow">
         <div class="brow__head">
           <span class="brow__st">Заводская</span>
           <span class="brow__n">1 · <i>свободно 1</i></span>
         </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="47" type="button" title="ул.Заводская 45 — свободен"><span class="vh">ул.Заводская 45 — свободен</span></button></div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="47" type="button" title="ул. Заводская 45 — свободен"><span class="vh">ул. Заводская 45 — свободен</span></button></div>
       </div>
       <div class="board__legend">
         <span><i class="sw sw--free"></i>свободно 11</span>
@@ -309,107 +370,146 @@ a{color:inherit}
 </section>
 
 
-<section class="sect" id="svobodno">
+<section class="sect sect--dark" id="svobodno">
   <div class="wrap">
     <div class="sect__head">
-      <h2>Пять светодиодных экранов</h2>
-      <p class="sect__sub">Экран показывает ролик в цикле — картинку можно менять хоть каждый день, печатать баннер не нужно. Свободны все пять.</p>
+      <h2>Пять светодиодных экранов<i class="h-mark"></i></h2>
+      <p class="sect__sub">Экран крутит ролик в цикле — картинку меняют хоть каждый день, баннер печатать не нужно. Свободны все пять.</p>
     </div>
-    <div class="grid"><article class="card">
-  <img class="card__photo" src="images/ekran-ul-kuybysheva-7.jpg" alt="Рекламное место: ул. Куйбышева 7, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Куйбышева 7</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg" alt="Рекламное место: ул. Максима Горького-1-й Пятилетки 354, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Максима Горького-1-й Пятилетки 354</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg" alt="Рекламное место: ул. Максима Горького -Луначарского 117, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Максима Горького -Луначарского 117</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/ekran-ul-engelsa-krupskaya-172.jpg" alt="Рекламное место: ул. Энгельса-Крупская 172, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Энгельса-Крупская 172</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/ekran-ul-engelsa-leningradskaya-46.jpg" alt="Рекламное место: ул. Энгельса-Ленинградская 46, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Энгельса-Ленинградская 46</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article></div>
+    <div class="reel">
+      <div class="reel__stage">
+        <figure class="reel__slide is-on" data-i="0">
+          <img src="images/ekran-ul-kuybysheva-7.jpg" alt="Светодиодный экран: ул. Куйбышева 7, Батайск">
+          <figcaption>
+            <span class="tag tag--free">Свободен</span>
+            <b>ул. Куйбышева 7</b>
+            <span class="reel__price">[от&nbsp;…&nbsp;₽ в месяц]</span>
+          </figcaption>
+        </figure>
+        <figure class="reel__slide" data-i="1">
+          <img src="images/ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg" alt="Светодиодный экран: ул. Максима Горького-1-й Пятилетки 354, Батайск">
+          <figcaption>
+            <span class="tag tag--free">Свободен</span>
+            <b>ул. Максима Горького-1-й Пятилетки 354</b>
+            <span class="reel__price">[от&nbsp;…&nbsp;₽ в месяц]</span>
+          </figcaption>
+        </figure>
+        <figure class="reel__slide" data-i="2">
+          <img src="images/ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg" alt="Светодиодный экран: ул. Максима Горького -Луначарского 117, Батайск">
+          <figcaption>
+            <span class="tag tag--free">Свободен</span>
+            <b>ул. Максима Горького -Луначарского 117</b>
+            <span class="reel__price">[от&nbsp;…&nbsp;₽ в месяц]</span>
+          </figcaption>
+        </figure>
+        <figure class="reel__slide" data-i="3">
+          <img src="images/ekran-ul-engelsa-krupskaya-172.jpg" alt="Светодиодный экран: ул. Энгельса-Крупская 172, Батайск">
+          <figcaption>
+            <span class="tag tag--free">Свободен</span>
+            <b>ул. Энгельса-Крупская 172</b>
+            <span class="reel__price">[от&nbsp;…&nbsp;₽ в месяц]</span>
+          </figcaption>
+        </figure>
+        <figure class="reel__slide" data-i="4">
+          <img src="images/ekran-ul-engelsa-leningradskaya-46.jpg" alt="Светодиодный экран: ул. Энгельса-Ленинградская 46, Батайск">
+          <figcaption>
+            <span class="tag tag--free">Свободен</span>
+            <b>ул. Энгельса-Ленинградская 46</b>
+            <span class="reel__price">[от&nbsp;…&nbsp;₽ в месяц]</span>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="reel__nav"><button class="reel__dot is-on" data-i="0" type="button"
+          aria-label="Экран 1: ул. Куйбышева 7"><span>1</span></button><button class="reel__dot" data-i="1" type="button"
+          aria-label="Экран 2: ул. Максима Горького-1-й Пятилетки 354"><span>2</span></button><button class="reel__dot" data-i="2" type="button"
+          aria-label="Экран 3: ул. Максима Горького -Луначарского 117"><span>3</span></button><button class="reel__dot" data-i="3" type="button"
+          aria-label="Экран 4: ул. Энгельса-Крупская 172"><span>4</span></button><button class="reel__dot" data-i="4" type="button"
+          aria-label="Экран 5: ул. Энгельса-Ленинградская 46"><span>5</span></button></div>
+    </div>
   </div>
 </section>
 
 <section class="sect">
   <div class="wrap">
     <div class="sect__head">
-      <h2>Свободные щиты 3×6</h2>
-      <p class="sect__sub">Шесть мест в городе, готовы к размещению.</p>
+      <h2>Шесть свободных щитов 3×6</h2>
+      <p class="sect__sub">Готовы к размещению. Номер на снимке — тот же, что у метки на карте выше.</p>
     </div>
-    <div class="grid"><article class="card">
-  <img class="card__photo" src="images/schit-ul-kuybysheva-104.jpg" alt="Рекламное место: ул. Куйбышева 104, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Куйбышева 104</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/schit-kuybysheva-114-a.jpg" alt="Рекламное место: Куйбышева 114 А, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">Куйбышева 114 А</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/schit-maksima-gorkogo-358-storona-b.jpg" alt="Рекламное место: Максима Горького, 358 (сторона B), Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">Максима Горького, 358 (сторона B)</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/schit-ul-engelsa-134.jpg" alt="Рекламное место: ул. Энгельса 134, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Энгельса 134</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/schit-ul-engelsa-40-sleva.jpg" alt="Рекламное место: ул. Энгельса 40 слева, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Энгельса 40 слева</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article><article class="card">
-  <img class="card__photo" src="images/schit-ul-zavodskaya-45.jpg" alt="Рекламное место: ул. Заводская 45, Батайск" loading="lazy">
-  <div class="card__body">
-    <h3 class="card__addr">ул. Заводская 45</h3>
-    <span class="tag tag--free">Свободен</span>
-    <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
-  </div>
-</article></div>
+    <div class="grid">
+      <article class="card" data-n="23">
+        <div class="card__shot">
+          <img class="card__photo" src="images/schit-ul-kuybysheva-104.jpg" alt="Свободный щит 3×6: ул. Куйбышева 104, Батайск" loading="lazy">
+          <span class="card__n">23</span>
+        </div>
+        <div class="card__body">
+          <h3 class="card__addr">ул. Куйбышева 104</h3>
+          <span class="tag tag--free">Свободен</span>
+          <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+        </div>
+      </article>
+      <article class="card" data-n="24">
+        <div class="card__shot">
+          <img class="card__photo" src="images/schit-kuybysheva-114-a.jpg" alt="Свободный щит 3×6: Куйбышева 114 А, Батайск" loading="lazy">
+          <span class="card__n">24</span>
+        </div>
+        <div class="card__body">
+          <h3 class="card__addr">Куйбышева 114 А</h3>
+          <span class="tag tag--free">Свободен</span>
+          <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+        </div>
+      </article>
+      <article class="card" data-n="37">
+        <div class="card__shot">
+          <img class="card__photo" src="images/schit-maksima-gorkogo-358-storona-b.jpg" alt="Свободный щит 3×6: Максима Горького, 358 (сторона B), Батайск" loading="lazy">
+          <span class="card__n">37</span>
+        </div>
+        <div class="card__body">
+          <h3 class="card__addr">Максима Горького, 358 (сторона B)</h3>
+          <span class="tag tag--free">Свободен</span>
+          <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+        </div>
+      </article>
+      <article class="card" data-n="43">
+        <div class="card__shot">
+          <img class="card__photo" src="images/schit-ul-engelsa-134.jpg" alt="Свободный щит 3×6: ул. Энгельса 134, Батайск" loading="lazy">
+          <span class="card__n">43</span>
+        </div>
+        <div class="card__body">
+          <h3 class="card__addr">ул. Энгельса 134</h3>
+          <span class="tag tag--free">Свободен</span>
+          <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+        </div>
+      </article>
+      <article class="card" data-n="46">
+        <div class="card__shot">
+          <img class="card__photo" src="images/schit-ul-engelsa-40-sleva.jpg" alt="Свободный щит 3×6: ул. Энгельса 40 слева, Батайск" loading="lazy">
+          <span class="card__n">46</span>
+        </div>
+        <div class="card__body">
+          <h3 class="card__addr">ул. Энгельса 40 слева</h3>
+          <span class="tag tag--free">Свободен</span>
+          <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+        </div>
+      </article>
+      <article class="card" data-n="47">
+        <div class="card__shot">
+          <img class="card__photo" src="images/schit-ul-zavodskaya-45.jpg" alt="Свободный щит 3×6: ул. Заводская 45, Батайск" loading="lazy">
+          <span class="card__n">47</span>
+        </div>
+        <div class="card__body">
+          <h3 class="card__addr">ул. Заводская 45</h3>
+          <span class="tag tag--free">Свободен</span>
+          <p class="card__price">[от&nbsp;…&nbsp;₽ в месяц]</p>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
 <section class="sect trassa">
   <div class="wrap">
     <div class="sect__head">
-      <h2>Щиты на въезде в город</h2>
+      <h2>Щиты на въезде в город<i class="h-mark"></i></h2>
       <p class="sect__sub">Северный подъезд к Батайску. Отметки — метры по ходу километража, как их считает агентство.</p>
     </div>
     <p class="lenta__cap">въезд в Батайск</p>
@@ -500,7 +600,7 @@ a{color:inherit}
       <p class="sect__sub">По улицам Батайска. Нажмите строку — на карте выше откроется это место.</p>
     </div>
     <label class="filter"><input type="checkbox" id="only-free-list"> Только свободные</label>
-    <div class="street">
+    <div class="streets"><div class="street">
   <h3 class="street__name">Северный подъезд и выезды <span class="street__count">15 мест · свободно 0</span></h3>
   <ul class="street__list"><li class="row" data-free="0" data-n="2"><span class="row__addr">Северный подъезд к Батайску 1610 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="4"><span class="row__addr">Северный подъезд к Батайску 1650 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="7"><span class="row__addr">Северный подъезд к Батайску 1650 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="8"><span class="row__addr">Северный подъезд к Батайску 1690 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="10"><span class="row__addr">Северный подъезд к Батайску 1700 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="11"><span class="row__addr">Северный подъезд к Батайску 1730 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="12"><span class="row__addr">Северный подъезд к Батайску 1750 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="13"><span class="row__addr">Северный подъезд к Батайску 1770 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="14"><span class="row__addr">Северный подъезд к Батайску 1800 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="15"><span class="row__addr">Северный подъезд к Батайску 1810 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="16"><span class="row__addr">Северный подъезд к Батайску 1885 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="17"><span class="row__addr">Северный подъезд к Батайску 1890 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="18"><span class="row__addr">Северный подъезд к Батайску 1980 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="48"><span class="row__addr">Выезд из города Батайска, Северный 16</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="49"><span class="row__addr">Выезд из города Батайска, Северный 35</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li></ul>
 </div><div class="street">
@@ -515,14 +615,14 @@ a{color:inherit}
 </div><div class="street">
   <h3 class="street__name">Заводская <span class="street__count">1 место · свободно 1</span></h3>
   <ul class="street__list"><li class="row row--free" data-free="1" data-n="47"><span class="row__addr">ул. Заводская 45</span><span class="row__kind">щит 3×6</span><span class="row__st">Свободен</span></li></ul>
-</div>
+</div></div>
   </div>
 </section>
 
 
 <section class="sect uslugi">
   <div class="wrap">
-    <h2>Печать и монтаж</h2>
+    <h2>Печать и монтаж<i class="h-mark"></i></h2>
     <ul class="uslugi__list">
       <li>Печать баннеров, интерьерная и широкоформатная печать</li>
       <li>Монтажные работы любой сложности</li>
@@ -568,7 +668,7 @@ a{color:inherit}
   </div>
 </footer>
 
-<script>window.PLACES=[{"n":1,"kind":"ekran","address":"ул.Куйбышева 7","lat":47.153239,"lon":39.737821,"free":true,"until":null,"photo":"ekran-ul-kuybysheva-7.jpg"},{"n":2,"kind":"schit","address":"Северный подъезд к Батайску 1610 м по ходу километража, справа","lat":47.1573,"lon":39.739,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1610-m-po-hodu-.jpg"},{"n":3,"kind":"ekran","address":"ул.Максима Горького-1-й Пятилетки 354","lat":47.13872,"lon":39.721795,"free":true,"until":null,"photo":"ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg"},{"n":4,"kind":"schit","address":"Северный подъезд к Батайску 1650 м по ходу километража, справа","lat":47.1569,"lon":39.7382,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1650-m-po-hodu-.jpg"},{"n":5,"kind":"ekran","address":"ул.Максима Горького -Луначарского 117","lat":47.140945,"lon":39.736689,"free":true,"until":null,"photo":"ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg"},{"n":6,"kind":"ekran","address":"ул.Энгельса-Крупская 172","lat":47.140424,"lon":39.749957,"free":true,"until":null,"photo":"ekran-ul-engelsa-krupskaya-172.jpg"},{"n":7,"kind":"schit","address":"Северный подъезд к Батайску 1650 м по ходу километража, слева","lat":47.1567,"lon":39.73953,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1650-m-po-hodu--2.jpg"},{"n":8,"kind":"schit","address":"Северный подъезд к Батайску 1690 м по ходу километража, справа","lat":47.1563,"lon":39.73755,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1690-m-po-hodu-.jpg"},{"n":9,"kind":"ekran","address":"ул.Энгельса-Ленинградская 46","lat":47.151492,"lon":39.747199,"free":true,"until":null,"photo":"ekran-ul-engelsa-leningradskaya-46.jpg"},{"n":10,"kind":"schit","address":"Северный подъезд к Батайску 1700 м по ходу километража, слева","lat":47.1569,"lon":39.73953,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1700-m-po-hodu-.jpg"},{"n":11,"kind":"schit","address":"Северный подъезд к Батайску 1730 м по ходу километража, справа","lat":47.156019,"lon":39.738414,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1730-m-po-hodu-.jpg"},{"n":12,"kind":"schit","address":"Северный подъезд к Батайску 1750 м по ходу километража, слева","lat":47.156506,"lon":39.738525,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1750-m-po-hodu-.jpg"},{"n":13,"kind":"schit","address":"Северный подъезд к Батайску 1770 м по ходу километража, справа","lat":47.15576,"lon":39.737645,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1770-m-po-hodu-.jpg"},{"n":14,"kind":"schit","address":"Северный подъезд к Батайску 1800 м по ходу километража, слева","lat":47.1564,"lon":39.73873,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1800-m-po-hodu-.jpg"},{"n":15,"kind":"schit","address":"Северный подъезд к Батайску 1810 м по ходу километража, справа","lat":47.155775,"lon":39.737817,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1810-m-po-hodu-.jpg"},{"n":16,"kind":"schit","address":"Северный подъезд к Батайску 1885 м по ходу километража, справа","lat":47.155761,"lon":39.737646,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1885-m-po-hodu-.jpg"},{"n":17,"kind":"schit","address":"Северный подъезд к Батайску 1890 м по ходу километража, слева","lat":47.156091,"lon":39.738429,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1890-m-po-hodu-.jpg"},{"n":18,"kind":"schit","address":"Северный подъезд к Батайску 1980 м по ходу километража, слева","lat":47.156653,"lon":39.739083,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1980-m-po-hodu-.jpg"},{"n":19,"kind":"prizmatron","address":"Куйбышева/Огородная","lat":47.15369,"lon":39.73743,"free":false,"until":"01.01.2027","photo":"prizma-kuybysheva-ogorodnaya.jpg"},{"n":20,"kind":"prizmatron","address":"Куйбышева, 2а","lat":47.15307,"lon":39.7365,"free":false,"until":"01.01.2027","photo":"prizma-kuybysheva-2a.jpg"},{"n":21,"kind":"schit","address":"Куйбышева 35/Морской","lat":47.1463,"lon":39.73839,"free":false,"until":"02.01.2027","photo":"schit-kuybysheva-35-morskoy.jpg"},{"n":22,"kind":"schit","address":"Куйбышева, 61","lat":47.14762,"lon":39.73839,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-61.jpg"},{"n":23,"kind":"schit","address":"ул.Куйбышева 104","lat":47.143366,"lon":39.738764,"free":true,"until":null,"photo":"schit-ul-kuybysheva-104.jpg"},{"n":24,"kind":"schit","address":"Куйбышева 114 А","lat":47.14263,"lon":39.738998,"free":true,"until":null,"photo":"schit-kuybysheva-114-a.jpg"},{"n":25,"kind":"prizmatron","address":"Куйбышева, 118","lat":47.142134,"lon":39.7386,"free":false,"until":"01.01.2027","photo":"prizma-kuybysheva-118.jpg"},{"n":26,"kind":"schit","address":"Куйбышева/Заводская (сторона А)","lat":47.142134,"lon":39.7398,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-zavodskaya-storona-a.jpg"},{"n":27,"kind":"schit","address":"Куйбышева/Заводская (сторона В)","lat":47.142134,"lon":39.7407,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-zavodskaya-storona-v.jpg"},{"n":28,"kind":"schit","address":"Куйбышева,136 ЦГБ справа","lat":47.139309,"lon":39.739438,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-136-cgb-sprava.jpg"},{"n":29,"kind":"schit","address":"ул. Куйбышева, 161, слева","lat":47.13767,"lon":39.74084,"free":false,"until":"01.01.2027","photo":"schit-ul-kuybysheva-161-sleva.jpg"},{"n":30,"kind":"schit","address":"ул. М.Горького 137","lat":47.140022,"lon":39.735449,"free":false,"until":"20.09.2026","photo":"schit-ul-m-gorkogo-137.jpg"},{"n":31,"kind":"schit","address":"Максима Горького 281 а","lat":47.137825,"lon":39.7205,"free":false,"until":"01.01.2027","photo":"schit-maksima-gorkogo-281-a.jpg"},{"n":32,"kind":"schit","address":"Максима Горького 281 в","lat":47.137825,"lon":39.722,"free":false,"until":"01.01.2027","photo":"schit-maksima-gorkogo-281-v.jpg"},{"n":33,"kind":"schit","address":"ул.М.Горького 281 Б","lat":47.138429,"lon":39.721115,"free":false,"until":"01.01.2027","photo":"schit-ul-m-gorkogo-281-b.jpg"},{"n":34,"kind":"schit","address":"ул.М.Горького 281 В","lat":47.138429,"lon":39.721115,"free":false,"until":"01.01.2027","photo":"schit-ul-m-gorkogo-281-v.jpg"},{"n":35,"kind":"prizmatron","address":"ул. М. Горького № 285 (Сторона A)","lat":47.137996,"lon":39.718573,"free":false,"until":"01.01.2027","photo":"prizma-ul-m-gorkogo-285-storona-a.jpg"},{"n":36,"kind":"schit","address":"Максима Горького, 358 (сторона А)","lat":47.13851,"lon":39.7171,"free":false,"until":"01.01.2027","photo":"schit-maksima-gorkogo-358-storona-a.jpg"},{"n":37,"kind":"schit","address":"Максима Горького, 358 (сторона B)","lat":47.13851,"lon":39.71651,"free":true,"until":null,"photo":"schit-maksima-gorkogo-358-storona-b.jpg"},{"n":38,"kind":"prizmatron","address":"ул. 1-й Пятилетки и М.Горького 356 (сторона B)","lat":47.138698,"lon":39.721302,"free":false,"until":"01.01.2027","photo":"prizma-ul-1-y-pyatiletki-i-m-gorkogo-356-storona.jpg"},{"n":39,"kind":"schit","address":"Энгельса /Кирова 18 универмаг","lat":47.138363,"lon":39.750755,"free":false,"until":"01.01.2027","photo":"schit-engelsa-kirova-18-univermag.jpg"},{"n":40,"kind":"schit","address":"ул.Энгельса-Садовая,51","lat":47.157145,"lon":39.750973,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-sadovaya-51.jpg"},{"n":41,"kind":"schit","address":"ул.Энгельса-Фрунзе,109","lat":47.146201,"lon":39.743159,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-frunze-109.jpg"},{"n":42,"kind":"schit","address":"Ул. Энгельса -Заводская 130","lat":47.143976,"lon":39.748895,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-zavodskaya-130.jpg"},{"n":43,"kind":"schit","address":"ул.Энгельса 134","lat":47.143421,"lon":39.749122,"free":true,"until":null,"photo":"schit-ul-engelsa-134.jpg"},{"n":44,"kind":"schit","address":"ул.Энгельса-Половинко,45","lat":47.152301,"lon":39.747627,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-polovinko-45.jpg"},{"n":45,"kind":"schit","address":"ул.Энгельса 53","lat":47.15186,"lon":39.747936,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-53.jpg"},{"n":46,"kind":"schit","address":"ул.Энгельса 40 слева","lat":47.152081,"lon":39.747047,"free":true,"until":null,"photo":"schit-ul-engelsa-40-sleva.jpg"},{"n":47,"kind":"schit","address":"ул.Заводская 45","lat":47.143531,"lon":39.748583,"free":true,"until":null,"photo":"schit-ul-zavodskaya-45.jpg"},{"n":48,"kind":"schit","address":"Выезд из города Батайска, Северный 16","lat":47.156658,"lon":39.743475,"free":false,"until":"01.01.2027","photo":"schit-vyezd-iz-goroda-batayska-severnyy-16.jpg"},{"n":49,"kind":"schit","address":"Выезд из города Батайска, Северный 35","lat":47.157268,"lon":39.742988,"free":false,"until":"01.01.2027","photo":"schit-vyezd-iz-goroda-batayska-severnyy-35.jpg"}];</script>
+<script>window.PLACES=[{"n":1,"kind":"ekran","address":"ул. Куйбышева 7","lat":47.153239,"lon":39.737821,"free":true,"until":null,"photo":"ekran-ul-kuybysheva-7.jpg"},{"n":2,"kind":"schit","address":"Северный подъезд к Батайску 1610 м по ходу километража, справа","lat":47.1573,"lon":39.739,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1610-m-po-hodu-.jpg"},{"n":3,"kind":"ekran","address":"ул. Максима Горького-1-й Пятилетки 354","lat":47.13872,"lon":39.721795,"free":true,"until":null,"photo":"ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg"},{"n":4,"kind":"schit","address":"Северный подъезд к Батайску 1650 м по ходу километража, справа","lat":47.1569,"lon":39.7382,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1650-m-po-hodu-.jpg"},{"n":5,"kind":"ekran","address":"ул. Максима Горького -Луначарского 117","lat":47.140945,"lon":39.736689,"free":true,"until":null,"photo":"ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg"},{"n":6,"kind":"ekran","address":"ул. Энгельса-Крупская 172","lat":47.140424,"lon":39.749957,"free":true,"until":null,"photo":"ekran-ul-engelsa-krupskaya-172.jpg"},{"n":7,"kind":"schit","address":"Северный подъезд к Батайску 1650 м по ходу километража, слева","lat":47.1567,"lon":39.73953,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1650-m-po-hodu--2.jpg"},{"n":8,"kind":"schit","address":"Северный подъезд к Батайску 1690 м по ходу километража, справа","lat":47.1563,"lon":39.73755,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1690-m-po-hodu-.jpg"},{"n":9,"kind":"ekran","address":"ул. Энгельса-Ленинградская 46","lat":47.151492,"lon":39.747199,"free":true,"until":null,"photo":"ekran-ul-engelsa-leningradskaya-46.jpg"},{"n":10,"kind":"schit","address":"Северный подъезд к Батайску 1700 м по ходу километража, слева","lat":47.1569,"lon":39.73953,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1700-m-po-hodu-.jpg"},{"n":11,"kind":"schit","address":"Северный подъезд к Батайску 1730 м по ходу километража, справа","lat":47.156019,"lon":39.738414,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1730-m-po-hodu-.jpg"},{"n":12,"kind":"schit","address":"Северный подъезд к Батайску 1750 м по ходу километража, слева","lat":47.156506,"lon":39.738525,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1750-m-po-hodu-.jpg"},{"n":13,"kind":"schit","address":"Северный подъезд к Батайску 1770 м по ходу километража, справа","lat":47.15576,"lon":39.737645,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1770-m-po-hodu-.jpg"},{"n":14,"kind":"schit","address":"Северный подъезд к Батайску 1800 м по ходу километража, слева","lat":47.1564,"lon":39.73873,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1800-m-po-hodu-.jpg"},{"n":15,"kind":"schit","address":"Северный подъезд к Батайску 1810 м по ходу километража, справа","lat":47.155775,"lon":39.737817,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1810-m-po-hodu-.jpg"},{"n":16,"kind":"schit","address":"Северный подъезд к Батайску 1885 м по ходу километража, справа","lat":47.155761,"lon":39.737646,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1885-m-po-hodu-.jpg"},{"n":17,"kind":"schit","address":"Северный подъезд к Батайску 1890 м по ходу километража, слева","lat":47.156091,"lon":39.738429,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1890-m-po-hodu-.jpg"},{"n":18,"kind":"schit","address":"Северный подъезд к Батайску 1980 м по ходу километража, слева","lat":47.156653,"lon":39.739083,"free":false,"until":"01.01.2027","photo":"schit-severnyy-podezd-k-bataysku-1980-m-po-hodu-.jpg"},{"n":19,"kind":"prizmatron","address":"Куйбышева/Огородная","lat":47.15369,"lon":39.73743,"free":false,"until":"01.01.2027","photo":"prizma-kuybysheva-ogorodnaya.jpg"},{"n":20,"kind":"prizmatron","address":"Куйбышева, 2а","lat":47.15307,"lon":39.7365,"free":false,"until":"01.01.2027","photo":"prizma-kuybysheva-2a.jpg"},{"n":21,"kind":"schit","address":"Куйбышева 35/Морской","lat":47.1463,"lon":39.73839,"free":false,"until":"02.01.2027","photo":"schit-kuybysheva-35-morskoy.jpg"},{"n":22,"kind":"schit","address":"Куйбышева, 61","lat":47.14762,"lon":39.73839,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-61.jpg"},{"n":23,"kind":"schit","address":"ул. Куйбышева 104","lat":47.143366,"lon":39.738764,"free":true,"until":null,"photo":"schit-ul-kuybysheva-104.jpg"},{"n":24,"kind":"schit","address":"Куйбышева 114 А","lat":47.14263,"lon":39.738998,"free":true,"until":null,"photo":"schit-kuybysheva-114-a.jpg"},{"n":25,"kind":"prizmatron","address":"Куйбышева, 118","lat":47.142134,"lon":39.7386,"free":false,"until":"01.01.2027","photo":"prizma-kuybysheva-118.jpg"},{"n":26,"kind":"schit","address":"Куйбышева/Заводская (сторона А)","lat":47.142134,"lon":39.7398,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-zavodskaya-storona-a.jpg"},{"n":27,"kind":"schit","address":"Куйбышева/Заводская (сторона В)","lat":47.142134,"lon":39.7407,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-zavodskaya-storona-v.jpg"},{"n":28,"kind":"schit","address":"Куйбышева,136 ЦГБ справа","lat":47.139309,"lon":39.739438,"free":false,"until":"01.01.2027","photo":"schit-kuybysheva-136-cgb-sprava.jpg"},{"n":29,"kind":"schit","address":"ул. Куйбышева, 161, слева","lat":47.13767,"lon":39.74084,"free":false,"until":"01.01.2027","photo":"schit-ul-kuybysheva-161-sleva.jpg"},{"n":30,"kind":"schit","address":"ул. М.Горького 137","lat":47.140022,"lon":39.735449,"free":false,"until":"20.09.2026","photo":"schit-ul-m-gorkogo-137.jpg"},{"n":31,"kind":"schit","address":"Максима Горького 281 а","lat":47.137825,"lon":39.7205,"free":false,"until":"01.01.2027","photo":"schit-maksima-gorkogo-281-a.jpg"},{"n":32,"kind":"schit","address":"Максима Горького 281 в","lat":47.137825,"lon":39.722,"free":false,"until":"01.01.2027","photo":"schit-maksima-gorkogo-281-v.jpg"},{"n":33,"kind":"schit","address":"ул. М.Горького 281 Б","lat":47.138429,"lon":39.721115,"free":false,"until":"01.01.2027","photo":"schit-ul-m-gorkogo-281-b.jpg"},{"n":34,"kind":"schit","address":"ул. М.Горького 281 В","lat":47.138429,"lon":39.721115,"free":false,"until":"01.01.2027","photo":"schit-ul-m-gorkogo-281-v.jpg"},{"n":35,"kind":"prizmatron","address":"ул. М. Горького № 285 (Сторона A)","lat":47.137996,"lon":39.718573,"free":false,"until":"01.01.2027","photo":"prizma-ul-m-gorkogo-285-storona-a.jpg"},{"n":36,"kind":"schit","address":"Максима Горького, 358 (сторона А)","lat":47.13851,"lon":39.7171,"free":false,"until":"01.01.2027","photo":"schit-maksima-gorkogo-358-storona-a.jpg"},{"n":37,"kind":"schit","address":"Максима Горького, 358 (сторона B)","lat":47.13851,"lon":39.71651,"free":true,"until":null,"photo":"schit-maksima-gorkogo-358-storona-b.jpg"},{"n":38,"kind":"prizmatron","address":"ул. 1-й Пятилетки и М.Горького 356 (сторона B)","lat":47.138698,"lon":39.721302,"free":false,"until":"01.01.2027","photo":"prizma-ul-1-y-pyatiletki-i-m-gorkogo-356-storona.jpg"},{"n":39,"kind":"schit","address":"Энгельса /Кирова 18 универмаг","lat":47.138363,"lon":39.750755,"free":false,"until":"01.01.2027","photo":"schit-engelsa-kirova-18-univermag.jpg"},{"n":40,"kind":"schit","address":"ул. Энгельса-Садовая,51","lat":47.157145,"lon":39.750973,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-sadovaya-51.jpg"},{"n":41,"kind":"schit","address":"ул. Энгельса-Фрунзе,109","lat":47.146201,"lon":39.743159,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-frunze-109.jpg"},{"n":42,"kind":"schit","address":"Ул. Энгельса -Заводская 130","lat":47.143976,"lon":39.748895,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-zavodskaya-130.jpg"},{"n":43,"kind":"schit","address":"ул. Энгельса 134","lat":47.143421,"lon":39.749122,"free":true,"until":null,"photo":"schit-ul-engelsa-134.jpg"},{"n":44,"kind":"schit","address":"ул. Энгельса-Половинко,45","lat":47.152301,"lon":39.747627,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-polovinko-45.jpg"},{"n":45,"kind":"schit","address":"ул. Энгельса 53","lat":47.15186,"lon":39.747936,"free":false,"until":"01.01.2027","photo":"schit-ul-engelsa-53.jpg"},{"n":46,"kind":"schit","address":"ул. Энгельса 40 слева","lat":47.152081,"lon":39.747047,"free":true,"until":null,"photo":"schit-ul-engelsa-40-sleva.jpg"},{"n":47,"kind":"schit","address":"ул. Заводская 45","lat":47.143531,"lon":39.748583,"free":true,"until":null,"photo":"schit-ul-zavodskaya-45.jpg"},{"n":48,"kind":"schit","address":"Выезд из города Батайска, Северный 16","lat":47.156658,"lon":39.743475,"free":false,"until":"01.01.2027","photo":"schit-vyezd-iz-goroda-batayska-severnyy-16.jpg"},{"n":49,"kind":"schit","address":"Выезд из города Батайска, Северный 35","lat":47.157268,"lon":39.742988,"free":false,"until":"01.01.2027","photo":"schit-vyezd-iz-goroda-batayska-severnyy-35.jpg"}];</script>
 <script src="https://api-maps.yandex.ru/2.1.22/?lang=ru_RU"></script>
 <script>
 const lenta=document.querySelector('.lenta');
@@ -636,7 +736,7 @@ function initMap(places){
     });
 
     // строка списка открывает метку — так же, как на их нынешнем сайте
-    document.querySelectorAll('.street__list .row, .board .cell').forEach(r=>{
+    document.querySelectorAll('.street__list .row, .board .cell, .card[data-n]').forEach(r=>{
       r.addEventListener('click',()=>{
         const pm=marks[r.dataset.n];
         if(!pm) return;
@@ -656,6 +756,29 @@ if(window.ymaps){
   // API Яндекса не приехал — список ниже остаётся рабочим, меняем только надпись
   const off=mapBox.querySelector('.map__off');
   if(off) off.textContent='Карта не загрузилась. Все 49 мест перечислены ниже — с адресами, состоянием и фотографиями.';
+}
+
+
+/* Барабан экранов: сам крутится, останавливается под курсором и при
+   фокусе с клавиатуры, молчит при prefers-reduced-motion. */
+const reel=document.querySelector('.reel');
+if(reel && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+  const slides=[...reel.querySelectorAll('.reel__slide')];
+  const dots=[...reel.querySelectorAll('.reel__dot')];
+  let i=0, timer=null;
+  const show=n=>{
+    i=(n+slides.length)%slides.length;
+    slides.forEach((s,k)=>s.classList.toggle('is-on',k===i));
+    dots.forEach((d,k)=>d.classList.toggle('is-on',k===i));
+  };
+  const start=()=>{ stop(); timer=setInterval(()=>show(i+1),5000); };
+  const stop=()=>{ if(timer){clearInterval(timer);timer=null;} };
+  dots.forEach(d=>d.addEventListener('click',()=>{show(+d.dataset.i);start();}));
+  reel.addEventListener('mouseenter',stop);
+  reel.addEventListener('mouseleave',start);
+  reel.addEventListener('focusin',stop);
+  reel.addEventListener('focusout',start);
+  start();
 }
 
 const form=document.querySelector('.form');
