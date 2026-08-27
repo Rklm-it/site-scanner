@@ -84,7 +84,7 @@ a{color:inherit}
 .card__price{margin-top:auto;padding-top:.7rem;color:var(--doroga);font-size:.9rem}
 
 /* лента трассы */
-.trassa{background:var(--grafit);color:var(--beton)}
+.trassa{background:var(--grafit);color:var(--beton);background-image:linear-gradient(90deg,rgba(28,30,32,.97) 42%,rgba(28,30,32,.55) 100%),url(images/fon-trassa-stock.jpg);background-size:auto,cover;background-position:center,right center;background-repeat:no-repeat}
 .trassa .sect__sub{color:rgba(237,239,240,.62)}
 .lenta{margin:2.2rem auto 0;max-width:560px}
 .lenta__sides{display:grid;grid-template-columns:1fr 1fr;gap:5rem;max-width:560px;margin:.7rem auto -.2rem;font-family:'PT Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(237,239,240,.45)}
@@ -295,6 +295,7 @@ a{color:inherit}
 
 .tel-mob{display:none}
 @media (max-width:900px){
+  .trassa{background-image:linear-gradient(rgba(28,30,32,.93),rgba(28,30,32,.97)),url(images/fon-trassa-stock.jpg)}
   /* На узком экране в шапке помещается либо логотип с подписью и двумя
      телефонами, либо логотип и одна кнопка. Второе полезнее: звонят с
      телефона, а не читают реквизиты. */
