@@ -300,6 +300,19 @@ def test_potolok_obyoma_ostanavlivaet_i_nazyvaetsya(site, tmp_path):
     assert stats.pages_left + stats.assets_left > 0
 
 
+def test_mesto_na_diske_ostanavlivaet_vygruzku(site, tmp_path):
+    """Диск кончился — обход обязан остановиться сам и назвать причину.
+
+    Выгрузка лежит на том же томе, что база лидов и ключи. На сервере
+    владельца под /data оставалось 533 МБ, а сайту на конструкторе нужен
+    гигабайт: без этой границы выгрузка чужих фотографий останавливает весь
+    инструмент, и чинится это руками на сервере.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0, min_free_bytes=10 ** 15)
+    assert stats.stopped_by == "disk"
+
+
 def test_kartinkam_ostayotsya_vremya_kogda_stranicy_ne_uspeli(site, tmp_path):
     """Картинки качаются последними и раньше оставались без бюджета совсем.
 

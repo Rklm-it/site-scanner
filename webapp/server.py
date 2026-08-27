@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import threading
 import time
 import uuid
@@ -596,6 +597,8 @@ class DumpJob:
     asset_skipped: dict[str, int] = field(default_factory=dict)
     robots: bool = True              # с какой галочкой реально прошла выгрузка
     max_mb: int = 200                # потолок объёма, с которым шла выгрузка
+    max_mb_asked: int = 200          # сколько просили в форме — если урезали
+    free_mb: int = 0                 # сколько было свободно на томе при старте
     error: str | None = None
     errors: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.time)
@@ -609,7 +612,8 @@ class DumpJob:
             "stopped_by": self.stopped_by, "title": self.title,
             "pages_left": self.pages_left, "assets_left": self.assets_left,
             "robots": self.robots, "asset_skipped": self.asset_skipped,
-            "max_mb": self.max_mb,
+            "max_mb": self.max_mb, "max_mb_asked": self.max_mb_asked,
+            "free_mb": self.free_mb,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
@@ -637,6 +641,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             max_depth=max(1, min(req.max_depth, 8)),
             time_budget=max(60, min(req.minutes, 90) * 60),
             max_total_bytes=job.max_mb * 1024 * 1024,
+            min_free_bytes=DISK_RESERVE_MB * 1024 * 1024,
             respect_robots=req.respect_robots,
             use_sitemap=req.use_sitemap,
             on_progress=on_progress,
@@ -685,6 +690,24 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             work.rmdir()
 
 
+# Сколько места на томе не отдаём выгрузке ни при каких настройках. Там же
+# лежат база лидов и ключи: заполненный до нуля диск ломает не выгрузку, а
+# весь инструмент, и чинится это уже руками на сервере.
+DISK_RESERVE_MB = 300
+
+
+def _disk_room() -> tuple[int, int]:
+    """Свободно на томе и сколько из этого можно отдать выгрузке.
+
+    Делим пополам не из осторожности: `mirror.pack` пишет zip рядом с ещё не
+    удалённой распакованной выгрузкой, а фотографии не сжимаются — в пике на
+    диске лежат две копии.
+    """
+    DUMPS_DIR.mkdir(parents=True, exist_ok=True)
+    free_mb = shutil.disk_usage(DUMPS_DIR).free // (1024 * 1024)
+    return free_mb, max(0, (free_mb - DISK_RESERVE_MB) // 2)
+
+
 @app.post("/api/dump")
 def start_dump(req: DumpRequest) -> dict:
     domain = (req.domain or "").strip().lower()
@@ -697,9 +720,16 @@ def start_dump(req: DumpRequest) -> dict:
         raise HTTPException(409, "Одна выгрузка уже идёт — дождитесь её окончания.")
     # Потолок объёма ограничен сверху не из вежливости к сайту, а ради тома:
     # архив ложится на тот же диск, где живёт база лидов.
-    max_mb = max(10, min(req.max_mb, 3000))
+    asked_mb = max(10, min(req.max_mb, 3000))
+    free_mb, mozhno_mb = _disk_room()
+    if mozhno_mb < 10:
+        raise HTTPException(
+            507, f"На диске свободно {free_mb} МБ — выгружать некуда. "
+                 f"Удалите готовые архивы ниже или освободите место на сервере."
+        )
     job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain,
-                  robots=req.respect_robots, max_mb=max_mb)
+                  robots=req.respect_robots, max_mb=min(asked_mb, mozhno_mb),
+                  max_mb_asked=asked_mb, free_mb=free_mb)
     DUMP_JOBS[job.id] = job
     threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
     return {"dump_id": job.id}
@@ -733,7 +763,12 @@ def list_dumps() -> dict:
             "mtime": st.st_mtime,
         })
     items.sort(key=lambda i: i["mtime"], reverse=True)
-    return {"count": len(items), "dumps": items}
+    # Свободное место — рядом со списком архивов, потому что решение «удалить
+    # старую выгрузку» принимается здесь же. На сервере владельца под /data
+    # оставалось 533 МБ при выгрузке, которой нужен гигабайт.
+    free_mb, mozhno_mb = _disk_room()
+    return {"count": len(items), "dumps": items,
+            "free_mb": free_mb, "mozhno_mb": mozhno_mb}
 
 
 @app.get("/api/dumps/{name}")

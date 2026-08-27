@@ -616,6 +616,7 @@ let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 // «Страниц» и «Глубина» сбрасывались. На экране было одно, применялось
 // другое — и выгрузка молча приезжала без картинок.
 const DUMP_FORM = { domain: "", pages: 1500, depth: 5, minutes: 30, mb: 200, robots: true, sitemap: true };
+let DUMP_DISK = { free: 0, mozhno: 0 };
 
 /** Из чего угодно — в домен. Люди вставляют адрес из адресной строки
  *  целиком: со схемой, www, путём и слешем на конце. Сервер это и так
@@ -627,6 +628,22 @@ function cleanDomain(v) {
     .replace(/^[^@/]*@/, "")                     // логин:пароль, если вставили
     .split(/[/?#]/)[0]                           // путь, запрос, якорь
     .replace(/\.+$/, "");                        // точка на конце
+}
+
+/** Место на томе. Выгрузка живёт там же, где база лидов и ключи, а в пике
+ *  занимает две копии: zip пишется рядом с ещё не удалённой распакованной
+ *  выгрузкой. Поэтому «можно отдать» — половина свободного за вычетом запаса,
+ *  и число это должно быть видно до запуска, а не после обрыва на середине. */
+function diskNote() {
+  if (!DUMP_DISK.free) return "";
+  const tesno = DUMP_DISK.mozhno < DUMP_FORM.mb;
+  return `<div class="${tesno ? "warn" : "hint"}">
+    На диске свободно <b>${DUMP_DISK.free} МБ</b>, выгрузке из них можно отдать
+    <b>${DUMP_DISK.mozhno} МБ</b> — архив пакуется рядом с распакованной копией,
+    поэтому места нужно вдвое.
+    ${tesno ? `Заказано ${DUMP_FORM.mb} МБ — потолок урежется до
+       ${DUMP_DISK.mozhno} МБ. Удалите ненужные архивы ниже, иначе фотографии
+       доедут не все.` : ""}</div>`;
 }
 
 function readDumpForm() {
@@ -676,7 +693,9 @@ function fmtMB(b) {
 
 async function loadDumps() {
   try {
-    DUMPS = ((await (await fetch("/api/dumps")).json()).dumps) || [];
+    const dumpsResp = await (await fetch("/api/dumps")).json();
+    DUMPS = dumpsResp.dumps || [];
+    DUMP_DISK = { free: dumpsResp.free_mb || 0, mozhno: dumpsResp.mozhno_mb || 0 };
   } catch (e) { DUMPS = []; }
 }
 
@@ -730,6 +749,7 @@ function renderDumps() {
           <input type="checkbox" id="dmp-sitemap" ${DUMP_FORM.sitemap ? "checked" : ""}> по карте сайта</label>
       </div>
       ${unknown}
+      ${diskNote()}
       <div id="dmp-progress"></div>
       <div class="hint">Любой сайт, не только из базы лидов — адрес можно вставить
         целиком, лишнее отрежется. По умолчанию выгрузка полная: 1500 страниц и
@@ -745,8 +765,12 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-mb", "dmp-robots", "dmp-sitemap"].forEach(
+  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap"].forEach(
     id => $(id).addEventListener("change", readDumpForm));
+  // «Объём» перерисовывает секцию: строка про место на диске сравнивает
+  // заказанное со свободным, и показывать в ней прежнее число — хуже, чем
+  // не показывать вовсе.
+  $("dmp-mb").addEventListener("change", () => { readDumpForm(); renderDumps(); });
   // Домен перерисовывает секцию: предупреждение про опечатку должно появиться
   // до запуска, а не после того, как выгрузился чужой сайт.
   $("dmp-domain").addEventListener("change", () => { readDumpForm(); renderDumps(); });
@@ -799,6 +823,8 @@ function renderDumpProgress() {
     const why = { limit: ["упёрлись в лимит страниц", "поднимите «Страниц» и повторите"],
                   bytes: [`выгрузка упёрлась в потолок объёма (${j.max_mb || 200} МБ)`,
                           "поднимите «Объём» и повторите"],
+                  disk: ["на диске кончилось место",
+                         "удалите старые архивы и повторите"],
                   deadline: ["кончилось время", "поднимите «Минут» и повторите"] }[j.stopped_by]
              || ["обход остановился", "повторите выгрузку"];
     const cut = left.length ? ` — не добрано ${left.join(" и ")}: ${why[0]}, ${why[1]}` : "";
@@ -829,9 +855,13 @@ function renderDumpProgress() {
         Портфолио придётся забирать отдельно.</div>`;
     }
     // Что реально применилось, а не что сейчас нарисовано в форме
+    const urezali = j.max_mb && j.max_mb_asked && j.max_mb < j.max_mb_asked
+      ? `<div class="warn">Потолок объёма урезан с ${j.max_mb_asked} до
+         <b>${j.max_mb} МБ</b>: на томе было свободно ${j.free_mb} МБ, а место
+         нужно и под распакованную выгрузку, и под архив рядом с ней.</div>` : "";
     const how = `<div class="hint">Домен: <b>${escHtml(j.domain)}</b>, robots.txt
         ${j.robots ? "уважали" : "игнорировали"}.</div>`;
-    box.innerHTML = `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
+    box.innerHTML = urezali + `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
       файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>${who}${how}${noimg}`;
   }
 }

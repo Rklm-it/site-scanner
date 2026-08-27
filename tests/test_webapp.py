@@ -479,6 +479,72 @@ def test_dump_obyom_dohodit_do_obhoda(client, monkeypatch):
     assert seen["max_total_bytes"] == 3000 * 1024 * 1024
 
 
+def test_dump_potolok_urezaetsya_po_mestu_na_diske(client, monkeypatch):
+    """Просить можно сколько угодно, отдать — только то, что есть на диске.
+
+    Место делится пополам: zip пакуется рядом с ещё не удалённой распакованной
+    выгрузкой. Урезание должно быть видно в статусе, иначе «файлов приехало
+    меньше» опять выясняется при разборе.
+    """
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen.update(kw)
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+
+    def mesto(free_mb):
+        total = free_mb * 1024 * 1024
+        monkeypatch.setattr(
+            server.shutil, "disk_usage",
+            lambda p, _t=total: type("U", (), {"total": _t, "used": 0, "free": _t})())
+
+    def dump(payload):
+        r = c.post("/api/dump", json=payload)
+        assert r.status_code == 200, r.text
+        for _ in range(50):
+            j = c.get(f"/api/dump/{r.json()['dump_id']}").json()
+            if j["status"] != "running":
+                return j
+            time.sleep(0.05)
+        raise AssertionError("выгрузка не завершилась")
+
+    # 533 МБ — ровно то, что было на сервере владельца: (533 - 300) / 2
+    mesto(533)
+    j = dump({"domain": "example.ru", "max_mb": 1500})
+    assert j["max_mb"] == 116 and j["max_mb_asked"] == 1500 and j["free_mb"] == 533
+    assert seen["max_total_bytes"] == 116 * 1024 * 1024
+    assert seen["min_free_bytes"] == server.DISK_RESERVE_MB * 1024 * 1024
+
+    # Места вдоволь — просимое доходит целиком
+    mesto(20000)
+    dump({"domain": "example.ru", "max_mb": 1500})
+    assert seen["max_total_bytes"] == 1500 * 1024 * 1024
+
+    # Места нет вовсе — выгрузка не начинается, а не забивает диск под ноль
+    mesto(310)
+    r = c.post("/api/dump", json={"domain": "example.ru", "max_mb": 1500})
+    assert r.status_code == 507
+    assert "310" in r.json()["detail"]
+
+
+def test_dumps_pokazyvayut_mesto_na_diske(client):
+    """Список архивов отдаёт свободное место: решение «удалить» принимается там."""
+    c, _ = client
+    data = c.get("/api/dumps").json()
+    assert data["free_mb"] > 0
+    assert data["mozhno_mb"] == max(0, (data["free_mb"] - 300) // 2)
+
+
 def test_dump_list_reads_from_disk(client, tmp_path):
     """Список архивов читается с тома, а не из памяти процесса: задачи
     перезапуск контейнера не переживают, а собранные архивы обязаны."""

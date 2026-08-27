@@ -27,6 +27,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import shutil
 import time
 import zipfile
 from collections import deque
@@ -150,7 +151,7 @@ class MirrorStats:
     errors: list[str] = field(default_factory=list)
     pages_index: list[dict] = field(default_factory=list)
     archive: str | None = None
-    stopped_by: str | None = None      # limit / deadline / bytes / done
+    stopped_by: str | None = None      # limit / deadline / bytes / disk / done
     # Сколько осталось в очередях, когда обход остановили. Без этих двух чисел
     # «выгрузка неполная» приходится вычислять руками по manifest.json, а
     # заметно это становится через неделю, когда сайт уже разобран не весь.
@@ -359,6 +360,10 @@ def run(
     respect_robots: bool = True,
     max_total_bytes: int = 200 * 1024 * 1024,
     max_file_bytes: int = 15 * 1024 * 1024,
+    # Сколько места на диске оставить нетронутым. Выгрузка живёт на том же
+    # томе, что база лидов и ключи: забить его фотографиями чужого сайта —
+    # это не «неудачная выгрузка», а остановка всего инструмента.
+    min_free_bytes: int = 0,
     timeout: float = 15.0,
     scheme: str | None = None,
     use_sitemap: bool = True,
@@ -424,9 +429,25 @@ def run(
     assets: list[str] = []
     site_encoding: str | None = None      # определяется на первой же странице
 
+    # Место на диске спрашиваем не на каждом файле: syscall дешёвый, но
+    # картинок тысячи, а свободное место так быстро не меняется.
+    disk_checked = [0.0]
+
+    def disk_ok() -> bool:
+        if not min_free_bytes:
+            return True
+        now = time.monotonic()
+        if now - disk_checked[0] < 2.0:
+            return True
+        disk_checked[0] = now
+        return shutil.disk_usage(dest_dir).free > min_free_bytes
+
     def budget_left(until: float) -> bool:
         if stats.bytes >= max_total_bytes:
             stats.stopped_by = stats.stopped_by or "bytes"
+            return False
+        if not disk_ok():
+            stats.stopped_by = stats.stopped_by or "disk"
             return False
         return time.monotonic() < until
 
