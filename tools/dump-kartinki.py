@@ -6,6 +6,10 @@
 ответ достаётся из архива, который уже лежит на томе: разбираем разметку теми
 же правилами, что и обход, и показываем, куда ведут адреса картинок.
 
+Скрипт намеренно самостоятельный: из зависимостей только BeautifulSoup, а
+`scanner` не импортируется вовсе. Иначе он не запустится там, где нужнее
+всего — внутри контейнера, собранного из старого кода, до перевыгрузки.
+
 Запуск на сервере сканера (репозиторий в образ не копируется, поэтому скрипт
 подаётся на вход, а не лежит внутри):
 
@@ -18,6 +22,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 import zipfile
 from collections import Counter
@@ -26,11 +31,44 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scanner import mirror  # noqa: E402
+# Те же правила, что и у обхода в scanner/mirror.py. Продублированы
+# сознательно: диагностика должна работать в контейнере со старым кодом.
+ASSET_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".bmp"}
+IMG_ATTRS = ("data-src", "data-original", "data-lazy-src", "data-lazy",
+             "data-echo", "data-image", "data-bg", "data-background")
+SRCSET_ATTRS = ("srcset", "data-srcset")
+CSS_URL = re.compile(r"""url\(\s*['"]?([^'")]+)['"]?\s*\)""", re.I)
 
 
-def _pages(src: Path):
+def ext(path: str) -> str:
+    tail = path.rsplit("/", 1)[-1]
+    return ("." + tail.rsplit(".", 1)[1].lower()) if "." in tail else ""
+
+
+def same_site(url: str, host: str) -> bool:
+    netloc = urlparse(url).netloc.lower().split(":")[0]
+    return netloc in (host, f"www.{host}")
+
+
+def image_refs(soup) -> list[str]:
+    """Все адреса картинок со страницы: src, ленивые атрибуты, srcset, фоны."""
+    out: list[str] = []
+    for el in soup.find_all(["img", "source"]):
+        out.append((el.get("src") or "").strip())
+        for attr in IMG_ATTRS:
+            out.append((el.get(attr) or "").strip())
+        for attr in SRCSET_ATTRS:
+            # `srcset` — это «адрес 1x, адрес 2x»: берём адреса, дескрипторы нет
+            for part in (el.get(attr) or "").split(","):
+                out.append(part.strip().split(" ")[0].strip())
+    for el in soup.find_all(attrs={"style": True}):
+        out += [m.group(1).strip() for m in CSS_URL.finditer(el["style"])]
+    for el in soup.find_all("style"):
+        out += [m.group(1).strip() for m in CSS_URL.finditer(el.get_text())]
+    return [v for v in out if v and not v.startswith(("data:", "javascript:", "#"))]
+
+
+def pages(src: Path):
     """(имя, html) по всем страницам выгрузки — из zip или из папки."""
     if src.is_dir():
         for path in sorted(src.rglob("*")):
@@ -53,43 +91,40 @@ def main(argv: list[str]) -> int:
         return 2
 
     # Хост берём из имени архива: mebel-ryazane.ru-2026-08-27-1249.zip
-    host = src.name.split(".ru-")[0] + ".ru" if ".ru-" in src.name else src.stem
+    m = re.match(r"([\w.-]+?\.[a-z]{2,})-\d{4}-\d{2}-\d{2}", src.name)
+    host = m.group(1) if m else src.stem
     hosts, prichiny = Counter(), Counter()
     primery: dict[str, str] = {}
     stranic = refs = svoi = 0
 
-    for name, html in _pages(src):
+    for _, html in pages(src):
         stranic += 1
-        soup = BeautifulSoup(html, "lxml")
-        adresa = [(el.get("src") or "").strip() for el in soup.find_all("img")]
-        adresa += mirror._image_refs(soup)
-        for val in adresa:
-            if not val or val.startswith(("data:", "javascript:", "#")):
-                continue
+        soup = BeautifulSoup(html, "html.parser")
+        for val in image_refs(soup):
             refs += 1
             # Страницы лежат в архиве плоско, поэтому относительные адреса
             # достраиваем от корня сайта — нам важен хост и расширение.
             url = urljoin(f"https://{host}/", val)
             netloc = urlparse(url).netloc.lower()
-            ext = mirror._ext(urlparse(url).path)
             hosts[netloc] += 1
-            if not mirror._same_site(url, host):
+            primery.setdefault(netloc, url)
+            if not same_site(url, host):
                 prichiny[f"чужой хост {netloc}"] += 1
-            elif ext not in mirror.ASSET_EXT:
+            elif ext(urlparse(url).path) not in ASSET_EXT:
                 prichiny["адрес без расширения — картинку отдаёт скрипт"] += 1
             else:
                 svoi += 1
-            primery.setdefault(netloc, url)
 
-    print(f"Выгрузка: {src.name}")
+    print(f"Выгрузка: {src.name}  (хост считаем {host})")
     print(f"Страниц разобрано: {stranic}, адресов картинок в разметке: {refs}")
-    print(f"Из них своих и скачиваемых: {svoi}")
+    print(f"Из них своих и скачиваемых обходом: {svoi}")
     if not refs:
         print("\nАдресов картинок нет вовсе — их подставляет скрипт,"
               " а обход JavaScript не выполняет.")
-    print("\nХосты:")
-    for netloc, n in hosts.most_common(15):
-        print(f"  {n:6d}  {netloc or '(относительный адрес)'}  ← {primery[netloc]}")
+    if hosts:
+        print("\nХосты:")
+        for netloc, n in hosts.most_common(15):
+            print(f"  {n:6d}  {netloc or '(относительный адрес)'}  ← {primery[netloc]}")
     if prichiny:
         print("\nПочему не поехали:")
         for reason, n in prichiny.most_common(10):
