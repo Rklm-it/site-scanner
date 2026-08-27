@@ -168,7 +168,74 @@ shadcn. Быстрый способ собрать эффектную секци
 библиотек) раздаются тем же маркетплейсом и включаются теми же скриптами —
 `plugins/README.md`.
 
+## Комьюнити-скилы по виду (добавлены по списку владельца)
+
+Владелец принёс подборку «топовых скилов для веб-дизайна» (пост Pasquale
+Pillitteri, «The 20 Best Claude Code Skills for UI/UX Design») и попросил
+добавить. Из пяти названных **Anthropic Frontend Design уже стоял**
+(`/frontend-design`), **Figma to Code не взят** (см. «Что сознательно не
+взяли»). Остальные три добавлены копиями с лицензиями — все MIT.
+
+Важно про них помнить: это большие универсальные скилы «на всё про вид», и
+они **перекрываются** с уже собранным набором (`/frontend-design`,
+`/web-design-engineer`, `/theme-factory`, `/web-animation`). Брать под задачу
+**один** вход, а не звать всё сразу — иначе три скила дадут три разных
+мнения о палитре на одной странице. Наши рамки остаются главными: движение —
+только через `/web-animation` (одна библиотека на проект, первый экран не
+анимируем), и никакого 3D/WebGL в бандл.
+
+**`/ui-ux-pro-max`** (`nextlevelbuilder/ui-ux-pro-max-skill`) — не методичка,
+а поисковик по локальной базе: 79 стилей, 192 палитры, 74 пары шрифтов, 119
+правил UX, пресеты GSAP, типы графиков, стеки. Ищется Python-скриптом
+(`scripts/search.py`, Python 3, без внешних зависимостей — проверено, база на
+месте, поиск отвечает). По сути расширенное меню поверх наших
+`/web-design-engineer` (25 стилей) и `/theme-factory` (10 пар): когда клиенту
+нужно показать больше вариантов «вот направления». Две грабли: (1) в SKILL.md
+пути к скрипту идут через `${CLAUDE_PLUGIN_ROOT}` — это переменная плагина, у
+голой копии в `.claude/skills/` она пустая, так что путь к `search.py`
+подставлять от корня репозитория руками; (2) в базе есть GSAP-пресеты — брать
+их можно только не нарушая правило `/web-animation` «одна библиотека».
+
+**`/bencium-innovative-ux-designer`** и **`/bencium-controlled-ux-designer`**
+(`bencium/bencium-claude-code-design-skill`) — один скил в двух режимах.
+*Innovative* — смелый вид под лендинг и кампанию, *Controlled* — строгий, со
+спросом разрешения на каждое решение и упором на WCAG/адаптив. Внутри каждого
+`ACCESSIBILITY.md`, `RESPONSIVE-DESIGN.md`, `MOTION-SPEC.md`,
+`DESIGN-SYSTEM-TEMPLATE.md`. Перекрываются с `/frontend-design` +
+`/web-design-engineer`; их `MOTION-SPEC.md` — второе мнение о движении, но
+решает всё равно наш `/web-animation` (там мобильная цена и запрет на анимацию
+первого экрана, которых у Bencium нет). Лицензия MIT объявлена в README
+репозитория, файла в папке скила не было — `LICENSE.txt` восстановлен по
+стандартному шаблону с указанием автора (bencium.io).
+
+**`/web-design-guidelines`** (`vercel-labs/agent-skills`) — не про «сделать»,
+а про «проверить»: разбирает готовый код интерфейса на соответствие Web
+Interface Guidelines Vercel и выдаёт находки с `файл:строка`. Отдельный угол
+от нашего `/web-quality-audit` (тот про Lighthouse — SEO, метатеги, alt,
+скорость), здесь — про поведение интерфейса: фокус, состояния, клавиатура,
+формы. Ставится рядом как второй, придирчивый ревьюер. Лицензия MIT из README,
+`LICENSE.txt` восстановлен так же (автор — Vercel).
+
 ## Что сознательно не взяли
+
+**Figma to Code** (из того же списка владельца) — официального скила Anthropic
+с таким именем в `anthropics/skills` нет, а сама конвертация «макет Figma →
+код» опирается на Figma MCP и живые макеты в Figma. У нас другой вход: мы
+разбираем **выгрузку старого сайта** (`scanner/mirror.py`) и собираем в
+Lovable, макетов Figma в цепочке не бывает. Скил лёг бы мёртвым грузом. Если
+появится клиент, приносящий дизайн в Figma, — брать Vercel-скилы
+`figma-*` из того же `vercel-labs/agent-skills`, они под Figma MCP и заточены.
+
+**Остальные скилы из тех же трёх репозиториев.** У
+`nextlevelbuilder/ui-ux-pro-max-skill` рядом лежат `design`, `design-system`,
+`ui-styling` (5,8 МБ), `brand`, `slides`, `banner-design` — взят только
+`ui-ux-pro-max`, прочее либо дублирует наш набор, либо не про сайты клиентов.
+У `bencium/...` — целый маркетплейс на два десятка скилов (типографика,
+код-конвенции, венгерский «очеловечиватель», ревьюер EU AI Act); взяты два
+режима UX-дизайнера, ради которых он и в списке. У `vercel-labs/agent-skills`
+не взяты `deploy-to-vercel`, `vercel-optimize`, `vercel-cli-with-tokens`
+(мы деплоим на свой VPS через Caddy, не на Vercel) и `react-*`/`writing-*`
+(перекрываются с тем, что уже есть).
 
 **3D-часть `freshtechbro/claudedesignskills`** — three.js, React Three Fiber,
 Babylon.js, PixiJS, PlayCanvas, A-Frame, Spline, Blender, Rive, Substance 3D.
@@ -206,6 +273,9 @@ DataForSEO, которых у нас нет.
 | `web-design-engineer` | [ConardLi/garden-skills](https://github.com/ConardLi/garden-skills) | `aaf9a82`, 12.07.2026 | MIT |
 | `web-quality-audit`, `seo`, `accessibility`, `core-web-vitals`, `performance`, `best-practices` | [addyosmani/web-quality-skills](https://github.com/addyosmani/web-quality-skills) | `95d6e25`, 14.06.2026 | MIT |
 | `motion-framer`, `gsap-scrolltrigger`, `scroll-reveal-libraries`, `animated-component-libraries` | [freshtechbro/claudedesignskills](https://github.com/freshtechbro/claudedesignskills) | `1da73fe`, 19.11.2025 | MIT |
+| `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `8bd29e7`, 27.08.2026 | MIT |
+| `bencium-innovative-ux-designer`, `bencium-controlled-ux-designer` | [bencium/bencium-claude-code-design-skill](https://github.com/bencium/bencium-claude-code-design-skill) | `bda4647`, 15.08.2026 | MIT (в README, файла в папке не было — восстановлен) |
+| `web-design-guidelines` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | `dd089a8`, 21.08.2026 | MIT (в README, файла в папке не было — восстановлен) |
 
 Четыре скила про движение приехали из репозитория, который с ноября 2025
 не обновлялся: приёмы там живые, а конкретное имя параметра могло уехать —
