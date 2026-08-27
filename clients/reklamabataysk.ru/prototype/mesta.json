@@ -7,7 +7,8 @@
   "lon": 39.737821,
   "free": true,
   "until": null,
-  "photo": "ekran-ul-kuybysheva-7.jpg"
+  "photo": "ekran-ul-kuybysheva-7.jpg",
+  "soon": false
  },
  {
   "n": 2,
@@ -17,7 +18,8 @@
   "lon": 39.739,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1610-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1610-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 3,
@@ -27,7 +29,8 @@
   "lon": 39.721795,
   "free": true,
   "until": null,
-  "photo": "ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg"
+  "photo": "ekran-ul-maksima-gorkogo-1-y-pyatiletki-354.jpg",
+  "soon": false
  },
  {
   "n": 4,
@@ -37,7 +40,8 @@
   "lon": 39.7382,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1650-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1650-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 5,
@@ -47,7 +51,8 @@
   "lon": 39.736689,
   "free": true,
   "until": null,
-  "photo": "ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg"
+  "photo": "ekran-ul-maksima-gorkogo-lunacharskogo-117.jpg",
+  "soon": false
  },
  {
   "n": 6,
@@ -57,7 +62,8 @@
   "lon": 39.749957,
   "free": true,
   "until": null,
-  "photo": "ekran-ul-engelsa-krupskaya-172.jpg"
+  "photo": "ekran-ul-engelsa-krupskaya-172.jpg",
+  "soon": false
  },
  {
   "n": 7,
@@ -67,7 +73,8 @@
   "lon": 39.73953,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1650-m-po-hodu--2.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1650-m-po-hodu--2.jpg",
+  "soon": false
  },
  {
   "n": 8,
@@ -77,7 +84,8 @@
   "lon": 39.73755,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1690-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1690-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 9,
@@ -87,7 +95,8 @@
   "lon": 39.747199,
   "free": true,
   "until": null,
-  "photo": "ekran-ul-engelsa-leningradskaya-46.jpg"
+  "photo": "ekran-ul-engelsa-leningradskaya-46.jpg",
+  "soon": false
  },
  {
   "n": 10,
@@ -97,7 +106,8 @@
   "lon": 39.73953,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1700-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1700-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 11,
@@ -107,7 +117,8 @@
   "lon": 39.738414,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1730-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1730-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 12,
@@ -117,7 +128,8 @@
   "lon": 39.738525,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1750-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1750-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 13,
@@ -127,7 +139,8 @@
   "lon": 39.737645,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1770-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1770-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 14,
@@ -137,7 +150,8 @@
   "lon": 39.73873,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1800-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1800-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 15,
@@ -147,7 +161,8 @@
   "lon": 39.737817,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1810-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1810-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 16,
@@ -157,7 +172,8 @@
   "lon": 39.737646,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1885-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1885-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 17,
@@ -167,7 +183,8 @@
   "lon": 39.738429,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1890-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1890-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 18,
@@ -177,7 +194,8 @@
   "lon": 39.739083,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-severnyy-podezd-k-bataysku-1980-m-po-hodu-.jpg"
+  "photo": "schit-severnyy-podezd-k-bataysku-1980-m-po-hodu-.jpg",
+  "soon": false
  },
  {
   "n": 19,
@@ -187,7 +205,8 @@
   "lon": 39.73743,
   "free": false,
   "until": "01.01.2027",
-  "photo": "prizma-kuybysheva-ogorodnaya.jpg"
+  "photo": "prizma-kuybysheva-ogorodnaya.jpg",
+  "soon": false
  },
  {
   "n": 20,
@@ -197,7 +216,8 @@
   "lon": 39.7365,
   "free": false,
   "until": "01.01.2027",
-  "photo": "prizma-kuybysheva-2a.jpg"
+  "photo": "prizma-kuybysheva-2a.jpg",
+  "soon": false
  },
  {
   "n": 21,
@@ -207,7 +227,8 @@
   "lon": 39.73839,
   "free": false,
   "until": "02.01.2027",
-  "photo": "schit-kuybysheva-35-morskoy.jpg"
+  "photo": "schit-kuybysheva-35-morskoy.jpg",
+  "soon": false
  },
  {
   "n": 22,
@@ -217,7 +238,8 @@
   "lon": 39.73839,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-kuybysheva-61.jpg"
+  "photo": "schit-kuybysheva-61.jpg",
+  "soon": false
  },
  {
   "n": 23,
@@ -227,7 +249,8 @@
   "lon": 39.738764,
   "free": true,
   "until": null,
-  "photo": "schit-ul-kuybysheva-104.jpg"
+  "photo": "schit-ul-kuybysheva-104.jpg",
+  "soon": false
  },
  {
   "n": 24,
@@ -237,7 +260,8 @@
   "lon": 39.738998,
   "free": true,
   "until": null,
-  "photo": "schit-kuybysheva-114-a.jpg"
+  "photo": "schit-kuybysheva-114-a.jpg",
+  "soon": false
  },
  {
   "n": 25,
@@ -247,7 +271,8 @@
   "lon": 39.7386,
   "free": false,
   "until": "01.01.2027",
-  "photo": "prizma-kuybysheva-118.jpg"
+  "photo": "prizma-kuybysheva-118.jpg",
+  "soon": false
  },
  {
   "n": 26,
@@ -257,7 +282,8 @@
   "lon": 39.7398,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-kuybysheva-zavodskaya-storona-a.jpg"
+  "photo": "schit-kuybysheva-zavodskaya-storona-a.jpg",
+  "soon": false
  },
  {
   "n": 27,
@@ -267,7 +293,8 @@
   "lon": 39.7407,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-kuybysheva-zavodskaya-storona-v.jpg"
+  "photo": "schit-kuybysheva-zavodskaya-storona-v.jpg",
+  "soon": false
  },
  {
   "n": 28,
@@ -277,7 +304,8 @@
   "lon": 39.739438,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-kuybysheva-136-cgb-sprava.jpg"
+  "photo": "schit-kuybysheva-136-cgb-sprava.jpg",
+  "soon": false
  },
  {
   "n": 29,
@@ -287,7 +315,8 @@
   "lon": 39.74084,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-kuybysheva-161-sleva.jpg"
+  "photo": "schit-ul-kuybysheva-161-sleva.jpg",
+  "soon": false
  },
  {
   "n": 30,
@@ -297,7 +326,8 @@
   "lon": 39.735449,
   "free": false,
   "until": "20.09.2026",
-  "photo": "schit-ul-m-gorkogo-137.jpg"
+  "photo": "schit-ul-m-gorkogo-137.jpg",
+  "soon": true
  },
  {
   "n": 31,
@@ -307,7 +337,8 @@
   "lon": 39.7205,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-maksima-gorkogo-281-a.jpg"
+  "photo": "schit-maksima-gorkogo-281-a.jpg",
+  "soon": false
  },
  {
   "n": 32,
@@ -317,7 +348,8 @@
   "lon": 39.722,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-maksima-gorkogo-281-v.jpg"
+  "photo": "schit-maksima-gorkogo-281-v.jpg",
+  "soon": false
  },
  {
   "n": 33,
@@ -327,7 +359,8 @@
   "lon": 39.721115,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-m-gorkogo-281-b.jpg"
+  "photo": "schit-ul-m-gorkogo-281-b.jpg",
+  "soon": false
  },
  {
   "n": 34,
@@ -337,7 +370,8 @@
   "lon": 39.721115,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-m-gorkogo-281-v.jpg"
+  "photo": "schit-ul-m-gorkogo-281-v.jpg",
+  "soon": false
  },
  {
   "n": 35,
@@ -347,7 +381,8 @@
   "lon": 39.718573,
   "free": false,
   "until": "01.01.2027",
-  "photo": "prizma-ul-m-gorkogo-285-storona-a.jpg"
+  "photo": "prizma-ul-m-gorkogo-285-storona-a.jpg",
+  "soon": false
  },
  {
   "n": 36,
@@ -357,7 +392,8 @@
   "lon": 39.7171,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-maksima-gorkogo-358-storona-a.jpg"
+  "photo": "schit-maksima-gorkogo-358-storona-a.jpg",
+  "soon": false
  },
  {
   "n": 37,
@@ -367,7 +403,8 @@
   "lon": 39.71651,
   "free": true,
   "until": null,
-  "photo": "schit-maksima-gorkogo-358-storona-b.jpg"
+  "photo": "schit-maksima-gorkogo-358-storona-b.jpg",
+  "soon": false
  },
  {
   "n": 38,
@@ -377,7 +414,8 @@
   "lon": 39.721302,
   "free": false,
   "until": "01.01.2027",
-  "photo": "prizma-ul-1-y-pyatiletki-i-m-gorkogo-356-storona.jpg"
+  "photo": "prizma-ul-1-y-pyatiletki-i-m-gorkogo-356-storona.jpg",
+  "soon": false
  },
  {
   "n": 39,
@@ -387,7 +425,8 @@
   "lon": 39.750755,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-engelsa-kirova-18-univermag.jpg"
+  "photo": "schit-engelsa-kirova-18-univermag.jpg",
+  "soon": false
  },
  {
   "n": 40,
@@ -397,7 +436,8 @@
   "lon": 39.750973,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-engelsa-sadovaya-51.jpg"
+  "photo": "schit-ul-engelsa-sadovaya-51.jpg",
+  "soon": false
  },
  {
   "n": 41,
@@ -407,7 +447,8 @@
   "lon": 39.743159,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-engelsa-frunze-109.jpg"
+  "photo": "schit-ul-engelsa-frunze-109.jpg",
+  "soon": false
  },
  {
   "n": 42,
@@ -417,7 +458,8 @@
   "lon": 39.748895,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-engelsa-zavodskaya-130.jpg"
+  "photo": "schit-ul-engelsa-zavodskaya-130.jpg",
+  "soon": false
  },
  {
   "n": 43,
@@ -427,7 +469,8 @@
   "lon": 39.749122,
   "free": true,
   "until": null,
-  "photo": "schit-ul-engelsa-134.jpg"
+  "photo": "schit-ul-engelsa-134.jpg",
+  "soon": false
  },
  {
   "n": 44,
@@ -437,7 +480,8 @@
   "lon": 39.747627,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-engelsa-polovinko-45.jpg"
+  "photo": "schit-ul-engelsa-polovinko-45.jpg",
+  "soon": false
  },
  {
   "n": 45,
@@ -447,7 +491,8 @@
   "lon": 39.747936,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-ul-engelsa-53.jpg"
+  "photo": "schit-ul-engelsa-53.jpg",
+  "soon": false
  },
  {
   "n": 46,
@@ -457,7 +502,8 @@
   "lon": 39.747047,
   "free": true,
   "until": null,
-  "photo": "schit-ul-engelsa-40-sleva.jpg"
+  "photo": "schit-ul-engelsa-40-sleva.jpg",
+  "soon": false
  },
  {
   "n": 47,
@@ -467,7 +513,8 @@
   "lon": 39.748583,
   "free": true,
   "until": null,
-  "photo": "schit-ul-zavodskaya-45.jpg"
+  "photo": "schit-ul-zavodskaya-45.jpg",
+  "soon": false
  },
  {
   "n": 48,
@@ -477,7 +524,8 @@
   "lon": 39.743475,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-vyezd-iz-goroda-batayska-severnyy-16.jpg"
+  "photo": "schit-vyezd-iz-goroda-batayska-severnyy-16.jpg",
+  "soon": false
  },
  {
   "n": 49,
@@ -487,6 +535,7 @@
   "lon": 39.742988,
   "free": false,
   "until": "01.01.2027",
-  "photo": "schit-vyezd-iz-goroda-batayska-severnyy-35.jpg"
+  "photo": "schit-vyezd-iz-goroda-batayska-severnyy-35.jpg",
+  "soon": false
  }
 ]
