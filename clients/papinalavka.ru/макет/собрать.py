@@ -195,8 +195,8 @@ section[id],div[id]{{scroll-margin-top:96px}}
    нечитаема, а имя рядом читается всегда — знак при этом остаётся ихним. */
 .лого{{text-decoration:none;color:inherit;display:grid;
   grid-template-columns:auto auto;align-items:center;column-gap:12px}}
-.лого img{{height:58px;width:auto;grid-row:span 2;align-self:center}}
-.лого b{{font-family:Bitter,Georgia,serif;font-size:23px;font-weight:700;
+.лого img{{height:78px;width:auto;grid-row:span 2;align-self:center}}
+.лого b{{font-family:Bitter,Georgia,serif;font-size:26px;font-weight:700;
   letter-spacing:-.01em;align-self:end;line-height:1.1}}
 section.тьма{{position:relative;overflow:hidden}}
 .гравюра{{position:absolute;right:-40px;bottom:-30px;width:420px;height:310px;
@@ -384,8 +384,9 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
 
 /* расписание поставок */
 .график{{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--край)}}
-.день{{padding:20px 24px 20px 0;border-right:1px solid var(--край)}}
-.день:last-child{{border-right:0}}
+.день{{padding:20px 28px;border-right:1px solid var(--край)}}
+.день:first-child{{padding-left:0}}
+.день:last-child{{border-right:0;padding-right:0}}
 .день b{{display:block;font-family:Bitter,Georgia,serif;font-size:20px}}
 .день u{{display:block;text-decoration:none;color:var(--форель);font-size:12px;
   letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}}
@@ -503,8 +504,8 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
   .тел{{font-size:17px;white-space:nowrap;justify-self:end;grid-row:1;grid-column:2}}
   .город{{grid-row:2;grid-column:1 / -1}}
   .город select{{width:100%;max-width:none}}
-  .лого img{{height:44px}}
-  .лого b{{font-size:19px}}
+  .лого img{{height:60px}}
+  .лого b{{font-size:20px}}
   .лого span{{display:none}}
   .город span{{display:none}}
   .шапка .обёртка{{gap:12px}}
