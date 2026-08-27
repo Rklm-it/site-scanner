@@ -37,8 +37,14 @@ a{color:inherit}
 
 /* шапка */
 .top{border-bottom:1px solid rgba(28,30,32,.12)}
-.top__in{display:flex;align-items:center;justify-content:space-between;gap:1rem;
-  padding-block:1rem}
+.top{position:sticky;top:0;z-index:20;background:var(--beton)}
+.top__in{display:flex;align-items:center;justify-content:space-between;gap:1.4rem;
+  padding-block:.9rem}
+.nav{display:flex;gap:1.5rem;margin-right:auto;margin-left:2.4rem;font-size:.95rem}
+.nav a{text-decoration:none;color:var(--doroga);white-space:nowrap;
+  padding-block:.3rem;border-bottom:2px solid transparent}
+.nav a:hover{color:var(--grafit);border-bottom-color:var(--ogon)}
+@media (max-width:1100px){.nav{display:none}}
 .top__logo{display:block;color:inherit;text-decoration:none}
 /* Оранжевый прямоугольник — ровно 2:1, тот самый формат 3×6. Он стоит на
    базовой линии как точка в конце имени: место под рекламу, а не картинка
@@ -230,6 +236,34 @@ a{color:inherit}
 .card{transition:transform .18s ease,box-shadow .18s ease}
 .card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(28,30,32,.13)}
 
+
+/* Три формата: карточка выше обычной, текста больше — это объяснение, а не
+   витрина. Отдельный класс, чтобы не тащить сюда поведение card. */
+.grid--3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.fmt{background:var(--belyy);display:flex;flex-direction:column}
+.fmt img{aspect-ratio:2/1;object-fit:cover;width:100%}
+.fmt__b{padding:1.2rem 1.3rem 1.5rem}
+.fmt__n{font-family:'PT Mono',monospace;font-size:.76rem;color:var(--doroga);
+  display:block;margin-bottom:.5rem}
+.fmt__n--free{color:var(--ogon);font-weight:700}
+.fmt h3{font-size:1.35rem;margin-bottom:.6rem}
+.fmt p{color:var(--doroga);font-size:.96rem;line-height:1.5}
+
+/* Шаги нумерованы, потому что это правда последовательность: сначала место,
+   потом макет, потом монтаж. Нумерация ради красоты здесь была бы враньём. */
+.steps{list-style:none;counter-reset:st;margin:0;padding:0;
+  display:grid;gap:1.6rem 2.6rem}
+@media (min-width:820px){.steps{grid-template-columns:repeat(4,1fr)}}
+.steps li{counter-increment:st;padding-top:2.6rem;position:relative;
+  border-top:2px solid var(--grafit)}
+.steps li::before{content:counter(st);position:absolute;top:.7rem;left:0;
+  font-family:'Unbounded',sans-serif;font-size:1.5rem;color:var(--ogon)}
+.steps b{display:block;font-family:'Unbounded',sans-serif;font-size:1.05rem;
+  line-height:1.2;margin-bottom:.5rem;letter-spacing:-.01em}
+.steps span{color:var(--doroga);font-size:.95rem;line-height:1.5}
+.steps__note{margin-top:2rem;color:var(--doroga);font-size:.95rem;max-width:62ch}
+.steps__note b{color:var(--grafit)}
+
 /* карта */
 .map{height:min(54vh,480px);margin-bottom:2rem;background:#e2e5e7;
   display:flex;align-items:center;justify-content:center}
@@ -333,6 +367,13 @@ a{color:inherit}
       <span class="logo"><span class="logo__name">ПОКОТИЛОВ</span><span class="logo__block"></span></span>
       <span class="logo__desc">рекламное агентство · батайск</span>
     </a>
+    <nav class="nav">
+      <a href="#formaty">Форматы</a>
+      <a href="#svobodno">Свободное</a>
+      <a href="#karta">Карта</a>
+      <a href="#kak">Как разместиться</a>
+      <a href="#uslugi">Печать и монтаж</a>
+    </nav>
     <a class="tel-mob" href="tel:+79185246060">Позвонить</a>
     <div class="tels">
       <a class="tel" href="tel:+79185246060"><span>Марина</span><b>8 918 524-60-60</b></a>
@@ -396,14 +437,54 @@ a{color:inherit}
   </div>
 </section>
 
-<div class="strip">
+<span id="karta-anchor"></span><div class="strip">
   <div class="wrap strip__in">
     <span><b>Свободно сейчас</b> — 5 светодиодных экранов и 6 щитов 3×6</span>
     <span class="strip__soon">20 сентября освободится ещё один: ул. М. Горького 137</span>
   </div>
 </div>
 
-<section class="sect">
+<section class="sect" id="formaty">
+  <div class="wrap">
+    <div class="sect__head">
+      <h2>Три формата</h2>
+      <p class="sect__sub">У агентства 49 конструкций трёх видов. Различаются не размером, а тем, как на них покупают внимание.</p>
+    </div>
+    <div class="grid grid--3">
+      <article class="fmt">
+        <img src="images/schit-severnyy-podezd-k-bataysku-1690-m-po-hodu-.jpg" alt="Щит 3×6 на Северном подъезде к Батайску" loading="lazy">
+        <div class="fmt__b">
+          <span class="fmt__n">39 конструкций · 6 свободно</span>
+          <h3>Щит 3×6</h3>
+          <p>Классический билборд: полотно шесть метров на три, восемнадцать квадратов.
+             Печатаем баннер, натягиваем, он висит месяц и работает круглосуточно.</p>
+        </div>
+      </article>
+      <article class="fmt">
+        <img src="images/prizma-kuybysheva-ogorodnaya.jpg" alt="Призматрон на Куйбышева в Батайске" loading="lazy">
+        <div class="fmt__b">
+          <span class="fmt__n">5 конструкций · сейчас заняты</span>
+          <h3>Призматрон</h3>
+          <p>Тот же размер, но полотно собрано из трёхгранных призм: они поворачиваются,
+             и на одном месте по очереди показываются три разные рекламы. Движение
+             в потоке замечают лучше, чем неподвижную картинку.</p>
+        </div>
+      </article>
+      <article class="fmt">
+        <img src="images/ekran-ul-engelsa-krupskaya-172.jpg" alt="Светодиодный экран на Энгельса в Батайске" loading="lazy">
+        <div class="fmt__b">
+          <span class="fmt__n fmt__n--free">5 конструкций · свободны все</span>
+          <h3>Светодиодный экран</h3>
+          <p>Цифровой: ролик крутится в цикле, картинку меняют когда угодно и без
+             печати. Годится, когда предложение живёт неделю — акция, открытие,
+             распродажа.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sect" id="karta">
   <div class="wrap">
     <div class="sect__head">
       <h2>Все 49 мест на карте</h2>
@@ -553,6 +634,22 @@ a{color:inherit}
   </div>
 </section>
 
+<section class="sect" id="kak">
+  <div class="wrap">
+    <div class="sect__head">
+      <h2>Как разместиться</h2>
+      <p class="sect__sub">Печать, изготовление конструкций и монтаж у агентства свои — искать подрядчиков и возить баннер по городу не придётся.</p>
+    </div>
+    <ol class="steps">
+      <li><b>Выбрать место</b><span>По карте выше или звонком: скажете, на какие улицы едут ваши покупатели, — подскажем, что свободно.</span></li>
+      <li><b>Отдать макет</b><span>Есть готовый — берём его. Нет — сделаем: изготовление и печать у агентства свои.</span></li>
+      <li><b>Печать и монтаж</b><span>Печатаем баннер, монтажники натягивают его на конструкцию. Широкоформатная и интерьерная печать тоже своя.</span></li>
+      <li><b>Реклама работает</b><span>Щит виден круглосуточно, весь срок размещения. Понадобится сменить картинку — перепечатаем и перевесим.</span></li>
+    </ol>
+    <p class="steps__note">Сроки и цену назовём по конкретному месту: они зависят от формата и того, есть ли у вас готовый макет. <b>[уточнить у агентства]</b></p>
+  </div>
+</section>
+
 <section class="sect trassa">
   <div class="wrap">
     <div class="sect__head">
@@ -671,7 +768,7 @@ a{color:inherit}
 </section>
 
 
-<section class="sect uslugi">
+<section class="sect uslugi" id="uslugi">
   <div class="wrap">
     <h2>Печать и монтаж<i class="h-mark"></i></h2>
     <ul class="uslugi__list">
