@@ -53,8 +53,6 @@ a{color:inherit}
 .hero{padding-block:clamp(2.4rem,5vw,4.4rem) clamp(2rem,4vw,3.4rem)}
 .hero__in{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.6rem,3.4vw,3.4rem);
   align-items:center}
-.hero__shot{aspect-ratio:2/1;object-fit:cover;object-position:center;width:100%;
-  border:6px solid var(--grafit)}
 .hero__free{margin-top:1.6rem;font-size:clamp(1.15rem,1.9vw,1.5rem);line-height:1.3}
 .hero__free b{font-family:'Unbounded',sans-serif;color:var(--ogon);
   font-size:clamp(2.6rem,5.4vw,4.2rem);line-height:.9;display:inline-block;
@@ -106,6 +104,40 @@ a{color:inherit}
   gap:1rem;font-family:'PT Mono',monospace;font-size:.86rem;
   color:rgba(237,239,240,.62);text-align:center}
 .vyezd div{border:1px solid rgba(237,239,240,.22);padding:.8rem}
+
+
+/* Первый экран — портрет всего хозяйства: 49 прямоугольников 2:1 по улицам.
+   Не иллюстрация щита, а он сам: каждая клетка — реальное место, оранжевые
+   свободны. Цифры в строках дублируют цвет, чтобы состояние читалось и без
+   него. */
+.board{margin:0;background:var(--grafit);padding:clamp(1.4rem,2.6vw,2.1rem)}
+.board__cap{color:rgba(237,239,240,.62);font-size:.86rem;line-height:1.4;
+  margin-bottom:1.5rem;max-width:38ch}
+.brow{padding-block:.78rem;border-top:1px solid rgba(237,239,240,.13)}
+.brow__head{display:flex;justify-content:space-between;align-items:baseline;
+  gap:1rem;margin-bottom:.5rem}
+.brow__st{font-family:'PT Mono',monospace;font-size:.72rem;letter-spacing:.05em;
+  text-transform:uppercase;color:rgba(237,239,240,.55)}
+.brow__cells{display:flex;flex-wrap:wrap;gap:5px}
+.cell{width:32px;height:16px;background:#6B7076;border:0;padding:0;cursor:pointer;
+  border-radius:1px;transition:transform .12s ease}
+.cell--free{background:var(--ogon)}
+.cell:hover{transform:translateY(-2px)}
+.cell:focus-visible{outline:2px solid #EDEFF0;outline-offset:2px}
+.brow__n{font-family:'PT Mono',monospace;font-size:.78rem;color:rgba(237,239,240,.8);
+  white-space:nowrap}
+.brow__n i{font-style:normal;color:var(--ogon)}
+.brow__n u{text-decoration:none;color:rgba(237,239,240,.45)}
+.board__legend{display:flex;gap:1.6rem;margin-top:1.3rem;
+  font-family:'PT Mono',monospace;font-size:.74rem;color:rgba(237,239,240,.6)}
+.board__legend .sw{display:inline-block;width:18px;height:9px;background:#6B7076;
+  margin-right:.5rem;vertical-align:.02em}
+.board__legend .sw--free{background:var(--ogon)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+  white-space:nowrap}
+@media (max-width:600px){
+  .cell{width:26px;height:13px}
+}
 
 /* карта */
 .map{height:min(62vh,560px);margin-bottom:2.6rem;background:#e2e5e7;
@@ -212,8 +244,48 @@ a{color:inherit}
 
 <section class="hero">
   <div class="wrap hero__in">
-    <img class="hero__shot" src="images/hero-engelsa-40.jpg"
-         alt="Свободный рекламный щит 3×6 на улице Энгельса в Батайске">
+    <figure class="board">
+      <figcaption class="board__cap">Все места агентства. Оранжевые свободны — их можно занять с этой недели.</figcaption>
+      <div class="brow">
+        <div class="brow__head">
+          <span class="brow__st">Северный подъезд</span>
+          <span class="brow__n">15 · <u>занято всё</u></span>
+        </div>
+        <div class="brow__cells"><button class="cell" data-n="2" type="button" title="Северный подъезд к Батайску 1610 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1610 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="4" type="button" title="Северный подъезд к Батайску 1650 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1650 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="7" type="button" title="Северный подъезд к Батайску 1650 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1650 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="8" type="button" title="Северный подъезд к Батайску 1690 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1690 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="10" type="button" title="Северный подъезд к Батайску 1700 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1700 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="11" type="button" title="Северный подъезд к Батайску 1730 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1730 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="12" type="button" title="Северный подъезд к Батайску 1750 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1750 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="13" type="button" title="Северный подъезд к Батайску 1770 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1770 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="14" type="button" title="Северный подъезд к Батайску 1800 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1800 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="15" type="button" title="Северный подъезд к Батайску 1810 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1810 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="16" type="button" title="Северный подъезд к Батайску 1885 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1885 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="17" type="button" title="Северный подъезд к Батайску 1890 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1890 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="18" type="button" title="Северный подъезд к Батайску 1980 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1980 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="48" type="button" title="Выезд из города Батайска, Северный 16 — занят до 01.01.2027"><span class="vh">Выезд из города Батайска, Северный 16 — занят до 01.01.2027</span></button><button class="cell" data-n="49" type="button" title="Выезд из города Батайска, Северный 35 — занят до 01.01.2027"><span class="vh">Выезд из города Батайска, Северный 35 — занят до 01.01.2027</span></button></div>
+      </div>
+      <div class="brow">
+        <div class="brow__head">
+          <span class="brow__st">Куйбышева</span>
+          <span class="brow__n">12 · <i>свободно 3</i></span>
+        </div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="1" type="button" title="ул.Куйбышева 7 — свободен"><span class="vh">ул.Куйбышева 7 — свободен</span></button><button class="cell" data-n="19" type="button" title="Куйбышева/Огородная — занят до 01.01.2027"><span class="vh">Куйбышева/Огородная — занят до 01.01.2027</span></button><button class="cell" data-n="20" type="button" title="Куйбышева, 2а — занят до 01.01.2027"><span class="vh">Куйбышева, 2а — занят до 01.01.2027</span></button><button class="cell" data-n="21" type="button" title="Куйбышева 35/Морской — занят до 02.01.2027"><span class="vh">Куйбышева 35/Морской — занят до 02.01.2027</span></button><button class="cell" data-n="22" type="button" title="Куйбышева, 61 — занят до 01.01.2027"><span class="vh">Куйбышева, 61 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="23" type="button" title="ул.Куйбышева 104 — свободен"><span class="vh">ул.Куйбышева 104 — свободен</span></button><button class="cell cell--free" data-n="24" type="button" title="Куйбышева 114 А — свободен"><span class="vh">Куйбышева 114 А — свободен</span></button><button class="cell" data-n="25" type="button" title="Куйбышева, 118 — занят до 01.01.2027"><span class="vh">Куйбышева, 118 — занят до 01.01.2027</span></button><button class="cell" data-n="26" type="button" title="Куйбышева/Заводская (сторона А) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона А) — занят до 01.01.2027</span></button><button class="cell" data-n="27" type="button" title="Куйбышева/Заводская (сторона В) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона В) — занят до 01.01.2027</span></button><button class="cell" data-n="28" type="button" title="Куйбышева,136 ЦГБ справа — занят до 01.01.2027"><span class="vh">Куйбышева,136 ЦГБ справа — занят до 01.01.2027</span></button><button class="cell" data-n="29" type="button" title="ул. Куйбышева, 161, слева — занят до 01.01.2027"><span class="vh">ул. Куйбышева, 161, слева — занят до 01.01.2027</span></button></div>
+      </div>
+      <div class="brow">
+        <div class="brow__head">
+          <span class="brow__st">Максима Горького</span>
+          <span class="brow__n">11 · <i>свободно 3</i></span>
+        </div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="3" type="button" title="ул.Максима Горького-1-й Пятилетки 354 — свободен"><span class="vh">ул.Максима Горького-1-й Пятилетки 354 — свободен</span></button><button class="cell cell--free" data-n="5" type="button" title="ул.Максима Горького -Луначарского 117 — свободен"><span class="vh">ул.Максима Горького -Луначарского 117 — свободен</span></button><button class="cell" data-n="30" type="button" title="ул. М.Горького 137 — занят до 20.09.2026"><span class="vh">ул. М.Горького 137 — занят до 20.09.2026</span></button><button class="cell" data-n="31" type="button" title="Максима Горького 281 а — занят до 01.01.2027"><span class="vh">Максима Горького 281 а — занят до 01.01.2027</span></button><button class="cell" data-n="32" type="button" title="Максима Горького 281 в — занят до 01.01.2027"><span class="vh">Максима Горького 281 в — занят до 01.01.2027</span></button><button class="cell" data-n="33" type="button" title="ул.М.Горького 281 Б — занят до 01.01.2027"><span class="vh">ул.М.Горького 281 Б — занят до 01.01.2027</span></button><button class="cell" data-n="34" type="button" title="ул.М.Горького 281 В — занят до 01.01.2027"><span class="vh">ул.М.Горького 281 В — занят до 01.01.2027</span></button><button class="cell" data-n="35" type="button" title="ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027"><span class="vh">ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027</span></button><button class="cell" data-n="36" type="button" title="Максима Горького, 358 (сторона А) — занят до 01.01.2027"><span class="vh">Максима Горького, 358 (сторона А) — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="37" type="button" title="Максима Горького, 358 (сторона B) — свободен"><span class="vh">Максима Горького, 358 (сторона B) — свободен</span></button><button class="cell" data-n="38" type="button" title="ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027"><span class="vh">ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027</span></button></div>
+      </div>
+      <div class="brow">
+        <div class="brow__head">
+          <span class="brow__st">Энгельса</span>
+          <span class="brow__n">10 · <i>свободно 4</i></span>
+        </div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="6" type="button" title="ул.Энгельса-Крупская 172 — свободен"><span class="vh">ул.Энгельса-Крупская 172 — свободен</span></button><button class="cell cell--free" data-n="9" type="button" title="ул.Энгельса-Ленинградская 46 — свободен"><span class="vh">ул.Энгельса-Ленинградская 46 — свободен</span></button><button class="cell" data-n="39" type="button" title="Энгельса /Кирова 18 универмаг — занят до 01.01.2027"><span class="vh">Энгельса /Кирова 18 универмаг — занят до 01.01.2027</span></button><button class="cell" data-n="40" type="button" title="ул.Энгельса-Садовая,51 — занят до 01.01.2027"><span class="vh">ул.Энгельса-Садовая,51 — занят до 01.01.2027</span></button><button class="cell" data-n="41" type="button" title="ул.Энгельса-Фрунзе,109 — занят до 01.01.2027"><span class="vh">ул.Энгельса-Фрунзе,109 — занят до 01.01.2027</span></button><button class="cell" data-n="42" type="button" title="Ул. Энгельса -Заводская 130 — занят до 01.01.2027"><span class="vh">Ул. Энгельса -Заводская 130 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="43" type="button" title="ул.Энгельса 134 — свободен"><span class="vh">ул.Энгельса 134 — свободен</span></button><button class="cell" data-n="44" type="button" title="ул.Энгельса-Половинко,45 — занят до 01.01.2027"><span class="vh">ул.Энгельса-Половинко,45 — занят до 01.01.2027</span></button><button class="cell" data-n="45" type="button" title="ул.Энгельса 53 — занят до 01.01.2027"><span class="vh">ул.Энгельса 53 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="46" type="button" title="ул.Энгельса 40 слева — свободен"><span class="vh">ул.Энгельса 40 слева — свободен</span></button></div>
+      </div>
+      <div class="brow">
+        <div class="brow__head">
+          <span class="brow__st">Заводская</span>
+          <span class="brow__n">1 · <i>свободно 1</i></span>
+        </div>
+        <div class="brow__cells"><button class="cell cell--free" data-n="47" type="button" title="ул.Заводская 45 — свободен"><span class="vh">ул.Заводская 45 — свободен</span></button></div>
+      </div>
+      <div class="board__legend">
+        <span><i class="sw sw--free"></i>свободно 11</span>
+        <span><i class="sw"></i>занято 38</span>
+      </div>
+    </figure>
     <div>
       <h1>Рекламные щиты 3×6 в Батайске</h1>
       <p class="hero__free">Свободно <b>11</b> мест из 49</p>
@@ -564,7 +636,7 @@ function initMap(places){
     });
 
     // строка списка открывает метку — так же, как на их нынешнем сайте
-    document.querySelectorAll('.street__list .row').forEach(r=>{
+    document.querySelectorAll('.street__list .row, .board .cell').forEach(r=>{
       r.addEventListener('click',()=>{
         const pm=marks[r.dataset.n];
         if(!pm) return;
