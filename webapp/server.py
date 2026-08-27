@@ -584,6 +584,10 @@ class DumpJob:
     pages_left: int = 0              # осталось в очереди, когда время вышло
     assets_left: int = 0
     title: str = ""                  # заголовок главной — чей сайт скачали
+    # Почему картинок нет: причина → сколько адресов. Совет «снимите галочку
+    # robots.txt» помогает только в половине случаев, а на mebel-ryazane.ru
+    # галочка была уже снята — и человек уходил на второй круг впустую.
+    asset_skipped: dict[str, int] = field(default_factory=dict)
     robots: bool = True              # с какой галочкой реально прошла выгрузка
     error: str | None = None
     errors: list[str] = field(default_factory=list)
@@ -597,7 +601,7 @@ class DumpJob:
             "archive": self.archive, "archive_bytes": self.archive_bytes,
             "stopped_by": self.stopped_by, "title": self.title,
             "pages_left": self.pages_left, "assets_left": self.assets_left,
-            "robots": self.robots,
+            "robots": self.robots, "asset_skipped": self.asset_skipped,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
@@ -632,6 +636,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         job.statuses = dict(stats.statuses)
         job.stopped_by = stats.stopped_by
         job.pages_left, job.assets_left = stats.pages_left, stats.assets_left
+        job.asset_skipped = stats.asset_skipped
         job.errors = stats.errors
         # Заголовок главной показываем в итоге: домен легко набрать с опечаткой
         # (project-doma.ru вместо projekt-doma.ru — реальный случай), выгрузка

@@ -63,6 +63,14 @@ SKIP_PATH = re.compile(
     re.I,
 )
 _CSS_URL = re.compile(r"""url\(\s*['"]?([^'")]+)['"]?\s*\)""", re.I)
+# Адрес картинки лежит в `src` далеко не всегда: ленивая загрузка держит его в
+# `data-src`, ретина — в `srcset`, фон секции — в `style="background:url(...)"`,
+# а часть оформления живёт в `<style>` прямо на странице. Пока смотрели только
+# `src`, выгрузка мебельного сайта приезжала с нулём файлов — то есть без
+# портфолио, ради которого её и делают.
+_IMG_ATTRS = ("data-src", "data-original", "data-lazy-src", "data-lazy",
+              "data-echo", "data-image", "data-bg", "data-background")
+_SRCSET_ATTRS = ("srcset", "data-srcset")
 _BAD_SEG = re.compile(r"[^\w.\-]+", re.U)
 _CHARSET_HDR = re.compile(r"charset=[\"']?([\w\-]+)", re.I)
 _META_CHARSET = re.compile(rb"""charset=["']?([\w\-]+)""", re.I)
@@ -150,6 +158,12 @@ class MirrorStats:
     # заметно это становится через неделю, когда сайт уже разобран не весь.
     pages_left: int = 0
     assets_left: int = 0
+    # Почему файлов в выгрузке мало или нет вовсе. «Ни одной картинки» —
+    # самая частая жалоба, и до сих пор причину выясняли запросами к живому
+    # сайту; теперь она лежит в самом архиве: адреса картинок посчитаны, а
+    # отказы разложены по причинам («чужой хост st.example.ru» и подобным).
+    asset_refs: int = 0
+    asset_skipped: dict[str, int] = field(default_factory=dict)
 
 
 def _same_site(url: str, host: str) -> bool:
@@ -165,6 +179,31 @@ def _same_site(url: str, host: str) -> bool:
 def _ext(path: str) -> str:
     tail = path.rsplit("/", 1)[-1]
     return ("." + tail.rsplit(".", 1)[1].lower()) if "." in tail else ""
+
+
+def _image_refs(soup) -> list[str]:
+    """Адреса картинок, которых нет в обычном `src`.
+
+    Разметку смотрим в четырёх местах: ленивые атрибуты и `srcset` у `<img>` и
+    `<source>`, `url(...)` в атрибуте `style` у чего угодно и `url(...)` в
+    `<style>` на самой странице. Внешние css-файлы разбираются отдельно, уже
+    после скачивания.
+    """
+    out: list[str] = []
+    for el in soup.find_all(["img", "source"]):
+        for attr in _IMG_ATTRS:
+            out.append((el.get(attr) or "").strip())
+        for attr in _SRCSET_ATTRS:
+            # `srcset` — это «адрес 1x, адрес 2x»: берём адреса, дескрипторы нет
+            for part in (el.get(attr) or "").split(","):
+                out.append(part.strip().split(" ")[0].strip())
+        if el.name == "source":
+            out.append((el.get("src") or "").strip())
+    for el in soup.find_all(attrs={"style": True}):
+        out += [m.group(1).strip() for m in _CSS_URL.finditer(el["style"])]
+    for el in soup.find_all("style"):
+        out += [m.group(1).strip() for m in _CSS_URL.finditer(el.get_text())]
+    return [v for v in out if v and not v.startswith(("data:", "javascript:", "#"))]
 
 
 def _local_path(url: str) -> str:
@@ -391,6 +430,37 @@ def run(
         path.write_bytes(data)
         stats.bytes += len(data)
 
+    def note_asset(url: str, *, image: bool = False) -> None:
+        """Положить адрес файла в очередь либо записать, почему не положили.
+
+        Отказы считаем именно для картинок: ноль файлов в готовой выгрузке —
+        это ноль портфолио, и разбираться, куда они делись, приходится уже
+        после разговора с клиентом. Две живые причины — картинки лежат на
+        поддомене или CDN (для нас это чужой хост) и картинку отдаёт скрипт,
+        у которого в адресе нет расширения.
+        """
+        if image:
+            stats.asset_refs += 1
+
+        def why(reason: str) -> None:
+            stats.asset_skipped[reason] = stats.asset_skipped.get(reason, 0) + 1
+
+        ext = _ext(urlparse(url).path)
+        if not _same_site(url, host):
+            if image or ext in ASSET_EXT:
+                why(f"чужой хост {urlparse(url).netloc.lower()}")
+            return
+        if ext in SKIP_EXT:
+            stats.skipped += 1
+            return
+        if ext not in ASSET_EXT:
+            if image:
+                why("адрес без расширения — картинку отдаёт скрипт")
+            return
+        if url not in seen:
+            seen.add(url)
+            assets.append(url)
+
     # --- фазы: сначала страницы, потом картинки ------------------------- #
     def crawl_pages(until: float) -> None:
         nonlocal site_encoding
@@ -453,6 +523,9 @@ def run(
                     if not val or val.startswith(("mailto:", "tel:", "javascript:", "data:", "#")):
                         continue
                     nxt = urljoin(final_url, val).split("#")[0]
+                    if tag != "a":
+                        note_asset(nxt, image=(tag == "img"))
+                        continue
                     if not _same_site(nxt, host):
                         continue
                     ext = _ext(urlparse(nxt).path)
@@ -460,11 +533,9 @@ def run(
                         stats.skipped += 1
                         continue
                     if ext in ASSET_EXT:
-                        if nxt not in seen:
-                            seen.add(nxt)
-                            assets.append(nxt)
+                        note_asset(nxt)
                         continue
-                    if tag != "a" or depth >= max_depth:
+                    if depth >= max_depth:
                         continue
                     # Ссылки с запросом пропускаем: на Joomla это ленты и
                     # сортировки — тот же контент под другим адресом. Исключение
@@ -475,6 +546,9 @@ def run(
                         continue
                     seen.add(nxt)
                     queue.append((nxt, depth + 1))
+
+            for val in _image_refs(soup):
+                note_asset(urljoin(final_url, val).split("#")[0], image=True)
 
 
     queue_assets: deque[str] = deque()
@@ -500,7 +574,10 @@ def run(
                 continue
             status, ctype, raw, final_url = got
             stats.statuses[status] = stats.statuses.get(status, 0) + 1
-            if status >= 400 or not raw:
+            # HTML в очереди файлов — это не картинка, а страница-заглушка
+            # («файл не найден», редирект на главную). Сохранять её незачем:
+            # в выгрузке она выглядела бы скачанным файлом.
+            if status >= 400 or not raw or "html" in ctype:
                 stats.skipped += 1
                 if on_progress:
                     on_progress(stats)
@@ -556,6 +633,8 @@ def run(
             "stopped_by": stats.stopped_by,
             "pages_left": stats.pages_left,
             "assets_left": stats.assets_left,
+            "asset_refs": stats.asset_refs,
+            "asset_skipped": stats.asset_skipped,
             "index": stats.pages_index,
         }, ensure_ascii=False, indent=2),
         encoding="utf-8",

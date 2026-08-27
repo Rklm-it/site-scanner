@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import http.server
+import json
 import threading
 import zipfile
 from functools import partial
@@ -33,7 +34,12 @@ PAGES = {
         <a href="/prays.pdf">Прайс</a>
         <a href="https://chужой.example/x">Партнёр</a>
         <a href="/administrator/index.php">Админка</a>
-        <img src="/images/dom.jpg"></body></html>""",
+        <img src="/images/dom.jpg">
+        <img src="data:image/gif;base64,R0lGOD" data-src="/images/lenivaya.jpg">
+        <picture><source srcset="/images/shirokaya.webp 2x, /images/uzkaya.webp 1x"></picture>
+        <div style="background-image: url('/images/fon-sekcii.png')"></div>
+        <img src="https://st.chuzhoy-cdn.example/foto.jpg">
+        <img src="/thumb.php?id=7"></body></html>""",
     "/uslugi": "<html><head><title>Услуги</title></head><body><h1>Услуги</h1>"
                "<a href='/katalog/dom-2'>Дом 2</a></body></html>",
     "/katalog/dom-1": "<html><head><title>Дом 1</title></head><body>Дом 1</body></html>",
@@ -65,7 +71,9 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             return self._send(b"<rss/>", "application/rss+xml")
         if path == "/css/style.css":
             return self._send(CSS, "text/css")
-        if path in ("/images/dom.jpg", "/images/fon.png"):
+        if path in ("/images/dom.jpg", "/images/fon.png", "/images/lenivaya.jpg",
+                    "/images/shirokaya.webp", "/images/uzkaya.webp",
+                    "/images/fon-sekcii.png"):
             return self._send(b"\xff\xd8\xff" + b"0" * 200, "image/jpeg")
         if path == "/prays.pdf":
             return self._send(b"%PDF-1.4" + b"0" * 500, "application/pdf")
@@ -203,6 +211,34 @@ def test_kartinka_iz_css_nahoditsya(site, tmp_path):
              (p.relative_to(tmp_path / "d") for p in (tmp_path / "d").rglob("*") if p.is_file())}
     assert "css/style.css" in files
     assert "images/fon.png" in files    # подключена только фоном в CSS
+
+
+def test_lenivye_kartinki_nahodyatsya(site, tmp_path):
+    """Картинка в `src` — уже редкость: ленивая загрузка держит адрес в
+    `data-src`, ретина в `srcset`, фон секции в атрибуте `style`. Пока
+    смотрели только `src`, выгрузка мебельного сайта приезжала с нулём
+    файлов, то есть без портфолио, ради которого её и делают.
+    """
+    _run(site, tmp_path / "d")
+    files = {p.relative_to(tmp_path / "d").as_posix()
+             for p in (tmp_path / "d").rglob("*") if p.is_file()}
+    assert "images/lenivaya.jpg" in files        # data-src
+    assert "images/shirokaya.webp" in files      # srcset у <source>
+    assert "images/uzkaya.webp" in files
+    assert "images/fon-sekcii.png" in files      # фон в атрибуте style
+
+
+def test_pochemu_kartinok_net_vidno_iz_vygruzki(site, tmp_path):
+    """Ноль картинок в архиве — самая частая жалоба, и причину выясняли
+    запросами к живому сайту. Теперь отказы посчитаны и лежат в манифесте:
+    видно и чужой хост, и картинку, которую отдаёт скрипт."""
+    stats = _run(site, tmp_path / "d")
+    assert stats.asset_refs >= 6
+    prichiny = stats.asset_skipped
+    assert any(k.startswith("чужой хост st.chuzhoy-cdn.example") for k in prichiny)
+    assert any("без расширения" in k for k in prichiny)      # /thumb.php?id=7
+    manifest = json.loads((tmp_path / "d" / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["asset_skipped"] == prichiny
 
 
 def test_robots_uvazhaetsya(site, tmp_path):
