@@ -340,6 +340,35 @@ def test_ostatok_vremeni_vozvrashaetsya_stranicam(site, tmp_path):
     assert stats.stopped_by == "done"
 
 
+def test_pack_ne_derzhit_dve_kopii(tmp_path, monkeypatch):
+    """В пике на диске должна лежать одна копия выгрузки, а не две.
+
+    Пока файлы удалялись после упаковки, выгрузке на 212 МБ требовалось 424 МБ
+    свободных — на сервере владельца столько не набиралось при 537 МБ на всё.
+    Считаем, сколько исходных файлов ещё живо в момент каждой записи в архив:
+    при упаковке «по мере удаления» это число убывает.
+    """
+    src = tmp_path / "work"
+    (src / "vnutri").mkdir(parents=True)
+    for i in range(5):
+        (src / "vnutri" / f"{i}.jpg").write_bytes(b"\xff\xd8\xff" + bytes(1000))
+
+    zhivyh = []
+    nastoyashchiy = zipfile.ZipFile.write
+
+    def schitat(self, filename, arcname=None, **kw):
+        zhivyh.append(sum(1 for p in src.rglob("*") if p.is_file()))
+        return nastoyashchiy(self, filename, arcname, **kw)
+
+    monkeypatch.setattr(zipfile.ZipFile, "write", schitat)
+    mirror.pack(src, tmp_path / "arhiv.zip")
+
+    assert zhivyh == [5, 4, 3, 2, 1]      # каждый файл уходит сразу после записи
+    assert not src.exists()               # рабочая папка убрана целиком
+    with zipfile.ZipFile(tmp_path / "arhiv.zip") as zf:
+        assert len(zf.namelist()) == 5    # и при этом в архиве всё
+
+
 def test_manifest_i_arhiv(site, tmp_path):
     dest = tmp_path / "d"
     _run(site, dest)

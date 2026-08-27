@@ -518,11 +518,11 @@ def test_dump_potolok_urezaetsya_po_mestu_na_diske(client, monkeypatch):
             time.sleep(0.05)
         raise AssertionError("выгрузка не завершилась")
 
-    # 533 МБ — ровно то, что было на сервере владельца: (533 - 300) / 2
+    # 533 МБ — ровно то, что было на сервере владельца: 533 - 300 запаса
     mesto(533)
     j = dump({"domain": "example.ru", "max_mb": 1500})
-    assert j["max_mb"] == 116 and j["max_mb_asked"] == 1500 and j["free_mb"] == 533
-    assert seen["max_total_bytes"] == 116 * 1024 * 1024
+    assert j["max_mb"] == 233 and j["max_mb_asked"] == 1500 and j["free_mb"] == 533
+    assert seen["max_total_bytes"] == 233 * 1024 * 1024
     assert seen["min_free_bytes"] == server.DISK_RESERVE_MB * 1024 * 1024
 
     # Места вдоволь — просимое доходит целиком
@@ -531,10 +531,10 @@ def test_dump_potolok_urezaetsya_po_mestu_na_diske(client, monkeypatch):
     assert seen["max_total_bytes"] == 1500 * 1024 * 1024
 
     # Места нет вовсе — выгрузка не начинается, а не забивает диск под ноль
-    mesto(310)
+    mesto(305)
     r = c.post("/api/dump", json={"domain": "example.ru", "max_mb": 1500})
     assert r.status_code == 507
-    assert "310" in r.json()["detail"]
+    assert "305" in r.json()["detail"]
 
 
 def test_dumps_pokazyvayut_mesto_na_diske(client):
@@ -542,7 +542,7 @@ def test_dumps_pokazyvayut_mesto_na_diske(client):
     c, _ = client
     data = c.get("/api/dumps").json()
     assert data["free_mb"] > 0
-    assert data["mozhno_mb"] == max(0, (data["free_mb"] - 300) // 2)
+    assert data["mozhno_mb"] == max(0, data["free_mb"] - 300)
 
 
 def test_dump_list_reads_from_disk(client, tmp_path):

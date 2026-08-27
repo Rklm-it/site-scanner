@@ -699,13 +699,14 @@ DISK_RESERVE_MB = 300
 def _disk_room() -> tuple[int, int]:
     """Свободно на томе и сколько из этого можно отдать выгрузке.
 
-    Делим пополам не из осторожности: `mirror.pack` пишет zip рядом с ещё не
-    удалённой распакованной выгрузкой, а фотографии не сжимаются — в пике на
-    диске лежат две копии.
+    Две копии на диске больше не лежат: `mirror.pack` удаляет каждый файл
+    сразу после упаковки, поэтому пик — одна копия плюс запас. Пока копий
+    было две, выгрузке на сервере владельца доставалось 118 МБ из 537, и
+    портфолио в них не влезало.
     """
     DUMPS_DIR.mkdir(parents=True, exist_ok=True)
     free_mb = shutil.disk_usage(DUMPS_DIR).free // (1024 * 1024)
-    return free_mb, max(0, (free_mb - DISK_RESERVE_MB) // 2)
+    return free_mb, max(0, free_mb - DISK_RESERVE_MB)
 
 
 @app.post("/api/dump")
