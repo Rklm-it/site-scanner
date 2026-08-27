@@ -276,7 +276,10 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
 .товары{{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}}
 .товар{{position:relative;background:var(--прилавок);border:1px solid var(--край);
   border-radius:2px;overflow:hidden;display:flex;flex-direction:column}}
-.товар .фото{{height:190px;background:var(--лёд);display:flex;align-items:center;justify-content:center}}
+/* overflow здесь обязателен: при увеличении картинка вылезала за рамку фото
+   и наезжала на название с ценой. */
+.товар .фото{{height:190px;background:var(--лёд);display:flex;align-items:center;
+  justify-content:center;overflow:hidden}}
 .товар .фото img{{max-height:190px;width:auto;object-fit:contain}}
 .товар .низ{{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}}
 .взаказ{{align-self:flex-start;background:none;border:1px solid var(--край);color:var(--вода);
@@ -288,8 +291,9 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
   margin-left:8px}}
 .цена em{{font-style:normal;font-family:"Golos Text",sans-serif;font-size:13px;font-weight:400;
   color:var(--тихий)}}
-.метка{{position:absolute;margin:10px;background:var(--зелень);color:#fff;font-size:11px;
-  letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:2px}}
+.метка{{position:absolute;z-index:2;margin:10px;background:var(--зелень);color:#fff;
+  font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;
+  border-radius:2px}}
 .метка.акция{{background:var(--форель)}}
 .сноска{{color:var(--тихий);font-size:13px;margin-top:22px}}
 
@@ -320,7 +324,7 @@ section.бел{{background:var(--прилавок);border-top:1px solid var(--к
   border-left:4px solid var(--форель);padding:6px 0 6px 18px;margin:26px 0 0}}
 
 /* Выгода на карточке: цифру экономии видно раньше, чем цену */
-.выгода{{position:absolute;right:0;top:0;background:var(--форель);color:#fff;
+.выгода{{position:absolute;z-index:2;right:0;top:0;background:var(--форель);color:#fff;
   font-family:Bitter,Georgia,serif;font-size:15px;padding:6px 10px;border-radius:0 0 0 2px}}
 
 /* Кнопка, которая всегда под большим пальцем: на телефоне человек читает
@@ -462,7 +466,7 @@ footer .обёртка{{display:flex;gap:24px;flex-wrap:wrap;justify-content:spa
 .товар{{transition:box-shadow .2s ease,transform .2s ease}}
 .товар:hover{{box-shadow:0 10px 28px rgba(0,0,0,.10);transform:translateY(-2px)}}
 .товар .фото img{{transition:transform .3s ease}}
-.товар:hover .фото img{{transform:scale(1.05)}}
+.товар:hover .фото img{{transform:scale(1.04)}}
 .раздел img{{transition:transform .25s ease}}
 .раздел:hover img{{transform:scale(1.06)}}
 .кнопка,.взаказ{{transition:background .15s ease,border-color .15s ease,color .15s ease}}
