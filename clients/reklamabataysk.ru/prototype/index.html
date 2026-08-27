@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="fonts.css">
 <style>
 :root{
-  --grafit:#1C1E20; --beton:#EDEFF0; --ogon:#FF4200; --doroga:#6B7076; --yantar:#FFBF00; --belyy:#fff;
+  --grafit:#14191E; --beton:#EFF1F2; --ogon:#FF4200; --doroga:#6A7480; --yantar:#FFBF00; --belyy:#fff;
   --step:clamp(2.5rem,4.4vw,4.2rem);
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -36,7 +36,7 @@ a{color:inherit}
 .sect__sub{margin:0;color:var(--doroga);font-size:1.02rem;max-width:52ch}
 
 /* шапка */
-.top{border-bottom:1px solid rgba(28,30,32,.12)}
+.top{border-bottom:1px solid rgba(20,25,30,.12)}
 .top{position:sticky;top:0;z-index:20;background:var(--beton)}
 .top__in{display:flex;align-items:center;justify-content:space-between;gap:1.4rem;
   padding-block:.9rem}
@@ -49,10 +49,15 @@ a{color:inherit}
 /* Оранжевый прямоугольник — ровно 2:1, тот самый формат 3×6. Он стоит на
    базовой линии как точка в конце имени: место под рекламу, а не картинка
    щита. Размер привязан к кеглю, чтобы держаться при любой высоте логотипа. */
-.logo{display:flex;align-items:flex-end;gap:.26em;
+.logo{display:flex;align-items:center;gap:.42em;
   font-family:'Unbounded',sans-serif;font-weight:700;font-size:var(--logo,26px);
   letter-spacing:-.03em;line-height:.86}
-.logo__block{width:1.3em;height:.65em;background:var(--ogon);flex:none}
+/* Монограмма: «П» — это и первая буква фамилии, и силуэт щита на двух опорах.
+   Перекладина ровно 2:1 и оранжевая: это то самое место под рекламу, которое
+   агентство сдаёт. Опоры набраны currentColor, поэтому один знак годится и на
+   светлой шапке, и на тёмном подвале. Собран из трёх прямоугольников — модуль
+   тот же, что у клеток первого экрана. */
+.logo__mark{width:1.05em;height:1.05em;flex:none;display:block}
 .logo__desc{display:block;margin-top:.55em;font-family:'PT Sans',sans-serif;
   font-weight:400;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
   color:var(--doroga);white-space:nowrap}
@@ -69,7 +74,7 @@ a{color:inherit}
 .hero__free b{font-family:'Unbounded',sans-serif;color:var(--ogon);
   font-size:clamp(2.6rem,5.4vw,4.2rem);line-height:.9;display:inline-block;
   vertical-align:-.09em;margin-inline:.06em}
-.hero__also{margin-top:1.6rem;color:var(--doroga);font-size:.95rem;max-width:36ch;border-top:1px solid rgba(28,30,32,.14);padding-top:1.1rem}
+.hero__also{margin-top:1.6rem;color:var(--doroga);font-size:.95rem;max-width:36ch;border-top:1px solid rgba(20,25,30,.14);padding-top:1.1rem}
 .hero__meta{margin-top:1.3rem;color:var(--doroga);font-size:.95rem;max-width:34ch}
 .btn{display:inline-block;margin-top:1.8rem;background:var(--ogon);color:var(--belyy);
   text-decoration:none;font-weight:700;padding:1rem 1.9rem;border:0;cursor:pointer;
@@ -90,36 +95,36 @@ a{color:inherit}
 .card__price{margin-top:auto;padding-top:.7rem;color:var(--doroga);font-size:.9rem}
 
 /* лента трассы */
-.trassa{background:var(--grafit);color:var(--beton);background-image:linear-gradient(90deg,rgba(28,30,32,.97) 42%,rgba(28,30,32,.55) 100%),url(images/fon-trassa-stock.jpg);background-size:auto,cover;background-position:center,right center;background-repeat:no-repeat}
-.trassa .sect__sub{color:rgba(237,239,240,.62)}
+.trassa{background:var(--grafit);color:var(--beton);background-image:linear-gradient(90deg,rgba(20,25,30,.97) 42%,rgba(20,25,30,.55) 100%),url(images/fon-trassa-stock.jpg);background-size:auto,cover;background-position:center,right center;background-repeat:no-repeat}
+.trassa .sect__sub{color:rgba(239,241,242,.62)}
 .lenta{margin:2.2rem auto 0;max-width:560px}
-.lenta__sides{display:grid;grid-template-columns:1fr 1fr;gap:5rem;max-width:560px;margin:.7rem auto -.2rem;font-family:'PT Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(237,239,240,.45)}
+.lenta__sides{display:grid;grid-template-columns:1fr 1fr;gap:5rem;max-width:560px;margin:.7rem auto -.2rem;font-family:'PT Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(239,241,242,.45)}
 .lenta__sides span:first-child{text-align:right;padding-right:.4rem}
 .lenta__sides span:last-child{padding-left:.4rem}
 .lenta__cap{font-family:'PT Mono',monospace;font-size:.8rem;text-align:center;
-  color:rgba(237,239,240,.55);letter-spacing:.08em;text-transform:uppercase}
+  color:rgba(239,241,242,.55);letter-spacing:.08em;text-transform:uppercase}
 .mark{display:grid;grid-template-columns:1fr 72px 1fr;align-items:center;
   column-gap:.6rem;min-height:56px;position:relative}
 .mark::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;
-  margin-left:-1px;background:rgba(237,239,240,.3)}
+  margin-left:-1px;background:rgba(239,241,242,.3)}
 .mark__side{display:flex;align-items:center;min-height:38px}
 .mark__side--l{justify-content:flex-end}
 .mark__box{display:block;width:100%;max-width:172px;height:48px;background:var(--doroga);
-  border:2px solid rgba(237,239,240,.3)}
+  border:2px solid rgba(239,241,242,.3)}
 .mark__km{font-family:'PT Mono',monospace;font-size:.9rem;text-align:center;
   position:relative;z-index:1;background:var(--grafit);padding-block:.3rem;
-  color:rgba(237,239,240,.8)}
+  color:rgba(239,241,242,.8)}
 .trassa__in{display:grid;gap:2.2rem;align-items:center}
 @media (min-width:1000px){.trassa__in{grid-template-columns:1fr .82fr;gap:3.4rem}}
 .trassa__note{margin:0;max-width:34ch}
 @media (max-width:999px){.trassa__note{margin-inline:auto;text-align:center}}
 .trassa__note strong{font-family:'Unbounded',sans-serif;font-size:clamp(1.25rem,2vw,1.75rem);
   display:block;line-height:1.2;margin-bottom:.8rem}
-.trassa__note span{color:rgba(237,239,240,.62)}
+.trassa__note span{color:rgba(239,241,242,.62)}
 .vyezd{margin:2.2rem auto 0;max-width:560px;display:grid;grid-template-columns:1fr 1fr;
   gap:1rem;font-family:'PT Mono',monospace;font-size:.86rem;
-  color:rgba(237,239,240,.62);text-align:center}
-.vyezd div{border:1px solid rgba(237,239,240,.22);padding:.8rem}
+  color:rgba(239,241,242,.62);text-align:center}
+.vyezd div{border:1px solid rgba(239,241,242,.22);padding:.8rem}
 
 
 /* Первый экран — портрет всего хозяйства: 49 прямоугольников 2:1 по улицам.
@@ -127,15 +132,15 @@ a{color:inherit}
    свободны. Цифры в строках дублируют цвет, чтобы состояние читалось и без
    него. */
 .board{margin:0;background:var(--grafit);padding:clamp(1.4rem,2.6vw,2.1rem)}
-.board__cap{color:rgba(237,239,240,.62);font-size:.86rem;line-height:1.4;
+.board__cap{color:rgba(239,241,242,.62);font-size:.86rem;line-height:1.4;
   margin-bottom:1.5rem;max-width:38ch}
-.brow{padding-block:.78rem;border-top:1px solid rgba(237,239,240,.13)}
+.brow{padding-block:.78rem;border-top:1px solid rgba(239,241,242,.13)}
 .brow__head{display:flex;justify-content:space-between;align-items:baseline;
   gap:1rem;margin-bottom:.5rem}
 .brow__st{font-family:'PT Mono',monospace;font-size:.72rem;letter-spacing:.05em;
-  text-transform:uppercase;color:rgba(237,239,240,.55)}
+  text-transform:uppercase;color:rgba(239,241,242,.55)}
 .brow__cells{display:flex;flex-wrap:wrap;gap:5px}
-.cell{width:32px;height:16px;background:#6B7076;border:0;padding:0;cursor:pointer;
+.cell{width:32px;height:16px;background:#6A7480;border:0;padding:0;cursor:pointer;
   border-radius:1px;transition:transform .12s ease}
 .cell--free{background:var(--ogon)}
 /* Янтарный — третье состояние «скоро освободится». Второй цвет заведён не для
@@ -143,15 +148,15 @@ a{color:inherit}
    строчка, и путать его ни со свободным, ни с занятым нельзя. */
 .cell--soon{background:var(--yantar)}
 .cell:hover{transform:translateY(-2px)}
-.cell:focus-visible{outline:2px solid #EDEFF0;outline-offset:2px}
-.brow__n{font-family:'PT Mono',monospace;font-size:.78rem;color:rgba(237,239,240,.8);
+.cell:focus-visible{outline:2px solid #EFF1F2;outline-offset:2px}
+.brow__n{font-family:'PT Mono',monospace;font-size:.78rem;color:rgba(239,241,242,.8);
   white-space:nowrap}
 .brow__n i{font-style:normal;color:var(--ogon)}
 .brow__n em{font-style:normal;color:var(--yantar)}
-.brow__n u{text-decoration:none;color:rgba(237,239,240,.45)}
+.brow__n u{text-decoration:none;color:rgba(239,241,242,.45)}
 .board__legend{display:flex;gap:1.6rem;margin-top:1.3rem;
-  font-family:'PT Mono',monospace;font-size:.74rem;color:rgba(237,239,240,.6)}
-.board__legend .sw{display:inline-block;width:18px;height:9px;background:#6B7076;
+  font-family:'PT Mono',monospace;font-size:.74rem;color:rgba(239,241,242,.6)}
+.board__legend .sw{display:inline-block;width:18px;height:9px;background:#6A7480;
   margin-right:.5rem;vertical-align:.02em}
 .board__legend .sw--free{background:var(--ogon)}
 .board__legend .sw--soon{background:var(--yantar)}
@@ -176,13 +181,13 @@ a{color:inherit}
 .strip__in{display:flex;flex-wrap:wrap;gap:.4rem 2rem;justify-content:space-between;
   align-items:baseline;padding-block:.9rem;font-size:1rem}
 .strip b{font-family:'Unbounded',sans-serif;font-weight:700;letter-spacing:-.01em}
-.strip__soon{font-family:'PT Mono',monospace;font-size:.82rem;color:rgba(28,30,32,.72)}
-.sect--ogon .partner p{color:rgba(28,30,32,.82)}
+.strip__soon{font-family:'PT Mono',monospace;font-size:.82rem;color:rgba(20,25,30,.72)}
+.sect--ogon .partner p{color:rgba(20,25,30,.82)}
 .sect--ogon .btn{background:var(--grafit)}
 .sect--ogon .btn:hover{background:#000}
 .sect--ogon .form .btn{background:var(--ogon)}
 .sect--ogon .form .btn:hover{background:#e03a00}
-.sect--dark .sect__sub{color:rgba(237,239,240,.6)}
+.sect--dark .sect__sub{color:rgba(239,241,242,.6)}
 
 /* Оранжевое поле 2:1 из логотипа — метка конца заголовка. Только на тёмных
    секциях, иначе превратится в надзаголовок над каждым блоком. Имя не `mark`:
@@ -208,7 +213,7 @@ a{color:inherit}
 .reel__price{font-family:'PT Mono',monospace;font-size:.82rem;
   color:rgba(255,255,255,.7)}
 .reel__nav{display:flex;gap:6px;margin-top:12px}
-.reel__dot{flex:1;height:6px;background:rgba(237,239,240,.22);border:0;padding:0;
+.reel__dot{flex:1;height:6px;background:rgba(239,241,242,.22);border:0;padding:0;
   cursor:pointer;position:relative}
 .reel__dot span{position:absolute;width:1px;height:1px;overflow:hidden;
   clip:rect(0 0 0 0)}
@@ -234,7 +239,7 @@ a{color:inherit}
 .card__n{position:absolute;left:0;top:0;background:var(--grafit);color:var(--beton);
   font-family:'PT Mono',monospace;font-size:.82rem;padding:.34rem .6rem}
 .card{transition:transform .18s ease,box-shadow .18s ease}
-.card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(28,30,32,.13)}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(20,25,30,.13)}
 
 
 /* Три формата: карточка выше обычной, текста больше — это объяснение, а не
@@ -271,13 +276,13 @@ a{color:inherit}
 .filters{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem 1.4rem;margin-bottom:1.6rem}
 .chips{display:flex;flex-wrap:wrap;gap:.45rem}
 .chip{font:400 .88rem/1 'PT Sans',sans-serif;padding:.55rem .9rem;cursor:pointer;
-  background:var(--belyy);color:var(--grafit);border:1px solid rgba(28,30,32,.2)}
+  background:var(--belyy);color:var(--grafit);border:1px solid rgba(20,25,30,.2)}
 .chip:hover{border-color:var(--grafit)}
 .chip.is-on{background:var(--grafit);color:var(--beton);border-color:var(--grafit)}
 .filters__street{font-family:'PT Mono',monospace;font-size:.82rem;color:var(--doroga);
   display:flex;align-items:center;gap:.5rem}
 .filters__street select{font:400 .9rem 'PT Sans',sans-serif;padding:.45rem .6rem;
-  border:1px solid rgba(28,30,32,.2);background:var(--belyy);color:var(--grafit)}
+  border:1px solid rgba(20,25,30,.2);background:var(--belyy);color:var(--grafit)}
 .street.is-hidden,.brow.is-hidden{display:none}
 
 /* Подбор мест в заявку: выбираешь несколько, отправляешь одной формой.
@@ -302,18 +307,18 @@ a{color:inherit}
 .tray__in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
   gap:.6rem 1.4rem;padding-block:.85rem}
 .tray b{font-family:'Unbounded',sans-serif;font-size:1rem}
-.tray__list{font-family:'PT Mono',monospace;font-size:.8rem;color:rgba(28,30,32,.72);
+.tray__list{font-family:'PT Mono',monospace;font-size:.8rem;color:rgba(20,25,30,.72);
   flex:1 1 20rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tray .btn{margin:0;padding:.7rem 1.3rem;background:var(--grafit)}
 .tray .btn:hover{background:#000}
 .tray__clear{background:none;border:0;cursor:pointer;font:400 .85rem 'PT Sans',sans-serif;
-  color:rgba(28,30,32,.7);text-decoration:underline}
+  color:rgba(20,25,30,.7);text-decoration:underline}
 
 /* Выбранное в форме — списком, а не одной строкой выпадашки. */
 .chosen{list-style:none;margin:0 0 1.1rem;padding:0;
   font-family:'PT Mono',monospace;font-size:.82rem}
 .chosen li{display:flex;justify-content:space-between;gap:.8rem;
-  padding:.45rem 0;border-bottom:1px solid rgba(28,30,32,.12)}
+  padding:.45rem 0;border-bottom:1px solid rgba(20,25,30,.12)}
 .chosen button{background:none;border:0;cursor:pointer;color:var(--doroga)}
 .chosen__empty{color:var(--doroga)}
 
@@ -347,7 +352,7 @@ a{color:inherit}
   color:var(--doroga)}
 .street__list{list-style:none;margin:0;padding:0}
 .row{display:grid;grid-template-columns:1fr auto auto;gap:.4rem 1rem;align-items:baseline;
-  padding:.62rem 0;border-bottom:1px solid rgba(28,30,32,.1);font-size:.96rem}
+  padding:.62rem 0;border-bottom:1px solid rgba(20,25,30,.1);font-size:.96rem}
 .row__kind,.row__st{font-family:'PT Mono',monospace;font-size:.78rem;color:var(--doroga);white-space:nowrap}
 .row__st{min-width:6.6rem;text-align:right}
 .row--free .row__st{color:var(--ogon);font-weight:700}
@@ -360,7 +365,7 @@ a{color:inherit}
 .uslugi__list{list-style:none;margin:2.4rem 0 0;padding:0;
   display:grid;grid-template-columns:1fr 1fr;gap:0 3rem}
 .uslugi__list li{font-family:'Unbounded',sans-serif;font-size:clamp(1rem,1.7vw,1.35rem);
-  line-height:1.25;padding-block:1.5rem;border-top:1px solid rgba(237,239,240,.2)}
+  line-height:1.25;padding-block:1.5rem;border-top:1px solid rgba(239,241,242,.2)}
 
 /* партнёрам + форма */
 .dva{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.6rem,3vw,3.4rem);
@@ -372,23 +377,23 @@ a{color:inherit}
 .form label{display:block;margin-bottom:1.1rem;font-size:.86rem;
   font-family:'PT Mono',monospace;color:var(--doroga)}
 .form input,.form select{display:block;width:100%;margin-top:.42rem;padding:.85rem .9rem;
-  border:1px solid rgba(28,30,32,.28);background:var(--belyy);color:var(--grafit);
+  border:1px solid rgba(20,25,30,.28);background:var(--belyy);color:var(--grafit);
   font:400 1rem 'PT Sans',sans-serif;border-radius:0}
 .form .btn{margin-top:.4rem;width:100%}
 .form__ok{display:none;margin-top:1rem;color:var(--ogon);font-weight:700}
 
 /* подвал */
-.foot{background:var(--grafit);color:rgba(237,239,240,.72);padding-block:2.6rem;
+.foot{background:var(--grafit);color:rgba(239,241,242,.72);padding-block:2.6rem;
   font-size:.92rem}
 .foot__logo{color:var(--beton);--logo:24px}
-.foot__logo .logo__desc{color:rgba(237,239,240,.5)}
+.foot__logo .logo__desc{color:rgba(239,241,242,.5)}
 
 .foot__in{display:flex;flex-wrap:wrap;gap:1rem 2.4rem;justify-content:space-between}
 .foot a{color:var(--beton)}
 
 .tel-mob{display:none}
 @media (max-width:900px){
-  .trassa{background-image:linear-gradient(rgba(28,30,32,.93),rgba(28,30,32,.97)),url(images/fon-trassa-stock.jpg)}
+  .trassa{background-image:linear-gradient(rgba(20,25,30,.93),rgba(20,25,30,.97)),url(images/fon-trassa-stock.jpg)}
   /* На узком экране в шапке помещается либо логотип с подписью и двумя
      телефонами, либо логотип и одна кнопка. Второе полезнее: звонят с
      телефона, а не читают реквизиты. */
@@ -423,7 +428,11 @@ a{color:inherit}
 <header class="top">
   <div class="wrap top__in">
     <a class="top__logo" href="#">
-      <span class="logo"><span class="logo__name">ПОКОТИЛОВ</span><span class="logo__block"></span></span>
+      <span class="logo"><svg class="logo__mark" viewBox="0 0 96 96" aria-hidden="true">
+        <rect x="0" y="0" width="96" height="48" fill="#FF4200"/>
+        <rect x="0" y="48" width="20" height="48" fill="currentColor"/>
+        <rect x="76" y="48" width="20" height="48" fill="currentColor"/>
+      </svg><span class="logo__name">ПОКОТИЛОВ</span></span>
       <span class="logo__desc">рекламное агентство · батайск</span>
     </a>
     <nav class="nav">
@@ -880,7 +889,11 @@ a{color:inherit}
 <footer class="foot">
   <div class="wrap foot__in">
     <div class="foot__logo">
-      <span class="logo"><span class="logo__name">ПОКОТИЛОВ</span><span class="logo__block"></span></span>
+      <span class="logo"><svg class="logo__mark" viewBox="0 0 96 96" aria-hidden="true">
+        <rect x="0" y="0" width="96" height="48" fill="#FF4200"/>
+        <rect x="0" y="48" width="20" height="48" fill="currentColor"/>
+        <rect x="76" y="48" width="20" height="48" fill="currentColor"/>
+      </svg><span class="logo__name">ПОКОТИЛОВ</span></span>
       <span class="logo__desc">рекламное агентство · батайск</span>
     </div>
     <div>
@@ -955,7 +968,7 @@ function initMap(places){
         cls:free?'free':(m.soon?'soon':'')
       },{
         preset:'islands#circleIcon',
-        iconColor:free?'#FF4200':(m.soon?'#FFBF00':'#6B7076'),
+        iconColor:free?'#FF4200':(m.soon?'#FFBF00':'#6A7480'),
         balloonContentLayout:layout,
         balloonMaxWidth:250,
         hideIconOnBalloonOpen:false
