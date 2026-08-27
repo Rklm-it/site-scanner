@@ -53,9 +53,15 @@ a{color:inherit}
    этого клиента она только мешает: агентство продаёт места, а не образ.
    Лочку держит типографика — имя, черта под ним и подпись, растянутая ровно
    по ширине имени. Черта заодно рифмуется с верхней кромкой щита. */
-.logo{display:inline-block;font-size:var(--logo,22px)}
-.logo__name{display:block;font-family:'Unbounded',sans-serif;font-weight:700;
-  font-size:1em;letter-spacing:-.035em;line-height:.9}
+.logo{display:inline-block;font-size:var(--logo,28px)}
+/* Каёмка: под именем лежит его же копия, набранная контуром фирменного цвета
+   и сдвинутая на пару пикселей. Приём из наружной рекламы — контурная обводка
+   на плёнке, чтобы буквы держали форму издалека. Цвет в знаке появляется, но
+   не заливкой. */
+.logo__name{display:block;position:relative;font-family:'Unbounded',sans-serif;
+  font-weight:700;font-size:1em;letter-spacing:-.035em;line-height:.9}
+.logo__name::before{content:attr(data-t);position:absolute;left:.055em;top:.06em;
+  z-index:-1;color:transparent;-webkit-text-stroke:.05em var(--ogon)}
 .logo__sub{display:flex;justify-content:space-between;gap:.6em;
   margin-top:.34em;padding-top:.3em;border-top:2px solid currentColor;
   font-family:'PT Sans',sans-serif;font-size:.3em;letter-spacing:.06em;
@@ -67,7 +73,7 @@ a{color:inherit}
 
 /* первый экран */
 .hero{padding-block:clamp(2.4rem,5vw,4.4rem) clamp(2rem,4vw,3.4rem)}
-.hero__in{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(1.6rem,3.4vw,3.4rem);
+.hero__in{display:grid;grid-template-columns:1.12fr .88fr;gap:clamp(1.6rem,3.4vw,3.4rem);
   align-items:center}
 .hero__free{margin-top:1.6rem;font-size:clamp(1.15rem,1.9vw,1.5rem);line-height:1.3}
 .hero__free b{font-family:'Unbounded',sans-serif;color:var(--ogon);
@@ -304,7 +310,8 @@ a{color:inherit}
   margin-top:0;vertical-align:.1em}
 .reel__slide .pick:hover,.reel__slide .pick[aria-pressed="true"]{background:var(--ogon);
   border-color:var(--ogon)}
-.pick--row{margin:0;padding:.1rem .5rem;font-size:.95rem;line-height:1.2}
+.pick--row{margin:0;padding:.12rem .48rem;font-size:.9rem;line-height:1.2;
+  justify-self:end;align-self:center}
 
 /* Панель выбранного. Всплывает, только когда что-то выбрано. */
 .tray{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--grafit);
@@ -334,8 +341,15 @@ a{color:inherit}
   width:0;transition:width .1s linear}
 
 /* карта */
-.map{height:min(54vh,480px);margin-bottom:2rem;background:#e2e5e7;
+.map{aspect-ratio:4/3;height:auto;margin:0;background:#e2e5e7;
   display:flex;align-items:center;justify-content:center}
+.maplg{display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;margin-top:.9rem;
+  font-family:'PT Mono',monospace;font-size:.74rem;color:var(--doroga)}
+.maplg .sw{display:inline-block;width:16px;height:8px;background:var(--doroga);
+  margin-right:.45rem;vertical-align:.02em}
+.maplg .sw--free{background:var(--ogon)}
+.maplg .sw--soon{background:var(--yantar)}
+.maplg__hint{margin-left:auto}
 .map__off{color:var(--doroga);font-size:.95rem;max-width:32ch;text-align:center;padding:1.5rem}
 .balloon{font-family:'PT Sans',sans-serif;max-width:230px}
 .balloon img{width:100%;aspect-ratio:2/1;object-fit:cover;margin-bottom:.55rem}
@@ -357,7 +371,7 @@ a{color:inherit}
 .street__count{font-family:'PT Mono',monospace;font-size:.8rem;font-weight:400;
   color:var(--doroga)}
 .street__list{list-style:none;margin:0;padding:0}
-.row{display:grid;grid-template-columns:1fr auto auto;gap:.4rem 1rem;align-items:baseline;
+.row{display:grid;grid-template-columns:1fr auto auto auto;gap:.4rem .9rem;align-items:baseline;
   padding:.62rem 0;border-bottom:1px solid rgba(20,25,30,.1);font-size:.96rem}
 .row__kind,.row__st{font-family:'PT Mono',monospace;font-size:.78rem;color:var(--doroga);white-space:nowrap}
 .row__st{min-width:6.6rem;text-align:right}
@@ -391,7 +405,7 @@ a{color:inherit}
 /* подвал */
 .foot{background:var(--grafit);color:rgba(239,241,242,.72);padding-block:2.6rem;
   font-size:.92rem}
-.foot__logo{color:var(--beton);--logo:24px}
+.foot__logo{color:var(--beton);--logo:32px}
 .foot__logo 
 .foot__in{display:flex;flex-wrap:wrap;gap:1rem 2.4rem;justify-content:space-between}
 .foot a{color:var(--beton)}
@@ -410,9 +424,10 @@ a{color:inherit}
   .hero__in,.dva,.uslugi__list{grid-template-columns:1fr}
   .row{grid-template-columns:1fr auto;row-gap:.2rem}
   .row__kind{grid-column:2;text-align:right}
-  .row__st{grid-column:1/-1}
+  .row__st{grid-column:1}
+  .pick--row{grid-column:2}
   .tels{flex-direction:column;gap:.3rem;text-align:right}
-  .top{--logo:22px}
+  .top{--logo:25px}
   .mark{grid-template-columns:1fr 62px 1fr}
   .mark__box{width:100%;max-width:120px;height:38px}
   .uslugi__list li{padding-block:1.15rem}
@@ -432,13 +447,13 @@ a{color:inherit}
 <header class="top">
   <div class="wrap top__in">
     <a class="top__logo" href="#"><span class="logo">
-        <span class="logo__name">ПОКОТИЛОВ</span>
+        <span class="logo__name" data-t="ПОКОТИЛОВ">ПОКОТИЛОВ</span>
         <span class="logo__sub"><span>рекламное</span><span>агентство</span><span>батайск</span></span>
       </span></a>
     <nav class="nav">
       <a href="#formaty">Форматы</a>
       <a href="#svobodno">Свободное</a>
-      <a href="#karta">Карта</a>
+      <a href="#top">Карта</a>
       <a href="#kak">Как разместиться</a>
       <a href="#uslugi">Печать и монтаж</a>
     </nav>
@@ -450,51 +465,17 @@ a{color:inherit}
   </div>
 </header>
 
-<section class="hero">
+<section class="hero" id="top">
   <div class="wrap hero__in">
-    <figure class="board">
-      <figcaption class="board__cap">Все места агентства. Оранжевые свободны — их можно занять с этой недели.</figcaption>
-      <div class="brow">
-        <div class="brow__head">
-          <span class="brow__st">Северный подъезд</span>
-          <span class="brow__n">15 · <u>занято всё</u></span>
-        </div>
-        <div class="brow__cells"><button class="cell" data-n="2" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1610 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1610 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="4" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1650 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1650 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="7" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1650 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1650 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="8" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1690 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1690 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="10" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1700 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1700 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="11" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1730 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1730 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="12" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1750 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1750 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="13" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1770 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1770 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="14" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1800 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1800 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="15" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1810 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1810 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="16" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1885 м по ходу километража, справа — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1885 м по ходу километража, справа — занят до 01.01.2027</span></button><button class="cell" data-n="17" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1890 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1890 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="18" data-kind="schit" data-street="Северный подъезд" type="button" title="Северный подъезд к Батайску 1980 м по ходу километража, слева — занят до 01.01.2027"><span class="vh">Северный подъезд к Батайску 1980 м по ходу километража, слева — занят до 01.01.2027</span></button><button class="cell" data-n="48" data-kind="schit" data-street="Северный подъезд" type="button" title="Выезд из города Батайска, Северный 16 — занят до 01.01.2027"><span class="vh">Выезд из города Батайска, Северный 16 — занят до 01.01.2027</span></button><button class="cell" data-n="49" data-kind="schit" data-street="Северный подъезд" type="button" title="Выезд из города Батайска, Северный 35 — занят до 01.01.2027"><span class="vh">Выезд из города Батайска, Северный 35 — занят до 01.01.2027</span></button></div>
-      </div>
-      <div class="brow">
-        <div class="brow__head">
-          <span class="brow__st">Куйбышева</span>
-          <span class="brow__n">12 · <i>свободно 3</i></span>
-        </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="1" data-kind="ekran" data-street="Куйбышева" type="button" title="ул. Куйбышева 7 — свободен"><span class="vh">ул. Куйбышева 7 — свободен</span></button><button class="cell" data-n="19" data-kind="prizmatron" data-street="Куйбышева" type="button" title="Куйбышева/Огородная — занят до 01.01.2027"><span class="vh">Куйбышева/Огородная — занят до 01.01.2027</span></button><button class="cell" data-n="20" data-kind="prizmatron" data-street="Куйбышева" type="button" title="Куйбышева, 2а — занят до 01.01.2027"><span class="vh">Куйбышева, 2а — занят до 01.01.2027</span></button><button class="cell" data-n="21" data-kind="schit" data-street="Куйбышева" type="button" title="Куйбышева 35/Морской — занят до 02.01.2027"><span class="vh">Куйбышева 35/Морской — занят до 02.01.2027</span></button><button class="cell" data-n="22" data-kind="schit" data-street="Куйбышева" type="button" title="Куйбышева, 61 — занят до 01.01.2027"><span class="vh">Куйбышева, 61 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="23" data-kind="schit" data-street="Куйбышева" type="button" title="ул. Куйбышева 104 — свободен"><span class="vh">ул. Куйбышева 104 — свободен</span></button><button class="cell cell--free" data-n="24" data-kind="schit" data-street="Куйбышева" type="button" title="Куйбышева 114 А — свободен"><span class="vh">Куйбышева 114 А — свободен</span></button><button class="cell" data-n="25" data-kind="prizmatron" data-street="Куйбышева" type="button" title="Куйбышева, 118 — занят до 01.01.2027"><span class="vh">Куйбышева, 118 — занят до 01.01.2027</span></button><button class="cell" data-n="26" data-kind="schit" data-street="Куйбышева" type="button" title="Куйбышева/Заводская (сторона А) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона А) — занят до 01.01.2027</span></button><button class="cell" data-n="27" data-kind="schit" data-street="Куйбышева" type="button" title="Куйбышева/Заводская (сторона В) — занят до 01.01.2027"><span class="vh">Куйбышева/Заводская (сторона В) — занят до 01.01.2027</span></button><button class="cell" data-n="28" data-kind="schit" data-street="Куйбышева" type="button" title="Куйбышева,136 ЦГБ справа — занят до 01.01.2027"><span class="vh">Куйбышева,136 ЦГБ справа — занят до 01.01.2027</span></button><button class="cell" data-n="29" data-kind="schit" data-street="Куйбышева" type="button" title="ул. Куйбышева, 161, слева — занят до 01.01.2027"><span class="vh">ул. Куйбышева, 161, слева — занят до 01.01.2027</span></button></div>
-      </div>
-      <div class="brow">
-        <div class="brow__head">
-          <span class="brow__st">Максима Горького</span>
-          <span class="brow__n">11 · <i>свободно 3</i> · <em>ещё 1 скоро</em></span>
-        </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="3" data-kind="ekran" data-street="Максима Горького" type="button" title="ул. Максима Горького-1-й Пятилетки 354 — свободен"><span class="vh">ул. Максима Горького-1-й Пятилетки 354 — свободен</span></button><button class="cell cell--free" data-n="5" data-kind="ekran" data-street="Максима Горького" type="button" title="ул. Максима Горького -Луначарского 117 — свободен"><span class="vh">ул. Максима Горького -Луначарского 117 — свободен</span></button><button class="cell cell--soon" data-n="30" data-kind="schit" data-street="Максима Горького" type="button" title="ул. М.Горького 137 — занят до 20.09.2026"><span class="vh">ул. М.Горького 137 — занят до 20.09.2026</span></button><button class="cell" data-n="31" data-kind="schit" data-street="Максима Горького" type="button" title="Максима Горького 281 а — занят до 01.01.2027"><span class="vh">Максима Горького 281 а — занят до 01.01.2027</span></button><button class="cell" data-n="32" data-kind="schit" data-street="Максима Горького" type="button" title="Максима Горького 281 в — занят до 01.01.2027"><span class="vh">Максима Горького 281 в — занят до 01.01.2027</span></button><button class="cell" data-n="33" data-kind="schit" data-street="Максима Горького" type="button" title="ул. М.Горького 281 Б — занят до 01.01.2027"><span class="vh">ул. М.Горького 281 Б — занят до 01.01.2027</span></button><button class="cell" data-n="34" data-kind="schit" data-street="Максима Горького" type="button" title="ул. М.Горького 281 В — занят до 01.01.2027"><span class="vh">ул. М.Горького 281 В — занят до 01.01.2027</span></button><button class="cell" data-n="35" data-kind="prizmatron" data-street="Максима Горького" type="button" title="ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027"><span class="vh">ул. М. Горького № 285 (Сторона A) — занят до 01.01.2027</span></button><button class="cell" data-n="36" data-kind="schit" data-street="Максима Горького" type="button" title="Максима Горького, 358 (сторона А) — занят до 01.01.2027"><span class="vh">Максима Горького, 358 (сторона А) — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="37" data-kind="schit" data-street="Максима Горького" type="button" title="Максима Горького, 358 (сторона B) — свободен"><span class="vh">Максима Горького, 358 (сторона B) — свободен</span></button><button class="cell" data-n="38" data-kind="prizmatron" data-street="Максима Горького" type="button" title="ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027"><span class="vh">ул. 1-й Пятилетки и М.Горького 356 (сторона B) — занят до 01.01.2027</span></button></div>
-      </div>
-      <div class="brow">
-        <div class="brow__head">
-          <span class="brow__st">Энгельса</span>
-          <span class="brow__n">10 · <i>свободно 4</i></span>
-        </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="6" data-kind="ekran" data-street="Энгельса" type="button" title="ул. Энгельса-Крупская 172 — свободен"><span class="vh">ул. Энгельса-Крупская 172 — свободен</span></button><button class="cell cell--free" data-n="9" data-kind="ekran" data-street="Энгельса" type="button" title="ул. Энгельса-Ленинградская 46 — свободен"><span class="vh">ул. Энгельса-Ленинградская 46 — свободен</span></button><button class="cell" data-n="39" data-kind="schit" data-street="Энгельса" type="button" title="Энгельса /Кирова 18 универмаг — занят до 01.01.2027"><span class="vh">Энгельса /Кирова 18 универмаг — занят до 01.01.2027</span></button><button class="cell" data-n="40" data-kind="schit" data-street="Энгельса" type="button" title="ул. Энгельса-Садовая,51 — занят до 01.01.2027"><span class="vh">ул. Энгельса-Садовая,51 — занят до 01.01.2027</span></button><button class="cell" data-n="41" data-kind="schit" data-street="Энгельса" type="button" title="ул. Энгельса-Фрунзе,109 — занят до 01.01.2027"><span class="vh">ул. Энгельса-Фрунзе,109 — занят до 01.01.2027</span></button><button class="cell" data-n="42" data-kind="schit" data-street="Энгельса" type="button" title="Ул. Энгельса -Заводская 130 — занят до 01.01.2027"><span class="vh">Ул. Энгельса -Заводская 130 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="43" data-kind="schit" data-street="Энгельса" type="button" title="ул. Энгельса 134 — свободен"><span class="vh">ул. Энгельса 134 — свободен</span></button><button class="cell" data-n="44" data-kind="schit" data-street="Энгельса" type="button" title="ул. Энгельса-Половинко,45 — занят до 01.01.2027"><span class="vh">ул. Энгельса-Половинко,45 — занят до 01.01.2027</span></button><button class="cell" data-n="45" data-kind="schit" data-street="Энгельса" type="button" title="ул. Энгельса 53 — занят до 01.01.2027"><span class="vh">ул. Энгельса 53 — занят до 01.01.2027</span></button><button class="cell cell--free" data-n="46" data-kind="schit" data-street="Энгельса" type="button" title="ул. Энгельса 40 слева — свободен"><span class="vh">ул. Энгельса 40 слева — свободен</span></button></div>
-      </div>
-      <div class="brow">
-        <div class="brow__head">
-          <span class="brow__st">Заводская</span>
-          <span class="brow__n">1 · <i>свободно 1</i></span>
-        </div>
-        <div class="brow__cells"><button class="cell cell--free" data-n="47" data-kind="schit" data-street="Заводская" type="button" title="ул. Заводская 45 — свободен"><span class="vh">ул. Заводская 45 — свободен</span></button></div>
-      </div>
-      <div class="board__legend">
-        <span><i class="sw sw--free"></i>свободно 11</span>
-        <span><i class="sw sw--soon"></i>освободится в сентябре 1</span>
-        <span><i class="sw"></i>занято 37</span>
-      </div>
-    </figure>
+    <div id="map" class="map">
+      <p class="map__off">Карта загружается. Если она не появилась — все места перечислены ниже, с адресами и состоянием.</p>
+    </div>
+    <div class="maplg">
+      <span><i class="sw sw--free"></i>свободно 11</span>
+      <span><i class="sw sw--soon"></i>освободится 1</span>
+      <span><i class="sw"></i>занято 37</span>
+      <span class="maplg__hint">нажмите метку — фотография места и состояние</span>
+    </div>
     <div>
       <h1>Рекламные щиты 3×6 в Батайске</h1>
       <p class="hero__free">Свободно <b>11</b> мест из 49</p>
@@ -548,30 +529,6 @@ a{color:inherit}
              распродажа.</p>
         </div>
       </article>
-    </div>
-  </div>
-</section>
-
-<section class="sect" id="karta">
-  <div class="wrap">
-    <div class="sect__head">
-      <h2>Все 49 мест на карте</h2>
-      <p class="sect__sub">Оранжевым — свободные. Нажмите метку или строку в списке: откроется фотография места и его состояние.</p>
-    </div>
-<div class="filters">
-      <div class="chips" role="group" aria-label="Формат">
-        <button class="chip is-on" type="button" data-kind="all">Все 49</button>
-        <button class="chip" type="button" data-kind="schit">Щиты 3×6 · 39</button>
-        <button class="chip" type="button" data-kind="prizmatron">Призматроны · 5</button>
-        <button class="chip" type="button" data-kind="ekran">Экраны · 5</button>
-      </div>
-      <label class="filters__street">Улица
-        <select id="f-street"><option value="all">все</option><option value="Северный подъезд">Северный подъезд</option><option value="Куйбышева">Куйбышева</option><option value="Максима Горького">Максима Горького</option><option value="Энгельса">Энгельса</option><option value="Заводская">Заводская</option></select>
-      </label>
-      <label class="filter"><input type="checkbox" id="only-free"> Только свободные</label>
-    </div>
-    <div id="map" class="map">
-      <p class="map__off">Карта загружается. Если она не появилась — все места перечислены ниже, с адресами и состоянием.</p>
     </div>
   </div>
 </section>
@@ -832,7 +789,18 @@ a{color:inherit}
       <h2>Полный список мест</h2>
       <p class="sect__sub">По улицам Батайска. Нажмите строку — на карте выше откроется это место.</p>
     </div>
-    <label class="filter"><input type="checkbox" id="only-free-list"> Только свободные</label>
+<div class="filters">
+      <div class="chips" role="group" aria-label="Формат">
+        <button class="chip is-on" type="button" data-kind="all">Все 49</button>
+        <button class="chip" type="button" data-kind="schit">Щиты 3×6 · 39</button>
+        <button class="chip" type="button" data-kind="prizmatron">Призматроны · 5</button>
+        <button class="chip" type="button" data-kind="ekran">Экраны · 5</button>
+      </div>
+      <label class="filters__street">Улица
+        <select id="f-street"><option value="all">все</option><option value="Северный подъезд">Северный подъезд</option><option value="Куйбышева">Куйбышева</option><option value="Максима Горького">Максима Горького</option><option value="Энгельса">Энгельса</option><option value="Заводская">Заводская</option></select>
+      </label>
+      <label class="filter"><input type="checkbox" id="only-free-list"> Только свободные</label>
+    </div>
     <div class="streets"><div class="street">
   <h3 class="street__name">Северный подъезд и выезды <span class="street__count">15 мест · свободно 0</span></h3>
   <ul class="street__list"><li class="row" data-free="0" data-n="2" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1610 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="4" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1650 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="7" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1650 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="8" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1690 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="10" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1700 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="11" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1730 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="12" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1750 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="13" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1770 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="14" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1800 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="15" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1810 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="16" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1885 м по ходу километража, справа</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="17" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1890 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="18" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Северный подъезд к Батайску 1980 м по ходу километража, слева</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="48" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Выезд из города Батайска, Северный 16</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li><li class="row" data-free="0" data-n="49" data-kind="schit" data-street="Северный подъезд"><span class="row__addr">Выезд из города Батайска, Северный 35</span><span class="row__kind">щит 3×6</span><span class="row__st">до 01.01.2027</span></li></ul>
@@ -889,7 +857,7 @@ a{color:inherit}
 <footer class="foot">
   <div class="wrap foot__in">
     <div class="foot__logo"><span class="logo">
-        <span class="logo__name">ПОКОТИЛОВ</span>
+        <span class="logo__name" data-t="ПОКОТИЛОВ">ПОКОТИЛОВ</span>
         <span class="logo__sub"><span>рекламное</span><span>агентство</span><span>батайск</span></span>
       </span></div>
     <div>
