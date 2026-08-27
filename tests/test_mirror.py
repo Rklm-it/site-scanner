@@ -286,6 +286,20 @@ def test_limit_stranic_ostanavlivaet(site, tmp_path):
     assert stats.pages_left > 0
 
 
+def test_potolok_obyoma_ostanavlivaet_i_nazyvaetsya(site, tmp_path):
+    """Упёрлись в объём — это должно быть видно, а не выглядеть успехом.
+
+    Сайт на конструкторе держит фотографии на чужом CDN, и там их тысячи:
+    у mebel-ryazane.ru 3005 картинок, которые в прежние зашитые 200 МБ не
+    влезают. Обход обязан назвать причину остановки и сказать, сколько не
+    добрано, иначе половина портфолио теряется молча.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0, max_total_bytes=300)
+    assert stats.stopped_by == "bytes"
+    assert stats.pages_left + stats.assets_left > 0
+
+
 def test_kartinkam_ostayotsya_vremya_kogda_stranicy_ne_uspeli(site, tmp_path):
     """Картинки качаются последними и раньше оставались без бюджета совсем.
 

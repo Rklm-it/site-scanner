@@ -565,6 +565,12 @@ class DumpRequest(BaseModel):
     max_pages: int = 1500
     max_depth: int = 5
     minutes: int = 30
+    # Потолок объёма был зашит в обходе (200 МБ) и снаружи не менялся. Сайт на
+    # конструкторе весит больше: у mebel-ryazane.ru 3005 картинок на CDN, и по
+    # 70 КБ на файл выгрузка обрывается на середине портфолио — с виду успешно,
+    # как это уже было с papinalavka.ru по времени. Поэтому объём — такой же
+    # параметр формы, как минуты, и его видно до запуска.
+    max_mb: int = 200
     respect_robots: bool = True
     use_sitemap: bool = True
 
@@ -589,6 +595,7 @@ class DumpJob:
     # галочка была уже снята — и человек уходил на второй круг впустую.
     asset_skipped: dict[str, int] = field(default_factory=dict)
     robots: bool = True              # с какой галочкой реально прошла выгрузка
+    max_mb: int = 200                # потолок объёма, с которым шла выгрузка
     error: str | None = None
     errors: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.time)
@@ -602,6 +609,7 @@ class DumpJob:
             "stopped_by": self.stopped_by, "title": self.title,
             "pages_left": self.pages_left, "assets_left": self.assets_left,
             "robots": self.robots, "asset_skipped": self.asset_skipped,
+            "max_mb": self.max_mb,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
@@ -628,6 +636,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             max_pages=max(1, min(req.max_pages, 5000)),
             max_depth=max(1, min(req.max_depth, 8)),
             time_budget=max(60, min(req.minutes, 90) * 60),
+            max_total_bytes=job.max_mb * 1024 * 1024,
             respect_robots=req.respect_robots,
             use_sitemap=req.use_sitemap,
             on_progress=on_progress,
@@ -686,7 +695,11 @@ def start_dump(req: DumpRequest) -> dict:
         raise HTTPException(400, "Укажите домен вида example.ru")
     if any(j.status == "running" for j in DUMP_JOBS.values()):
         raise HTTPException(409, "Одна выгрузка уже идёт — дождитесь её окончания.")
-    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain, robots=req.respect_robots)
+    # Потолок объёма ограничен сверху не из вежливости к сайту, а ради тома:
+    # архив ложится на тот же диск, где живёт база лидов.
+    max_mb = max(10, min(req.max_mb, 3000))
+    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain,
+                  robots=req.respect_robots, max_mb=max_mb)
     DUMP_JOBS[job.id] = job
     threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
     return {"dump_id": job.id}

@@ -434,6 +434,51 @@ def test_dump_minuty_dohodyat_do_obhoda(client, monkeypatch):
     assert seen["time_budget"] == 90 * 60
 
 
+def test_dump_obyom_dohodit_do_obhoda(client, monkeypatch):
+    """«Объём» из формы обязан доехать до обхода и упереться в потолок.
+
+    Раньше потолок в 200 МБ был зашит в обходе и снаружи не менялся: выгрузка
+    сайта на конструкторе обрывалась на середине портфолио и выглядела при
+    этом успешной. Число должно ещё и вернуться в статусе — по нему интерфейс
+    называет причину остановки.
+    """
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen.update(kw)
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+
+    def dump(payload):
+        r = c.post("/api/dump", json=payload)
+        assert r.status_code == 200, r.text
+        for _ in range(50):
+            j = c.get(f"/api/dump/{r.json()['dump_id']}").json()
+            if j["status"] != "running":
+                return j
+            time.sleep(0.05)
+        raise AssertionError("выгрузка не завершилась")
+
+    j = dump({"domain": "example.ru", "max_mb": 900})
+    assert seen["max_total_bytes"] == 900 * 1024 * 1024
+    assert j["max_mb"] == 900
+
+    dump({"domain": "example.ru"})                        # умолчание не изменилось
+    assert seen["max_total_bytes"] == 200 * 1024 * 1024
+
+    dump({"domain": "example.ru", "max_mb": 99999})       # потолок ради тома
+    assert seen["max_total_bytes"] == 3000 * 1024 * 1024
+
+
 def test_dump_list_reads_from_disk(client, tmp_path):
     """Список архивов читается с тома, а не из памяти процесса: задачи
     перезапуск контейнера не переживают, а собранные архивы обязаны."""
