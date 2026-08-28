@@ -32,7 +32,10 @@ import zipfile
 from pathlib import Path
 from urllib.parse import unquote, urljoin, urlparse
 
-from bs4 import BeautifulSoup
+try:
+    from bs4 import BeautifulSoup
+except ImportError:                       # на хосте сервера его может не быть
+    BeautifulSoup = None
 
 # Место в макете → страница выгрузки, откуда берём кадр. Порядок важен:
 # первые четыре — крупные места, дальше сетка работ.
@@ -69,7 +72,36 @@ CSS_URL = re.compile(r"""url\(\s*['"]?([^'")]+)['"]?\s*\)""", re.I)
 FOTO_EXT = (".jpg", ".jpeg")
 
 
+# Запасной разбор без BeautifulSoup: на сервере сканера скрипт запускается на
+# хосте (репозиторий в контейнер не копируется), а bs4 там ставить незачем ради
+# одной команды. Адреса на конструкторе протокол-относительные — `//media...`,
+# поэтому схема в выражении необязательна.
+_ADRESA = re.compile(
+    r"""(?:src|data-src|data-original|data-lazy-src|srcset|data-srcset)\s*=\s*["']([^"']+)["']"""
+    r"""|url\(\s*['"]?([^'")]+)['"]?\s*\)""", re.I)
+
+
+def adresa_regexpom(html: str) -> list[str]:
+    out: list[str] = []
+    for m in _ADRESA.finditer(html):
+        znachenie = m.group(1) or m.group(2) or ""
+        # srcset — это «адрес 1x, адрес 2x»: дескрипторы отбрасываем
+        for chast in znachenie.split(","):
+            out.append(chast.strip().split(" ")[0].strip())
+    return out
+
+
 def adresa_stranicy(html: str) -> set[str]:
+    if BeautifulSoup is None:
+        adresa = set()
+        for v in adresa_regexpom(html):
+            if not v or v.startswith(("data:", "javascript:", "#")):
+                continue
+            u = urljoin("https://mebel-ryazane.ru/", v).split("#")[0]
+            if urlparse(u).path.lower().endswith(FOTO_EXT):
+                adresa.add(u)
+        return adresa
+
     soup = BeautifulSoup(html, "html.parser")
     out: list[str] = []
     for el in soup.find_all(["img", "source"]):
