@@ -5,20 +5,39 @@
 заданы. Руками искать их среди трёх тысяч картинок бессмысленно: имена на
 CDN конструктора ни о чём не говорят, а половина файлов — иконки шаблона.
 
-Здесь это делается по двум признакам, которые известны из разбора:
+Отбор идёт по четырём признакам, и три последних появились после того, как
+первый заход привёз пять негодных кадров из шестнадцати:
 
 1. **Какой странице принадлежит картинка.** Галерея «угловых кухонь» лежит
    на странице угловых кухонь, и только на ней: 2559 картинок из 3005
    встречаются ровно на одной странице. Значит, для каждого места в макете
-   можно назвать страницу-источник.
-2. **Вес файла.** Средний файл 72 КБ при медиане 32 — то есть мелочь это
-   иконки шаблона, а настоящие фотографии работ тяжёлые. Внутри страницы
-   берём самые крупные.
+   можно назвать страницы-источники.
+2. **Размер кадра.** Решающий признак, которого не хватало. Вес не отличает
+   фотографию от карточки с нарисованной иконкой: обе по 40 КБ. А размер
+   отличает — настоящие снимки работ в этой выгрузке от 830 пикселей по
+   ширине, карточки ровно 457×508, баннеры-полосы 1921×717. Поэтому кадр уже
+   `MIN_SHIRINA` и всё, что не похоже по пропорциям на фотографию комнаты,
+   выбывает до взвешивания.
+3. **Имя файла.** На конструкторе имена говорящие, и брак называет себя сам:
+   `raschet-kuhni-1.jpg` — баннер с калькулятором, `napolnenie-shkafa` —
+   схема с размерами. Отдельный список `NE_FOTO` их отсекает.
+4. **Вес файла.** Последний признак, а не первый: среди прошедших фильтры
+   крупный файл действительно означает более чистый кадр.
 
-Запуск на сервере сканера, из /root/site-scanner-main:
+Два режима. Обычный кладёт по одному файлу на место:
 
-    python3 tools/otobrat-foto.py /tmp/mebel-ryazane.ru.zip \
+    python3 tools/otobrat-foto.py /tmp/mebel.zip \\
         clients/mebel-ryazane.ru/full clients/mebel-ryazane.ru/foto
+
+С `--kandidaty N` кладёт по N штук на место, в подпапки. Это режим для
+разбора: кадры смотрятся глазами разом, а не по одному за заход владельца.
+Автоматика отличает фотографию от схемы, но не отличает **фотографию работы
+от 3D-визуализации и каталожного кадра чужой фабрики** — а на сайте клиента
+это разные вещи, и решать должен человек.
+
+    python3 tools/otobrat-foto.py /tmp/mebel.zip \\
+        clients/mebel-ryazane.ru/full clients/mebel-ryazane.ru/kandidaty \\
+        --kandidaty 6
 
 Скрипт печатает, что выбрал и почему, — выбор проверяется глазами до показа
 клиенту.
@@ -27,6 +46,7 @@ CDN конструктора ни о чём не говорят, а полови
 from __future__ import annotations
 
 import re
+import struct
 import sys
 import zipfile
 from pathlib import Path
@@ -37,32 +57,50 @@ try:
 except ImportError:                       # на хосте сервера его может не быть
     BeautifulSoup = None
 
-# Место в макете → страница выгрузки, откуда берём кадр. Порядок важен:
-# первые четыре — крупные места, дальше сетка работ.
-MESTA: list[tuple[str, str, str, str]] = [
-    ("kuhnya-uglovaya-01.jpg", "kuhni-uglovyie.html", "uglov", "первый экран, угловая кухня"),
-    ("kuhnya-pryamaya-01.jpg", "kuhni-pryamyie.html", "pryam", "блок «Кухни»"),
-    ("shkaf-kupe-01.jpg", "vstroennie-shkafi-kupe.html", "shkaf", "блок «Шкафы-купе»"),
-    ("garderobnaya-01.jpg", "garderobnaya-iz-kladovki.html", "garderob", "блок «Гардеробные»"),
-    ("rabota-01.jpg", "kuhni-belyie.html", "bel", "работы: белая кухня"),
-    ("rabota-02.jpg", "kuhni-s-ostrovom.html", "ostrov", "работы: кухня с островом"),
-    ("rabota-03.jpg", "kuhni-zelenyie.html", "zelen", "работы: зелёная кухня"),
-    ("rabota-04.jpg", "kuhni-loft.html", "loft", "работы: кухня лофт"),
-    ("rabota-05.jpg", "kuhnya-hruschevke.html", "hrusch", "работы: маленькая кухня"),
-    ("rabota-06.jpg", "shkaf-kupe-zerkalom.html", "zerkal", "работы: шкаф с зеркалом"),
-    ("rabota-07.jpg", "shkafi-kupe-prikhozhuyu.html", "prihozh", "работы: шкаф в прихожую"),
-    ("rabota-08.jpg", "shkaf-pod-lestnitsei.html", "lestnits", "работы: шкаф под лестницей"),
-    ("rabota-09.jpg", "bolshaya-garderobnaya.html", "garderob", "работы: гардеробная"),
-    ("rabota-10.jpg", "prikhozhaya.html", "prihozh", "работы: прихожая"),
-    ("rabota-11.jpg", "detskaya-mebel.html", "detsk", "работы: детская"),
-    ("rabota-12.jpg", "vannaya.html", "vann", "работы: мебель для ванной"),
+# Место в макете → страницы выгрузки, откуда берём кадр. Страниц несколько, а
+# не одна: у страницы бывает галерея из схем и баннеров, и тогда своих
+# фотографий на ней просто нет — так место «гардеробная» в первом заходе
+# получило баннер с калькулятором. Соседняя страница той же услуги закрывает
+# дыру, оставаясь по смыслу тем же самым.
+MESTA: list[tuple[str, tuple[str, ...], str, str]] = [
+    ("kuhnya-uglovaya-01.jpg", ("kuhni-uglovyie.html", "kuhni-sovremennyie.html"),
+     "uglov", "первый экран, угловая кухня"),
+    ("kuhnya-pryamaya-01.jpg", ("kuhni-pryamyie.html", "kuhni-sovremennyie.html"),
+     "pryam", "блок «Кухни»"),
+    ("shkaf-kupe-01.jpg", ("vstroennie-shkafi-kupe.html", "shkafi-kupe-spalnyu.html",
+                           "sovremennie-shkafi.html"),
+     "shkaf", "блок «Шкафы-купе»"),
+    ("garderobnaya-01.jpg", ("garderobnaya-komnata.html", "garderobnaya-spalne.html",
+                             "uglovaya-garderobnaya.html", "garderobnaya-iz-kladovki.html"),
+     "garderob", "блок «Гардеробные»"),
+    ("rabota-01.jpg", ("kuhni-belyie.html",), "bel", "работы: белая кухня"),
+    ("rabota-02.jpg", ("kuhni-s-ostrovom.html",), "ostrov", "работы: кухня с островом"),
+    ("rabota-03.jpg", ("kuhni-zelenyie.html",), "zelen", "работы: зелёная кухня"),
+    ("rabota-04.jpg", ("kuhni-loft.html",), "loft", "работы: кухня лофт"),
+    ("rabota-05.jpg", ("kuhnya-hruschevke.html", "kuhni-malenkie.html"),
+     "hrusch", "работы: маленькая кухня"),
+    ("rabota-06.jpg", ("shkaf-kupe-zerkalom.html",), "zerkal", "работы: шкаф с зеркалом"),
+    ("rabota-07.jpg", ("shkafi-kupe-prikhozhuyu.html",), "prihozh", "работы: шкаф в прихожую"),
+    ("rabota-08.jpg", ("shkaf-pod-lestnitsei.html",), "lestnits", "работы: шкаф под лестницей"),
+    ("rabota-09.jpg", ("vstroennaya-garderobnaya.html", "bolshaya-garderobnaya.html"),
+     "garderob", "работы: гардеробная"),
+    ("rabota-10.jpg", ("prikhozhaya.html",), "prihozh", "работы: прихожая"),
+    ("rabota-11.jpg", ("shkafi-kupe-detskuyu.html", "detskaya-mebel.html"),
+     "detsk", "работы: детская"),
+    ("rabota-12.jpg", ("shkaf-kupe-vannuyu.html", "vannaya.html"),
+     "vann", "работы: мебель для ванной"),
 ]
 
 # Имена файлов на конструкторе говорящие: `kuhnya-s-ostrovom.jpg` — это
 # кухня, а `fon_IiQJSaZ.jpg` — подложка секции, и по весу они не отличаются.
-# Поэтому вес — второй признак, а первый — само имя.
+# Вторая половина списка — брак, вскрытый первым заходом: баннер расчёта с
+# калькулятором приехал вместо гардеробной, схема наполнения с размерами —
+# вместо фотографии шкафа.
 NE_FOTO = ("fon", "bg", "background", "icon", "ikon", "el", "logo", "knopk",
-           "button", "strelk", "arrow", "banner", "shapka", "header", "line")
+           "button", "strelk", "arrow", "banner", "shapka", "header", "line",
+           "raschet", "kalkulyator", "kupon", "aktsi", "skidk", "podarok",
+           "shema", "sxema", "chertezh", "napolnenie", "razmer", "zamer",
+           "otziv", "sertifikat", "dostavka", "oplata", "garantiya")
 
 IMG_ATTRS = ("data-src", "data-original", "data-lazy-src", "data-lazy",
              "data-echo", "data-image", "data-bg", "data-background")
@@ -70,6 +108,17 @@ CSS_URL = re.compile(r"""url\(\s*['"]?([^'")]+)['"]?\s*\)""", re.I)
 # Только настоящие фотоформаты: png на конструкторе — это иконки и подложки,
 # а имя файла в макете заканчивается на .jpg.
 FOTO_EXT = (".jpg", ".jpeg")
+
+# Пороги отбраковки по кадру. Взяты не из головы, а из первого захода:
+# карточки услуг на сайте ровно 457×508, и по весу (40 КБ) они не отличались
+# от настоящих фотографий, поэтому две такие и приехали — с нарисованной
+# поверх кадра иконкой «палец нажимает». Настоящие снимки работ здесь
+# начинаются от 830 пикселей.
+MIN_SHIRINA = 700
+# Полоса-баннер во всю ширину экрана (1921×717 — сток с ребёнком на кровати,
+# мебели в кадре нет вовсе) и вертикальная карточка отсекаются пропорциями:
+# фотография комнаты почти всегда между квадратом и широким кадром.
+MIN_OTNOSHENIE, MAX_OTNOSHENIE = 1.05, 2.10
 
 
 # Запасной разбор без BeautifulSoup: на сервере сканера скрипт запускается на
@@ -123,6 +172,36 @@ def adresa_stranicy(html: str) -> set[str]:
     return adresa
 
 
+# Размер кадра из заголовка JPEG. Своими руками, а не Pillow: на хосте сервера
+# его нет, а ставить зависимость ради двух чисел незачем — маркер SOF лежит в
+# первых килобайтах файла.
+_SOF = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+        0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
+
+
+def razmer_jpeg(nachalo: bytes) -> tuple[int, int]:
+    """(ширина, высота) или (0, 0), если заголовок не разобрался."""
+    if not nachalo.startswith(b"\xff\xd8"):
+        return 0, 0
+    i = 2
+    while i + 9 < len(nachalo):
+        if nachalo[i] != 0xFF:
+            i += 1
+            continue
+        marker = nachalo[i + 1]
+        if marker in _SOF:
+            h, w = struct.unpack(">HH", nachalo[i + 5:i + 9])
+            return w, h
+        if marker == 0xD8 or marker == 0xD9 or 0xD0 <= marker <= 0xD7 or marker == 0xFF:
+            i += 2
+            continue
+        dlina = struct.unpack(">H", nachalo[i + 2:i + 4])[0]
+        if dlina < 2:
+            return 0, 0
+        i += 2 + dlina
+    return 0, 0
+
+
 # Та же чистка имён, что в scanner/mirror.py: без неё путь не совпадёт с тем,
 # под которым файл лежит в архиве.
 _PLOHO = re.compile(r"[^\w.\-]+", re.U)
@@ -137,7 +216,31 @@ def put_v_arhive(url: str) -> str:
     return f"_vneshnie/{host}/" + "/".join(segments)
 
 
+def kadr_goditsya(zf: zipfile.ZipFile, put: str) -> tuple[bool, int, int]:
+    """Похоже ли содержимое на фотографию работы, а не на карточку или полосу."""
+    try:
+        with zf.open(put) as f:
+            w, h = razmer_jpeg(f.read(65536))
+    except (KeyError, OSError):
+        return False, 0, 0
+    if not w or not h:
+        return False, w, h
+    if w < MIN_SHIRINA:
+        return False, w, h
+    return MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE, w, h
+
+
 def main(argv: list[str]) -> int:
+    argv = list(argv)
+    skolko = 1
+    if "--kandidaty" in argv:
+        i = argv.index("--kandidaty")
+        try:
+            skolko = int(argv[i + 1])
+        except (IndexError, ValueError):
+            print("--kandidaty ждёт число")
+            return 2
+        del argv[i:i + 2]
     if len(argv) != 4:
         print(__doc__)
         return 2
@@ -162,41 +265,64 @@ def main(argv: list[str]) -> int:
         vnutri = {i.filename: i.file_size for i in zf.infolist()}
         vzyato: set[str] = set()
         ne_nashlos: list[str] = []
+        otbrakovano = 0
 
-        for imya, stranica, slovo, zachem in MESTA:
-            adresa = po_stranicam.get(stranica)
-            if adresa is None:
-                ne_nashlos.append(f"{imya}: нет страницы {stranica}")
-                continue
-            # Кандидаты: только свои для этой страницы и ещё не занятые.
+        for imya, stranicy_mesta, slovo, zachem in MESTA:
             kandidaty = []
-            for a in adresa:
-                # Порог 40, а не «только своя»: у двенадцати страниц
-                # гардеробных галерея общая, и строгий фильтр оставлял их
-                # без единого кадра. Шаблон сайта — это 70+ страниц.
-                if vstrechaetsya.get(a, 0) > 40 or a in vzyato:
+            for nomer_stranicy, stranica in enumerate(stranicy_mesta):
+                adresa = po_stranicam.get(stranica)
+                if adresa is None:
+                    ne_nashlos.append(f"{imya}: нет страницы {stranica}")
                     continue
-                put = put_v_arhive(a)
-                if put not in vnutri:
-                    continue
-                fayl = put.rsplit("/", 1)[-1].lower()
-                if any(fayl.startswith(x) for x in NE_FOTO):
-                    continue
-                kandidaty.append((1 if slovo in fayl else 0, vnutri[put], put, a))
+                for a in adresa:
+                    # Порог 40, а не «только своя»: у двенадцати страниц
+                    # гардеробных галерея общая, и строгий фильтр оставлял их
+                    # без единого кадра. Шаблон сайта — это 70+ страниц.
+                    if vstrechaetsya.get(a, 0) > 40 or a in vzyato:
+                        continue
+                    put = put_v_arhive(a)
+                    if put not in vnutri:
+                        continue
+                    fayl = put.rsplit("/", 1)[-1].lower()
+                    if any(fayl.startswith(x) or x in fayl for x in NE_FOTO):
+                        continue
+                    godno, w, h = kadr_goditsya(zf, put)
+                    if not godno:
+                        otbrakovano += 1
+                        continue
+                    # Порядок предпочтения: страница по смыслу ближе (первая в
+                    # списке), потом имя по делу, потом вес.
+                    kandidaty.append((-nomer_stranicy, 1 if slovo in fayl else 0,
+                                      vnutri[put], put, a, w, h))
             if not kandidaty:
-                ne_nashlos.append(f"{imya}: на странице {stranica} не нашлось своих фотографий")
+                ne_nashlos.append(
+                    f"{imya}: на страницах {', '.join(stranicy_mesta)} не нашлось фотографий")
                 continue
-            # Сначала имя по делу, потом вес: крупный кадр среди подходящих.
             kandidaty.sort(reverse=True)
-            po_imeni, ves, put, adres = kandidaty[0]
-            vzyato.add(adres)
-            (kuda / imya).write_bytes(zf.read(put))
-            print(f"{imya:26} {ves/1024:6.0f} КБ  ← {stranica}"
-                  f"{'  (имя по делу)' if po_imeni else '  (только по весу — проверить)'}\n"
-                  f"{'':26} {zachem}\n"
-                  f"{'':26} {adres}")
 
-    print(f"\nПоложено в {kuda}: {len(list(kuda.glob('*.jpg')))} файлов")
+            if skolko == 1:
+                _, po_imeni, ves, put, adres, w, h = kandidaty[0]
+                vzyato.add(adres)
+                (kuda / imya).write_bytes(zf.read(put))
+                print(f"{imya:26} {w}x{h}  {ves/1024:6.0f} КБ"
+                      f"{'  (имя по делу)' if po_imeni else '  (только по весу — проверить)'}\n"
+                      f"{'':26} {zachem}\n"
+                      f"{'':26} {adres}")
+                continue
+
+            papka = kuda / imya.replace(".jpg", "")
+            papka.mkdir(parents=True, exist_ok=True)
+            print(f"\n{imya}  — {zachem}")
+            for n, (_, po_imeni, ves, put, adres, w, h) in enumerate(kandidaty[:skolko], 1):
+                vzyato.add(adres)
+                (papka / f"{n:02d}.jpg").write_bytes(zf.read(put))
+                print(f"   {n:02d}  {w}x{h}  {ves/1024:5.0f} КБ  "
+                      f"{adres.rsplit('/', 1)[-1]}")
+
+        vsego = len(list(kuda.rglob("*.jpg")))
+        print(f"\nПоложено в {kuda}: {vsego} файлов")
+        print(f"Отбраковано по размеру кадра: {otbrakovano} "
+              f"(карточки 457×508, баннеры-полосы, схемы)")
     if ne_nashlos:
         print("\nНе нашлось:")
         for x in ne_nashlos:
