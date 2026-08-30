@@ -276,8 +276,68 @@ def kadr_goditsya(zf: zipfile.ZipFile, put: str, ves: int) -> tuple[bool, int, i
     return ves / (w * h) >= MIN_PLOTNOST, w, h
 
 
+def pochemu(zf: zipfile.ZipFile, vnutri: dict[str, int], adres: str) -> str:
+    """Одной строкой: что это за файл и почему он прошёл или не прошёл."""
+    put = put_v_arhive(adres)
+    imya = put.rsplit("/", 1)[-1]
+    if put not in vnutri:
+        return f"{imya:52} НЕТ В АРХИВЕ"
+    ves = vnutri[put]
+    if imya_brakovannoe(imya.lower()):
+        return f"{imya:52} {ves // 1024:5} КБ  срезан по имени"
+    try:
+        with zf.open(put) as f:
+            w, h = razmer_jpeg(f.read(65536))
+    except (KeyError, OSError):
+        return f"{imya:52} {ves // 1024:5} КБ  не читается"
+    if not w or not h:
+        return f"{imya:52} {ves // 1024:5} КБ  заголовок не разобран"
+    plotnost = ves / (w * h)
+    opis = f"{imya:52} {ves // 1024:5} КБ  {w}x{h}  к={w / h:.2f}  п={plotnost:.3f}"
+    if w < MIN_SHIRINA:
+        return f"{opis}  УЗКИЙ (нужно от {MIN_SHIRINA})"
+    if not MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE:
+        return f"{opis}  ПРОПОРЦИИ (нужно {MIN_OTNOSHENIE}–{MAX_OTNOSHENIE})"
+    if plotnost < MIN_PLOTNOST:
+        return f"{opis}  ПЛОТНОСТЬ (нужно от {MIN_PLOTNOST})"
+    return f"{opis}  годится"
+
+
+def razbor(arhiv: Path, stranicy: Path, mesta: list[str]) -> int:
+    """Почему на месте не нашлось кадров: разбор по каждому кандидату.
+
+    Гадать, какой из фильтров срезал галерею, дорого: каждый заход владельца —
+    это его время. Дешевле, чтобы скрипт сказал сам.
+    """
+    po_stranicam: dict[str, set[str]] = {}
+    for f in sorted(stranicy.glob("*.html")):
+        po_stranicam[f.name] = adresa_stranicy(
+            f.read_text(encoding="utf-8", errors="replace"))
+
+    with zipfile.ZipFile(arhiv) as zf:
+        vnutri = {i.filename: i.file_size for i in zf.infolist()}
+        for imya_mesta, stranicy_mesta, _, zachem in MESTA:
+            if mesta and imya_mesta.replace(".jpg", "") not in mesta:
+                continue
+            print(f"\n=== {imya_mesta}  — {zachem}")
+            for stranica in stranicy_mesta:
+                adresa = sorted(po_stranicam.get(stranica, ()))
+                print(f"  {stranica}: адресов {len(adresa)}")
+                for a in adresa:
+                    print("     " + pochemu(zf, vnutri, a))
+    return 0
+
+
 def main(argv: list[str]) -> int:
     argv = list(argv)
+    if "--pochemu" in argv:
+        i = argv.index("--pochemu")
+        mesta = [x for x in argv[i + 1:] if not x.startswith("-")]
+        del argv[i:]
+        if len(argv) != 3:
+            print("--pochemu: нужны архив, папка страниц и имена мест")
+            return 2
+        return razbor(Path(argv[1]), Path(argv[2]), mesta)
     skolko = 1
     if "--kandidaty" in argv:
         i = argv.index("--kandidaty")
