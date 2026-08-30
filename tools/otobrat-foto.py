@@ -14,10 +14,15 @@ CDN конструктора ни о чём не говорят, а полови
    можно назвать страницы-источники.
 2. **Размер кадра.** Решающий признак, которого не хватало. Вес не отличает
    фотографию от карточки с нарисованной иконкой: обе по 40 КБ. А размер
-   отличает — настоящие снимки работ в этой выгрузке от 830 пикселей по
-   ширине, карточки ровно 457×508, баннеры-полосы 1921×717. Поэтому кадр уже
-   `MIN_SHIRINA` и всё, что не похоже по пропорциям на фотографию комнаты,
-   выбывает до взвешивания.
+   отличает — снимки комнат в этой выгрузке от 830 пикселей по ширине,
+   баннеры-полосы 1921×717. Поэтому кадр уже `MIN_SHIRINA` и всё, что не
+   похоже по пропорциям на фотографию комнаты, выбывает до взвешивания.
+
+   **С оговоркой, которая стоила двух заходов:** шкаф и гардеробную снимают
+   вертикально, и строгий порог выбрасывал их галерею целиком — двадцать пять
+   кадров 458×550. Дважды подряд это выглядело как «у клиента нет фотографий
+   гардеробных», а было ошибкой порога. Для таких мест (`MESTA_MYAGKIE`)
+   действуют мягкие пороги по меньшей стороне и числу пикселей.
 3. **Имя файла.** На конструкторе имена говорящие, и брак называет себя сам:
    `raschet-kuhni-1.jpg` — баннер с калькулятором, `napolnenie-shkafa` —
    схема с размерами. Отдельный список `NE_FOTO` их отсекает.
@@ -159,6 +164,22 @@ MIN_SHIRINA = 700
 # мебели в кадре нет вовсе) и вертикальная карточка отсекаются пропорциями:
 # фотография комнаты почти всегда между квадратом и широким кадром.
 MIN_OTNOSHENIE, MAX_OTNOSHENIE = 1.05, 2.10
+
+# Мягкие пороги для мест, где предмет снимают вертикально. Шкаф и гардеробная
+# высокие, и на этом сайте их галерея — двадцать пять кадров 458×550: строгий
+# порог «от 700 по ширине» и «от 1.05 по пропорции» рассчитан на горизонтальный
+# снимок комнаты и выбрасывал их все до единого. Место оставалось пустым, и я
+# дважды принял это за факт «у клиента нет фотографий гардеробных» — а это была
+# ошибка порога.
+#
+# Мельче их не пускаем: у иконок шаблона 300×300 и 334×200, у плашек 550×330.
+# По пикселям 458×550 (252 тыс.) от них отделяется, а вот от карточки с
+# нарисованной иконкой «палец» (457×508, 232 тыс.) — **нет**. Геометрией эти
+# два случая не разделить, поэтому мягкие места смотрятся глазами обязательно.
+MESTA_MYAGKIE = frozenset(("garderobnaya-01.jpg", "rabota-08.jpg", "rabota-09.jpg"))
+MYAGKO_MIN_STORONA = 400
+MYAGKO_MIN_PIKSELEY = 230_000
+MYAGKO_OTNOSHENIE = (0.60, 2.20)
 # Заливка цвета и однотонная подложка проходят и по размеру, и по пропорциям:
 # `color-fill-1-2.jpg` — 1920×1010 при 23 КБ. Отличает их плотность: у неё
 # 0,012 байта на пиксель, у настоящей фотографии от 0,06. Порог с запасом.
@@ -260,7 +281,8 @@ def put_v_arhive(url: str) -> str:
     return f"_vneshnie/{host}/" + "/".join(segments)
 
 
-def kadr_goditsya(zf: zipfile.ZipFile, put: str, ves: int) -> tuple[bool, int, int]:
+def kadr_goditsya(zf: zipfile.ZipFile, put: str, ves: int,
+                  myagko: bool = False) -> tuple[bool, int, int]:
     """Похоже ли содержимое на фотографию работы, а не на карточку или полосу."""
     try:
         with zf.open(put) as f:
@@ -269,14 +291,19 @@ def kadr_goditsya(zf: zipfile.ZipFile, put: str, ves: int) -> tuple[bool, int, i
         return False, 0, 0
     if not w or not h:
         return False, w, h
+    if ves / (w * h) < MIN_PLOTNOST:
+        return False, w, h
+    if myagko:
+        return (min(w, h) >= MYAGKO_MIN_STORONA
+                and w * h >= MYAGKO_MIN_PIKSELEY
+                and MYAGKO_OTNOSHENIE[0] <= w / h <= MYAGKO_OTNOSHENIE[1]), w, h
     if w < MIN_SHIRINA:
         return False, w, h
-    if not MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE:
-        return False, w, h
-    return ves / (w * h) >= MIN_PLOTNOST, w, h
+    return MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE, w, h
 
 
-def pochemu(zf: zipfile.ZipFile, vnutri: dict[str, int], adres: str) -> str:
+def pochemu(zf: zipfile.ZipFile, vnutri: dict[str, int], adres: str,
+            myagko: bool = False) -> str:
     """Одной строкой: что это за файл и почему он прошёл или не прошёл."""
     put = put_v_arhive(adres)
     imya = put.rsplit("/", 1)[-1]
@@ -293,13 +320,22 @@ def pochemu(zf: zipfile.ZipFile, vnutri: dict[str, int], adres: str) -> str:
     if not w or not h:
         return f"{imya:52} {ves // 1024:5} КБ  заголовок не разобран"
     plotnost = ves / (w * h)
-    opis = f"{imya:52} {ves // 1024:5} КБ  {w}x{h}  к={w / h:.2f}  п={plotnost:.3f}"
+    opis = (f"{imya:52} {ves // 1024:5} КБ  {w}x{h}  к={w / h:.2f}"
+            f"  п={plotnost:.3f}" + ("  [мягко]" if myagko else ""))
+    if plotnost < MIN_PLOTNOST:
+        return f"{opis}  ПЛОТНОСТЬ (нужно от {MIN_PLOTNOST})"
+    if myagko:
+        if min(w, h) < MYAGKO_MIN_STORONA:
+            return f"{opis}  МЕЛКИЙ (сторона от {MYAGKO_MIN_STORONA})"
+        if w * h < MYAGKO_MIN_PIKSELEY:
+            return f"{opis}  МЕЛКИЙ (пикселей от {MYAGKO_MIN_PIKSELEY})"
+        if not MYAGKO_OTNOSHENIE[0] <= w / h <= MYAGKO_OTNOSHENIE[1]:
+            return f"{opis}  ПРОПОРЦИИ (нужно {MYAGKO_OTNOSHENIE[0]}–{MYAGKO_OTNOSHENIE[1]})"
+        return f"{opis}  годится"
     if w < MIN_SHIRINA:
         return f"{opis}  УЗКИЙ (нужно от {MIN_SHIRINA})"
     if not MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE:
         return f"{opis}  ПРОПОРЦИИ (нужно {MIN_OTNOSHENIE}–{MAX_OTNOSHENIE})"
-    if plotnost < MIN_PLOTNOST:
-        return f"{opis}  ПЛОТНОСТЬ (нужно от {MIN_PLOTNOST})"
     return f"{opis}  годится"
 
 
@@ -319,12 +355,13 @@ def razbor(arhiv: Path, stranicy: Path, mesta: list[str]) -> int:
         for imya_mesta, stranicy_mesta, _, zachem in MESTA:
             if mesta and imya_mesta.replace(".jpg", "") not in mesta:
                 continue
+            myagko = imya_mesta in MESTA_MYAGKIE
             print(f"\n=== {imya_mesta}  — {zachem}")
             for stranica in stranicy_mesta:
                 adresa = sorted(po_stranicam.get(stranica, ()))
                 print(f"  {stranica}: адресов {len(adresa)}")
                 for a in adresa:
-                    print("     " + pochemu(zf, vnutri, a))
+                    print("     " + pochemu(zf, vnutri, a, myagko))
     return 0
 
 
@@ -396,7 +433,8 @@ def main(argv: list[str]) -> int:
                     fayl = put.rsplit("/", 1)[-1].lower()
                     if imya_brakovannoe(fayl):
                         continue
-                    godno, w, h = kadr_goditsya(zf, put, vnutri[put])
+                    godno, w, h = kadr_goditsya(zf, put, vnutri[put],
+                                                imya in MESTA_MYAGKIE)
                     if not godno:
                         otbrakovano += 1
                         continue
