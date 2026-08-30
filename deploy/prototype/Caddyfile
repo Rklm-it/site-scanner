@@ -29,11 +29,20 @@ projekt-review.nexus-flow.ru {
 	}
 
 	root * /srv/projekt-doma
-	file_server
+
+	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
+	# Разбор беды — в блоке mebel-review ниже.
+	@fayly path /assets/* /projects/* /fonts/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
 
 	# Одностраничник: любой неизвестный путь отдаём index.html, чтобы
 	# ссылка с «хвостом» не приводила на 404.
-	try_files {path} {path}/ /index.html
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
 
 	# Картинки, бандл и шрифты именованы с хешем либо неизменны, их можно
 	# кэшировать надолго. Саму разметку — нет: она меняется на каждом
@@ -72,9 +81,18 @@ rgz61.nexus-flow.ru {
 	}
 
 	root * /srv/rgz61
-	file_server
 
-	try_files {path} {path}/ /index.html
+	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
+	# Разбор беды — в блоке mebel-review ниже.
+	@fayly path /assets/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
 
 	# Бандл именован с хешем — кэшируется надолго; разметка меняется на каждом
 	# обновлении прототипа, её кэшировать нельзя.
@@ -105,9 +123,18 @@ lavka-review.nexus-flow.ru {
 	}
 
 	root * /srv/papinalavka
-	file_server
 
-	try_files {path} {path}/ /index.html
+	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
+	# Разбор беды — в блоке mebel-review ниже.
+	@fayly path /img/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
 
 	# Кэшировать нечего: вся страница — один файл, и он меняется с каждой
 	# правкой макета. Показ идёт живьём, устаревшая версия дороже трафика.
@@ -131,14 +158,26 @@ reklamabataysk.nexus-flow.ru {
 	}
 
 	root * /srv/reklamabataysk
-	file_server
 
-	try_files {path} {path}/ /index.html
+	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
+	# Разбор беды — в блоке mebel-review ниже.
+	@fayly path /images/* /fonts/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
 
 	# Фотографии щитов и шрифты именами не хешируются, но и не меняются:
 	# кэшируем на неделю, а не на месяц, чтобы замена фотографии доехала до
 	# клиента, которому уже показывали ссылку.
-	@static path /images/* /fonts/*
+	@static {
+		path /images/* /fonts/*
+		file
+	}
 	header @static Cache-Control "public, max-age=604800"
 	header /index.html Cache-Control "no-cache"
 }
@@ -162,15 +201,41 @@ mebel-review.nexus-flow.ru {
 	}
 
 	root * /srv/mebel-ryazane
-	file_server
 
-	try_files {path} {path}/ /index.html
+	# Файлы отдаются как файлы, и только остальное — одностраничником.
+	#
+	# Раньше здесь стоял общий `try_files {path} {path}/ /index.html`, и он
+	# ловил в том числе `/images/*.jpg`. Пока фотографий в сборке не было,
+	# каждый запрос картинки получал **index.html с кодом 200**, а правило
+	# `@foto` ниже штамповало на него «кэшировать неделю». Браузер сложил
+	# разметку под адреса всех шестнадцати картинок и держал её неделю: после
+	# выкладки фотографий на странице по-прежнему не было ни одной, и выглядело
+	# это как несработавшая выкладка.
+	#
+	# Теперь ненайденный файл — честный 404, который браузер не кэширует.
+	@fayly path /assets/* /images/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
 
 	# Бандл именован с хешем — кэшируется надолго. Фотографии работ приедут
 	# позже и будут заменяться по ходу показа, поэтому им неделя, а не месяц.
-	@static path /assets/*
+	# `file` в матчере обязателен: без него метка «кэшировать неделю»
+	# вешалась и на ответ 404, то есть браузер запоминал промах.
+	@static {
+		path /assets/*
+		file
+	}
 	header @static Cache-Control "public, max-age=2592000, immutable"
-	@foto path /images/*
+	@foto {
+		path /images/*
+		file
+	}
 	header @foto Cache-Control "public, max-age=604800"
 
 	# «/» обязателен в матчере — см. пояснение в блоке projekt-doma.
