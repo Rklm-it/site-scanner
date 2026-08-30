@@ -93,14 +93,37 @@ MESTA: list[tuple[str, tuple[str, ...], str, str]] = [
 
 # Имена файлов на конструкторе говорящие: `kuhnya-s-ostrovom.jpg` — это
 # кухня, а `fon_IiQJSaZ.jpg` — подложка секции, и по весу они не отличаются.
-# Вторая половина списка — брак, вскрытый первым заходом: баннер расчёта с
+#
+# Сравниваем **по частям имени**, а не по вхождению подстроки, и это не
+# придирка к стилю. Короткий маркер `el` (от «element») внутри строки попадает
+# в `belaya` и `zelenaya`: заход с проверкой `in` выбросил белую и зелёную
+# кухни — оба кадра годные — и оставил три места вовсе без кандидатов.
+# Имя рубится по `-`, `_` и точке, дальше часть сравнивается целиком либо по
+# началу.
+NE_FOTO_TOCHNO = frozenset((
+    "el", "bg", "fon", "line", "icon", "ikon", "logo", "banner", "header",
+    "arrow", "button", "color", "fill", "dizajner",
+))
+# Здесь начало части: «aktsiya» и «aktsii», «shemy» и «shema» — одно и то же.
+# Всё, что тут перечислено, — брак, вскрытый первым заходом: баннер расчёта с
 # калькулятором приехал вместо гардеробной, схема наполнения с размерами —
 # вместо фотографии шкафа.
-NE_FOTO = ("fon", "bg", "background", "icon", "ikon", "el", "logo", "knopk",
-           "button", "strelk", "arrow", "banner", "shapka", "header", "line",
-           "raschet", "kalkulyator", "kupon", "aktsi", "skidk", "podarok",
-           "shema", "sxema", "chertezh", "napolnenie", "razmer", "zamer",
-           "otziv", "sertifikat", "dostavka", "oplata", "garantiya")
+NE_FOTO_NACHALO = (
+    "background", "knopk", "strelk", "shapka", "raschet", "kalkulyator",
+    "kupon", "aktsi", "skidk", "podarok", "shema", "sxema", "chertezh",
+    "napolnenie", "razmer", "zamer", "otziv", "sertifikat", "dostavka",
+    "oplata", "garantiya",
+)
+_CHASTI = re.compile(r"[-_.]+")
+
+
+def imya_brakovannoe(fayl: str) -> bool:
+    for chast in _CHASTI.split(fayl.lower()):
+        if not chast:
+            continue
+        if chast in NE_FOTO_TOCHNO or chast.startswith(NE_FOTO_NACHALO):
+            return True
+    return False
 
 IMG_ATTRS = ("data-src", "data-original", "data-lazy-src", "data-lazy",
              "data-echo", "data-image", "data-bg", "data-background")
@@ -119,6 +142,10 @@ MIN_SHIRINA = 700
 # мебели в кадре нет вовсе) и вертикальная карточка отсекаются пропорциями:
 # фотография комнаты почти всегда между квадратом и широким кадром.
 MIN_OTNOSHENIE, MAX_OTNOSHENIE = 1.05, 2.10
+# Заливка цвета и однотонная подложка проходят и по размеру, и по пропорциям:
+# `color-fill-1-2.jpg` — 1920×1010 при 23 КБ. Отличает их плотность: у неё
+# 0,012 байта на пиксель, у настоящей фотографии от 0,06. Порог с запасом.
+MIN_PLOTNOST = 0.03
 
 
 # Запасной разбор без BeautifulSoup: на сервере сканера скрипт запускается на
@@ -216,7 +243,7 @@ def put_v_arhive(url: str) -> str:
     return f"_vneshnie/{host}/" + "/".join(segments)
 
 
-def kadr_goditsya(zf: zipfile.ZipFile, put: str) -> tuple[bool, int, int]:
+def kadr_goditsya(zf: zipfile.ZipFile, put: str, ves: int) -> tuple[bool, int, int]:
     """Похоже ли содержимое на фотографию работы, а не на карточку или полосу."""
     try:
         with zf.open(put) as f:
@@ -227,7 +254,9 @@ def kadr_goditsya(zf: zipfile.ZipFile, put: str) -> tuple[bool, int, int]:
         return False, w, h
     if w < MIN_SHIRINA:
         return False, w, h
-    return MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE, w, h
+    if not MIN_OTNOSHENIE <= w / h <= MAX_OTNOSHENIE:
+        return False, w, h
+    return ves / (w * h) >= MIN_PLOTNOST, w, h
 
 
 def main(argv: list[str]) -> int:
@@ -269,6 +298,10 @@ def main(argv: list[str]) -> int:
 
         for imya, stranicy_mesta, slovo, zachem in MESTA:
             kandidaty = []
+            # Страниц-источников несколько, и одна картинка лежит сразу на
+            # нескольких: без этого набора `shkaf-kupevivatv` приезжал в папку
+            # трижды и съедал места под живые варианты.
+            uzhe_v_meste: set[str] = set()
             for nomer_stranicy, stranica in enumerate(stranicy_mesta):
                 adresa = po_stranicam.get(stranica)
                 if adresa is None:
@@ -281,15 +314,16 @@ def main(argv: list[str]) -> int:
                     if vstrechaetsya.get(a, 0) > 40 or a in vzyato:
                         continue
                     put = put_v_arhive(a)
-                    if put not in vnutri:
+                    if put not in vnutri or put in uzhe_v_meste:
                         continue
                     fayl = put.rsplit("/", 1)[-1].lower()
-                    if any(fayl.startswith(x) or x in fayl for x in NE_FOTO):
+                    if imya_brakovannoe(fayl):
                         continue
-                    godno, w, h = kadr_goditsya(zf, put)
+                    godno, w, h = kadr_goditsya(zf, put, vnutri[put])
                     if not godno:
                         otbrakovano += 1
                         continue
+                    uzhe_v_meste.add(put)
                     # Порядок предпочтения: страница по смыслу ближе (первая в
                     # списке), потом имя по делу, потом вес.
                     kandidaty.append((-nomer_stranicy, 1 if slovo in fayl else 0,
