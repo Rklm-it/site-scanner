@@ -62,6 +62,19 @@ except ImportError:                       # на хосте сервера ег�
 # фотографий на ней просто нет — так место «гардеробная» в первом заходе
 # получило баннер с калькулятором. Соседняя страница той же услуги закрывает
 # дыру, оставаясь по смыслу тем же самым.
+#
+# **Категории берутся из прототипа, а не из головы.** В `src/routes/index.tsx`
+# у каждой карточки сетки работ жёстко заданы `category` и `alt`: rabota-01..04
+# — «Кухни», 05..07 — «Шкафы-купе», 08..09 — «Гардеробные», 10 — «Прихожие»,
+# 11 — «Детская», 12 — «Ванная». Раскладка обязана им соответствовать: иначе
+# фотография кухни встаёт под фильтр «Шкафы-купе» и с подписью про шкаф —
+# ошибка, которую видно и глазами, и поиску. Проверено на живом: первая
+# раскладка ставила в 05 маленькую кухню, а в 08 шкаф под лестницей.
+#
+# Страницы-источники выбраны по числу собственных картинок, а не наугад:
+# у гардеробных настоящая галерея одна — `garderobnaya-prikhozhei.html`
+# (31 снимок), а на остальных двенадцати страницах лежат схемы и общий шаблон.
+# Отсюда и был пустой результат: список источников назвал не ту страницу.
 MESTA: list[tuple[str, tuple[str, ...], str, str]] = [
     ("kuhnya-uglovaya-01.jpg", ("kuhni-uglovyie.html", "kuhni-sovremennyie.html"),
      "uglov", "первый экран, угловая кухня"),
@@ -70,20 +83,24 @@ MESTA: list[tuple[str, tuple[str, ...], str, str]] = [
     ("shkaf-kupe-01.jpg", ("vstroennie-shkafi-kupe.html", "shkafi-kupe-spalnyu.html",
                            "sovremennie-shkafi.html"),
      "shkaf", "блок «Шкафы-купе»"),
-    ("garderobnaya-01.jpg", ("garderobnaya-komnata.html", "garderobnaya-spalne.html",
-                             "uglovaya-garderobnaya.html", "garderobnaya-iz-kladovki.html"),
+    ("garderobnaya-01.jpg", ("garderobnaya-prikhozhei.html", "garderobnaya-komnata.html",
+                             "uglovaya-garderobnaya.html"),
      "garderob", "блок «Гардеробные»"),
-    ("rabota-01.jpg", ("kuhni-belyie.html",), "bel", "работы: белая кухня"),
-    ("rabota-02.jpg", ("kuhni-s-ostrovom.html",), "ostrov", "работы: кухня с островом"),
-    ("rabota-03.jpg", ("kuhni-zelenyie.html",), "zelen", "работы: зелёная кухня"),
-    ("rabota-04.jpg", ("kuhni-loft.html",), "loft", "работы: кухня лофт"),
-    ("rabota-05.jpg", ("kuhnya-hruschevke.html", "kuhni-malenkie.html"),
-     "hrusch", "работы: маленькая кухня"),
-    ("rabota-06.jpg", ("shkaf-kupe-zerkalom.html",), "zerkal", "работы: шкаф с зеркалом"),
-    ("rabota-07.jpg", ("shkafi-kupe-prikhozhuyu.html",), "prihozh", "работы: шкаф в прихожую"),
-    ("rabota-08.jpg", ("shkaf-pod-lestnitsei.html",), "lestnits", "работы: шкаф под лестницей"),
-    ("rabota-09.jpg", ("vstroennaya-garderobnaya.html", "bolshaya-garderobnaya.html"),
-     "garderob", "работы: гардеробная"),
+    ("rabota-01.jpg", ("kuhni-belyie.html",), "bel", "работы, Кухни: белая"),
+    ("rabota-02.jpg", ("kuhni-s-ostrovom.html",), "ostrov", "работы, Кухни: с островом"),
+    ("rabota-03.jpg", ("kuhni-zelenyie.html",), "zelen", "работы, Кухни: зелёная"),
+    ("rabota-04.jpg", ("kuhni-loft.html",), "loft", "работы, Кухни: лофт"),
+    ("rabota-05.jpg", ("shkaf-pod-lestnitsei.html", "uglovoi-shkaf-kupe.html",
+                       "shkaf-kupe-koridor.html"),
+     "shkaf", "работы, Шкафы-купе: встроенный"),
+    ("rabota-06.jpg", ("shkaf-kupe-zerkalom.html",), "zerkal",
+     "работы, Шкафы-купе: с зеркалом"),
+    ("rabota-07.jpg", ("shkafi-kupe-prikhozhuyu.html",), "prihozh",
+     "работы, Шкафы-купе: в прихожую"),
+    ("rabota-08.jpg", ("garderobnaya-prikhozhei.html",), "garderob",
+     "работы, Гардеробные: в прихожей"),
+    ("rabota-09.jpg", ("garderobnaya-prikhozhei.html", "vstroennaya-garderobnaya.html"),
+     "garderob", "работы, Гардеробные: встроенная"),
     ("rabota-10.jpg", ("prikhozhaya.html",), "prihozh", "работы: прихожая"),
     ("rabota-11.jpg", ("shkafi-kupe-detskuyu.html", "detskaya-mebel.html"),
      "detsk", "работы: детская"),
