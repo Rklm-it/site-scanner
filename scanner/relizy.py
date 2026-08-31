@@ -103,4 +103,14 @@ def proverit() -> tuple[bool, str]:
     prava = otvet.json().get("permissions") or {}
     if not prava.get("push", True):
         return False, f"у токена нет права записи в {repo}"
+
+    # Пустой репозиторий — отдельная ловушка. Релиз создаётся на теге, а тег
+    # создаётся от коммита: в репозитории без единого коммита заливка падает
+    # уже после обхода, когда части удалены с тома. Проверяем заранее.
+    kom = requests.get(f"{API}/repos/{repo}/commits", headers=_zagolovki(),
+                       params={"per_page": 1}, timeout=TAJMAUT)
+    if kom.status_code == 409 or (kom.ok and not kom.json()):
+        return False, (f"репозиторий {repo} пустой — в нём нет ни одного коммита, "
+                       f"а релиз создаётся на теге. Добавьте README (кнопка "
+                       f"«Add a README file» при создании) и повторите")
     return True, repo
