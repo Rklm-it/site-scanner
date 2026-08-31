@@ -22,11 +22,12 @@ else
     || { echo "не удалось получить маркетплейс $MARKETPLACE" >&2; exit 1; }
 fi
 
-# studio ставим только там, где скилов нет в самом репозитории: в сканере они
-# лежат в .claude/skills и грузятся напрямую, вторая копия из плагина только
-# путает список.
-PLUGINS=(playwright context7 stitch)
-[ -d ".claude/skills" ] || PLUGINS+=(studio)
+# studio ставим всегда. Соблазн пропустить его в сканере (скилы там лежат в
+# .claude/skills и грузятся напрямую) обходится дорого: окружение одно на все
+# репозитории, и в проекте клиента из Lovable скилов взять больше неоткуда.
+# Двойной показ в списке — меньшее зло, чем сессия на сайте клиента без
+# /lovable-site.
+PLUGINS=(studio playwright context7 stitch)
 
 for p in "${PLUGINS[@]}"; do
   claude plugin install "$p@rklm" >/dev/null 2>&1 && echo "  + $p" || echo "  ! $p не встал" >&2
