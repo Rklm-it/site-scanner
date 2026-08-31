@@ -44,6 +44,15 @@ function pochinit(shema) {
   for (const imya of net) shema.$defs[imya] = { type: 'object' };
 }
 
+// Ответ клиенту об ошибке, а не молчание. Молчание клиент трактует как «сервер
+// не отвечает» и ждёт свой таймаут: без ключа Stitch отдаёт на initialize
+// HTML-страницу 401, мост её не разбирал, и сессия объявляла сервер мёртвым
+// через 30 секунд вместо внятного «нет ключа».
+function oshibka(soobshenie, tekst) {
+  if (!soobshenie || soobshenie.id === undefined) return null;   // уведомление
+  return { jsonrpc: '2.0', id: soobshenie.id, error: { code: -32000, message: tekst } };
+}
+
 async function otpravit(soobshenie) {
   const zagolovki = {
     'Content-Type': 'application/json',
@@ -61,6 +70,13 @@ async function otpravit(soobshenie) {
   const telo = await otvet.text();
   if (!telo.trim()) return null;
 
+  if (!otvet.ok) {
+    const chego = otvet.status === 401 || otvet.status === 403
+      ? 'нет ключа STITCH_API_KEY в окружении сессии или он недействителен'
+      : telo.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+    return oshibka(soobshenie, `Stitch ответил ${otvet.status}: ${chego}`);
+  }
+
   // Сервер вправе ответить потоком SSE вместо json — тогда полезное лежит в data:
   const tip = otvet.headers.get('content-type') || '';
   const syroe = tip.includes('text/event-stream')
@@ -69,7 +85,7 @@ async function otpravit(soobshenie) {
 
   try { return JSON.parse(syroe); } catch {
     process.stderr.write(`не разобрал ответ (${otvet.status}): ${telo.slice(0, 200)}\n`);
-    return null;
+    return oshibka(soobshenie, `Stitch вернул не JSON (${otvet.status})`);
   }
 }
 
@@ -108,6 +124,8 @@ async function nasos() {
       }
     } catch (e) {
       process.stderr.write(`сбой запроса: ${e && e.message}\n`);
+      const o = oshibka(soobshenie, `не достучался до Stitch: ${e && e.message}`);
+      if (o) await pisat(JSON.stringify(o) + '\n');
     }
   }
   idet = false;
