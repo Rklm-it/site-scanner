@@ -780,8 +780,15 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap", "dmp-github"].forEach(
+  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap"].forEach(
     id => $(id) && $(id).addEventListener("change", readDumpForm));
+  // Галочка GitHub меняет смысл строки про место: с ней диску нужна одна
+  // часть, а не весь сайт. Без перерисовки владелец видел прежнее «потолок
+  // урежется до 11 МБ» уже после того, как поставил галочку, — и делал
+  // единственный возможный вывод, что ничего не изменилось.
+  $("dmp-github") && $("dmp-github").addEventListener("change", () => {
+    readDumpForm(); renderDumps();
+  });
   // «Объём» перерисовывает секцию: строка про место на диске сравнивает
   // заказанное со свободным, и показывать в ней прежнее число — хуже, чем
   // не показывать вовсе.
