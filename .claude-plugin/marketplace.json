@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Скилы студии для работы над сайтами клиентов",
-    "version": "1.4.0"
+    "version": "1.3.0"
   },
   "plugins": [
     {
@@ -26,6 +26,11 @@
       "name": "context7",
       "description": "Свежая документация библиотек по запросу: React, Vite, Nuxt, Tailwind, shadcn, FastAPI — вместо памяти модели",
       "source": "./plugins/context7"
+    },
+    {
+      "name": "stitch",
+      "description": "Google Stitch: сгенерировать экраны интерфейса по тексту, забрать HTML и картинку, применить дизайн-систему из DESIGN.md",
+      "source": "./plugins/stitch"
     }
   ]
 }

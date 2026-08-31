@@ -1,0 +1,12 @@
+{
+  "name": "stitch",
+  "description": "Google Stitch: сгенерировать экраны интерфейса по тексту, забрать HTML и картинку, применить дизайн-систему из DESIGN.md",
+  "version": "1.0.0",
+  "author": { "name": "Rklm-it" },
+  "mcpServers": {
+    "stitch": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/most.mjs"]
+    }
+  }
+}

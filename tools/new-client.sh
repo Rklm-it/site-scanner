@@ -24,7 +24,7 @@ with open(path, encoding='utf-8') as f:
 data.setdefault('extraKnownMarketplaces', {})['rklm'] = {
     'source': {'source': 'github', 'repo': 'Rklm-it/site-scanner'}}
 plugins = data.setdefault('enabledPlugins', {})
-for name in ('studio@rklm', 'playwright@rklm', 'context7@rklm'):
+for name in ('studio@rklm', 'playwright@rklm', 'context7@rklm', 'stitch@rklm'):
     plugins[name] = True
 with open(path, 'w', encoding='utf-8') as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
@@ -43,7 +43,8 @@ else
   "enabledPlugins": {
     "studio@rklm": true,
     "playwright@rklm": true,
-    "context7@rklm": true
+    "context7@rklm": true,
+    "stitch@rklm": true
   }
 }
 J
