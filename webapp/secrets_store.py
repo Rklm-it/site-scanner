@@ -23,6 +23,10 @@ FIELDS = {
     "serpapi_key": "SERPAPI_KEY",
     "dadata_token": "DADATA_TOKEN",
     "datanewton_token": "DATANEWTON_TOKEN",
+    # Куда отправлять выгрузки, чтобы они не занимали том: релизы GitHub.
+    # Токену хватает права contents:write на один приватный репозиторий.
+    "github_token": "GITHUB_TOKEN",
+    "github_dumps_repo": "GITHUB_DUMPS_REPO",
     # SMTP для рассылки (хранится тут же)
     "smtp_host": "SMTP_HOST",
     "smtp_port": "SMTP_PORT",

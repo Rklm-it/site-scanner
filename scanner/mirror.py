@@ -30,6 +30,7 @@ import re
 import shutil
 import time
 import zipfile
+from typing import Callable
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -691,6 +692,68 @@ def run(
              stats.statuses or "нет", stats.stopped_by,
              stats.pages_left, stats.assets_left)
     return stats
+
+
+def pack_chastyami(
+    src_dir: Path,
+    dest_dir: Path,
+    base: str,
+    chast_bytes: int,
+    otdat: "Callable[[Path], bool] | None" = None,
+) -> list[tuple[str, int]]:
+    """Пакует выгрузку в несколько архивов, отдавая каждый по готовности.
+
+    Ради диска, а не ради удобства. Даже с удалением файлов по ходу упаковки
+    пик по месту равен целому архиву, и на томе в 9,8 ГБ (свободно бывает 533
+    МБ) сайт с тремя тысячами фотографий не помещается никак. Здесь пик равен
+    одной части: часть закрывается, уходит наружу через `otdat` и тут же
+    удаляется с тома.
+
+    `otdat` возвращает True, если часть принята — только тогда файл удаляется.
+    Без него части остаются на месте, и функция ведёт себя как обычный `pack`,
+    разрезанный на куски.
+
+    manifest.json кладётся в первую часть первым: разбор начинается с него, и
+    качать ради списка страниц гигабайт картинок незачем.
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    fajly = [p for p in sorted(src_dir.rglob("*")) if p.is_file()]
+    fajly.sort(key=lambda p: (p.name != "manifest.json", p.as_posix()))
+
+    chasti: list[tuple[str, int]] = []
+    nomer = 0
+    zf: zipfile.ZipFile | None = None
+    put: Path | None = None
+
+    def zakryt() -> None:
+        nonlocal zf, put
+        if zf is None or put is None:
+            return
+        zf.close()
+        razmer = put.stat().st_size
+        chasti.append((put.name, razmer))
+        if otdat is not None and otdat(put):
+            put.unlink()          # принято — на томе больше не держим
+        zf, put = None, None
+
+    for path in fajly:
+        if zf is None:
+            nomer += 1
+            put = dest_dir / f"{base}-{nomer:02d}.zip"
+            zf = zipfile.ZipFile(put, "w", zipfile.ZIP_DEFLATED, compresslevel=6)
+        zf.write(path, path.relative_to(src_dir).as_posix())
+        path.unlink()
+        # Размер узнаём только у закрытого архива: пока zip открыт, часть
+        # данных лежит в буфере и st_size врёт в меньшую сторону. Поэтому
+        # граница проверяется по сумме записанного, а не по файлу на диске.
+        if sum(i.compress_size for i in zf.infolist()) >= chast_bytes:
+            zakryt()
+    zakryt()
+
+    for path in sorted(src_dir.rglob("*"), reverse=True):
+        path.rmdir() if path.is_dir() else path.unlink()
+    src_dir.rmdir()
+    return chasti
 
 
 def pack(src_dir: Path, archive: Path) -> int:

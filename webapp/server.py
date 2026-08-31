@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel
 
-from scanner import analytics, enrich, mirror, outreach, pipeline
+from scanner import analytics, enrich, mirror, outreach, pipeline, relizy
 from scanner.catalog import CATALOG
 from scanner.config import Settings
 from scanner.report import write_csv, write_json
@@ -574,6 +574,11 @@ class DumpRequest(BaseModel):
     max_mb: int = 200
     respect_robots: bool = True
     use_sitemap: bool = True
+    # Отдавать части в релизы GitHub и не держать их на томе. Ради этого всё и
+    # затевалось: на томе 9,8 ГБ на всё, включая базу лидов, и сайт с тремя
+    # тысячами фотографий туда не влезает целиком ни при каком сжатии.
+    v_github: bool = False
+    chast_mb: int = 200
 
 
 @dataclass
@@ -602,6 +607,11 @@ class DumpJob:
     error: str | None = None
     errors: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.time)
+    # Части, ушедшие в релиз: имя → ссылка. Держим и то и другое, потому что
+    # разбор начинается с первой части (в ней manifest.json), а качать их
+    # можно по одной.
+    chasti: list[dict] = field(default_factory=list)
+    reliz_url: str = ""
 
     def public(self) -> dict:
         return {
@@ -614,6 +624,7 @@ class DumpJob:
             "robots": self.robots, "asset_skipped": self.asset_skipped,
             "max_mb": self.max_mb, "max_mb_asked": self.max_mb_asked,
             "free_mb": self.free_mb,
+            "chasti": self.chasti, "reliz_url": self.reliz_url,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
@@ -675,9 +686,36 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
                 "не удалось скачать ни одной страницы — скорее всего закрыт "
                 "в robots.txt (снимите галочку и повторите)"
             )
-        name = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}.zip"
-        job.archive_bytes = mirror.pack(work, DUMPS_DIR / name)
-        job.archive = name
+        base = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}"
+        if req.v_github:
+            reliz = relizy.sozdat_reliz(
+                tag=base, zagolovok=f"{job.domain}: выгрузка сайта",
+                opisanie=(f"Страниц {stats.pages}, файлов {stats.assets}, "
+                          f"{stats.bytes / 1048576:.0f} МБ. "
+                          f"manifest.json — в первой части."),
+            )
+            job.reliz_url = reliz.get("html_url", "")
+
+            def otdat(chast: Path) -> bool:
+                # Возврат False оставил бы часть на томе — ровно то, от чего
+                # уходим. Поэтому сбой заливки прерывает выгрузку с внятной
+                # ошибкой, а не копит части молча.
+                ssylka = relizy.zalit(reliz, chast)
+                job.chasti.append({"name": chast.name, "url": ssylka,
+                                   "bytes": chast.stat().st_size})
+                log.info("часть %s ушла в релиз", chast.name)
+                return True
+
+            chasti = mirror.pack_chastyami(
+                work, DUMPS_DIR, base,
+                chast_bytes=max(50, min(req.chast_mb, 1500)) * 1024 * 1024,
+                otdat=otdat,
+            )
+            job.archive_bytes = sum(r for _, r in chasti)
+        else:
+            name = f"{base}.zip"
+            job.archive_bytes = mirror.pack(work, DUMPS_DIR / name)
+            job.archive = name
         job.status = "done"
     except Exception as exc:  # noqa: BLE001
         job.status = "error"
@@ -728,6 +766,13 @@ def start_dump(req: DumpRequest) -> dict:
             507, f"На диске свободно {free_mb} МБ — выгружать некуда. "
                  f"Удалите готовые архивы ниже или освободите место на сервере."
         )
+    if req.v_github:
+        # Проверяем до обхода, а не после: узнать про негодный токен, когда
+        # сайт уже скачан и части удалены с тома, значит потерять выгрузку
+        # целиком и идти на второй заход к клиенту.
+        ladno, prichina = relizy.proverit()
+        if not ladno:
+            raise HTTPException(400, f"Отправка в GitHub не настроена: {prichina}")
     job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain,
                   robots=req.respect_robots, max_mb=min(asked_mb, mozhno_mb),
                   max_mb_asked=asked_mb, free_mb=free_mb)

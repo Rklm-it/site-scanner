@@ -471,3 +471,62 @@ def test_shema_beryotsya_ta_chto_otvetila(otkaz_site):
 
     root = mirror._pick_root(otkaz_site, requests.Session(), timeout=5)
     assert root.startswith("http://")
+
+
+def test_pack_chastyami_rezhet_po_granice_i_chistit_tom(tmp_path):
+    """Пик по диску должен равняться одной части, а не всей выгрузке.
+
+    Ради этого всё и делалось: на томе владельца 9,8 ГБ на всё вместе с базой
+    лидов, и сайт с тремя тысячами фотографий целым архивом туда не влезает.
+    Проверяем, что части закрываются по границе, отданное удаляется сразу, а
+    исходный каталог не остаётся на диске.
+    """
+    src = tmp_path / "vygruzka"
+    (src / "foto").mkdir(parents=True)
+    (src / "manifest.json").write_text('{"pages": []}', encoding="utf-8")
+    # Случайные байты: jpeg не сжимается, и упаковка должна считать по факту.
+    import os as _os
+    for i in range(6):
+        (src / "foto" / f"{i}.jpg").write_bytes(_os.urandom(300_000))
+
+    otdano: list[str] = []
+    chasti = mirror.pack_chastyami(
+        src, tmp_path / "out", "proba", chast_bytes=500_000,
+        otdat=lambda p: (otdano.append(p.name), True)[1],
+    )
+
+    assert len(chasti) >= 3, f"по 300 КБ на файл и границе 500 КБ частей должно быть несколько: {chasti}"
+    assert [n for n, _ in chasti] == otdano, "каждая закрытая часть обязана уйти сразу"
+    assert not list((tmp_path / "out").glob("*.zip")), "принятые части на томе не держим"
+    assert not src.exists(), "каталог выгрузки должен быть убран целиком"
+
+
+def test_pack_chastyami_manifest_v_pervoj_chasti(tmp_path):
+    """Разбор начинается с manifest.json — качать ради списка страниц гигабайт
+    картинок незачем, поэтому он кладётся в первую часть первым."""
+    import zipfile
+
+    src = tmp_path / "v"
+    (src / "a").mkdir(parents=True)
+    (src / "manifest.json").write_text("{}", encoding="utf-8")
+    for i in range(4):
+        (src / "a" / f"{i}.bin").write_bytes(b"x" * 200_000)
+
+    mirror.pack_chastyami(src, tmp_path / "o", "proba", chast_bytes=1_000)
+
+    pervaya = sorted((tmp_path / "o").glob("*.zip"))[0]
+    with zipfile.ZipFile(pervaya) as zf:
+        assert zf.namelist()[0] == "manifest.json"
+
+
+def test_pack_chastyami_bez_otdachi_ostavlyaet_fajly(tmp_path):
+    """Без обработчика функция ведёт себя как обычный pack, разрезанный на
+    куски: части остаются на месте. Иначе выгрузка пропала бы вовсе."""
+    src = tmp_path / "v"
+    src.mkdir()
+    (src / "one.bin").write_bytes(b"y" * 100_000)
+
+    chasti = mirror.pack_chastyami(src, tmp_path / "o", "proba", chast_bytes=10_000)
+
+    assert len(chasti) == 1
+    assert (tmp_path / "o" / chasti[0][0]).exists()

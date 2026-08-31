@@ -591,3 +591,28 @@ def test_dump_one_at_a_time(client, monkeypatch):
         assert c.post("/api/dump", json={"domain": "b.ru"}).status_code == 409
     finally:
         server.DUMP_JOBS.clear()
+
+
+def test_vygruzka_v_github_bez_tokena_otkazyvaet_srazu(client):
+    """Проверка доступа идёт ДО обхода. Узнать про негодный токен после того,
+    как сайт скачан, а части уже удалены с тома, значит потерять выгрузку
+    целиком и идти на второй заход к клиенту."""
+    c, server = client
+    otvet = c.post("/api/dump", json={"domain": "example.ru", "v_github": True})
+
+    assert otvet.status_code == 400
+    assert "GITHUB_TOKEN" in otvet.json()["detail"]
+    assert not [j for j in server.DUMP_JOBS.values()], "задача не должна была стартовать"
+
+
+def test_vygruzka_bez_github_rabotaet_kak_ranshe(client, monkeypatch):
+    """Отправка в релизы — галочка, а не новое обязательное условие: без неё
+    архив по-прежнему ложится на том и скачивается кнопкой."""
+    c, server = client
+    monkeypatch.setattr(server.threading, "Thread", lambda *a, **k: type(
+        "T", (), {"start": lambda self: None})())
+
+    otvet = c.post("/api/dump", json={"domain": "example.ru"})
+
+    assert otvet.status_code == 200
+    assert "dump_id" in otvet.json()

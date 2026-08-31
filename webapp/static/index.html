@@ -439,6 +439,8 @@ const KEY_LABELS = {
   google_api_key: "Google: API key", google_cse_cx: "Google: cx",
   serpapi_key: "SerpAPI: key", dadata_token: "DaData: token (название/директор)",
   datanewton_token: "DataNewton: token (оборот)",
+  github_token: "GitHub: токен (выгрузки в релизы)",
+  github_dumps_repo: "GitHub: репозиторий выгрузок (вида Rklm-it/dumps)",
 };
 let CURRENT_JOB = null, TIMER = null, SORT_KEY = "outreach_score", SORT_DIR = -1, ROWS = [];
 let VIEW = "scan", LAST_JOB = null, BASE = [], SMTP_OK = false;
@@ -615,7 +617,7 @@ let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 // умолчанию: снятая галочка robots.txt снова оказывалась поставленной, а
 // «Страниц» и «Глубина» сбрасывались. На экране было одно, применялось
 // другое — и выгрузка молча приезжала без картинок.
-const DUMP_FORM = { domain: "", pages: 1500, depth: 5, minutes: 30, mb: 200, robots: true, sitemap: true };
+const DUMP_FORM = { domain: "", pages: 1500, depth: 5, minutes: 30, mb: 200, robots: true, sitemap: true, github: false };
 let DUMP_DISK = { free: 0, mozhno: 0 };
 
 /** Из чего угодно — в домен. Люди вставляют адрес из адресной строки
@@ -656,6 +658,7 @@ function readDumpForm() {
   DUMP_FORM.mb = +$("dmp-mb").value || 200;
   DUMP_FORM.robots = $("dmp-robots").checked;
   DUMP_FORM.sitemap = $("dmp-sitemap").checked;
+  DUMP_FORM.github = $("dmp-github") ? $("dmp-github").checked : false;
 }
 
 /** Ближайший по написанию домен из базы — чтобы поймать опечатку до запуска.
@@ -746,6 +749,8 @@ function renderDumps() {
           <input type="checkbox" id="dmp-robots" ${DUMP_FORM.robots ? "checked" : ""}> уважать robots.txt</label>
         <label title="Взять адреса из sitemap.xml. В меню попадает не всё: у блогов и каталогов часть страниц не прилинкована ниоткуда">
           <input type="checkbox" id="dmp-sitemap" ${DUMP_FORM.sitemap ? "checked" : ""}> по карте сайта</label>
+        <label title="Паковать частями по 200 МБ и сразу отправлять их в релиз GitHub, не оставляя на томе. Тогда на диске в пике лежит одна часть, а не весь архив: сайт с тремя тысячами фотографий целиком сюда не влезает. Нужны ключ и репозиторий в настройках">
+          <input type="checkbox" id="dmp-github" ${DUMP_FORM.github ? "checked" : ""}> сразу в GitHub</label>
       </div>
       ${unknown}
       ${diskNote()}
@@ -764,8 +769,8 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap"].forEach(
-    id => $(id).addEventListener("change", readDumpForm));
+  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap", "dmp-github"].forEach(
+    id => $(id) && $(id).addEventListener("change", readDumpForm));
   // «Объём» перерисовывает секцию: строка про место на диске сравнивает
   // заказанное со свободным, и показывать в ней прежнее число — хуже, чем
   // не показывать вовсе.
@@ -860,8 +865,18 @@ function renderDumpProgress() {
          из них держится под базу лидов.</div>` : "";
     const how = `<div class="hint">Домен: <b>${escHtml(j.domain)}</b>, robots.txt
         ${j.robots ? "уважали" : "игнорировали"}.</div>`;
+    // Части показываем ссылками: архива на томе больше нет, и «Скачать» в
+    // списке ниже для такой выгрузки не появится — забирают из релиза.
+    const chasti = (j.chasti || []).length
+      ? `<div class="hint">Ушло в GitHub ${j.chasti.length}
+         ${plural(j.chasti.length, "часть", "части", "частей")}, на томе не осталось.
+         Разбор начинать с первой — в ней <code>manifest.json</code>:<br>
+         ${j.chasti.map(c => `<a href="${escHtml(c.url)}">${escHtml(c.name)}</a>
+            (${fmtMB(c.bytes)})`).join(" · ")}
+         ${j.reliz_url ? `<br><a href="${escHtml(j.reliz_url)}">весь релиз</a>` : ""}</div>`
+      : "";
     box.innerHTML = urezali + `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
-      файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>${who}${how}${noimg}`;
+      файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>${who}${how}${chasti}${noimg}`;
   }
 }
 
@@ -882,6 +897,7 @@ async function startDump() {
         max_mb: DUMP_FORM.mb,
         respect_robots: DUMP_FORM.robots,
         use_sitemap: DUMP_FORM.sitemap,
+        v_github: DUMP_FORM.github,
       }),
     });
     data = await res.json();
