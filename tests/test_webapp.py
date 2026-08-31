@@ -616,3 +616,36 @@ def test_vygruzka_bez_github_rabotaet_kak_ranshe(client, monkeypatch):
 
     assert otvet.status_code == 200
     assert "dump_id" in otvet.json()
+
+
+def test_chast_podstraivaetsya_pod_svobodnoe_mesto(client, monkeypatch):
+    """Отказ «уменьшите размер части» был тупиком: поля для этого в форме нет.
+    На 311 МБ свободных (из них 11 доступно выгрузке) часть должна ужаться, а
+    не остановить работу."""
+    c, server = client
+    server.DUMP_JOBS.clear()   # задачи живут в словаре модуля и переживают тест
+    monkeypatch.setattr(server, "_disk_room", lambda: (311, 11))  # как на сервере владельца
+    monkeypatch.setattr(server.relizy, "proverit", lambda: (True, "Rklm-it/dumps"))
+    monkeypatch.setattr(server.threading, "Thread", lambda *a, **k: type(
+        "T", (), {"start": lambda self: None})())
+
+    otvet = c.post("/api/dump", json={"domain": "example.ru", "v_github": True})
+
+    assert otvet.status_code == 200
+    job = list(server.DUMP_JOBS.values())[-1]
+    assert job.chast_mb == 191, "из 311 свободных: 100 под базу, 20 запас, остальное — часть"
+    assert job.chast_mb_asked == 200
+
+
+def test_sovsem_bez_mesta_otkazyvaem_ponyatno(client, monkeypatch):
+    """Когда на томе нет места даже под минимальную часть, работать нечем —
+    но сообщение должно называть числа, а не советовать невозможное."""
+    c, server = client
+    server.DUMP_JOBS.clear()   # задачи живут в словаре модуля и переживают тест
+    monkeypatch.setattr(server, "_disk_room", lambda: (120, 0))
+    monkeypatch.setattr(server.relizy, "proverit", lambda: (True, "Rklm-it/dumps"))
+
+    otvet = c.post("/api/dump", json={"domain": "example.ru", "v_github": True})
+
+    assert otvet.status_code == 507
+    assert "120" in otvet.json()["detail"]

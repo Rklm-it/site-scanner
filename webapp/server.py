@@ -603,6 +603,8 @@ class DumpJob:
     robots: bool = True              # с какой галочкой реально прошла выгрузка
     max_mb: int = 200                # потолок объёма, с которым шла выгрузка
     max_mb_asked: int = 200          # сколько просили в форме — если урезали
+    chast_mb: int = 200              # размер части, с которым реально пошли
+    chast_mb_asked: int = 200        # и сколько просили — если подстроили под диск
     free_mb: int = 0                 # сколько было свободно на томе при старте
     error: str | None = None
     errors: list[str] = field(default_factory=list)
@@ -623,6 +625,7 @@ class DumpJob:
             "pages_left": self.pages_left, "assets_left": self.assets_left,
             "robots": self.robots, "asset_skipped": self.asset_skipped,
             "max_mb": self.max_mb, "max_mb_asked": self.max_mb_asked,
+            "chast_mb": self.chast_mb, "chast_mb_asked": self.chast_mb_asked,
             "free_mb": self.free_mb,
             "chasti": self.chasti, "reliz_url": self.reliz_url,
             "error": self.error, "errors": self.errors[:10],
@@ -637,7 +640,8 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
     work = DUMPS_DIR / f".work-{job.id}"
     base = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}"
     reliz = None
-    chast_bytes = max(50, min(req.chast_mb, 1500)) * 1024 * 1024
+    # Из задачи, а не из запроса: там он уже подстроен под свободное место.
+    chast_bytes = job.chast_mb * 1024 * 1024
 
     def otdat(chast: Path) -> bool:
         ssylka = relizy.zalit(reliz, chast)
@@ -678,7 +682,8 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             max_depth=max(1, min(req.max_depth, 8)),
             time_budget=max(60, min(req.minutes, 90) * 60),
             max_total_bytes=job.max_mb * 1024 * 1024,
-            min_free_bytes=DISK_RESERVE_MB * 1024 * 1024,
+            min_free_bytes=(GITHUB_REZERV_MB if req.v_github else DISK_RESERVE_MB)
+                            * 1024 * 1024,
             respect_robots=req.respect_robots,
             use_sitemap=req.use_sitemap,
             on_progress=on_progress,
@@ -751,6 +756,12 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
 # весь инструмент, и чинится это уже руками на сервере.
 DISK_RESERVE_MB = 300
 
+# С отправкой в релизы том не заполняется: каждая часть уходит и удаляется.
+# Держать под это те же 300 МБ значит запретить выгрузку там, где она пройдёт —
+# у владельца на томе бывает свободно 311 МБ, и с прежним резервом сканер
+# отказывался начинать вовсе.
+GITHUB_REZERV_MB = 100
+
 
 def _disk_room() -> tuple[int, int]:
     """Свободно на томе и сколько из этого можно отдать выгрузке.
@@ -787,15 +798,20 @@ def start_dump(req: DumpRequest) -> dict:
         ladno, prichina = relizy.proverit()
         if not ladno:
             raise HTTPException(400, f"Отправка в GitHub не настроена: {prichina}")
-        # Диску нужна одна часть, а не весь сайт: обход сбрасывает накопленное
-        # по ходу. Требовать здесь место под всю выгрузку было ошибкой — форма
-        # отказывала на 164 МБ свободных, хотя гигабайтный сайт проходит
-        # частями по 200 МБ.
-        if mozhno_mb < chast_mb:
+        # Резерв в 300 МБ рассчитан на то, что весь архив лежит на томе. При
+        # отправке по ходу это не так: место освобождается каждой частью,
+        # поэтому здесь держим меньший запас и считаем от свободного, а не от
+        # «сколько можно отдать». Со старым расчётом на 311 МБ свободных
+        # выходило 11 доступных, и выгрузка отказывалась начинаться — а совет
+        # «уменьшите размер части» был невыполним, поля для этого нет.
+        zapas = free_mb - GITHUB_REZERV_MB
+        if zapas < 30:
             raise HTTPException(
-                507, f"На диске свободно {free_mb} МБ, а часть весит {chast_mb} МБ. "
-                     f"Удалите готовые архивы ниже или уменьшите размер части."
+                507, f"На диске свободно {free_mb} МБ, а нужно хотя бы "
+                     f"{GITHUB_REZERV_MB + 30}: {GITHUB_REZERV_MB} держим под базу "
+                     f"лидов и 30 на часть. Удалите готовые архивы ниже."
             )
+        chast_mb = min(chast_mb, zapas - 20 if zapas > 50 else 30)
         limit_mb = asked_mb
     else:
         if mozhno_mb < 10:
@@ -806,7 +822,8 @@ def start_dump(req: DumpRequest) -> dict:
         limit_mb = min(asked_mb, mozhno_mb)
     job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain,
                   robots=req.respect_robots, max_mb=limit_mb,
-                  max_mb_asked=asked_mb, free_mb=free_mb)
+                  max_mb_asked=asked_mb, free_mb=free_mb,
+                  chast_mb=chast_mb, chast_mb_asked=max(30, min(req.chast_mb, 1500)))
     DUMP_JOBS[job.id] = job
     threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
     return {"dump_id": job.id}
