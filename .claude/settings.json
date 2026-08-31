@@ -1,12 +1,16 @@
 {
   "extraKnownMarketplaces": {
     "rklm": {
-      "source": { "source": "github", "repo": "Rklm-it/site-scanner" }
+      "source": {
+        "source": "github",
+        "repo": "Rklm-it/site-scanner"
+      }
     }
   },
   "enabledPlugins": {
     "playwright@rklm": true,
-    "context7@rklm": true
+    "context7@rklm": true,
+    "stitch@rklm": true
   },
   "hooks": {
     "SessionStart": [
