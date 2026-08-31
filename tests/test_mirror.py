@@ -498,7 +498,10 @@ def test_pack_chastyami_rezhet_po_granice_i_chistit_tom(tmp_path):
     assert len(chasti) >= 3, f"по 300 КБ на файл и границе 500 КБ частей должно быть несколько: {chasti}"
     assert [n for n, _ in chasti] == otdano, "каждая закрытая часть обязана уйти сразу"
     assert not list((tmp_path / "out").glob("*.zip")), "принятые части на томе не держим"
-    assert not src.exists(), "каталог выгрузки должен быть убран целиком"
+    # Каталог остаётся, а содержимое — нет: сброс бывает посреди обхода, и в тот
+    # же каталог сейчас же снова пишут. Пустая папка диска не занимает.
+    assert src.exists(), "каталог нужен дальше: обход продолжит писать в него"
+    assert not any(src.rglob("*")), "а вот файлов остаться не должно — ради них всё и затевалось"
 
 
 def test_pack_chastyami_manifest_v_pervoj_chasti(tmp_path):

@@ -370,6 +370,12 @@ def run(
     use_sitemap: bool = True,
     external_images: bool = True,
     on_progress=None,
+    # Сброс накопленного прямо по ходу обхода. Без него выгрузка целиком лежит
+    # на диске до самого конца, и «упаковка частями» диску не помогает: на
+    # томе владельца свободно бывает 164 МБ, а сайт весит гигабайт. С этим
+    # обработчиком на диске в каждый момент лежит не больше `sbros_bytes`.
+    sbros=None,
+    sbros_bytes: int = 0,
 ) -> MirrorStats:
     """Обходит сайт вширь и складывает страницы и картинки в `dest_dir`.
 
@@ -452,11 +458,22 @@ def run(
             return False
         return time.monotonic() < until
 
+    nakopleno = [0]
+
     def save(rel: str, data: bytes) -> None:
         path = dest_dir / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(data)
         stats.bytes += len(data)
+        if sbros is None or not sbros_bytes:
+            return
+        nakopleno[0] += len(data)
+        if nakopleno[0] >= sbros_bytes:
+            # Скачанное больше не нужно самому обходу: ссылки берутся из
+            # разметки в памяти, повторно файлы не читаются. Поэтому накопленное
+            # можно отдать наружу и убрать с диска прямо посреди выгрузки.
+            sbros(dest_dir)
+            nakopleno[0] = 0
 
     def note_asset(url: str, *, image: bool = False) -> None:
         """Положить адрес файла в очередь либо записать, почему не положили.
@@ -700,6 +717,7 @@ def pack_chastyami(
     base: str,
     chast_bytes: int,
     otdat: "Callable[[Path], bool] | None" = None,
+    nachalnyj_nomer: int = 0,
 ) -> list[tuple[str, int]]:
     """Пакует выгрузку в несколько архивов, отдавая каждый по готовности.
 
@@ -721,7 +739,7 @@ def pack_chastyami(
     fajly.sort(key=lambda p: (p.name != "manifest.json", p.as_posix()))
 
     chasti: list[tuple[str, int]] = []
-    nomer = 0
+    nomer = nachalnyj_nomer
     zf: zipfile.ZipFile | None = None
     put: Path | None = None
 
@@ -752,7 +770,8 @@ def pack_chastyami(
 
     for path in sorted(src_dir.rglob("*"), reverse=True):
         path.rmdir() if path.is_dir() else path.unlink()
-    src_dir.rmdir()
+    # Сам каталог оставляем: при сбросе посреди обхода в него сейчас же снова
+    # начнут писать, а удалять и пересоздавать его на каждой части незачем.
     return chasti
 
 

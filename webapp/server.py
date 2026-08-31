@@ -635,7 +635,33 @@ DUMP_JOBS: dict[str, DumpJob] = {}
 
 def _run_dump(job: DumpJob, req: DumpRequest) -> None:
     work = DUMPS_DIR / f".work-{job.id}"
+    base = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}"
+    reliz = None
+    chast_bytes = max(50, min(req.chast_mb, 1500)) * 1024 * 1024
+
+    def otdat(chast: Path) -> bool:
+        ssylka = relizy.zalit(reliz, chast)
+        job.chasti.append({"name": chast.name, "url": ssylka,
+                           "bytes": chast.stat().st_size})
+        log.info("часть %s ушла в релиз", chast.name)
+        return True
+
+    def sbros(katalog: Path) -> None:
+        """Отдать накопленное посреди обхода и освободить диск.
+
+        Без этого «упаковка частями» диску не помогала вовсе: до конца обхода
+        сайт целиком лежал на томе, и выгрузка упиралась в место ровно так же,
+        как раньше. Теперь на диске в каждый момент лежит не больше одной части.
+        """
+        mirror.pack_chastyami(katalog, DUMPS_DIR, base, chast_bytes,
+                              otdat=otdat, nachalnyj_nomer=len(job.chasti))
     try:
+        if req.v_github:
+            reliz = relizy.sozdat_reliz(
+                tag=base, zagolovok=f"{job.domain}: выгрузка сайта",
+                opisanie="Части приходят по ходу обхода. manifest.json — отдельным файлом.",
+            )
+            job.reliz_url = reliz.get("html_url", "")
         def on_progress(st: mirror.MirrorStats) -> None:
             job.pages, job.assets, job.bytes = st.pages, st.assets, st.bytes
             # Ответы сайта показываем в ходе выгрузки: «страниц 0, файлов 0»
@@ -656,6 +682,8 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             respect_robots=req.respect_robots,
             use_sitemap=req.use_sitemap,
             on_progress=on_progress,
+            sbros=sbros if req.v_github else None,
+            sbros_bytes=chast_bytes if req.v_github else 0,
         )
         job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes
         job.statuses = dict(stats.statuses)
@@ -686,32 +714,22 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
                 "не удалось скачать ни одной страницы — скорее всего закрыт "
                 "в robots.txt (снимите галочку и повторите)"
             )
-        base = f"{job.domain}-{time.strftime('%Y-%m-%d-%H%M')}"
         if req.v_github:
-            reliz = relizy.sozdat_reliz(
-                tag=base, zagolovok=f"{job.domain}: выгрузка сайта",
-                opisanie=(f"Страниц {stats.pages}, файлов {stats.assets}, "
-                          f"{stats.bytes / 1048576:.0f} МБ. "
-                          f"manifest.json — в первой части."),
-            )
-            job.reliz_url = reliz.get("html_url", "")
-
-            def otdat(chast: Path) -> bool:
-                # Возврат False оставил бы часть на томе — ровно то, от чего
-                # уходим. Поэтому сбой заливки прерывает выгрузку с внятной
-                # ошибкой, а не копит части молча.
-                ssylka = relizy.zalit(reliz, chast)
-                job.chasti.append({"name": chast.name, "url": ssylka,
-                                   "bytes": chast.stat().st_size})
-                log.info("часть %s ушла в релиз", chast.name)
-                return True
-
-            chasti = mirror.pack_chastyami(
-                work, DUMPS_DIR, base,
-                chast_bytes=max(50, min(req.chast_mb, 1500)) * 1024 * 1024,
-                otdat=otdat,
-            )
-            job.archive_bytes = sum(r for _, r in chasti)
+            # manifest.json уходит отдельным файлом, а не внутри части: он
+            # пишется в самом конце обхода и иначе оказался бы в последнем
+            # архиве, хотя разбор начинается именно с него. Весит килобайты.
+            manifest = work / "manifest.json"
+            if manifest.exists():
+                job.chasti.append({"name": manifest.name,
+                                   "url": relizy.zalit(reliz, manifest),
+                                   "bytes": manifest.stat().st_size})
+                manifest.unlink()
+            chasti = mirror.pack_chastyami(work, DUMPS_DIR, base, chast_bytes,
+                                           otdat=otdat,
+                                           nachalnyj_nomer=len(job.chasti))
+            job.archive_bytes = sum(c["bytes"] for c in job.chasti)
+            if work.exists():
+                work.rmdir()
         else:
             name = f"{base}.zip"
             job.archive_bytes = mirror.pack(work, DUMPS_DIR / name)
@@ -761,11 +779,7 @@ def start_dump(req: DumpRequest) -> dict:
     # архив ложится на тот же диск, где живёт база лидов.
     asked_mb = max(10, min(req.max_mb, 3000))
     free_mb, mozhno_mb = _disk_room()
-    if mozhno_mb < 10:
-        raise HTTPException(
-            507, f"На диске свободно {free_mb} МБ — выгружать некуда. "
-                 f"Удалите готовые архивы ниже или освободите место на сервере."
-        )
+    chast_mb = max(50, min(req.chast_mb, 1500))
     if req.v_github:
         # Проверяем до обхода, а не после: узнать про негодный токен, когда
         # сайт уже скачан и части удалены с тома, значит потерять выгрузку
@@ -773,8 +787,25 @@ def start_dump(req: DumpRequest) -> dict:
         ladno, prichina = relizy.proverit()
         if not ladno:
             raise HTTPException(400, f"Отправка в GitHub не настроена: {prichina}")
+        # Диску нужна одна часть, а не весь сайт: обход сбрасывает накопленное
+        # по ходу. Требовать здесь место под всю выгрузку было ошибкой — форма
+        # отказывала на 164 МБ свободных, хотя гигабайтный сайт проходит
+        # частями по 200 МБ.
+        if mozhno_mb < chast_mb:
+            raise HTTPException(
+                507, f"На диске свободно {free_mb} МБ, а часть весит {chast_mb} МБ. "
+                     f"Удалите готовые архивы ниже или уменьшите размер части."
+            )
+        limit_mb = asked_mb
+    else:
+        if mozhno_mb < 10:
+            raise HTTPException(
+                507, f"На диске свободно {free_mb} МБ — выгружать некуда. "
+                     f"Удалите готовые архивы ниже или освободите место на сервере."
+            )
+        limit_mb = min(asked_mb, mozhno_mb)
     job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain,
-                  robots=req.respect_robots, max_mb=min(asked_mb, mozhno_mb),
+                  robots=req.respect_robots, max_mb=limit_mb,
                   max_mb_asked=asked_mb, free_mb=free_mb)
     DUMP_JOBS[job.id] = job
     threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
