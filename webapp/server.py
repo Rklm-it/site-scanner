@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import threading
 import time
 import uuid
@@ -562,8 +563,15 @@ def send_status(send_id: str) -> dict:
 # --------------------------------------------------------------------------- #
 class DumpRequest(BaseModel):
     domain: str
-    max_pages: int = 150
-    max_depth: int = 3
+    max_pages: int = 1500
+    max_depth: int = 5
+    minutes: int = 30
+    # Потолок объёма был зашит в обходе (200 МБ) и снаружи не менялся. Сайт на
+    # конструкторе весит больше: у mebel-ryazane.ru 3005 картинок на CDN, и по
+    # 70 КБ на файл выгрузка обрывается на середине портфолио — с виду успешно,
+    # как это уже было с papinalavka.ru по времени. Поэтому объём — такой же
+    # параметр формы, как минуты, и его видно до запуска.
+    max_mb: int = 200
     respect_robots: bool = True
     use_sitemap: bool = True
 
@@ -580,8 +588,17 @@ class DumpJob:
     archive: str | None = None
     archive_bytes: int = 0
     stopped_by: str | None = None
+    pages_left: int = 0              # осталось в очереди, когда время вышло
+    assets_left: int = 0
     title: str = ""                  # заголовок главной — чей сайт скачали
+    # Почему картинок нет: причина → сколько адресов. Совет «снимите галочку
+    # robots.txt» помогает только в половине случаев, а на mebel-ryazane.ru
+    # галочка была уже снята — и человек уходил на второй круг впустую.
+    asset_skipped: dict[str, int] = field(default_factory=dict)
     robots: bool = True              # с какой галочкой реально прошла выгрузка
+    max_mb: int = 200                # потолок объёма, с которым шла выгрузка
+    max_mb_asked: int = 200          # сколько просили в форме — если урезали
+    free_mb: int = 0                 # сколько было свободно на томе при старте
     error: str | None = None
     errors: list[str] = field(default_factory=list)
     started: float = field(default_factory=time.time)
@@ -593,7 +610,10 @@ class DumpJob:
             "statuses": {str(k): v for k, v in self.statuses.items()},
             "archive": self.archive, "archive_bytes": self.archive_bytes,
             "stopped_by": self.stopped_by, "title": self.title,
-            "robots": self.robots,
+            "pages_left": self.pages_left, "assets_left": self.assets_left,
+            "robots": self.robots, "asset_skipped": self.asset_skipped,
+            "max_mb": self.max_mb, "max_mb_asked": self.max_mb_asked,
+            "free_mb": self.free_mb,
             "error": self.error, "errors": self.errors[:10],
             "elapsed": round(time.time() - self.started, 1),
         }
@@ -614,8 +634,14 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
 
         stats = mirror.run(
             job.domain, work,
-            max_pages=max(1, min(req.max_pages, 600)),
-            max_depth=max(1, min(req.max_depth, 6)),
+            # Потолки подняты сознательно: выгрузка делается ради разбора, а
+            # неполная выгрузка стоит второго захода к клиенту. Время — главный
+            # ограничитель, оно же и видно в форме.
+            max_pages=max(1, min(req.max_pages, 5000)),
+            max_depth=max(1, min(req.max_depth, 8)),
+            time_budget=max(60, min(req.minutes, 90) * 60),
+            max_total_bytes=job.max_mb * 1024 * 1024,
+            min_free_bytes=DISK_RESERVE_MB * 1024 * 1024,
             respect_robots=req.respect_robots,
             use_sitemap=req.use_sitemap,
             on_progress=on_progress,
@@ -623,6 +649,8 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         job.pages, job.assets, job.bytes = stats.pages, stats.assets, stats.bytes
         job.statuses = dict(stats.statuses)
         job.stopped_by = stats.stopped_by
+        job.pages_left, job.assets_left = stats.pages_left, stats.assets_left
+        job.asset_skipped = stats.asset_skipped
         job.errors = stats.errors
         # Заголовок главной показываем в итоге: домен легко набрать с опечаткой
         # (project-doma.ru вместо projekt-doma.ru — реальный случай), выгрузка
@@ -662,6 +690,25 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
             work.rmdir()
 
 
+# Сколько места на томе не отдаём выгрузке ни при каких настройках. Там же
+# лежат база лидов и ключи: заполненный до нуля диск ломает не выгрузку, а
+# весь инструмент, и чинится это уже руками на сервере.
+DISK_RESERVE_MB = 300
+
+
+def _disk_room() -> tuple[int, int]:
+    """Свободно на томе и сколько из этого можно отдать выгрузке.
+
+    Две копии на диске больше не лежат: `mirror.pack` удаляет каждый файл
+    сразу после упаковки, поэтому пик — одна копия плюс запас. Пока копий
+    было две, выгрузке на сервере владельца доставалось 118 МБ из 537, и
+    портфолио в них не влезало.
+    """
+    DUMPS_DIR.mkdir(parents=True, exist_ok=True)
+    free_mb = shutil.disk_usage(DUMPS_DIR).free // (1024 * 1024)
+    return free_mb, max(0, free_mb - DISK_RESERVE_MB)
+
+
 @app.post("/api/dump")
 def start_dump(req: DumpRequest) -> dict:
     domain = (req.domain or "").strip().lower()
@@ -672,7 +719,18 @@ def start_dump(req: DumpRequest) -> dict:
         raise HTTPException(400, "Укажите домен вида example.ru")
     if any(j.status == "running" for j in DUMP_JOBS.values()):
         raise HTTPException(409, "Одна выгрузка уже идёт — дождитесь её окончания.")
-    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain, robots=req.respect_robots)
+    # Потолок объёма ограничен сверху не из вежливости к сайту, а ради тома:
+    # архив ложится на тот же диск, где живёт база лидов.
+    asked_mb = max(10, min(req.max_mb, 3000))
+    free_mb, mozhno_mb = _disk_room()
+    if mozhno_mb < 10:
+        raise HTTPException(
+            507, f"На диске свободно {free_mb} МБ — выгружать некуда. "
+                 f"Удалите готовые архивы ниже или освободите место на сервере."
+        )
+    job = DumpJob(id=uuid.uuid4().hex[:12], domain=domain,
+                  robots=req.respect_robots, max_mb=min(asked_mb, mozhno_mb),
+                  max_mb_asked=asked_mb, free_mb=free_mb)
     DUMP_JOBS[job.id] = job
     threading.Thread(target=_run_dump, args=(job, req), daemon=True).start()
     return {"dump_id": job.id}
@@ -706,7 +764,12 @@ def list_dumps() -> dict:
             "mtime": st.st_mtime,
         })
     items.sort(key=lambda i: i["mtime"], reverse=True)
-    return {"count": len(items), "dumps": items}
+    # Свободное место — рядом со списком архивов, потому что решение «удалить
+    # старую выгрузку» принимается здесь же. На сервере владельца под /data
+    # оставалось 533 МБ при выгрузке, которой нужен гигабайт.
+    free_mb, mozhno_mb = _disk_room()
+    return {"count": len(items), "dumps": items,
+            "free_mb": free_mb, "mozhno_mb": mozhno_mb}
 
 
 @app.get("/api/dumps/{name}")

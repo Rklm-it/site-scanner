@@ -392,6 +392,159 @@ def test_dump_accepts_any_url_form(client, raw, expect, monkeypatch):
     assert seen["domain"] == expect
 
 
+def test_dump_minuty_dohodyat_do_obhoda(client, monkeypatch):
+    """«Минут» из формы обязано доехать до обхода и упереться в потолок.
+
+    Поле, которое рисуется на экране и молча теряется по дороге, — уже
+    случавшаяся здесь ошибка: выгрузка приезжала не той, что заказывали, и
+    выяснялось это только по содержимому архива.
+    """
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen.update(kw)
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+
+    def dump(payload):
+        r = c.post("/api/dump", json=payload)
+        assert r.status_code == 200, r.text
+        for _ in range(50):
+            if c.get(f"/api/dump/{r.json()['dump_id']}").json()["status"] != "running":
+                break
+            time.sleep(0.05)
+
+    dump({"domain": "example.ru", "minutes": 12})
+    assert seen["time_budget"] == 12 * 60
+
+    dump({"domain": "example.ru"})                       # по умолчанию — полная
+    assert seen["time_budget"] == 30 * 60
+    assert seen["max_pages"] == 1500
+
+    dump({"domain": "example.ru", "minutes": 999})       # потолок, а не «сколько попросили»
+    assert seen["time_budget"] == 90 * 60
+
+
+def test_dump_obyom_dohodit_do_obhoda(client, monkeypatch):
+    """«Объём» из формы обязан доехать до обхода и упереться в потолок.
+
+    Раньше потолок в 200 МБ был зашит в обходе и снаружи не менялся: выгрузка
+    сайта на конструкторе обрывалась на середине портфолио и выглядела при
+    этом успешной. Число должно ещё и вернуться в статусе — по нему интерфейс
+    называет причину остановки.
+    """
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen.update(kw)
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+
+    def dump(payload):
+        r = c.post("/api/dump", json=payload)
+        assert r.status_code == 200, r.text
+        for _ in range(50):
+            j = c.get(f"/api/dump/{r.json()['dump_id']}").json()
+            if j["status"] != "running":
+                return j
+            time.sleep(0.05)
+        raise AssertionError("выгрузка не завершилась")
+
+    j = dump({"domain": "example.ru", "max_mb": 900})
+    assert seen["max_total_bytes"] == 900 * 1024 * 1024
+    assert j["max_mb"] == 900
+
+    dump({"domain": "example.ru"})                        # умолчание не изменилось
+    assert seen["max_total_bytes"] == 200 * 1024 * 1024
+
+    dump({"domain": "example.ru", "max_mb": 99999})       # потолок ради тома
+    assert seen["max_total_bytes"] == 3000 * 1024 * 1024
+
+
+def test_dump_potolok_urezaetsya_po_mestu_na_diske(client, monkeypatch):
+    """Просить можно сколько угодно, отдать — только то, что есть на диске.
+
+    Место делится пополам: zip пакуется рядом с ещё не удалённой распакованной
+    выгрузкой. Урезание должно быть видно в статусе, иначе «файлов приехало
+    меньше» опять выясняется при разборе.
+    """
+    from webapp import server
+
+    c, _ = client
+    seen = {}
+
+    def fake_run(domain, dest, **kw):
+        seen.update(kw)
+        dest.mkdir(parents=True, exist_ok=True)
+        st = server.mirror.MirrorStats()
+        st.pages, st.stopped_by = 1, "done"
+        st.pages_index = [{"title": "тест", "file": "index.html"}]
+        (dest / "index.html").write_text("<html></html>", encoding="utf-8")
+        return st
+
+    monkeypatch.setattr(server.mirror, "run", fake_run)
+
+    def mesto(free_mb):
+        total = free_mb * 1024 * 1024
+        monkeypatch.setattr(
+            server.shutil, "disk_usage",
+            lambda p, _t=total: type("U", (), {"total": _t, "used": 0, "free": _t})())
+
+    def dump(payload):
+        r = c.post("/api/dump", json=payload)
+        assert r.status_code == 200, r.text
+        for _ in range(50):
+            j = c.get(f"/api/dump/{r.json()['dump_id']}").json()
+            if j["status"] != "running":
+                return j
+            time.sleep(0.05)
+        raise AssertionError("выгрузка не завершилась")
+
+    # 533 МБ — ровно то, что было на сервере владельца: 533 - 300 запаса
+    mesto(533)
+    j = dump({"domain": "example.ru", "max_mb": 1500})
+    assert j["max_mb"] == 233 and j["max_mb_asked"] == 1500 and j["free_mb"] == 533
+    assert seen["max_total_bytes"] == 233 * 1024 * 1024
+    assert seen["min_free_bytes"] == server.DISK_RESERVE_MB * 1024 * 1024
+
+    # Места вдоволь — просимое доходит целиком
+    mesto(20000)
+    dump({"domain": "example.ru", "max_mb": 1500})
+    assert seen["max_total_bytes"] == 1500 * 1024 * 1024
+
+    # Места нет вовсе — выгрузка не начинается, а не забивает диск под ноль
+    mesto(305)
+    r = c.post("/api/dump", json={"domain": "example.ru", "max_mb": 1500})
+    assert r.status_code == 507
+    assert "305" in r.json()["detail"]
+
+
+def test_dumps_pokazyvayut_mesto_na_diske(client):
+    """Список архивов отдаёт свободное место: решение «удалить» принимается там."""
+    c, _ = client
+    data = c.get("/api/dumps").json()
+    assert data["free_mb"] > 0
+    assert data["mozhno_mb"] == max(0, data["free_mb"] - 300)
+
+
 def test_dump_list_reads_from_disk(client, tmp_path):
     """Список архивов читается с тома, а не из памяти процесса: задачи
     перезапуск контейнера не переживают, а собранные архивы обязаны."""

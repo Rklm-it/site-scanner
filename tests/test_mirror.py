@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import http.server
+import json
 import threading
 import zipfile
 from functools import partial
@@ -33,7 +34,14 @@ PAGES = {
         <a href="/prays.pdf">Прайс</a>
         <a href="https://chужой.example/x">Партнёр</a>
         <a href="/administrator/index.php">Админка</a>
-        <img src="/images/dom.jpg"></body></html>""",
+        <img src="/images/dom.jpg">
+        <img src="data:image/gif;base64,R0lGOD" data-src="/images/lenivaya.jpg">
+        <picture><source srcset="/images/shirokaya.webp 2x, /images/uzkaya.webp 1x"></picture>
+        <div style="background-image: url('/images/fon-sekcii.png')"></div>
+        <img src="https://st.chuzhoy-cdn.example/foto.jpg">
+        <img src="/thumb.php?id=7">
+        <img src="http://VNESHNIY_HOST/images/s-konstruktora.jpg#size_594x376">
+        </body></html>""",
     "/uslugi": "<html><head><title>Услуги</title></head><body><h1>Услуги</h1>"
                "<a href='/katalog/dom-2'>Дом 2</a></body></html>",
     "/katalog/dom-1": "<html><head><title>Дом 1</title></head><body>Дом 1</body></html>",
@@ -65,7 +73,9 @@ class _Handler(http.server.BaseHTTPRequestHandler):
             return self._send(b"<rss/>", "application/rss+xml")
         if path == "/css/style.css":
             return self._send(CSS, "text/css")
-        if path in ("/images/dom.jpg", "/images/fon.png"):
+        if path in ("/images/dom.jpg", "/images/fon.png", "/images/lenivaya.jpg",
+                    "/images/shirokaya.webp", "/images/uzkaya.webp",
+                    "/images/fon-sekcii.png"):
             return self._send(b"\xff\xd8\xff" + b"0" * 200, "image/jpeg")
         if path == "/prays.pdf":
             return self._send(b"%PDF-1.4" + b"0" * 500, "application/pdf")
@@ -74,10 +84,16 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         if path == "/sitemap.xml":
             host = self.headers.get("Host", "")
             return self._send(SITEMAP.replace(b"SITE", host.encode()), "application/xml")
+        if path == "/images/s-konstruktora.jpg":
+            return self._send(b"\xff\xd8\xff" + b"0" * 300, "image/jpeg")
         if path in PAGES:
+            # Тот же сервер под другим именем хоста — так выглядит CDN
+            # конструктора: страницы на домене клиента, картинки на чужом.
+            port = self.headers.get("Host", "").split(":")[-1]
+            body = PAGES[path].replace("VNESHNIY_HOST", f"localhost:{port}")
             # Кириллица в windows-1251 и без charset в заголовке — так отдаёт
             # добрая половина старых сайтов рунета.
-            return self._send(PAGES[path].encode("windows-1251"), "text/html")
+            return self._send(body.encode("windows-1251"), "text/html")
         self.send_error(404)
 
     def _send(self, body: bytes, ctype: str) -> None:
@@ -205,6 +221,57 @@ def test_kartinka_iz_css_nahoditsya(site, tmp_path):
     assert "images/fon.png" in files    # подключена только фоном в CSS
 
 
+def test_lenivye_kartinki_nahodyatsya(site, tmp_path):
+    """Картинка в `src` — уже редкость: ленивая загрузка держит адрес в
+    `data-src`, ретина в `srcset`, фон секции в атрибуте `style`. Пока
+    смотрели только `src`, выгрузка мебельного сайта приезжала с нулём
+    файлов, то есть без портфолио, ради которого её и делают.
+    """
+    _run(site, tmp_path / "d")
+    files = {p.relative_to(tmp_path / "d").as_posix()
+             for p in (tmp_path / "d").rglob("*") if p.is_file()}
+    assert "images/lenivaya.jpg" in files        # data-src
+    assert "images/shirokaya.webp" in files      # srcset у <source>
+    assert "images/uzkaya.webp" in files
+    assert "images/fon-sekcii.png" in files      # фон в атрибуте style
+
+
+def test_pochemu_kartinok_net_vidno_iz_vygruzki(site, tmp_path):
+    """Ноль картинок в архиве — самая частая жалоба, и причину выясняли
+    запросами к живому сайту. Теперь отказы посчитаны и лежат в манифесте:
+    видно и чужой хост, и картинку, которую отдаёт скрипт."""
+    stats = _run(site, tmp_path / "d", external_images=False)
+    assert stats.asset_refs >= 6
+    prichiny = stats.asset_skipped
+    assert any(k.startswith("чужой хост st.chuzhoy-cdn.example") for k in prichiny)
+    assert any("без расширения" in k for k in prichiny)      # /thumb.php?id=7
+    manifest = json.loads((tmp_path / "d" / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["asset_skipped"] == prichiny
+
+
+def test_kartinki_s_cdn_konstruktora_zabirayutsya(site, tmp_path):
+    """Сайт на конструкторе держит фотографии на чужом хосте.
+
+    У mebel-ryazane.ru все 23 тысячи адресов картинок вели на
+    media.lpgenerator.ru, и выгрузка приезжала с нулём файлов при 88
+    скачанных страницах. Для обхода это чужой хост, для клиента — его
+    собственное портфолио, ради которого выгрузка и делается.
+    """
+    stats = _run(site, tmp_path / "d")
+    nashli = list((tmp_path / "d" / "_vneshnie").rglob("s-konstruktora.jpg"))
+    assert nashli, "картинка с чужого хоста не скачана"
+    assert stats.assets_external >= 1
+    # Стили и скрипты с чужих хостов по-прежнему мимо: чужое оформление в
+    # разборе не нужно, а архив раздувает.
+    assert not list((tmp_path / "d" / "_vneshnie").rglob("*.js"))
+
+
+def test_chuzhie_kartinki_otklyuchaemy(site, tmp_path):
+    stats = _run(site, tmp_path / "d", external_images=False)
+    assert stats.assets_external == 0
+    assert not (tmp_path / "d" / "_vneshnie").exists()
+
+
 def test_robots_uvazhaetsya(site, tmp_path):
     _run(site, tmp_path / "d", respect_robots=True)
     assert not (tmp_path / "d" / "administrator").exists()
@@ -214,6 +281,92 @@ def test_limit_stranic_ostanavlivaet(site, tmp_path):
     stats = _run(site, tmp_path / "d", max_pages=2)
     assert stats.pages == 2
     assert stats.stopped_by == "limit"
+    # Сколько именно не добрали — иначе «выгрузка неполная» выясняется через
+    # неделю, когда сайт уже разобран не весь.
+    assert stats.pages_left > 0
+
+
+def test_potolok_obyoma_ostanavlivaet_i_nazyvaetsya(site, tmp_path):
+    """Упёрлись в объём — это должно быть видно, а не выглядеть успехом.
+
+    Сайт на конструкторе держит фотографии на чужом CDN, и там их тысячи:
+    у mebel-ryazane.ru 3005 картинок, которые в прежние зашитые 200 МБ не
+    влезают. Обход обязан назвать причину остановки и сказать, сколько не
+    добрано, иначе половина портфолио теряется молча.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0, max_total_bytes=300)
+    assert stats.stopped_by == "bytes"
+    assert stats.pages_left + stats.assets_left > 0
+
+
+def test_mesto_na_diske_ostanavlivaet_vygruzku(site, tmp_path):
+    """Диск кончился — обход обязан остановиться сам и назвать причину.
+
+    Выгрузка лежит на том же томе, что база лидов и ключи. На сервере
+    владельца под /data оставалось 533 МБ, а сайту на конструкторе нужен
+    гигабайт: без этой границы выгрузка чужих фотографий останавливает весь
+    инструмент, и чинится это руками на сервере.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0, min_free_bytes=10 ** 15)
+    assert stats.stopped_by == "disk"
+
+
+def test_kartinkam_ostayotsya_vremya_kogda_stranicy_ne_uspeli(site, tmp_path):
+    """Картинки качаются последними и раньше оставались без бюджета совсем.
+
+    На papinalavka.ru выгрузка выглядела успешной — 500 страниц, — а картинок
+    приехало 76 из 850: страницы по 0,7 секунды съели семь минут целиком.
+    Теперь доля времени под картинки удержана заранее.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0.2, time_budget=1.0)
+    assert stats.pages_left > 0        # страницам времени не хватило
+    assert stats.assets >= 1           # но картинки всё равно приехали
+    assert stats.stopped_by == "deadline"
+
+
+def test_ostatok_vremeni_vozvrashaetsya_stranicam(site, tmp_path):
+    """Доля под картинки не должна сгорать на сайте, где картинок мало.
+
+    Страницам отдано всего 20% бюджета — за это время сайт не обойти. Но
+    картинки заканчиваются быстро, и остаток возвращается страницам: выгрузка
+    приезжает полной, а не обрезанной по искусственной границе фаз.
+    """
+    stats = mirror.run(site, tmp_path / "d", scheme="http", respect_robots=False,
+                       per_host_delay=0.2, time_budget=3.0, assets_share=0.8)
+    assert stats.pages_left == 0
+    assert stats.stopped_by == "done"
+
+
+def test_pack_ne_derzhit_dve_kopii(tmp_path, monkeypatch):
+    """В пике на диске должна лежать одна копия выгрузки, а не две.
+
+    Пока файлы удалялись после упаковки, выгрузке на 212 МБ требовалось 424 МБ
+    свободных — на сервере владельца столько не набиралось при 537 МБ на всё.
+    Считаем, сколько исходных файлов ещё живо в момент каждой записи в архив:
+    при упаковке «по мере удаления» это число убывает.
+    """
+    src = tmp_path / "work"
+    (src / "vnutri").mkdir(parents=True)
+    for i in range(5):
+        (src / "vnutri" / f"{i}.jpg").write_bytes(b"\xff\xd8\xff" + bytes(1000))
+
+    zhivyh = []
+    nastoyashchiy = zipfile.ZipFile.write
+
+    def schitat(self, filename, arcname=None, **kw):
+        zhivyh.append(sum(1 for p in src.rglob("*") if p.is_file()))
+        return nastoyashchiy(self, filename, arcname, **kw)
+
+    monkeypatch.setattr(zipfile.ZipFile, "write", schitat)
+    mirror.pack(src, tmp_path / "arhiv.zip")
+
+    assert zhivyh == [5, 4, 3, 2, 1]      # каждый файл уходит сразу после записи
+    assert not src.exists()               # рабочая папка убрана целиком
+    with zipfile.ZipFile(tmp_path / "arhiv.zip") as zf:
+        assert len(zf.namelist()) == 5    # и при этом в архиве всё
 
 
 def test_manifest_i_arhiv(site, tmp_path):

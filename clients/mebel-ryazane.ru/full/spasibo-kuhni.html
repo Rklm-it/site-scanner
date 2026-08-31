@@ -1,0 +1,868 @@
+
+
+
+
+
+
+<!DOCTYPE HTML>
+<html lang="en" class="lang-en site-en">
+<head>
+	<link rel="manifest" href="//static.lpgenerator.ru/media/pushNotification/manifest.json">
+	<script type="text/javascript" src="//static.lpgenerator.ru/media/pushNotification/push.js"></script>
+
+    
+
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+    
+    <title>Спасибо за Вашу заявку!</title>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta name="robots" content="NOINDEX, NOFOLLOW"/>
+
+    <meta property="og:image" content="" />
+    <meta property="og:title" content="Спасибо за Вашу заявку!" />
+    <meta property="og:description" content="" />
+
+    <!--/sprypay.tag.check:09723c76c3b5ded03864f1b52b563418/-->
+    
+    
+    
+
+    
+    
+		
+			<link rel="shortcut icon" type="image/png" href="https://media.lpgenerator.ru/favicons/276267/1562831510.jpg" />
+			<link rel="icon" type="image/png" href="https://media.lpgenerator.ru/favicons/276267/1562831510.jpg" />
+		
+
+    
+
+
+	<!-- LPG global declaration -->
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/app/dsn/ru/texts.js?v=11124"></script>
+    
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/dist/landings/lpgCore.js?v=11124"></script>
+
+	<script>
+		LPG.accountId = +'0';
+		LPG.accountPhone = '';
+		LPG.accountFirstName = '';
+        LPG.user = {
+            dateJoined: ''
+        };
+
+		window.callpyLogin = LPG.accountId;
+		window.callpyUserId = 'b6627797169ece686417503494024e01';
+
+		LPG.MEDIA_URL	= '//media.lpgenerator.ru/';
+		LPG.STATIC_URL	= '//static.lpgenerator.ru/media/';
+		LPG.STATIC_V	= '11124';
+		LPG.REG_LANG	= 'ru';
+		LPG.LOCALE		= 'ru';
+
+		LPG.namespace('LPG.config');
+		LPG.config.tutorialToggle = {
+			url: '/editor/tutorial/toggle/'
+		};
+		LPG.config.isTutorial = true;
+		LPG.config.fixedMenu = {
+			alwaysVisible: false
+		};
+		
+		LPG.config.mmSeen = true;
+		LPG.config.isSocialSetup = false;
+		LPG.config.mmAddAnswerUrl = '/main_marketing_add_answer/';
+
+		LPG.namespace('LPG.path');
+		LPG.path = {
+			staticUrl:	'//static.lpgenerator.ru/media/'
+		};
+	</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+
+<script>
+
+function PopUpServices(event) {
+  event.preventDefault();
+
+  var notification = new Noty({
+    type: 'success',
+    layout: 'topRight',
+    theme: 'bootstrap-v4',
+    text: '<div style="display: flex; align-items: center;">' +
+            '<img src="//static.lpgenerator.ru/media/css/images/chelik.png" alt="Icon" style="width: 100px; height: 100px; margin-right: 10px;">' +
+            '<div style="flex: 1;">' +
+              '<div style="font-size: 16px; line-height: 1.1;">Мы обновили раздел «Услуги»!</div>' +
+              '<div style="font-size: 12px; line-height: 1.1; margin-top: 8px;"><a href="https://lpgenerator.ru/services">Перейдите, чтобы узнать, что нового</a></div>' +
+            '</div>' +
+          '</div>',
+    progressBar: true,
+    closeWith: ['click']
+  }).show();
+
+  document.addEventListener('mousedown', function(e) {
+    if (e.target.closest('.noty_bar') === null) {
+      notification.close();
+    }
+  });
+}
+
+</script>
+
+	
+
+    
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/dist/landings/vendors.min.js?v=11124"></script>
+    
+		<script>
+			var redirect = false;
+		</script>
+		
+    
+
+    <link type="text/css" rel="stylesheet" href="//static.lpgenerator.ru/media/ckeditor-4.3.4/plugins/fontAwesome/css/font-awesome.min.css"/>
+
+    
+
+    <link href="//static.lpgenerator.ru/media/css/global/screen.css?v=11124" rel="stylesheet" type="text/css" media="screen,projection" />
+    
+
+    <!--[if lt IE 8]>
+    <link href="//static.lpgenerator.ru/media/css/ie.css?v=11124" rel="stylesheet" type="text/css" media="screen,projection" />
+    <![endif]-->
+	
+
+
+
+
+	
+
+    
+        <script type="text/javascript">
+            jq_144 = jQuery.noConflict(true);
+        </script>
+    
+
+    
+
+    
+    <link href="//static.lpgenerator.ru/media/css/public.css?v=11124" rel="stylesheet" type="text/css" media="screen,projection" />
+    
+        <style class="page__variant-css">.body-pageVariant,
+.preview-main-container {
+    font-family: Arial, Helvetica, sans-serif;
+}
+.page_container {
+    width: 960px;
+    background: 0% 0% no-repeat #FFFFFF ;     height: 100%;
+}
+#middle_container { width: 960px; }
+.preview-main-container,
+.main-container {
+    background-no-scroll: on;
+    min-height: 1805px;
+    width: 960;
+    z-index: 101;
+    anchor-id: #block-page;
+    font-family: Arial, Helvetica, sans-serif; 
+}
+.preview-main-container {
+    min-width: 960px !important;
+}
+</style>
+    
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800,300i,400i,600i,700i,800i,400italic,600italic,300italic|Noto+Serif:400,700|Yeseva+One:400|Play:400,700|Montserrat:300,400,600|Pacifico:400|Comfortaa:400,700,300|Playfair+Display SC:400|Arimo:400,400italic,700,700italic|Neucha:400|Cormorant+SC:300,400|Open+Sans Condensed:300,700|PT+Sans:400,700|PT+Sans Caption:400,700|PT+Serif Caption:400,400italic|Roboto+Condensed:400,300,700|Scada:400,700|Lobster:400|Exo+2:300,200,400,500,600,700,800,900,100|Merriweather:300,300i,400,400i,700,700i,900,900i|Rubik:500,700,300,400,900|Pattaya:400|Ubuntu:300,400,300italic,500,700,300i,400i,500i,700i|Roboto:100,400,300,500,700,900,100italic,300italic,400italic,500italic,700italic,200|Poiret+One:400|Playfair+Display:400,700,900|Lora:400,700|Roboto+Slab:400,300,700,100&amp;subset=cyrillic,cyrillic-ext,latin" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Nothing+You Could Do:400" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Exo:300,400,500,600,700" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Russo+One:400" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Old+Standard TT:400,700" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Marmelad:400" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Reenie+Beanie:400" type="text/css" media="screen" />
+        
+    
+        
+          <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Alice:400" type="text/css" media="screen" />
+        
+    
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/js/upgrade/manager.js?v=11124"></script>
+
+    <link type="text/css" rel="stylesheet" href="//static.lpgenerator.ru/media/app/src/editor/widgets/animation/resource/css/animation.css" />
+
+
+    
+    <script type="text/javascript">
+      var variantId = 2233826;
+    </script>
+    
+    
+
+	<script>
+		/**GLOBAL VARS*/
+        LPG.config.csrfToken = "<input type='hidden' name='csrfmiddlewaretoken' value='h7G7Ap1f4A8ykFZNKKogXCIf2wS4fJNMm6CCFyTyKpx1JntsgDDHHZSyeepe6gPT' />";
+        LPG.config.isFbPage = false;
+        LPG.config.isMobilePage = false;
+        LPG.config.tyPageUrl = '';
+        LPG.texts = {
+            errors: {
+                validation: {
+                    email: 'Enter valid email',
+                    url: 'Enter a valid URL',
+                    value: 'Enter the correct value',
+                    required: 'Required field',
+                }
+            }
+        };
+	</script>
+
+    
+
+
+    
+
+    
+
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/js/lpg/_init.js"></script>
+<script type="text/javascript" src="//static.lpgenerator.ru/media/js/lpg/extensions/array.js"></script>
+<script type="text/javascript" src="//static.lpgenerator.ru/media/js/lpg/utils/elements.js"></script>
+
+</head>
+<body style="" class="reg_lang-ru body-editor body-pageVariant">
+
+
+
+
+
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/dist/landings/landingScriptsBefore.js?v=11124"></script>
+
+    
+
+
+
+    
+        
+            <div id="lpg__oldBrowserWarning" class="lpg__oldBrowserWarning">
+                <div class="lpg__oldBrowserWarning_container">
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td width="40">
+                                <div class="lpg__oldBrowserWarning__ico_alert"></div>
+                            </td>
+                            <td>
+                                <noindex>
+                                    Уважаемый посетитель! Вы используете устаревший браузер, чтобы страница работала правильно, рекомендуется использовать современный браузер.
+                                </noindex>
+                            </td>
+                            <td style="vertical-align:top;"><div id="lpg__oldBrowserWarning__closeX" class="lpg__oldBrowserWarning__ico_closeX"></div></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <script>
+                (function () {
+                    var warningElem = document.getElementById('lpg__oldBrowserWarning');
+
+                    function showWarning() {
+                        warningElem.style.display = 'block';
+                        document.getElementById('lpg__oldBrowserWarning__closeX').onclick = hideWarning;
+                    }
+                    function hideWarning() {
+                        warningElem.style.display = 'none';
+                    }
+
+                    if ( bowser.msie		&&	bowser.version <= 9 )	{ showWarning(); }
+                    if ( bowser.opera		&&	bowser.version <= 30 )	{ showWarning(); }
+                    if ( bowser.firefox		&&	bowser.version <= 35 )	{ showWarning(); }
+                    if ( bowser.safari		&&	bowser.version <= 7 )	{ showWarning(); }
+                }());
+            </script>
+        
+    
+
+
+
+
+    
+
+	
+
+
+    
+
+    
+
+    
+
+    <div class="container preview-main-container" style="">
+    
+    
+    <div id="loading_bar" class="formSending" style="display: none;">
+        <div class="vmidHolder"></div>
+        <div class="loadingBar__loaderWrapper">
+            <div class="loadingBar__loader"></div>
+            <div class="loadingBar__text loadingBar__text-formSending">Отправка...</div>
+        </div>
+    </div>
+
+    
+        <div id="block-new2" style="position: absolute; display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;capture: on;container: on;height: 60px;width: 100%;z-index: 1;anchor-id: #block-new2;background-color: #ffffff;left: 0;top: 0;opacity: NaN;" class="outer-section"></div>
+    
+        <div id="block-new3" style="position: absolute; display: block;position: absolute;background-position: 0% 100%;background-repeat: repeat-x;border-width: 1px;capture: on;container: on;top: 60px;height: 743px;width: 100%;z-index: 1;anchor-id: #block-new3;background-color: #eeeeee;left: 0;opacity: NaN;" class="outer-section"></div>
+    
+        <div id="block-new21" style="position: absolute; display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;capture: on;container: on;top: 803px;height: 1002px;width: 100%;z-index: 1;anchor-id: #block-new21;left: 0;opacity: NaN;" class="outer-section"></div>
+    
+    <div id="fb-root"></div>
+    <div id="preview" class="page_container" style="margin: 0 auto; position: relative; ">
+        
+
+    
+        
+        
+        
+          <div class="block block-text is-text" id="block-new40" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 1211px;height: 60px;width: 103px;z-index: 999;anchor-id: #block-new40;left: 487px;">
+              <p style="text-align: center;"><span style="color:#000000;"><span style="font-size:28px; font-weight: 300;"><span style="font-family:open sans,sans-serif;">№4</span></span></span></p>
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-html is-html" id="block-new39" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 1191px;height: 265px;width: 485px;z-index: 102;anchor-id: #block-new39;left: 484px;">
+              <iframe width="485" height="265" src="https://www.youtube.com/embed/GuB5M2sgtKs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-animationBlock is-animationBlock" id="block-animationBlock" style="">
+              <script>window.blocksAnimatation.set({"new2":{"include":["new14"],"hover":{},"scroll":{},"area":"section"},"new3":{"include":["new13","new7","new16","new66"],"hover":{},"scroll":{},"area":"section"},"new21":{"include":["new30","new31","new50","new34","new35","new38","new39","new40","new53","new48","new42","new41","new61"],"hover":{},"scroll":{},"area":"section"},"new13":{"hover":{},"scroll":{}},"new7":{"hover":{},"scroll":{}},"new30":{"hover":{},"scroll":{}},"new31":{"hover":{},"scroll":{}},"new50":{"hover":{},"scroll":{}},"new16":{"hover":{},"scroll":{}},"new40":{"hover":{},"scroll":{}},"new53":{"hover":{},"scroll":{}},"new48":{"hover":{},"scroll":{}},"new42":{"hover":{},"scroll":{}},"new41":{"hover":{},"scroll":{}},"new66":{"hover":{},"scroll":{}},"new61":{"hover":{},"scroll":{}}});</script>
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-text is-text" id="block-new7" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 405px;height: 160px;width: 795px;z-index: 105;anchor-id: #block-new7;raw-css: Line-height:40px; text-shadow:2px 2px 8px black;;left: 7px;; Line-height:40px; text-shadow:2px 2px 8px black;">
+              <p><span style="color:#FFFFFF;"><span style="font-family:trebuchet ms,helvetica,sans-serif;"><strong><span style="font-size:30px; font-weight: 300;">Пока мы занимаемся обработкой<br />
+ваших данных! Вы можете посмтреть<br />
+отзывы наших клиентов</span><span style="font-size:30px; font-weight: 300;"></span></strong></span></span></p>
+
+          </div>
+        
+    
+        
+            
+        
+        
+        
+    
+        
+            <style id="block-style-new30"> #block-new30  {display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;fix-aspect: on;top: 896px;height: 86px;width: 80px;z-index: 777;anchor-id: #block-new30;left: 499px;}#block-new30 > img{vertical-align:top;}</style>
+        
+        
+        
+          <div class="block block-image is-image" id="block-new30" >
+              
+
+    <img src="//media.lpgenerator.ru/images/276267/artikul.png#size_80x86"
+        alt=""
+        width="80"
+        height="86" />
+
+
+          </div>
+        
+    
+        
+            <style id="block-style-new31"> #block-new31  {display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;fix-aspect: on;top: 1195px;height: 86px;width: 80px;z-index: 777;anchor-id: #block-new31;left: 6px;}#block-new31 > img{vertical-align:top;}</style>
+        
+        
+        
+          <div class="block block-image is-image" id="block-new31" >
+              
+
+    <img src="//media.lpgenerator.ru/images/276267/artikul.png#size_80x86"
+        alt=""
+        width="80"
+        height="86" />
+
+
+          </div>
+        
+    
+        
+            <style id="block-style-new50"> #block-new50  {display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;fix-aspect: on;top: 896px;height: 86px;width: 80px;z-index: 777;anchor-id: #block-new50;left: 6px;}#block-new50 > img{vertical-align:top;}</style>
+        
+        
+        
+          <div class="block block-image is-image" id="block-new50" >
+              
+
+    <img src="//media.lpgenerator.ru/images/276267/artikul.png#size_80x86"
+        alt=""
+        width="80"
+        height="86" />
+
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-html is-html" id="block-new34" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 891px;height: 265px;width: 485px;z-index: 102;anchor-id: #block-new34;left: -13px;">
+              <iframe width="485" height="265" src="https://www.youtube.com/embed/eYxV3kQI10Q" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-html is-html" id="block-new35" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 891px;height: 265px;width: 485px;z-index: 102;anchor-id: #block-new35;left: 484px;">
+              <iframe width="485" height="265" src="https://www.youtube.com/embed/2WVipA7C8TU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-html is-html" id="block-new38" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 1191px;height: 265px;width: 485px;z-index: 102;anchor-id: #block-new38;left: -13px;">
+              <iframe width="485" height="265" src="https://www.youtube.com/embed/SGRBpKaZIX8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-text is-text" id="block-new13" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 198px;height: 195px;width: 771px;z-index: 108;anchor-id: #block-new13;raw-css: Line-height:40px; text-shadow:2px 2px 8px black;;left: 7px;; Line-height:40px; text-shadow:2px 2px 8px black;">
+              <p style="line-height: 1.2;"><span style="font-family:trebuchet ms,helvetica,sans-serif;"><span style="font-size: 74px; line-height: 1.2;"><strong><span style="color: rgb(255, 255, 255); line-height: 1.2;"><span line-height:="" trebuchet="">Спасибо за<br />
+Вашу заявку!</span></span></strong></span></span></p>
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-box is-box" id="block-new14" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;opacity: 0.35;border-color: #cccccc;top: 59px;height: 740px;width: 100%;z-index: 104;anchor-id: #block-new14;border-style: none;background-color: #000000;left: 0;box-sizing: border-box;">
+              
+    <script>
+    var bl = jq_144('#block-new14');
+    bl.parent().parent().append(bl);
+    </script>
+
+          </div>
+        
+    
+        
+            <style id="block-style-new53"> #block-new53  {display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;fix-aspect: on;top: 1195px;height: 86px;width: 80px;z-index: 777;anchor-id: #block-new53;left: 499px;}#block-new53 > img{vertical-align:top;}</style>
+        
+        
+        
+          <div class="block block-image is-image" id="block-new53" >
+              
+
+    <img src="//media.lpgenerator.ru/images/276267/artikul.png#size_80x86"
+        alt=""
+        width="80"
+        height="86" />
+
+
+          </div>
+        
+    
+        
+            <style id="block-style-new16"> #block-new16 { anchor-id: #block-new16; position: absolute; top: 566px;left: 8px;width: 51px; text-align: center; background-color: #; z-index: 108; height: 51px; background-image: url(//media.lpgenerator.ru/images/57561/h-i1.png#size_49x49); background-position: 50% 50%; background-repeat: no-repeat; } #block-new16 > a { display: block; text-decoration: none; cursor: pointer; width: 51px; color: #ffffff; font-size: 26px; box-sizing: border-box; line-height: 51px; height: 51px; padding-right: 9.9px; padding-left: 9.9px; }  </style>
+        
+        
+        
+          <div class="block block-button is-button" id="block-new16" >
+              <a href="#"
+   target="_self"
+   data-label=""
+        ><span class="button__text"></span></a>
+
+
+
+
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-text is-text" id="block-new48" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 912px;height: 60px;width: 103px;z-index: 999;anchor-id: #block-new48;left: -4px;">
+              <p style="text-align: center;"><span style="color:#000000;"><span style="font-size:28px; font-weight: 300;"><span style="font-family:open sans,sans-serif;">№1</span></span></span></p>
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-text is-text" id="block-new42" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 912px;height: 60px;width: 103px;z-index: 999;anchor-id: #block-new42;left: 486.97922803515627px;">
+              <p style="text-align: center;"><span style="color:#000000;"><span style="font-size:28px; font-weight: 300;"><span style="font-family:open sans,sans-serif;">№2</span></span></span></p>
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-text is-text" id="block-new41" style="display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;top: 1211px;height: 60px;width: 103px;z-index: 999;anchor-id: #block-new41;left: -6.006947501953107px;">
+              <p style="text-align: center;"><span style="color:#000000;"><span style="font-size:28px; font-weight: 300;"><span style="font-family:open sans,sans-serif;">№3</span></span></span></p>
+
+          </div>
+        
+    
+        
+            <style id="block-style-new66"> #block-new66  {display: block;position: absolute;background-position: 0% 0%;background-repeat: no-repeat;border-width: 1px;fix-aspect: on;top: 63px;height: 735px;width: 1103px;z-index: 103;anchor-id: #block-new66;left: -24.47265625px;}#block-new66 > img{vertical-align:top;}</style>
+        
+        
+        
+          <div class="block block-image is-image" id="block-new66" >
+              
+
+    <img src="//media.lpgenerator.ru/images/276267/dizajner-2.jpg#size_1103x735"
+        alt=""
+        width="1103"
+        height="735" />
+
+
+          </div>
+        
+    
+        
+            <style id="block-style-new61"> #block-new61 { anchor-id: #block-new61; position: absolute; top: 1508px;left: 278px;width: 389.00694px; text-align: center; background-color: #ffffff; z-index: 1007; height: 83px; border-color: #e45c2d; border-width: 7px; border-style: solid; border-radius: 8px;background-position: 95% 50%; } #block-new61 > a { display: block; text-decoration: none; cursor: pointer; width: 389.00694px; color: #6c5044; font-size: 32px; box-sizing: border-box; line-height: 83px; height: 83px; padding-right: 11.8px; padding-left: 11.8px; font-family: Trebuchet MS; font-weight: bold; } #block-new61:hover { background-color: #fce7e7; } </style>
+        
+        
+        
+          <div class="block block-button is-button" id="block-new61" >
+              <a href="/pages/goto/27464585/?lpg_index=0"
+   target="_blank"
+   data-label="смотреть больше "
+        ><span class="button__text">смотреть больше </span></a>
+
+
+
+
+
+          </div>
+        
+    
+        
+        
+        
+          <div class="block block-langBlock is-langBlock" id="block-langBlock" style="">
+              <script>LPG.LOCALE = 'ru';</script>
+          </div>
+        
+    
+
+    
+        <style type="text/css">
+            .preview-main-container {
+                overflow: hidden;
+            }
+        </style>
+    
+
+
+<!--style class="page__variant-css">.body-pageVariant,
+.preview-main-container {
+    font-family: Arial, Helvetica, sans-serif;
+}
+.page_container {
+    width: 960px;
+    background: 0% 0% no-repeat #FFFFFF ;     height: 100%;
+}
+#middle_container { width: 960px; }
+.preview-main-container,
+.main-container {
+    background-no-scroll: on;
+    min-height: 1805px;
+    width: 960;
+    z-index: 101;
+    anchor-id: #block-page;
+    font-family: Arial, Helvetica, sans-serif; 
+}
+.preview-main-container {
+    min-width: 960px !important;
+}
+</style-->
+
+<script id="tpl-form_error" type="text/template">
+	<div class="landing__form__error">
+		<div class="landing__form__error__iconWrap"><i class="landing__form__error__icon-error ico-sites__exclamation_point_white"></i></div><div class="landing__form__error__message"><span></span></div>
+	</div>
+</script>
+
+
+<script>
+if (typeof jq_144 == 'undefined') { jq_144 = $ }
+
+jq_144(function ( $ ) {
+
+        
+
+        
+
+        
+
+
+        jq_144('iframe').each(function() {
+            jq_144(this).attr("wmode", "transparent");
+        });
+        jq_144('embed').each(function() {
+            jq_144(this).attr("wmode", "transparent");
+        });
+        jq_144('object').each(function() {
+            jq_144(this).append('<param name="wmode" value="transparent" />')
+        });
+
+        jq_144('a.ajax_out').each(function() {
+            var a = jq_144(this);
+            a.attr('data-href', a.attr('href')).attr('href', '#').mousedown(function(e) {
+                if (e.button != 0) { return; }
+                jq_144.ajax({
+                    url: a.attr('rel'),
+                    type: 'GET',
+                    success: function() {
+                        window.location.href = a.attr('data-href');
+                    },
+                    error: function(data) {
+                        window.location.href = a.attr('data-href');
+                    }
+                });
+                return false;
+            });
+        });
+
+
+        
+
+});
+</script>
+
+    </div>
+    
+    
+
+
+    </div>
+
+    
+
+
+    
+
+
+    
+    <script type="text/javascript" src="//static.lpgenerator.ru/media/dist/landings/landingScriptsAfter.js?v=11124"></script>
+    <script>
+        setTimeout(window.blocksAnimatation.run, 500);
+    </script>
+
+    
+    
+	
+
+	
+
+    
+
+    
+
+    
+        <script type="text/javascript">
+        //<![CDATA[
+        function getQueryParams(qs) {
+            qs = qs.split("+").join(" ");
+
+            var params = {}, tokens, re = /[?&]?([^=]+)=([^&]*)/g;
+
+            while (tokens = re.exec(qs)) {
+                params[decodeURIComponent(tokens[1])]
+                    = decodeURIComponent(tokens[2]);
+            }
+
+            return params;
+        }
+        lpg.queryParams = getQueryParams( document.location.search );
+
+        if(redirect===false){
+        (function () {
+        	var query = lpg.queryParams;
+			var params = window.location.search.substring(1);
+        	var vid = "2233826";
+            var pid = "1866740";
+            var pr = "276267";
+            var cv = "1";
+            var ln = 'http://' + location.hostname + location.pathname;
+            var hostname = window.location.hostname;
+
+            if (lpg.queryParams['ch'] || lpg.queryParams['utm_source']) {
+            	var url = "/api/v1/channels/send-to-tracking/" + "?";
+            	url += "vid=" + vid;
+            	url += "&pid=" + pid;
+                url += "&pr=" + pr;
+                url += "&cv=" + cv;
+                url += "&ln=" + ln;
+                url += "&domain=" + hostname;
+
+				if (params)
+					url += "&" + params;
+
+				var s = document.createElement('img');
+				s.id = 'lpg_tr';
+				s.style.display = 'none';
+				s.src = url;
+				var ss = document.body;
+				ss.appendChild(s);
+
+            }
+            else {
+				
+					var remote = "//t.lpgenerator.ru/?type=track";
+				
+
+				var cid = "";
+
+				var path = remote + "&domain=" + hostname;
+
+				path += "&vid=" + vid;
+				path += "&pid=" + pid;
+				if (query.hasOwnProperty('ch'))
+					path += "&cid=" + "";
+				path += "&pr=" + pr;
+				path += "&cv=" + cv;
+				path += "&url=" + ln;
+				if (params)
+					path += "&" + params;
+
+				var s = document.createElement('img');
+				s.id = 'lpg_tr';
+				s.style.display = 'none';
+				s.src = path;
+				var ss = document.body;
+				ss.appendChild(s);
+            }
+        })();
+        }
+        //]]>
+    </script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+        (function () {
+            function setcookie(name, value, expires, path, domain, secure) {
+                expires instanceof Date ? expires = expires.toGMTString() : typeof(expires) == 'number' && (expires = (new Date(+(new Date) + expires * 1e3)).toGMTString());
+                var r = [name + "=" + encodeURIComponent(value)], s, i;
+                for (i in s = {expires: expires, path: path, domain: domain}) {
+                    s[i] && r.push(i + "=" + s[i]);
+                }
+                return secure && r.push("secure"), document.cookie = r.join(";"), true;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            var v_id = '2233826';
+
+            // Utm params
+            var query = lpg.queryParams;
+            var utm_params = ['utm_medium', 'utm_campaign', 'utm_term', 'utm_source', 'ch'];
+
+            for (var i in utm_params) {
+                if (query.hasOwnProperty(utm_params[i])) {
+                    setcookie(utm_params[i] + "_" + v_id, query[utm_params[i]], 86400, '/');
+                }
+            }
+
+            // Meta info
+            var meta_info = {
+                HTTP_USER_AGENT: navigator.userAgent,
+                HTTP_REFERER: document.referrer,
+                LANGUAGE: window.navigator.userLanguage || window.navigator.language,
+                URL_PATH: document.location.search
+            };
+
+            for (var k in meta_info) {
+                setcookie(k, meta_info[k], 2592000, '/');
+            }
+
+            /* cookie for callbackhunter */
+            var cbhCookieParams = lpg.queryParams;
+            cbhCookieParams.page_id = '1866740';
+            cbhCookieParams.page_variant_id = '2233826';
+            setcookie('CBH', JSON.stringify(cbhCookieParams), 86400, '/');
+            setcookie('cbk_lpgenerator_id', JSON.stringify(cbhCookieParams), 86400, '/');
+
+        })();
+        //]]>
+        </script>
+    
+
+    
+
+    
+    
+    
+    
+
+
+    
+
+    
+
+
+
+    
+
+
+<!-- pushNotification popup -->
+
+
+<!-- end pushNotification popup -->
+
+</body>
+</html>

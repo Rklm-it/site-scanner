@@ -615,7 +615,8 @@ let DUMPS = [], DUMP_TIMER = null, DUMP_JOB = null;
 // умолчанию: снятая галочка robots.txt снова оказывалась поставленной, а
 // «Страниц» и «Глубина» сбрасывались. На экране было одно, применялось
 // другое — и выгрузка молча приезжала без картинок.
-const DUMP_FORM = { domain: "", pages: 150, depth: 3, robots: true, sitemap: true };
+const DUMP_FORM = { domain: "", pages: 1500, depth: 5, minutes: 30, mb: 200, robots: true, sitemap: true };
+let DUMP_DISK = { free: 0, mozhno: 0 };
 
 /** Из чего угодно — в домен. Люди вставляют адрес из адресной строки
  *  целиком: со схемой, www, путём и слешем на конце. Сервер это и так
@@ -629,13 +630,30 @@ function cleanDomain(v) {
     .replace(/\.+$/, "");                        // точка на конце
 }
 
+/** Место на томе. Выгрузка живёт там же, где база лидов и ключи, поэтому
+ *  «можно отдать» — свободное за вычетом запаса, и число это должно быть
+ *  видно до запуска, а не после обрыва на середине. Две копии сразу на диске
+ *  больше не лежат: файлы удаляются по мере упаковки в архив. */
+function diskNote() {
+  if (!DUMP_DISK.free) return "";
+  const tesno = DUMP_DISK.mozhno < DUMP_FORM.mb;
+  return `<div class="${tesno ? "warn" : "hint"}">
+    На диске свободно <b>${DUMP_DISK.free} МБ</b>, выгрузке из них можно отдать
+    <b>${DUMP_DISK.mozhno} МБ</b> — остальное держим под базу лидов.
+    ${tesno ? `Заказано ${DUMP_FORM.mb} МБ — потолок урежется до
+       ${DUMP_DISK.mozhno} МБ. Удалите ненужные архивы ниже, иначе фотографии
+       доедут не все.` : ""}</div>`;
+}
+
 function readDumpForm() {
   if (!$("dmp-domain")) return;
   const cleaned = cleanDomain($("dmp-domain").value);
   if (cleaned !== $("dmp-domain").value) $("dmp-domain").value = cleaned;
   DUMP_FORM.domain = cleaned;
-  DUMP_FORM.pages = +$("dmp-pages").value || 150;
-  DUMP_FORM.depth = +$("dmp-depth").value || 3;
+  DUMP_FORM.pages = +$("dmp-pages").value || 1500;
+  DUMP_FORM.depth = +$("dmp-depth").value || 5;
+  DUMP_FORM.minutes = +$("dmp-minutes").value || 30;
+  DUMP_FORM.mb = +$("dmp-mb").value || 200;
   DUMP_FORM.robots = $("dmp-robots").checked;
   DUMP_FORM.sitemap = $("dmp-sitemap").checked;
 }
@@ -674,7 +692,9 @@ function fmtMB(b) {
 
 async function loadDumps() {
   try {
-    DUMPS = ((await (await fetch("/api/dumps")).json()).dumps) || [];
+    const dumpsResp = await (await fetch("/api/dumps")).json();
+    DUMPS = dumpsResp.dumps || [];
+    DUMP_DISK = { free: dumpsResp.free_mb || 0, mozhno: dumpsResp.mozhno_mb || 0 };
   } catch (e) { DUMPS = []; }
 }
 
@@ -715,6 +735,10 @@ function renderDumps() {
           <input type="number" id="dmp-pages" value="${DUMP_FORM.pages}"></div>
         <div><label title="Как глубоко уходить по ссылкам от главной">Глубина</label>
           <input type="number" id="dmp-depth" value="${DUMP_FORM.depth}"></div>
+        <div><label title="Сколько всего минут на выгрузку. Обход ждёт 0,7 секунды между запросами, так что 1000 адресов это примерно 12 минут. Меньшая часть времени удержана под картинки: они качаются последними">Минут</label>
+          <input type="number" id="dmp-minutes" value="${DUMP_FORM.minutes}"></div>
+        <div><label title="Потолок объёма выгрузки. Сайт на конструкторе держит фотографии на чужом CDN, и три тысячи картинок в 200 МБ не влезают: обход остановится на середине портфолио, а выгрузка будет выглядеть успешной">Объём, МБ</label>
+          <input type="number" id="dmp-mb" value="${DUMP_FORM.mb}"></div>
         <div><button id="dmp-run" class="primary" style="width:auto" ${busy ? "disabled" : ""}>Выгрузить сайт</button></div>
       </div>
       <div class="checks">
@@ -724,9 +748,12 @@ function renderDumps() {
           <input type="checkbox" id="dmp-sitemap" ${DUMP_FORM.sitemap ? "checked" : ""}> по карте сайта</label>
       </div>
       ${unknown}
+      ${diskNote()}
       <div id="dmp-progress"></div>
       <div class="hint">Любой сайт, не только из базы лидов — адрес можно вставить
-        целиком, лишнее отрежется. Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
+        целиком, лишнее отрежется. По умолчанию выгрузка полная: 1500 страниц и
+        30 минут, из них меньшая часть удержана под картинки — они качаются
+        последними и без этой доли не доставались вовсе. Тяжёлое (архивы, PDF, видео, шрифты) и RSS-ленты не качаются — они всё
         равно не нужны для разбора и раздувают репозиторий. Страницы приводятся к UTF-8,
         внутри архива есть <code>manifest.json</code> с картой сайта.</div>
     </div>
@@ -737,8 +764,12 @@ function renderDumps() {
 
   $("dmp-run").onclick = startDump;
   $("dmp-domain").onkeydown = e => { if (e.key === "Enter") startDump(); };
-  ["dmp-pages", "dmp-depth", "dmp-robots", "dmp-sitemap"].forEach(
+  ["dmp-pages", "dmp-depth", "dmp-minutes", "dmp-robots", "dmp-sitemap"].forEach(
     id => $(id).addEventListener("change", readDumpForm));
+  // «Объём» перерисовывает секцию: строка про место на диске сравнивает
+  // заказанное со свободным, и показывать в ней прежнее число — хуже, чем
+  // не показывать вовсе.
+  $("dmp-mb").addEventListener("change", () => { readDumpForm(); renderDumps(); });
   // Домен перерисовывает секцию: предупреждение про опечатку должно появиться
   // до запуска, а не после того, как выгрузился чужой сайт.
   $("dmp-domain").addEventListener("change", () => { readDumpForm(); renderDumps(); });
@@ -748,6 +779,16 @@ function renderDumps() {
     await loadDumps(); renderDumps();
   });
   renderDumpProgress();
+}
+
+/** Склонение после числа: «41 страница», а не «41 страниц». Мелочь, но
+ *  сообщение об итогах читают каждый раз, и корявая строка в своём же
+ *  инструменте раздражает сильнее, чем стоило бы. */
+function plural(n, one, few, many) {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return many;
+  if (b > 1 && b < 5) return few;
+  return b === 1 ? one : many;
 }
 
 // Ответы сайта в строке прогресса: без них выгрузка, которой сайт отдаёт
@@ -771,23 +812,55 @@ function renderDumpProgress() {
   } else if (j.status === "error") {
     box.innerHTML = `<div class="warn bad">Не вышло: ${escHtml(j.error || "")}</div>`;
   } else {
-    const cut = j.stopped_by === "limit" ? " — упёрлись в лимит страниц или объёма, подними «Страниц» и повтори"
-              : j.stopped_by === "deadline" ? " — кончился бюджет времени, часть страниц могла не попасть"
-              : "";
+    // Раньше здесь было «упёрлись в лимит» без числа, и понять, чего именно
+    // не хватило, можно было только разбирая архив. Теперь обход считает, что
+    // осталось в очередях, и это единственное, что человеку нужно знать:
+    // повторять выгрузку или идти разбирать.
+    const left = [];
+    if (j.pages_left) left.push(`${j.pages_left} ${plural(j.pages_left, "страница", "страницы", "страниц")}`);
+    if (j.assets_left) left.push(`${j.assets_left} ${plural(j.assets_left, "файл", "файла", "файлов")}`);
+    const why = { limit: ["упёрлись в лимит страниц", "поднимите «Страниц» и повторите"],
+                  bytes: [`выгрузка упёрлась в потолок объёма (${j.max_mb || 200} МБ)`,
+                          "поднимите «Объём» и повторите"],
+                  disk: ["на диске кончилось место",
+                         "удалите старые архивы и повторите"],
+                  deadline: ["кончилось время", "поднимите «Минут» и повторите"] }[j.stopped_by]
+             || ["обход остановился", "повторите выгрузку"];
+    const cut = left.length ? ` — не добрано ${left.join(" и ")}: ${why[0]}, ${why[1]}` : "";
     // Заголовок главной — проверка «тот ли сайт скачали»: опечатка в домене
     // даёт чужой сайт, и без этой строки промах виден только по числу страниц.
     const who = j.title ? `<div class="hint">Скачан сайт: <b>${escHtml(j.title)}</b>
         — если это не ваш клиент, проверьте домен на опечатку.</div>` : "";
-    // Ноль файлов почти всегда значит, что robots.txt закрыл /images/ — так
-    // выглядит стандартный robots Joomla, и выгрузка приезжает без единой
-    // фотографии. Для портфолио это пустая выгрузка, а не «просто без картинок».
-    const noimg = j.assets === 0 ? `<div class="warn">Ни одной картинки. Обычно это
-        robots.txt сайта закрывает папку с изображениями — снимите галочку и
-        повторите, иначе портфолио собирать не из чего.</div>` : "";
+    // Ноль файлов при уважении к robots.txt почти всегда значит, что закрыт
+    // /images/ — так выглядит стандартный robots Joomla. Но если галочку уже
+    // сняли, тот же совет отправляет на второй круг впустую: на
+    // mebel-ryazane.ru выгрузка так и приехала — 89 страниц, ноль картинок,
+    // robots игнорировали. Поэтому во втором случае показываем посчитанную
+    // обходом причину, а не догадку.
+    let noimg = "";
+    if (j.assets === 0 && j.robots) {
+      noimg = `<div class="warn">Ни одной картинки. Обычно это robots.txt сайта
+        закрывает папку с изображениями — снимите галочку и повторите, иначе
+        портфолио собирать не из чего.</div>`;
+    } else if (j.assets === 0) {
+      const top = Object.entries(j.asset_skipped || {}).sort((a, b) => b[1] - a[1])[0];
+      noimg = `<div class="warn">Ни одной картинки, а robots.txt мы и так игнорировали —
+        причина другая, повторять с той же галочкой смысла нет. ${top
+          ? `Обход насчитал ${top[1]} ${plural(top[1], "адрес", "адреса", "адресов")}
+             с причиной «${escHtml(top[0])}».`
+          : `Адресов картинок в разметке не нашлось вовсе — их подставляет скрипт,
+             а обход JavaScript не выполняет.`}
+        Полный разбор — в <code>manifest.json</code>, поле <code>asset_skipped</code>.
+        Портфолио придётся забирать отдельно.</div>`;
+    }
     // Что реально применилось, а не что сейчас нарисовано в форме
+    const urezali = j.max_mb && j.max_mb_asked && j.max_mb < j.max_mb_asked
+      ? `<div class="warn">Потолок объёма урезан с ${j.max_mb_asked} до
+         <b>${j.max_mb} МБ</b>: на томе было свободно ${j.free_mb} МБ, а часть
+         из них держится под базу лидов.</div>` : "";
     const how = `<div class="hint">Домен: <b>${escHtml(j.domain)}</b>, robots.txt
         ${j.robots ? "уважали" : "игнорировали"}.</div>`;
-    box.innerHTML = `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
+    box.innerHTML = urezali + `<div class="warn" style="color:var(--ok)">Готово: страниц ${j.pages},
       файлов ${j.assets}, архив ${fmtMB(j.archive_bytes)}${escHtml(cut)}</div>${who}${how}${noimg}`;
   }
 }
@@ -805,6 +878,8 @@ async function startDump() {
         domain,
         max_pages: DUMP_FORM.pages,
         max_depth: DUMP_FORM.depth,
+        minutes: DUMP_FORM.minutes,
+        max_mb: DUMP_FORM.mb,
         respect_robots: DUMP_FORM.robots,
         use_sitemap: DUMP_FORM.sitemap,
       }),

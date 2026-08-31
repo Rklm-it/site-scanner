@@ -107,10 +107,69 @@ Lighthouse, тянет за собой соседей `/seo`, `/accessibility`,
 без alt у картинок, без sitemap и с картинками в оригинальном разрешении —
 клиенту это продаётся как сайт, а находиться в поиске он не будет.
 
+## Движение: свой скил и четыре чужих
+
+Раньше анимации в наборе не было вовсе (см. «Что сознательно не взяли» —
+причина никуда не делась). Теперь она есть, но с рамкой: сначала правила,
+потом библиотека.
+
+**`/web-animation`** — наш. Отвечает на вопрос «чем и сколько это стоит на
+телефоне»: лестница инструментов от CSS (0 КБ) до GSAP (~50 КБ) с правилом
+«одна библиотека на проект», что анимировать по блокам, почему первый экран
+не анимируется вообще (это LCP: метрика считается по появлению, а без JS там
+пусто), длительности, `prefers-reduced-motion` и мобильный. Проверяется
+скриптом, а не памятью:
+
+```bash
+.claude/skills/web-animation/scripts/check-anim.sh <папка сайта>
+```
+
+Уровень «стоп» (выход 1) — 3D-движок в зависимостях, две библиотеки анимации
+разом, анимация на заголовке первого экрана, движение без
+`prefers-reduced-motion`. Уровень «внимание» — вечные циклы, длительности
+больше секунды, `transition: all`, анимация раскладки вместо `transform`,
+параллакс без отключения на узком экране: выход не меняет, решает человек.
+На боевом прототипе `rgz61.ru` он сразу нашёл два подчёркивания через
+`transition: width` и `transition: right` — оба пересчитывают раскладку на
+каждом кадре. Готовые куски под каждый блок (появление секции, лесенка
+карточек, аккордеон, счётчик, форма) — в `references/dvizhenie.md`, сначала
+на голом CSS, рядом то же на `motion`.
+
+Дальше — четыре чужих, каждый под свой случай, и берётся ровно один:
+
+**`/motion-framer`** — Framer Motion (нынешний `motion`) для React: варианты,
+жесты, `AnimatePresence`, `layout`, пружины. Основной для проектов из
+Lovable — стек там как раз React + Tailwind + shadcn.
+
+**`/gsap-scrolltrigger`** — когда нужен сценарий по прокрутке: закрепление
+экрана, `scrub`, таймлайны. 765 строк в `SKILL.md` плюс каталог приёмов и
+разбор кривых; тяжелее остальных и по весу в бандле, поэтому берётся под
+задачу, а не «чтобы было».
+
+**`/scroll-reveal-libraries`** — AOS: появления по атрибутам в разметке, без
+React и без сборки. Для статической страницы, которую правим кодом.
+
+**`/animated-component-libraries`** — Magic UI и React Bits: готовые
+анимированные блоки под Tailwind и shadcn, копируются в проект как компоненты
+shadcn. Быстрый способ собрать эффектную секцию, не сочиняя анимацию с нуля.
+
+Ни один из четырёх не пишет про `prefers-reduced-motion` в SKILL.md
+(проверено грепом; у Motion есть только `useReducedMotion` в разделе про
+доступность) — поэтому правила лежат в нашем `/web-animation`, и начинать
+надо с него.
+
 ## Остальное
 
 **`/theme-factory`** — десять готовых пар «палитра + шрифты» и PDF-показ.
 Быстрый ответ на «покажите варианты», когда style-recipes избыточны.
+
+**`/algorithmic-art`** — генеративная графика на p5.js: поля потоков, частицы,
+паттерны с воспроизводимым зерном. Взят ради «фирменного элемента», который
+требует `/frontend-design`: свой паттерн для фона шапки, разделителя или
+подложки — это ответ на чужие стоки, которые `check-shablon.sh` считает
+«стопом». На сайт клиента кладётся **картинкой** (SVG или PNG), сам p5.js в
+бандле не появляется — иначе это ровно та тяжесть, от которой мы отказались
+абзацем ниже.
 
 **`/webapp-testing`** — Playwright: открыть свою страницу, прокликать,
 снять скриншоты, посмотреть консоль. Chromium в образе уже стоит (ставился
@@ -123,13 +182,90 @@ Lighthouse, тянет за собой соседей `/seo`, `/accessibility`,
 библиотек) раздаются тем же маркетплейсом и включаются теми же скриптами —
 `plugins/README.md`.
 
+## Комьюнити-скилы по виду (добавлены по списку владельца)
+
+Владелец принёс подборку «топовых скилов для веб-дизайна» (пост Pasquale
+Pillitteri, «The 20 Best Claude Code Skills for UI/UX Design») и попросил
+добавить. Из пяти названных **Anthropic Frontend Design уже стоял**
+(`/frontend-design`), **Figma to Code не взят** (см. «Что сознательно не
+взяли»). Остальные три добавлены копиями с лицензиями — все MIT.
+
+Важно про них помнить: это большие универсальные скилы «на всё про вид», и
+они **перекрываются** с уже собранным набором (`/frontend-design`,
+`/web-design-engineer`, `/theme-factory`, `/web-animation`). Брать под задачу
+**один** вход, а не звать всё сразу — иначе три скила дадут три разных
+мнения о палитре на одной странице. Наши рамки остаются главными: движение —
+только через `/web-animation` (одна библиотека на проект, первый экран не
+анимируем), и никакого 3D/WebGL в бандл.
+
+**`/ui-ux-pro-max`** (`nextlevelbuilder/ui-ux-pro-max-skill`) — не методичка,
+а поисковик по локальной базе: 79 стилей, 192 палитры, 74 пары шрифтов, 119
+правил UX, пресеты GSAP, типы графиков, стеки. Ищется Python-скриптом
+(`scripts/search.py`, Python 3, без внешних зависимостей — проверено, база на
+месте, поиск отвечает). По сути расширенное меню поверх наших
+`/web-design-engineer` (25 стилей) и `/theme-factory` (10 пар): когда клиенту
+нужно показать больше вариантов «вот направления». Две грабли: (1) в SKILL.md
+пути к скрипту идут через `${CLAUDE_PLUGIN_ROOT}` — это переменная плагина, у
+голой копии в `.claude/skills/` она пустая, так что путь к `search.py`
+подставлять от корня репозитория руками; (2) в базе есть GSAP-пресеты — брать
+их можно только не нарушая правило `/web-animation` «одна библиотека».
+
+**`/bencium-innovative-ux-designer`** и **`/bencium-controlled-ux-designer`**
+(`bencium/bencium-claude-code-design-skill`) — один скил в двух режимах.
+*Innovative* — смелый вид под лендинг и кампанию, *Controlled* — строгий, со
+спросом разрешения на каждое решение и упором на WCAG/адаптив. Внутри каждого
+`ACCESSIBILITY.md`, `RESPONSIVE-DESIGN.md`, `MOTION-SPEC.md`,
+`DESIGN-SYSTEM-TEMPLATE.md`. Перекрываются с `/frontend-design` +
+`/web-design-engineer`; их `MOTION-SPEC.md` — второе мнение о движении, но
+решает всё равно наш `/web-animation` (там мобильная цена и запрет на анимацию
+первого экрана, которых у Bencium нет). Лицензия MIT объявлена в README
+репозитория, файла в папке скила не было — `LICENSE.txt` восстановлен по
+стандартному шаблону с указанием автора (bencium.io).
+
+**`/web-design-guidelines`** (`vercel-labs/agent-skills`) — не про «сделать»,
+а про «проверить»: разбирает готовый код интерфейса на соответствие Web
+Interface Guidelines Vercel и выдаёт находки с `файл:строка`. Отдельный угол
+от нашего `/web-quality-audit` (тот про Lighthouse — SEO, метатеги, alt,
+скорость), здесь — про поведение интерфейса: фокус, состояния, клавиатура,
+формы. Ставится рядом как второй, придирчивый ревьюер. Лицензия MIT из README,
+`LICENSE.txt` восстановлен так же (автор — Vercel).
+
 ## Что сознательно не взяли
 
-**3D и тяжёлая анимация** (`freshtechbro/claudedesignskills`: three.js, GSAP
-ScrollTrigger, Lottie, Spline, R3F). Соблазнительно, но клиентов смотрят с
-телефона на мобильном интернете, а три библиотеки анимации убивают Core Web
-Vitals — и ту самую выдачу, ради которой сайт заказывают. Если под конкретный
-проект понадобится скролл-эффект, скил ставится точечно, а не пачкой.
+**Figma to Code** (из того же списка владельца) — официального скила Anthropic
+с таким именем в `anthropics/skills` нет, а сама конвертация «макет Figma →
+код» опирается на Figma MCP и живые макеты в Figma. У нас другой вход: мы
+разбираем **выгрузку старого сайта** (`scanner/mirror.py`) и собираем в
+Lovable, макетов Figma в цепочке не бывает. Скил лёг бы мёртвым грузом. Если
+появится клиент, приносящий дизайн в Figma, — брать Vercel-скилы
+`figma-*` из того же `vercel-labs/agent-skills`, они под Figma MCP и заточены.
+
+**Остальные скилы из тех же трёх репозиториев.** У
+`nextlevelbuilder/ui-ux-pro-max-skill` рядом лежат `design`, `design-system`,
+`ui-styling` (5,8 МБ), `brand`, `slides`, `banner-design` — взят только
+`ui-ux-pro-max`, прочее либо дублирует наш набор, либо не про сайты клиентов.
+У `bencium/...` — целый маркетплейс на два десятка скилов (типографика,
+код-конвенции, венгерский «очеловечиватель», ревьюер EU AI Act); взяты два
+режима UX-дизайнера, ради которых он и в списке. У `vercel-labs/agent-skills`
+не взяты `deploy-to-vercel`, `vercel-optimize`, `vercel-cli-with-tokens`
+(мы деплоим на свой VPS через Caddy, не на Vercel) и `react-*`/`writing-*`
+(перекрываются с тем, что уже есть).
+
+**3D-часть `freshtechbro/claudedesignskills`** — three.js, React Three Fiber,
+Babylon.js, PixiJS, PlayCanvas, A-Frame, Spline, Blender, Rive, Substance 3D.
+Причина прежняя и она не про вкус: клиентов смотрят с телефона на мобильном
+интернете, а WebGL в шапке — это мегабайты, греющаяся батарея и просевшие
+Core Web Vitals, то есть та самая выдача, ради которой сайт и заказывают.
+Из этого набора взяты только четыре скила без 3D (раздел «Движение»), и
+`/web-animation` держит рамку, чтобы они не превратились в три библиотеки
+анимации на одной странице.
+
+Оттуда же не взяты **Lottie** (файл лёгкий, но нужен исходник из After
+Effects — его никто не рисует; иконку в 20 строк SVG проще анимировать
+через CSS), **Locomotive Scroll** и **Barba.js** (перехват прокрутки и
+переходы между страницами: пользователь теряет контроль, а поиск —
+навигацию) и мета-скил **modern-web-design** (перекрывается с
+`/frontend-design` и `/web-design-engineer`, которые уже стоят).
 
 **`bzsasson/pre-launch-audit-skill`** — хороший предзапусковый чек-лист, но
 перекрывается с `web-quality-audit` и рассчитан на Screaming Frog и
@@ -147,9 +283,18 @@ DataForSEO, которых у нас нет.
 
 | Папка | Источник | Коммит | Лицензия |
 |---|---|---|---|
-| `frontend-design`, `theme-factory`, `webapp-testing` | [anthropics/skills](https://github.com/anthropics/skills) | `3b3fad9`, 21.08.2026 | Apache 2.0 |
+| `frontend-design`, `theme-factory`, `webapp-testing`, `algorithmic-art` | [anthropics/skills](https://github.com/anthropics/skills) | `3b3fad9`, 21.08.2026 | Apache 2.0 |
 | `web-design-engineer` | [ConardLi/garden-skills](https://github.com/ConardLi/garden-skills) | `aaf9a82`, 12.07.2026 | MIT |
 | `web-quality-audit`, `seo`, `accessibility`, `core-web-vitals`, `performance`, `best-practices` | [addyosmani/web-quality-skills](https://github.com/addyosmani/web-quality-skills) | `95d6e25`, 14.06.2026 | MIT |
+| `motion-framer`, `gsap-scrolltrigger`, `scroll-reveal-libraries`, `animated-component-libraries` | [freshtechbro/claudedesignskills](https://github.com/freshtechbro/claudedesignskills) | `1da73fe`, 19.11.2025 | MIT |
+| `ui-ux-pro-max` | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | `8bd29e7`, 27.08.2026 | MIT |
+| `bencium-innovative-ux-designer`, `bencium-controlled-ux-designer` | [bencium/bencium-claude-code-design-skill](https://github.com/bencium/bencium-claude-code-design-skill) | `bda4647`, 15.08.2026 | MIT (в README, файла в папке не было — восстановлен) |
+| `web-design-guidelines` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | `dd089a8`, 21.08.2026 | MIT (в README, файла в папке не было — восстановлен) |
+
+Четыре скила про движение приехали из репозитория, который с ноября 2025
+не обновлялся: приёмы там живые, а конкретное имя параметра могло уехать —
+перед правкой кода спрашивать документацию через **context7**, как и по
+любой другой библиотеке.
 
 Копии не изменены, `LICENSE.txt` внутри каждой папки — часть условий, удалять
 нельзя. Начнём править под себя — обе лицензии требуют пометить в `SKILL.md`,
