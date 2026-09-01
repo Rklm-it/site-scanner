@@ -649,3 +649,24 @@ def test_sovsem_bez_mesta_otkazyvaem_ponyatno(client, monkeypatch):
 
     assert otvet.status_code == 507
     assert "120" in otvet.json()["detail"]
+
+
+def test_chast_mozhno_udalit_i_skachat(client):
+    """Недоотправленная часть остаётся на томе с номером в имени
+    (…-2144-01.zip). Проверка имени про номер не знала, и владелец не мог ни
+    скачать такой файл, ни удалить: «Некорректное имя архива» на свой же файл,
+    занимающий место."""
+    c, server = client
+    server.DUMPS_DIR.mkdir(parents=True, exist_ok=True)
+    chast = server.DUMPS_DIR / "textileopt.ru-2026-08-31-2144-01.zip"
+    chast.write_bytes(b"PK\x05\x06" + b"\0" * 18)
+
+    assert c.get("/api/dumps/textileopt.ru-2026-08-31-2144-01.zip").status_code == 200
+    assert c.delete("/api/dumps/textileopt.ru-2026-08-31-2144-01.zip").status_code == 200
+    assert not chast.exists()
+
+
+def test_chuzhoe_imya_po_prezhnemu_otvergaetsya(client):
+    """Послабление в проверке не должно открывать путь наружу."""
+    c, _ = client
+    assert c.delete("/api/dumps/..%2Fsecrets.local.json").status_code in (400, 404)
