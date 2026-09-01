@@ -90,9 +90,13 @@
 cd /root/site-scanner-main
 git fetch origin
 git checkout -B claude/textileopt-new-client-i6zs6n origin/claude/textileopt-new-client-i6zs6n
-df -h /data | tail -1
-ls -la /data/webapp_data/dumps/ | grep textileopt
+docker compose exec -T app df -h /data | tail -1
+docker compose exec -T app ls -la /data/webapp_data/dumps/
 ```
+
+`/data` — том **внутри контейнера**, на хосте такого пути нет: без
+`docker compose exec` обе команды падают с `No such file or directory`, и
+выглядит это как поломка сервера.
 
 Последняя строка — не для порядка. **В релизе лежат части 01, 02 и 04, а 03
 нет.** Нумерация частей сквозная, пропусков в ней не бывает, значит часть 03
@@ -116,6 +120,12 @@ wc -l clients/textileopt.ru/ТЕКСТЫ.md
 Части качаются все (190 МБ), но каждая удаляется сразу после разбора, а на
 диск ложатся только отобранные страницы: пик по месту — одна часть.
 
+**Что в какой части лежит — выяснилось на этом прогоне:** страницы в частях 01
+и 02 (26 и 30 подошедших файлов), в части 04 их нет вовсе — она целиком из
+картинок. Значит **пропавшая часть 03 — это страницы каталога**, то есть ровно
+те, откуда берутся цены. Пока она не найдена, блок 3 достанет цены только по
+той части карточек, что попала в 01–02.
+
 Отсюда приезжает то, чего сейчас не хватает совсем: телефоны, адрес склада,
 режим работы, условия опта и доставки, дословный текст «О компании» и
 «Услуги», вопросы-ответы. Без этого прототип не собирается — выдумывать в
@@ -123,8 +133,8 @@ wc -l clients/textileopt.ru/ТЕКСТЫ.md
 
 ### Блок 3. Сервер сканера: цены (185 МБ на диск, только если место есть)
 
-Смотреть на вывод `df -h /data` из блока 1: **если свободно меньше 400 МБ —
-не запускать**, сначала чистить (`docker image prune -f`, старые архивы на
+Смотреть на вывод `docker compose exec -T app df -h /data` из блока 1: **если
+свободно меньше 400 МБ — не запускать**, сначала чистить (`docker image prune -f`, старые архивы на
 томе).
 
 ```bash
@@ -134,8 +144,8 @@ docker compose exec -T app python - textileopt.ru-2026-09-01-0753 --tolko 'catal
 docker compose exec -T app python - /data/razbor/textileopt.ru-2026-09-01-0753 --tovary \
     < tools/teksty-iz-vygruzki.py > clients/textileopt.ru/ЦЕНЫ.tsv
 head -5 clients/textileopt.ru/ЦЕНЫ.tsv
-rm -rf /data/razbor/textileopt.ru-2026-09-01-0753/catalog
-df -h /data | tail -1
+docker compose exec -T app rm -rf /data/razbor/textileopt.ru-2026-09-01-0753/catalog
+docker compose exec -T app df -h /data | tail -1
 ```
 
 `head -5` — не украшение: разметку цен на этом сайте я не видел, скрипт ищет
