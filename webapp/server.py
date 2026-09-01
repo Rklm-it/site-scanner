@@ -654,6 +654,16 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         _scan_log.info("часть %s ушла в релиз", chast.name)
         return True
 
+    def nomer_chasti() -> int:
+        """Сколько архивов уже ушло — по ним и продолжаем нумерацию.
+
+        Считать по всей длине списка нельзя: там же лежит manifest.json, и
+        из-за него номер перескакивал. В релизе получалось 01, 02, 04 —
+        данные целы, но выглядит как потерянная часть, и первый же разбор
+        начнётся с поисков третьей.
+        """
+        return sum(1 for c in job.chasti if c["name"].endswith(".zip"))
+
     def sbros(katalog: Path) -> None:
         """Отдать накопленное посреди обхода и освободить диск.
 
@@ -662,7 +672,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         как раньше. Теперь на диске в каждый момент лежит не больше одной части.
         """
         mirror.pack_chastyami(katalog, DUMPS_DIR, base, chast_bytes,
-                              otdat=otdat, nachalnyj_nomer=len(job.chasti))
+                              otdat=otdat, nachalnyj_nomer=nomer_chasti())
     try:
         if req.v_github:
             reliz = relizy.sozdat_reliz(
@@ -734,7 +744,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
                                    "bytes": manifest.stat().st_size})
                 manifest.unlink()
             mirror.pack_chastyami(work, DUMPS_DIR, base, chast_bytes,
-                                  otdat=otdat, nachalnyj_nomer=len(job.chasti))
+                                  otdat=otdat, nachalnyj_nomer=nomer_chasti())
             job.archive_bytes = sum(c["bytes"] for c in job.chasti)
             if work.exists():
                 work.rmdir()
