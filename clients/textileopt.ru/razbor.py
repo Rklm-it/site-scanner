@@ -5,7 +5,7 @@
 пересобирать выводы придётся каждой следующей сессии — после дозагрузки
 выгрузки цифры поменяются. Печатает то, из чего собраны КАРТА.md и КАТАЛОГ.md.
 
-    python3 clients/textileopt.ru/razbor.py [--tree|--seo|--tovary]
+    python3 clients/textileopt.ru/razbor.py [--tree|--seo|--tovary|--ceny]
 """
 import json, re, sys, collections, os
 from urllib.parse import urlparse
@@ -23,6 +23,34 @@ for p in M['index']:
     PAGES.append((path, p))
 
 TOVAR = re.compile(r'/(\d+)/$')
+CENY_TSV = os.path.join(BASE, 'ЦЕНЫ.tsv')
+
+
+def ceny() -> dict:
+    """id товара -> цена в рублях, из ЦЕНЫ.tsv.
+
+    Файл снят с выгрузки на сервере: цен в манифесте нет, они внутри HTML.
+    Строки страниц-разделов сюда не идут — цена на листинге принадлежит
+    первому товару в списке, а не разделу, и «от» из неё не получается:
+    на 47 разделах, где есть и листинг, и карточки, она совпала с минимумом
+    только в 26.
+    """
+    out = {}
+    if not os.path.exists(CENY_TSV):
+        return out
+    with open(CENY_TSV, encoding='utf-8') as f:
+        for stroka in f:
+            chasti = stroka.rstrip('\n').split('\t')
+            if len(chasti) < 3:
+                continue
+            m = re.search(r'/(\d+)\.html$', chasti[0])
+            if not m or not chasti[2].strip():
+                continue
+            try:
+                out[m.group(1)] = float(chasti[2].replace(' ', '').replace(',', '.'))
+            except ValueError:
+                pass
+    return out
 
 
 def razdely():
@@ -83,8 +111,18 @@ if __name__ == '__main__':
     if what == '--tree':
         tree()
     elif what == '--tovary':
+        c = ceny()
         for k, v in sorted(tovary().items()):
             for i, name in v:
-                print(f'{k}\t{i}\t{name}')
+                print(f'{k}\t{i}\t{name}\t{c.get(i, "")}')
+    elif what == '--ceny':
+        c, t = ceny(), tovary()
+        r = razdely()
+        print('товаров с ценой: %d' % len(c))
+        for key in sorted(t):
+            ceny_razdela = [c[i] for i, _ in t[key] if i in c]
+            if ceny_razdela:
+                print('%8.2f – %8.2f  (%2d)  %s' % (min(ceny_razdela), max(ceny_razdela),
+                                                    len(ceny_razdela), r.get(key, key)))
     else:
         seo()
