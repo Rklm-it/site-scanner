@@ -1,0 +1,75 @@
+/* Величины и палитра — из DESIGN.md, менять только там и переносить сюда. */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root {
+  --grafit: #1C1918;
+  --bumaga: #F4EDE8;
+  --signal: #E27328;
+  --holod: #719C9E;
+  --vtoroy: #5C534D;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Golos Text', system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ekran {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 48px 0;
+}
+
+.shapka {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 15px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.leybl {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.knopka {
+  display: inline-block;
+  background: var(--signal);
+  color: var(--grafit);          /* белый по оранжевому даёт 3.1 — нельзя */
+  font-family: 'Golos Text', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 16px 32px;
+  border: 0;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Строка сметы: название слева, цифра справа, между ними точки. */
+.stroka {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+}
+.stroka .tochki { flex: 1; border-bottom: 1px dotted currentColor; opacity: .45; transform: translateY(-4px); }
+
+@media (max-width: 700px) {
+  .ekran { padding: 16px 20px 0; }
+  /* На 375 px название и телефон слипались в одну строку без пробела —
+     ставим их в столбик, а не жмём кегль. */
+  .shapka { flex-direction: column; align-items: flex-start; gap: 4px; }
+}

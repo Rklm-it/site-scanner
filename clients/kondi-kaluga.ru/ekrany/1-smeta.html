@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конди-Калуга — первый экран, вариант «Смета»</title>
+<link rel="stylesheet" href="obshee.css">
+<style>
+  body { background: var(--grafit); color: var(--bumaga); }
+  .shapka { color: var(--bumaga); }
+  .telefon { color: var(--bumaga); text-decoration: none; }
+  .telo { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 64px; align-items: center; padding: 48px 0; }
+  .itog {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 128px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--signal);
+    font-variant-numeric: tabular-nums;
+    margin: 8px 0 32px;
+  }
+  .smeta { max-width: 520px; }
+  .smeta .stroka + .stroka { margin-top: 0; }
+  .stroka.itogo { color: var(--bumaga); font-weight: 500; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--vtoroy); }
+  .polya { display: flex; flex-direction: column; gap: 24px; }
+  .pole label { display: block; color: var(--holod); margin-bottom: 8px; }
+  .pole select {
+    width: 100%; height: 56px; padding: 0 16px;
+    background: transparent; color: var(--bumaga);
+    border: 1px solid var(--vtoroy); border-radius: 4px;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 15px;
+    appearance: none;
+  }
+  .pole select:focus { outline: 2px solid var(--signal); outline-offset: 2px; }
+  .podval { padding: 24px 0 32px; border-top: 1px solid #2a2624; font-size: 15px; color: #A69C95; }
+  @media (max-width: 900px) {
+    .telo { grid-template-columns: 1fr; gap: 32px; padding: 32px 0; }
+    .itog { font-size: 56px; }
+    .polya { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+<main class="ekran">
+  <header class="shapka">
+    <span>Конди-Калуга, Калуга</span>
+    <a class="telefon" href="tel:+74842400998">+7 (4842) 400-998</a>
+  </header>
+
+  <div class="telo">
+    <div class="smeta">
+      <p class="leybl" style="color: var(--holod)">Монтаж под ключ, всё включено</p>
+      <p class="itog">14&nbsp;250&nbsp;₽</p>
+
+      <p class="stroka"><span>девятка, 2,5 кВт</span><span class="tochki"></span><span>12 000 ₽</span></p>
+      <p class="stroka"><span>штроба, кирпич, 1,5 м</span><span class="tochki"></span><span>2 250 ₽</span></p>
+      <p class="stroka itogo"><span>итого</span><span class="tochki"></span><span>14 250 ₽</span></p>
+    </div>
+
+    <form class="polya" onsubmit="return false">
+      <div class="pole">
+        <label class="leybl" for="m">Мощность</label>
+        <select id="m"><option>9 (25) — 2,5 кВт</option><option>7 (20) — 2,0 кВт</option><option>12 (35) — 3,5 кВт</option></select>
+      </div>
+      <div class="pole">
+        <label class="leybl" for="s">Стена</label>
+        <select id="s"><option>кирпич</option><option>пеноблок</option><option>бетон</option></select>
+      </div>
+      <div class="pole">
+        <label class="leybl" for="t">Трасса</label>
+        <select id="t"><option>3 метра</option><option>5 метров</option><option>больше 5 метров</option></select>
+      </div>
+      <button class="knopka" type="submit">Отправить расчёт мастеру</button>
+    </form>
+  </div>
+
+  <footer class="podval">
+    В стандартный монтаж входит: подбор кондиционера, работа монтажников, трасса 5 метров
+    (медная труба, межблочный кабель, дренаж, теплоизоляция), комплект кронштейнов.
+  </footer>
+</main>
+</body>
+</html>

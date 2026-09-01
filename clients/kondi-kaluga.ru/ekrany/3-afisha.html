@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конди-Калуга — первый экран, вариант «Прайс как афиша»</title>
+<link rel="stylesheet" href="obshee.css">
+<style>
+  body { background: var(--bumaga); color: var(--grafit); }
+  .telefon { color: var(--grafit); text-decoration: none; }
+  .telo { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 0; }
+  .prays { width: 100%; border-collapse: collapse; margin-top: 16px; max-width: 1100px; }
+  .prays td {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-weight: 500; font-size: 36px; line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    border-bottom: 1px solid var(--holod);
+    padding: 4px 0;
+  }
+  .prays td.cena { text-align: right; }
+  .prays tr.vydelena { position: relative; }
+  .prays td.k-knopke { border-bottom: 0; padding-left: 0; width: 320px; }
+  .k-knopke .vmeste { display: flex; align-items: center; }
+  .k-knopke .liniya { width: 56px; height: 2px; background: var(--signal); flex: none; }
+  .pod { margin-top: 32px; max-width: 62ch; color: var(--vtoroy); }
+  .podval { padding: 24px 0 32px; }
+  @media (max-width: 900px) {
+    .prays td { font-size: 20px; }
+    .prays td.k-knopke { display: none; }
+    .prays tr:nth-child(3) td.k-knopke { display: table-cell; width: auto; }
+    .k-knopke .liniya { display: none; }
+  }
+</style>
+</head>
+<body>
+<main class="ekran">
+  <header class="shapka">
+    <span>Конди-Калуга, Калуга</span>
+    <a class="telefon" href="tel:+74842400998">+7 (4842) 400-998</a>
+  </header>
+
+  <div class="telo">
+    <p class="leybl">Стандартный монтаж, трасса до 5 метров</p>
+
+    <table class="prays">
+      <tr><td>7 (20) · 2,0 кВт</td><td class="cena">12 000 ₽</td><td class="k-knopke"></td></tr>
+      <tr><td>9 (25) · 2,5 кВт</td><td class="cena">12 000 ₽</td><td class="k-knopke"></td></tr>
+      <tr><td>12 (35) · 3,5 кВт</td><td class="cena">13 000 ₽</td>
+          <td class="k-knopke"><span class="vmeste"><span class="liniya"></span><a class="knopka" href="#">Посчитать мой случай</a></span></td></tr>
+      <tr><td>18 (50) · 5,1 кВт</td><td class="cena">14 000 ₽</td><td class="k-knopke"></td></tr>
+      <tr><td>24 (70) · 6,5 кВт</td><td class="cena">16 000 ₽</td><td class="k-knopke"></td></tr>
+      <tr><td>30 (80) · 8,0 кВт</td><td class="cena">17 000 ₽</td><td class="k-knopke"></td></tr>
+    </table>
+
+    <p class="pod">
+      Дальше метр трассы 1 700–2 600 ₽, штроба по материалу стены:
+      пеноблок 900, кирпич 1 500, бетон 2 000 ₽ за метр.
+    </p>
+  </div>
+</main>
+</body>
+</html>

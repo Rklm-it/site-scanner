@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конди-Калуга — первый экран, вариант «Кадр»</title>
+<link rel="stylesheet" href="obshee.css">
+<style>
+  body { background: var(--grafit); color: var(--bumaga); }
+  .ekran { position: relative; padding: 0; overflow: hidden; height: 100vh; }
+  /* Фотография их же работы: uploads/gallery/DSC09122.JPG из выгрузки.
+     Никаких стоков и никаких сгенерированных кадров — это правило DESIGN.md. */
+  .kadr { position: absolute; inset: 0; background: url(fasad.jpg) center/cover no-repeat; }
+  .zatemnenie { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(28,25,24,.55) 0%, rgba(28,25,24,.35) 40%, rgba(28,25,24,.85) 100%); }
+  .sloy { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .shapka { color: var(--bumaga); padding: 24px 48px; }
+  .telefon { color: var(--bumaga); text-decoration: none; }
+  .niz { margin-top: auto; padding: 0 48px 48px; }
+  h1 {
+    font-family: 'Unbounded', system-ui, sans-serif;
+    font-weight: 700; font-size: 72px; line-height: .98; letter-spacing: -0.02em;
+    max-width: 16ch;
+  }
+  .pod { margin-top: 24px; font-size: 18px; max-width: 46ch; }
+  .polosa {
+    position: relative; z-index: 1;
+    background: var(--signal); color: var(--grafit);
+    min-height: 72px; display: flex; align-items: center; gap: 32px;
+    padding: 12px 48px; flex-wrap: wrap;
+  }
+  .polosa .stroka { flex: 0 1 auto; gap: 12px; }
+  .polosa .tochki { display: none; }
+  .polosa .itogo { font-weight: 500; }
+  .polosa a { margin-left: auto; color: var(--grafit); font-weight: 500; }
+  @media (max-width: 900px) {
+    .ekran { height: auto; min-height: 100vh; }
+    .shapka { padding: 16px 20px; flex-direction: column; gap: 4px; align-items: flex-start; }
+    .niz { padding: 0 20px 32px; }
+    h1 { font-size: 34px; }
+    .polosa { padding: 16px 20px; gap: 8px; flex-direction: column; align-items: flex-start; }
+    .polosa a { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<main class="ekran">
+  <div class="kadr"></div>
+  <div class="zatemnenie"></div>
+
+  <div class="sloy">
+    <header class="shapka">
+      <span>Конди-Калуга, Калуга</span>
+      <a class="telefon" href="tel:+74842400998">+7 (4842) 400-998</a>
+    </header>
+
+    <div class="niz">
+      <h1>Ставим кондиционеры в Калуге с 2004 года</h1>
+      <p class="pod">Монтаж под ключ, цена известна до выезда.</p>
+    </div>
+  </div>
+
+  <div class="polosa">
+    <span class="stroka"><span>девятка, 2,5 кВт</span><span>12 000 ₽</span></span>
+    <span class="stroka"><span>штроба, кирпич, 1,5 м</span><span>2 250 ₽</span></span>
+    <span class="stroka itogo"><span>итого</span><span>14 250 ₽</span></span>
+    <a href="#">Собрать свою смету</a>
+  </div>
+</main>
+</body>
+</html>
