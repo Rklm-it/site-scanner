@@ -67,11 +67,20 @@ echo "== выгрузка $teg → $kuda"
 # checkout о них споткнётся. Форма с -B — единственная безопасная: она
 # одинаково работает, есть ветка на машине или её тут ещё не было.
 if [ -n "$vetka" ]; then
-    if [ -n "$(git status --porcelain)" ]; then
+    # Смотрим только на отслеживаемые файлы: неотслеживаемые checkout переносит
+    # между ветками как есть и теряет их только если бы затирал. На первом же
+    # запуске гвард встал из-за забытого clients/textileopt.ru/ЦЕНЫ.tsv, к
+    # переключению ветки отношения не имевшего.
+    if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
         echo "в рабочем каталоге есть незакоммиченные правки — разберись с ними," >&2
         echo "иначе переключение ветки их утащит:" >&2
-        git status --short >&2
+        git status --short --untracked-files=no >&2
         exit 1
+    fi
+    lishnee="$(git status --porcelain --untracked-files=all | grep '^??' || true)"
+    if [ -n "$lishnee" ]; then
+        echo "рядом лежат неотслеживаемые файлы, их не трогаю:"
+        printf '%s\n' "$lishnee"
     fi
     git fetch origin
     if git rev-parse --verify -q "origin/$vetka" >/dev/null; then
