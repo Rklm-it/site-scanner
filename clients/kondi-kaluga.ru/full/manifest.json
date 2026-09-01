@@ -1,0 +1,2594 @@
+{
+  "domain": "kondi-kaluga.ru",
+  "collected": "2026-09-01 18:24",
+  "pages": 322,
+  "assets": 662,
+  "stopped_by": "done",
+  "pages_left": 0,
+  "assets_left": 0,
+  "asset_refs": 4340,
+  "asset_skipped": {
+    "чужой хост mc.yandex.ru": 322,
+    "чужой хост top-fwz1.mail.ru": 644,
+    "чужой хост web.redhelper.ru": 322
+  },
+  "assets_external": 1,
+  "index": [
+    {
+      "url": "https://www.kondi-kaluga.ru/",
+      "file": "index.html",
+      "title": "Конди-Калуга: установка кондиционеров в Калуге, продажа кондиционеров",
+      "h1": "Установка, ремонт, продажа кондиционеров в Калуге и области",
+      "description": "Наша компани в течении 14 лет профессионально занимается установкой кондиционеров на территории Калуги и области. Сервисное и гарантийное обслуживание кондиционеров.",
+      "bytes": 43902
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/novinki/",
+      "file": "novinki.html",
+      "title": "Новинки - новые модели кондиционеров",
+      "h1": "Новинки 2026 года!",
+      "description": "",
+      "bytes": 50204
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/montazh/",
+      "file": "montazh.html",
+      "title": "Установка (монтаж) кондиционеров в Калуге, купить кондиционер",
+      "h1": "Установка (монтаж) кондиционеров и климатической техники",
+      "description": "Информация о производимых работах при установке кондиционера и другой климатической техники.",
+      "bytes": 45493
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/stoimost/",
+      "file": "stoimost.html",
+      "title": "Стоимость установки кондиционера, кондиционер цена",
+      "h1": "Стоимость установки кондиционера, цена кондиционера",
+      "description": "Информация о ценах на установку кондиционеров.",
+      "bytes": 46840
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/foto-nashih-rabot/",
+      "file": "foto-nashih-rabot.html",
+      "title": "Фото наших работ",
+      "h1": "Фото наших работ",
+      "description": "",
+      "bytes": 39626
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/pomosch-v-vybore/",
+      "file": "pomosch-v-vybore.html",
+      "title": "Кондиционеры - помощь в выборе кондиционера",
+      "h1": "Помощь в выборе",
+      "description": "",
+      "bytes": 46403
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/remont/",
+      "file": "remont.html",
+      "title": "Ремонт кондиционеров",
+      "h1": "Ремонт кондиционеров",
+      "description": "Информация о ремонт кодиционеров и климатической техники нашей компанией.",
+      "bytes": 39115
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/tehnicheskoe-obsluzhivanie/",
+      "file": "tehnicheskoe-obsluzhivanie.html",
+      "title": "Техническое обслуживание кондиционеров Калуга",
+      "h1": "Техническое обслуживание кондиционеров в Калуге",
+      "description": "Информация о проводимом техническом обслуживании кондиционеров и списке работ.",
+      "bytes": 46355
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/garantiya/",
+      "file": "garantiya.html",
+      "title": "Гарантия на кондиционеры",
+      "h1": "Гарантия",
+      "description": "Информация о гарантии и гарантийных случаях.",
+      "bytes": 40468
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/about/",
+      "file": "about.html",
+      "title": "Информация о компании Конди-Калуга",
+      "h1": "О компании Конди-Калуга",
+      "description": "Информация о истории и создании компании Конди-Калуга.",
+      "bytes": 47601
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/vakansii/",
+      "file": "vakansii.html",
+      "title": "Вакансии",
+      "h1": "Вакансии",
+      "description": "",
+      "bytes": 38984
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kontakty/",
+      "file": "kontakty.html",
+      "title": "Контакты",
+      "h1": "Контакты",
+      "description": "",
+      "bytes": 40400
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/split-sistemy/",
+      "file": "split-sistemy.html",
+      "title": "Сплит-системы",
+      "h1": "Сплит-системы",
+      "description": "Информация и цены на сплит-системы предлагаемые компанией Конди-Калуга.",
+      "bytes": 58435
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51577
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kanalnaya/",
+      "file": "kanalnaya.html",
+      "title": "Канальные кондиционеры",
+      "h1": "Канальные кондиционеры",
+      "description": "",
+      "bytes": 48253
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/",
+      "file": "kassetnye.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 50079
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/napolno-potolochnye/",
+      "file": "napolno-potolochnye.html",
+      "title": "Напольные кондиционеры (напольно-потолочные кондиционеры)",
+      "h1": "Напольные кондиционеры",
+      "description": "",
+      "bytes": 48363
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kolonnye/",
+      "file": "kolonnye.html",
+      "title": "Колонные кондиционеры",
+      "h1": "Колонные кондиционеры",
+      "description": "",
+      "bytes": 45964
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/okonnye_fix/",
+      "file": "okonnye_fix.html",
+      "title": "Оконные кондиционеры",
+      "h1": "Оконные кондиционеры",
+      "description": "Информация, характеристики и цены оконных кондиционеров.",
+      "bytes": 38771
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/mobilnye/",
+      "file": "mobilnye.html",
+      "title": "Мобильные кондиционеры",
+      "h1": "Мобильные кондиционеры",
+      "description": "",
+      "bytes": 45625
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/multisplit-sistemy/",
+      "file": "multisplit-sistemy.html",
+      "title": "Мультисплит-системы",
+      "h1": "Мультисплит-системы",
+      "description": "",
+      "bytes": 45469
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/multizone/",
+      "file": "multizone.html",
+      "title": "Мультизональные системы",
+      "h1": "Мультизональные системы",
+      "description": "Мультизональные системы.",
+      "bytes": 38689
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51247
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/12042017/",
+      "file": "12042017.html",
+      "title": "Отложенная установка кондиционера",
+      "h1": "Отложенная установка",
+      "description": "",
+      "bytes": 32433
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/29062016/",
+      "file": "29062016.html",
+      "title": "Жара - время ставить кондиционер",
+      "h1": "Лето! Жара! Самое время ставить кондиционер!",
+      "description": "",
+      "bytes": 31665
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/karta-sayta/",
+      "file": "karta-sayta.html",
+      "title": "Карта сайта",
+      "h1": "Карта сайта",
+      "description": "",
+      "bytes": 33625
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/okonnyy-kondicioner/",
+      "file": "okonnyy-kondicioner.html",
+      "title": "Оконный кондиционер",
+      "h1": "Оконный кондиционер",
+      "description": "",
+      "bytes": 39857
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/mobilnyy-kondicioner/",
+      "file": "mobilnyy-kondicioner.html",
+      "title": "Мобильный кондиционер",
+      "h1": "Мобильный кондиционер",
+      "description": "",
+      "bytes": 42044
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennaya-split-sistema/",
+      "file": "nastennaya-split-sistema.html",
+      "title": "Настенная сплит-система",
+      "h1": "Настенная сплит-система",
+      "description": "",
+      "bytes": 42579
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kanalnaya-split-sistema/",
+      "file": "kanalnaya-split-sistema.html",
+      "title": "Канальная сплит-система",
+      "h1": "Канальная сплит-система",
+      "description": "",
+      "bytes": 42481
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnaya-split-sitema/",
+      "file": "kassetnaya-split-sitema.html",
+      "title": "Кассетная сплит-ситема",
+      "h1": "Кассетная сплит-ситема",
+      "description": "",
+      "bytes": 42181
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/napolno-potolochnaya-split-sistema/",
+      "file": "napolno-potolochnaya-split-sistema.html",
+      "title": "Напольно-потолочная сплит-система",
+      "h1": "Напольно-потолочная сплит-система",
+      "description": "",
+      "bytes": 42574
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kolonnaya-split-sistema/",
+      "file": "kolonnaya-split-sistema.html",
+      "title": "Колонная сплит-система",
+      "h1": "Колонная сплит-система",
+      "description": "",
+      "bytes": 41767
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/multi-split-sistema/",
+      "file": "multi-split-sistema.html",
+      "title": "Мульти-сплит система",
+      "h1": "Мульти-сплит система",
+      "description": "",
+      "bytes": 42193
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/multizonalnaya-sistema/",
+      "file": "multizonalnaya-sistema.html",
+      "title": "Мультизональная система",
+      "h1": "Мультизональная система",
+      "description": "",
+      "bytes": 40781
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertor/",
+      "file": "invertor.html",
+      "title": "Инвертор",
+      "h1": "Инвертор",
+      "description": "",
+      "bytes": 43697
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGM53HFA1-KSRM53HFA1/",
+      "file": "kondicioner-Kentatsu-KSGM53HFA1-KSRM53HFA1.html",
+      "title": "Кондиционер Kentatsu KSGM53HFA1/ KSRM53HFA1",
+      "h1": "Кондиционер Kentatsu KSGM53HFA1/ KSRM53HFA1",
+      "description": "",
+      "bytes": 48671
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMBD-24HRN1--MOMBD-24HRN1/",
+      "file": "kondicioner-Midea-MSMBD-24HRN1--MOMBD-24HRN1.html",
+      "title": "Кондиционер Midea MSMBD-24HRN1 / MOMBD-24HRN1",
+      "h1": "Кондиционер Midea MSMBD-24HRN1 / MOCA01-24HN1",
+      "description": "",
+      "bytes": 52660
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-MIDEA-MSMA1A-12HRN1MOAB02-12HN1/",
+      "file": "kondicioner-MIDEA-MSMA1A-12HRN1MOAB02-12HN1.html",
+      "title": "Кондиционер MIDEA MSMA1A-12HRN1/MOAB02-12HN1",
+      "h1": "Кондиционер MIDEA MSMA1A-12HRN1/MOAB02-12HN1",
+      "description": "",
+      "bytes": 45947
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42SMH048100193138HN0481193A/",
+      "file": "kondicioner-Carrier-42SMH048100193138HN0481193A.html",
+      "title": "Кондиционер Carrier 42SMH0481001931/38HN0481193A",
+      "h1": "Кондиционер Carrier 42SMH0481001931/ 38HN0481193A",
+      "description": "",
+      "bytes": 43220
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42SMH036100193138HN0361193A/",
+      "file": "kondicioner-Carrier-42SMH036100193138HN0361193A.html",
+      "title": "Кондиционер Carrier 42SMH0361001931/38HN0361193A",
+      "h1": "Кондиционер Carrier 42SMH0361001931/ 38HN0361193A",
+      "description": "",
+      "bytes": 43179
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42SMH060100193138HN0601193A/",
+      "file": "kondicioner-Carrier-42SMH060100193138HN0601193A.html",
+      "title": "Кондиционер Carrier 42SMH0601001931/38HN0601193A",
+      "h1": "Кондиционер Carrier 42SMH0601001931/ 38HN0601193A",
+      "description": "",
+      "bytes": 43172
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-RP100BA3/",
+      "file": "PLA-RP100BA3.html",
+      "title": "PLA-RP100BA3",
+      "h1": "Кондиционер Mitsubishi PLA-RP100BA3",
+      "description": "",
+      "bytes": 51723
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP71BA/",
+      "file": "PLA-ZRP71BA.html",
+      "title": "PLA-ZRP71BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP71BA",
+      "description": "",
+      "bytes": 52276
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-RP71BA2/",
+      "file": "PLA-RP71BA2.html",
+      "title": "PLA-RP71BA2",
+      "h1": "Кондиционер Mitsubishi PLA-RP71BA2",
+      "description": "",
+      "bytes": 51684
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42FTH024100123138HN0241123A/",
+      "file": "kondicioner-Carrier-42FTH024100123138HN0241123A.html",
+      "title": "Кондиционер Carrier 42FTH0241001231/38HN0241123A",
+      "h1": "Кондиционер Carrier 42FTH0241001231/ 38HN0241123A",
+      "description": "",
+      "bytes": 43172
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42FTH018100123138HN0181123A/",
+      "file": "kondicioner-Carrier-42FTH018100123138HN0181123A.html",
+      "title": "Кондиционер Carrier 42FTH0181001231/38HN0181123A",
+      "h1": "Кондиционер Carrier 42FTH0181001231/ 38HN0181123A",
+      "description": "",
+      "bytes": 43032
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42FTH060100193138HN0601193A/",
+      "file": "kondicioner-Carrier-42FTH060100193138HN0601193A.html",
+      "title": "Кондиционер Carrier 42FTH0601001931/38HN0601193A",
+      "h1": "Кондиционер Carrier 42FTH0601001931/  38HN0601193A",
+      "description": "",
+      "bytes": 43184
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MFAMOV-76CN1-C/",
+      "file": "kondicioner-Midea-MFAMOV-76CN1-C.html",
+      "title": "Кондиционер Midea MFA/MOV-76CN1-C",
+      "h1": "Кондиционер Midea MFA/MOV-76CN1-C",
+      "description": "",
+      "bytes": 42863
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Electrolux-EACF-24H/",
+      "file": "kondicioner-Electrolux-EACF-24H.html",
+      "title": "Кондиционер Electrolux EACF-24H",
+      "h1": "Кондиционер Electrolux EACF-24H",
+      "description": "",
+      "bytes": 42871
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Zanussi-ZACF-24GN1/",
+      "file": "kondicioner-Zanussi-ZACF-24GN1.html",
+      "title": "Кондиционер Zanussi ZACF-24G/N1",
+      "h1": "Кондиционер Zanussi ZACF-24G/N1",
+      "description": "",
+      "bytes": 43001
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50221
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 46831
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=Daikin",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47916
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=Kentatsu",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51228
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=MIDEA",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51141
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50226
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/?model=Axioma",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50145
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB70HFAN1KSRB70HFAN1/",
+      "file": "kondicioner-Kentatsu-KSGB70HFAN1KSRB70HFAN1.html",
+      "title": "Кондиционер Kentatsu KSGB70HFAN1/KSRB70HFAN1",
+      "h1": "Кондиционер Kentatsu KSGB70HFAN1/KSRB70HFAN1",
+      "description": "",
+      "bytes": 49637
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB53HFAN1KSRB53HFAN1/",
+      "file": "kondicioner-Kentatsu-KSGB53HFAN1KSRB53HFAN1.html",
+      "title": "Кондиционер Kentatsu KSGB53HFAN1/KSRB53HFAN1",
+      "h1": "Кондиционер Kentatsu KSGB53HFAN1/KSRB53HFAN1",
+      "description": "",
+      "bytes": 49767
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB35HFAN1KSRB35HFAN1/",
+      "file": "kondicioner-Kentatsu-KSGB35HFAN1KSRB35HFAN1.html",
+      "title": "Кондиционер Kentatsu KSGB35HFAN1/KSRB35HFAN1",
+      "h1": "Кондиционер Kentatsu KSGB35HFAN1/KSRB35HFAN1",
+      "description": "",
+      "bytes": 49696
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB26HFAN1KSRB26HFAN1/",
+      "file": "kondicioner-Kentatsu-KSGB26HFAN1KSRB26HFAN1.html",
+      "title": "Кондиционер Kentatsu KSGB26HFAN1/KSRB26HFAN1",
+      "h1": "Кондиционер Kentatsu KSGB26HFAN1/KSRB26HFAN1",
+      "description": "",
+      "bytes": 49741
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB21HFAN1KSRB21HFAN1/",
+      "file": "kondicioner-Kentatsu-KSGB21HFAN1KSRB21HFAN1.html",
+      "title": "Кондиционер Kentatsu KSGB21HFAN1/KSRB21HFAN1",
+      "h1": "Кондиционер Kentatsu KSGB21HFAN1/KSRB21HFAN1",
+      "description": "",
+      "bytes": 49602
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX27A1ASB27A1/",
+      "file": "kondicioner-Axioma-ASX27A1ASB27A1.html",
+      "title": "Кондиционер Axioma ASX27A1/ASB27A1",
+      "h1": "Кондиционер Axioma ASX27A1/ASB27A1",
+      "description": "",
+      "bytes": 50281
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kanalnaya/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "kanalnaya.html",
+      "title": "Канальные кондиционеры",
+      "h1": "Канальные кондиционеры",
+      "description": "",
+      "bytes": 48231
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42SMH024100123138HN0241123A/",
+      "file": "kondicioner-Carrier-42SMH024100123138HN0241123A.html",
+      "title": "Кондиционер Carrier 42SMH0241001231/38HN0241123A",
+      "h1": "Кондиционер Carrier 42SMH0241001231/ 38HN0241123A",
+      "description": "",
+      "bytes": 43087
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42SMH018100123138HN0181123A/",
+      "file": "kondicioner-Carrier-42SMH018100123138HN0181123A.html",
+      "title": "Кондиционер Carrier 42SMH0181001231/38HN0181123A",
+      "h1": "Кондиционер Carrier 42SMH0181001231/ 38HN0181123A",
+      "description": "",
+      "bytes": 42977
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/?model=%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%B1%D1%80%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F",
+      "file": "kassetnye.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 49753
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "kassetnye.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 45875
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42TSH38HN0361193A/",
+      "file": "kondicioner-Carrier-42TSH38HN0361193A.html",
+      "title": "Кондиционер Carrier 42TSH/38HN0361193A",
+      "h1": "Кондиционер Carrier 42TSH/38HN0361193A",
+      "description": "",
+      "bytes": 40164
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42TSH38HN0241123A/",
+      "file": "kondicioner-Carrier-42TSH38HN0241123A.html",
+      "title": "Кондиционер Carrier 42TSH/38HN0241123A",
+      "h1": "Кондиционер Carrier 42TSH/38HN0241123A",
+      "description": "",
+      "bytes": 40086
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42TSH38HN0181123A/",
+      "file": "kondicioner-Carrier-42TSH38HN0181123A.html",
+      "title": "Кондиционер Carrier 42TSH/38HN0181123A",
+      "h1": "Кондиционер Carrier 42TSH/38HN0181123A",
+      "description": "",
+      "bytes": 40015
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-RP125BA2/",
+      "file": "PLA-RP125BA2.html",
+      "title": "PLA-RP125BA2",
+      "h1": "Кондиционер Mitsubishi PLA-RP125BA2",
+      "description": "",
+      "bytes": 48892
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/napolno-potolochnye/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "napolno-potolochnye.html",
+      "title": "Напольные кондиционеры (напольно-потолочные кондиционеры)",
+      "h1": "Напольные кондиционеры",
+      "description": "",
+      "bytes": 45366
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42FTH048100193138HN0481193A/",
+      "file": "kondicioner-Carrier-42FTH048100193138HN0481193A.html",
+      "title": "Кондиционер Carrier 42FTH0481001931/38HN0481193A",
+      "h1": "Кондиционер Carrier 42FTH0481001931/ 38HN0481193A",
+      "description": "",
+      "bytes": 40273
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42FTH036100193138HN0361193A/",
+      "file": "kondicioner-Carrier-42FTH036100193138HN0361193A.html",
+      "title": "Кондиционер Carrier 42FTH0361001931/38HN0361193A",
+      "h1": "Кондиционер Carrier 42FTH0361001931/ 38HN0361193A",
+      "description": "",
+      "bytes": 40232
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kolonnye/?model=%D0%98%D1%82%D0%B0%D0%BB%D0%B8%D1%8F%20Zanussi",
+      "file": "kolonnye.html",
+      "title": "Колонные кондиционеры",
+      "h1": "Колонные кондиционеры",
+      "description": "",
+      "bytes": 40772
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kolonnye/?model=Electrolux%20%D0%A8%D0%B2%D0%B5%D1%86%D0%B8%D1%8F",
+      "file": "kolonnye.html",
+      "title": "Колонные кондиционеры",
+      "h1": "Колонные кондиционеры",
+      "description": "",
+      "bytes": 40793
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kolonnye/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "kolonnye.html",
+      "title": "Колонные кондиционеры",
+      "h1": "Колонные кондиционеры",
+      "description": "",
+      "bytes": 40769
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/mobilnye/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "mobilnye.html",
+      "title": "Мобильные кондиционеры",
+      "h1": "Мобильные кондиционеры",
+      "description": "",
+      "bytes": 41539
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/mobilnye/?model=Electrolux%20%D0%A8%D0%B2%D0%B5%D1%86%D0%B8%D1%8F",
+      "file": "mobilnye.html",
+      "title": "Мобильные кондиционеры",
+      "h1": "Мобильные кондиционеры",
+      "description": "",
+      "bytes": 40513
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Electrolux-EACM-14DRN3/",
+      "file": "kondicioner-Electrolux-EACM-14DRN3.html",
+      "title": "Кондиционер Electrolux EACM-14DR/N3",
+      "h1": "Кондиционер Electrolux EACM-14DR/N3",
+      "description": "",
+      "bytes": 39929
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BPAM-12HD/",
+      "file": "kondicioner-Ballu-BPAM-12HD.html",
+      "title": "Кондиционер Ballu BPAM-12HD",
+      "h1": "Кондиционер Ballu BPAM-12HD",
+      "description": "",
+      "bytes": 39900
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BPAM-09H/",
+      "file": "kondicioner-Ballu-BPAM-09H.html",
+      "title": "Кондиционер Ballu BPAM-09H",
+      "h1": "Кондиционер Ballu BPAM-09H",
+      "description": "",
+      "bytes": 39854
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/multisplit-sistemy/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "multisplit-sistemy.html",
+      "title": "Мультисплит-системы",
+      "h1": "Мультисплит-системы",
+      "description": "",
+      "bytes": 42507
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-M4OC-36HRDN1/",
+      "file": "kondicioner-Midea-M4OC-36HRDN1.html",
+      "title": "Кондиционер Midea M4OC-36HRDN1",
+      "h1": "Кондиционер Midea M4OC-36HRDN1",
+      "description": "",
+      "bytes": 39854
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-M3OC1-21HRDN1/",
+      "file": "kondicioner-Midea-M3OC1-21HRDN1.html",
+      "title": "Кондиционер Midea M3OC1-21HRDN1",
+      "h1": "Кондиционер Midea M3OC1-21HRDN1",
+      "description": "",
+      "bytes": 40003
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-M2OC-14HRDN1/",
+      "file": "kondicioner-Midea-M2OC-14HRDN1.html",
+      "title": "Кондиционер Midea M2OC-14HRDN1",
+      "h1": "Кондиционер Midea M2OC-14HRDN1",
+      "description": "",
+      "bytes": 39936
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47625
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=Toshiba",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48288
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45094
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=Daikin",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45910
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=MIDEA",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45004
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=Axioma",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 42396
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/?model=Kentatsu",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 44842
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB70HZAN1KSRB70HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGB70HZAN1KSRB70HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGB70HZAN1/KSRB70HZAN1",
+      "h1": "Кондиционер Kentatsu KSGB70HZAN1/KSRB70HZAN1",
+      "description": "",
+      "bytes": 46349
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB53HZAN1KSRB53HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGB53HZAN1KSRB53HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGB53HZAN1/KSRB53HZAN1",
+      "h1": "Кондиционер Kentatsu KSGB53HZAN1/KSRB53HZAN1",
+      "description": "",
+      "bytes": 46166
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB35HZAN1KSRB35HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGB35HZAN1KSRB35HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGB35HZAN1/KSRB35HZAN1",
+      "h1": "Кондиционер Kentatsu KSGB35HZAN1/KSRB35HZAN1",
+      "description": "",
+      "bytes": 46052
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGB26HZAN1KSRB26HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGB26HZAN1KSRB26HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGB26HZAN1/KSRB26HZAN1",
+      "h1": "Кондиционер Kentatsu KSGB26HZAN1/KSRB26HZAN1",
+      "description": "",
+      "bytes": 46061
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX09AZ1ASB09AZ1/",
+      "file": "kondicioner-Axioma-ASX09AZ1ASB09AZ1.html",
+      "title": "Кондиционер Axioma ASX09AZ1/ASB09AZ1",
+      "h1": "Кондиционер Axioma ASX09AZ1/ASB09AZ1",
+      "description": "",
+      "bytes": 44420
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX07AZ1ASB07AZ1/",
+      "file": "kondicioner-Axioma-ASX07AZ1ASB07AZ1.html",
+      "title": "Кондиционер Axioma ASX07AZ1/ASB07AZ1",
+      "h1": "Кондиционер Axioma ASX07AZ1/ASB07AZ1",
+      "description": "",
+      "bytes": 44771
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/o-kompanii/",
+      "file": "o-kompanii.html",
+      "title": "Конди-Калуга: установка кондиционеров в Калуге, продажа кондиционеров",
+      "h1": "Установка, ремонт, продажа кондиционеров в Калуге и области",
+      "description": "Наша компани в течении 14 лет профессионально занимается установкой кондиционеров на территории Калуги и области. Сервисное и гарантийное обслуживание кондиционеров.",
+      "bytes": 40962
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/vybor-kondicionera/",
+      "file": "vybor-kondicionera.html",
+      "title": "Выбор кондиционера",
+      "h1": "Выбор кондиционера",
+      "description": "",
+      "bytes": 36008
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/ustanovka-kondicionera/",
+      "file": "ustanovka-kondicionera.html",
+      "title": "Установка и стоимость работ",
+      "h1": "Установка и стоимость",
+      "description": "",
+      "bytes": 36309
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/servis-i-remont/",
+      "file": "servis-i-remont.html",
+      "title": "Сервис и Ремонт",
+      "h1": "Сервис и Ремонт",
+      "description": "",
+      "bytes": 36114
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kredit/",
+      "file": "kredit.html",
+      "title": "Кредит",
+      "h1": "Кредит",
+      "description": "",
+      "bytes": 39299
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/climat/",
+      "file": "climat.html",
+      "title": "Умный микроклимат для дома и офиса",
+      "h1": "Умный микроклимат",
+      "description": "Умный микроклимат для дома и офиса - информация, описание и характеристики оборудования.",
+      "bytes": 45530
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/foto-nashih-rabot/page/2/",
+      "file": "foto-nashih-rabot/page/2.html",
+      "title": "Фото наших работ",
+      "h1": "Фото наших работ",
+      "description": "",
+      "bytes": 38996
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGM61HFA1-KSRM61HFA1/",
+      "file": "kondicioner-Kentatsu-KSGM61HFA1-KSRM61HFA1.html",
+      "title": "Кондиционер Kentatsu KSGM61HFA1/ KSRM61HFA1",
+      "h1": "Кондиционер Kentatsu KSGM61HFA1/ KSRM61HFA1",
+      "description": "",
+      "bytes": 45568
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMO11D-09HRN1/",
+      "file": "kondicioner-Midea-MSMO11D-09HRN1.html",
+      "title": "Кондиционер Midea MS/MO11D-09HRN1",
+      "h1": "Кондиционер Midea MS/MO11D-09HRN1",
+      "description": "",
+      "bytes": 44813
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP35BA/",
+      "file": "PLA-ZRP35BA.html",
+      "title": "PLA-ZRP35BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP35BA",
+      "description": "",
+      "bytes": 49349
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP50BA/",
+      "file": "PLA-ZRP50BA.html",
+      "title": "PLA-ZRP50BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP50BA",
+      "description": "",
+      "bytes": 49293
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-invertor-FTXB60CRXB60C/",
+      "file": "kondicioner-Daikin-invertor-FTXB60CRXB60C.html",
+      "title": "Кондиционер Daikin инвертор FTXB60C/RXB60C",
+      "h1": "Кондиционер Daikin FTXB60C/RXB60C",
+      "description": "",
+      "bytes": 51421
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-16EKV-EERAS-16EAV-EE/",
+      "file": "kondicioner-Toshiba-invertor-RAS-16EKV-EERAS-16EAV-EE.html",
+      "title": "Кондиционер Toshiba инвертор RAS-16EKV-EE/RAS-16EAV-EE",
+      "h1": "Кондиционер Toshiba инвертор RAS-16EKV-EE/RAS-16EAV-EE",
+      "description": "",
+      "bytes": 44262
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-18N3KV-ERAS-18N3AV-E/",
+      "file": "kondicioner-Toshiba-invertor-RAS-18N3KV-ERAS-18N3AV-E.html",
+      "title": "Кондиционер Toshiba инвертор RAS-18N3KV-E/RAS-18N3AV-E",
+      "h1": "Кондиционер Toshiba инвертор RAS-18N3KV-E/RAS-18N3AV-E",
+      "description": "",
+      "bytes": 44965
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-MIDEA-MSMA1A-24HRN1MOAB02-24HN1/",
+      "file": "kondicioner-MIDEA-MSMA1A-24HRN1MOAB02-24HN1.html",
+      "title": "Кондиционер MIDEA MSMA1A-24HRN1/MOAB02-24HN1",
+      "h1": "Кондиционер MIDEA MSMA1A-24HRN1/MOAB02-24HN1",
+      "description": "",
+      "bytes": 43666
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-invertor-Midea-MS11D-09HRDN1-M011D-09HRDN1/",
+      "file": "kondicioner-invertor-Midea-MS11D-09HRDN1-M011D-09HRDN1.html",
+      "title": "Кондиционер инвертор Midea MS11D-09HRDN1/ M011D-09HRDN1",
+      "h1": "Кондиционер  Midea инвертор MS11D-09HRDN1/ M011D-09HRDN1",
+      "description": "",
+      "bytes": 44943
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-10EKV-EERAS-10EAV-EE/",
+      "file": "kondicioner-Toshiba-invertor-RAS-10EKV-EERAS-10EAV-EE.html",
+      "title": "Кондиционер Toshiba инвертор RAS-10EKV-EE/RAS-10EAV-EE",
+      "h1": "Кондиционер Toshiba инвертор RAS-10EKV-EE/RAS-10EAV-EE",
+      "description": "",
+      "bytes": 44720
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMBA-18HRN1--MOMBA-18HRN1/",
+      "file": "kondicioner-Midea-MSMBA-18HRN1--MOMBA-18HRN1.html",
+      "title": "Кондиционер Midea MSMBA-18HRN1 / MOMBA-18HRN1",
+      "h1": "Кондиционер Midea MSMBC-19HRN1 / MOBA02-18HN1",
+      "description": "",
+      "bytes": 49689
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-invertor-FTXB20CRXB20C/",
+      "file": "kondicioner-Daikin-invertor-FTXB20CRXB20C.html",
+      "title": "Кондиционер Daikin инвертор FTXB20C/RXB20C",
+      "h1": "Кондиционер Daikin FTXB20C/RXB20C",
+      "description": "",
+      "bytes": 45553
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX07A1ASB07A1/",
+      "file": "kondicioner-Axioma-ASX07A1ASB07A1.html",
+      "title": "Кондиционер Axioma ASX07A1/ASB07A1",
+      "h1": "Кондиционер Axioma ASX07A1/ASB07A1",
+      "description": "",
+      "bytes": 46785
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-FTYN60LRYN60L/",
+      "file": "kondicioner-Daikin-FTYN60LRYN60L.html",
+      "title": "Кондиционер Daikin FTYN60L/RYN60L",
+      "h1": "Кондиционер Daikin FTYN60L/RYN60L",
+      "description": "",
+      "bytes": 48779
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX12A1ASB12A1/",
+      "file": "kondicioner-Axioma-ASX12A1ASB12A1.html",
+      "title": "Кондиционер Axioma ASX12A1/ASB12A1",
+      "h1": "Кондиционер Axioma ASX12A1/ASB12A1",
+      "description": "",
+      "bytes": 47272
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-UQV-Inverter-5-kvt/",
+      "file": "kondicioner-CARRIER-42-UQV-Inverter-5-kvt.html",
+      "title": "Кондиционер CARRIER - 42 UQV Inverter 5 квт",
+      "h1": "Кондиционер CARRIER инвертор - 42UQV050M/ 38UYV050M",
+      "description": "",
+      "bytes": 44813
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-22N3KV-ERAS-22N3AV-E/",
+      "file": "kondicioner-Toshiba-invertor-RAS-22N3KV-ERAS-22N3AV-E.html",
+      "title": "Кондиционер Toshiba инвертор RAS-22N3KV-E/RAS-22N3AV-E",
+      "h1": "Кондиционер Toshiba инвертор RAS-22N3KV-E/RAS-22N3AV-E",
+      "description": "",
+      "bytes": 45024
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-UQV-Inverter-6-kvt/",
+      "file": "kondicioner-CARRIER-42-UQV-Inverter-6-kvt.html",
+      "title": "Кондиционер CARRIER - 42 UQV Inverter 6 квт",
+      "h1": "Кондиционер CARRIER инвертор - 42UQV060M/ 38UYV060M",
+      "description": "",
+      "bytes": 44779
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGM70HFA1-KSRM70HFA1/",
+      "file": "kondicioner-Kentatsu-KSGM70HFA1-KSRM70HFA1.html",
+      "title": "Кондиционер Kentatsu KSGM70HFA1/ KSRM70HFA1",
+      "h1": "Кондиционер Kentatsu KSGM70HFA1/ KSRM70HFA1",
+      "description": "",
+      "bytes": 45716
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BSW-12HN1-15Y/",
+      "file": "kondicioner-Ballu-BSW-12HN1-15Y.html",
+      "title": "Кондиционер Ballu BSW-12HN1_15Y",
+      "h1": "Кондиционер Ballu BSW-12HN1_15Y",
+      "description": "",
+      "bytes": 46395
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMO11D-24NHR1/",
+      "file": "kondicioner-Midea-MSMO11D-24NHR1.html",
+      "title": "Кондиционер Midea MS/MO11D-24NHR1",
+      "h1": "Кондиционер Midea MS/MO11D-24HRN1",
+      "description": "",
+      "bytes": 44869
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMO11D-21HRN1/",
+      "file": "kondicioner-Midea-MSMO11D-21HRN1.html",
+      "title": "Кондиционер Midea MS/MO11D-21HRN1",
+      "h1": "Кондиционер Midea MS/MO11D-21HRN1",
+      "description": "",
+      "bytes": 47828
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMO11D-18HRN1/",
+      "file": "kondicioner-Midea-MSMO11D-18HRN1.html",
+      "title": "Кондиционер Midea MS/MO11D-18HRN1",
+      "h1": "Кондиционер Midea MS/MO11D-18HRN1",
+      "description": "",
+      "bytes": 47904
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMO11D-12HRN1/",
+      "file": "kondicioner-Midea-MSMO11D-12HRN1.html",
+      "title": "Кондиционер Midea MS/MO11D-12HRN1",
+      "h1": "Кондиционер Midea MS/MO11D-12HRN1",
+      "description": "",
+      "bytes": 47709
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMO11D-07HRN1/",
+      "file": "kondicioner-Midea-MSMO11D-07HRN1.html",
+      "title": "Кондиционер Midea MS/MO11D-07HRN1",
+      "h1": "Кондиционер Midea MS/MO11D-07HRN1",
+      "description": "",
+      "bytes": 47815
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42NQ38NY018N/",
+      "file": "kondicioner-Carrier-42NQ38NY018N.html",
+      "title": "Кондиционер Carrier 42NQ/38NY018N",
+      "h1": "Кондиционер Carrier 42NQ/38NY018N",
+      "description": "",
+      "bytes": 47438
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42NQ38NY012N/",
+      "file": "kondicioner-Carrier-42NQ38NY012N.html",
+      "title": "Кондиционер Carrier 42NQ/38NY012N",
+      "h1": "Кондиционер Carrier 42NQ/38NY012N",
+      "description": "",
+      "bytes": 47524
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Carrier-42NQ38NY009N/",
+      "file": "kondicioner-Carrier-42NQ38NY009N.html",
+      "title": "Кондиционер Carrier 42NQ/38NY009N",
+      "h1": "Кондиционер Carrier 42NQ/38NY009N",
+      "description": "",
+      "bytes": 47514
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-FTYN50LRYN50L/",
+      "file": "kondicioner-Daikin-FTYN50LRYN50L.html",
+      "title": "Кондиционер Daikin FTYN50L/RYN50L",
+      "h1": "Кондиционер Daikin FTYN50L/RYN50L",
+      "description": "",
+      "bytes": 51708
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-FTYN35LRYN35L/",
+      "file": "kondicioner-Daikin-FTYN35LRYN35L.html",
+      "title": "Кондиционер Daikin FTYN35L/RYN35L",
+      "h1": "Кондиционер Daikin FTYN35L/RYN35L",
+      "description": "",
+      "bytes": 51733
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-FTYN25LRYN25L/",
+      "file": "kondicioner-Daikin-FTYN25LRYN25L.html",
+      "title": "Кондиционер Daikin FTYN25L/RYN25L",
+      "h1": "Кондиционер Daikin FTYN25L/RYN25L",
+      "description": "",
+      "bytes": 51744
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-MIDEA-MSMA1A-18HRN1MOAB02-18HN1/",
+      "file": "kondicioner-MIDEA-MSMA1A-18HRN1MOAB02-18HN1.html",
+      "title": "Кондиционер MIDEA MSMA1A-18HRN1/MOAB02-18HN1",
+      "h1": "Кондиционер MIDEA MSMA1A-18HRN1/MOAB02-18HN1",
+      "description": "",
+      "bytes": 46111
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-MIDEA-MSMA1A-09HRN1MOAB02-09HN1/",
+      "file": "kondicioner-MIDEA-MSMA1A-09HRN1MOAB02-09HN1.html",
+      "title": "Кондиционер MIDEA MSMA1A-09HRN1/MOAB02-09HN1",
+      "h1": "Кондиционер MIDEA MSMA1A-09HRN1/MOAB02-09HN1",
+      "description": "",
+      "bytes": 45572
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/MSMA1A-07HRN1MOAB02-07HN1/",
+      "file": "MSMA1A-07HRN1MOAB02-07HN1.html",
+      "title": "MSMA1A-07HRN1/MOAB02-07HN1",
+      "h1": "Кондиционер MIDEA MSMA1A-07HRN1/MOAB02-07HN1",
+      "description": "",
+      "bytes": 45578
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BSW-30HN1-15Y/",
+      "file": "kondicioner-Ballu-BSW-30HN1-15Y.html",
+      "title": "Кондиционер Ballu BSW-30HN1_15Y",
+      "h1": "Кондиционер Ballu BSW-30HN1_15Y",
+      "description": "",
+      "bytes": 46532
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BSW-24HN1-15Y/",
+      "file": "kondicioner-Ballu-BSW-24HN1-15Y.html",
+      "title": "Кондиционер Ballu BSW-24HN1_15Y",
+      "h1": "Кондиционер Ballu BSW-24HN1_15Y",
+      "description": "",
+      "bytes": 46626
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BSW-18HN1-15Y/",
+      "file": "kondicioner-Ballu-BSW-18HN1-15Y.html",
+      "title": "Кондиционер Ballu BSW-18HN1_15Y",
+      "h1": "Кондиционер Ballu BSW-18HN1_15Y",
+      "description": "",
+      "bytes": 46497
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BSW-09HN1-15Y/",
+      "file": "kondicioner-Ballu-BSW-09HN1-15Y.html",
+      "title": "Кондиционер Ballu BSW-09HN1_15Y",
+      "h1": "Кондиционер Ballu BSW-09HN1_15Y",
+      "description": "",
+      "bytes": 46380
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Ballu-BSW-07HN1/",
+      "file": "kondicioner-Ballu-BSW-07HN1.html",
+      "title": "Кондиционер Ballu BSW-07HN1",
+      "h1": "Кондиционер Ballu BSW-07HN1_15Y",
+      "description": "",
+      "bytes": 46432
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX24A1ASB24A1/",
+      "file": "kondicioner-Axioma-ASX24A1ASB24A1.html",
+      "title": "Кондиционер Axioma ASX24A1/ASB24A1",
+      "h1": "Кондиционер Axioma ASX24A1/ASB24A1",
+      "description": "",
+      "bytes": 50357
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX18A1ASB18A1/",
+      "file": "kondicioner-Axioma-ASX18A1ASB18A1.html",
+      "title": "Кондиционер Axioma ASX18A1/ASB18A1",
+      "h1": "Кондиционер Axioma ASX18A1/ASB18A1",
+      "description": "",
+      "bytes": 50297
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Axioma-ASX09A1ASB09A1/",
+      "file": "kondicioner-Axioma-ASX09A1ASB09A1.html",
+      "title": "Кондиционер Axioma ASX09A1/ASB09A1",
+      "h1": "Кондиционер Axioma ASX09A1/ASB09A1",
+      "description": "",
+      "bytes": 50367
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51353
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50228
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 46838
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=Daikin",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47923
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=Kentatsu",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50032
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=MIDEA",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 48925
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50233
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/?model=Axioma",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50152
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51452
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50228
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 46838
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=Daikin",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47923
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=Kentatsu",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50032
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=MIDEA",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 48925
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50233
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/?model=Axioma",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50152
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51464
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 50194
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 46820
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=Daikin",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47901
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=Kentatsu",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47055
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=MIDEA",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 45950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47246
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/?model=Axioma",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47169
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 48630
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47243
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 43869
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=Daikin",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 44950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=Kentatsu",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47055
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=MIDEA",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 45950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47246
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/?model=Axioma",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47169
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMBA-12HRN1--MOMBA-12HRN1/",
+      "file": "kondicioner-Midea-MSMBA-12HRN1--MOMBA-12HRN1.html",
+      "title": "Кондиционер Midea MSMBA-12HRN1 / MOMBA-12HRN1",
+      "h1": "Кондиционер Midea MSMBB-12HRN1 / MOBA02-12HN1",
+      "description": "",
+      "bytes": 49604
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMBA-09HRN1--MOMBA-09HRN1/",
+      "file": "kondicioner-Midea-MSMBA-09HRN1--MOMBA-09HRN1.html",
+      "title": "Кондиционер Midea MSMBA-09HRN1 / MOMBA-09HRN1",
+      "h1": "Кондиционер Midea MSMBA-09HRN1 / MOAB01-09HN1",
+      "description": "",
+      "bytes": 49589
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-MSMBA-07HRN1--MOMBA-07HRN1/",
+      "file": "kondicioner-Midea-MSMBA-07HRN1--MOMBA-07HRN1.html",
+      "title": "Кондиционер Midea MSMBA-07HRN1 / MOMBA-07HRN1",
+      "h1": "Кондиционер Midea MSMBA-07HRN1 / MOAB01-07HN1",
+      "description": "",
+      "bytes": 49691
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 46187
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47243
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 43869
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=Daikin",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 44950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=Kentatsu",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47055
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=MIDEA",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 45950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47246
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/?model=Axioma",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47169
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-UQV-Inverter-25/",
+      "file": "kondicioner-CARRIER-42-UQV-Inverter-25.html",
+      "title": "Кондиционер CARRIER - 42 UQV Inverter",
+      "h1": "Кондиционер CARRIER инвертор - 42UQV025M/ 38UYV025M",
+      "description": "",
+      "bytes": 44577
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MSMBBU-12HRFN1--MOMBBU-12HRFN1/",
+      "file": "kondicioner-Midea-invertor-MSMBBU-12HRFN1--MOMBBU-12HRFN1.html",
+      "title": "Кондиционер Midea инвертор MSMBBU-12HRFN1 / MOMBBU-12HRFN1",
+      "h1": "Кондиционер Midea  MSMBBU-12HRFN1 / MOB03-12HFN1",
+      "description": "",
+      "bytes": 52138
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGM26HFA1-KSRM26HFA1/",
+      "file": "kondicioner-Kentatsu-KSGM26HFA1-KSRM26HFA1.html",
+      "title": "Кондиционер Kentatsu KSGM26HFA1/ KSRM26HFA1",
+      "h1": "Кондиционер Kentatsu KSGM26HFA1/ KSRM26HFA1",
+      "description": "",
+      "bytes": 45498
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGM21HFA1-KSRM21HFA1/",
+      "file": "kondicioner-Kentatsu-KSGM21HFA1-KSRM21HFA1.html",
+      "title": "Кондиционер Kentatsu KSGM21HFA1/ KSRM21HFA1",
+      "h1": "Кондиционер Kentatsu KSGM21HFA1/ KSRM21HFA1",
+      "description": "",
+      "bytes": 45505
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MSMBCU-18HRFN1--MOMBCU-18HRFN1/",
+      "file": "kondicioner-Midea-invertor-MSMBCU-18HRFN1--MOMBCU-18HRFN1.html",
+      "title": "Кондиционер Midea инвертор MSMBCU-18HRFN1 / MOMBCU-18HRFN1",
+      "h1": "Кондиционер Midea MSMBCU-18HRFN1 / MOBO2-19HFN1",
+      "description": "",
+      "bytes": 52149
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MSMBDU-24HRFN1--MOMBDU-24HRFN1/",
+      "file": "kondicioner-Midea-invertor-MSMBDU-24HRFN1--MOMBDU-24HRFN1.html",
+      "title": "Кондиционер Midea инвертор MSMBDU-24HRFN1 / MOMBDU-24HRFN1",
+      "h1": "Кондиционер Midea  MSMBDU-24HRFN1 / MOCA01-24HFN1",
+      "description": "",
+      "bytes": 52189
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-RP50BAR3/",
+      "file": "PLA-RP50BAR3.html",
+      "title": "PLA-RP50BAR3",
+      "h1": "Кондиционер Mitsubishi PLA-RP50BAR3",
+      "description": "",
+      "bytes": 48823
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-RP35BAR3/",
+      "file": "PLA-RP35BAR3.html",
+      "title": "PLA-RP35BAR3",
+      "h1": "Кондиционер Mitsubishi PLA-RP35BAR3",
+      "description": "",
+      "bytes": 48883
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP140BA/",
+      "file": "PLA-ZRP140BA.html",
+      "title": "PLA-ZRP140BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP140BA",
+      "description": "",
+      "bytes": 49157
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/2/",
+      "file": "kassetnye/page/2.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 46850
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/2/?model=%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%B1%D1%80%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F",
+      "file": "kassetnye/page/2.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 46838
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/2/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "kassetnye/page/2.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 42931
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP125BA/",
+      "file": "PLA-ZRP125BA.html",
+      "title": "PLA-ZRP125BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP125BA",
+      "description": "",
+      "bytes": 49343
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP100BA/",
+      "file": "PLA-ZRP100BA.html",
+      "title": "PLA-ZRP100BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP100BA",
+      "description": "",
+      "bytes": 49328
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/3/",
+      "file": "kassetnye/page/3.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 43647
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/3/?model=%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%BE%D0%B1%D1%80%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F",
+      "file": "kassetnye/page/3.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 46838
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/3/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "kassetnye/page/3.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 42931
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/PLA-ZRP60BA/",
+      "file": "PLA-ZRP60BA.html",
+      "title": "PLA-ZRP60BA",
+      "h1": "Кондиционер Mitsubishi PLA-ZRP60BA",
+      "description": "",
+      "bytes": 49241
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-NQV-Inverter-5-kvt/",
+      "file": "kondicioner-CARRIER-42-NQV-Inverter-5-kvt.html",
+      "title": "Кондиционер CARRIER - 42 NQV Inverter 5 квт",
+      "h1": "Кондиционер CARRIER - 42 NQV Inverter",
+      "description": "",
+      "bytes": 44656
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-invertor-FTXB35CRXB35C/",
+      "file": "kondicioner-Daikin-invertor-FTXB35CRXB35C.html",
+      "title": "Кондиционер Daikin инвертор FTXB35C/RXB35C",
+      "h1": "Кондиционер Daikin FTXB35C/RXB35C",
+      "description": "",
+      "bytes": 49531
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-invertor-FTXB50CRXB50C/",
+      "file": "kondicioner-Daikin-invertor-FTXB50CRXB50C.html",
+      "title": "Кондиционер Daikin инвертор FTXB50C/RXB50C",
+      "h1": "Кондиционер Daikin  FTXB50C/RXB50C",
+      "description": "",
+      "bytes": 54374
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-NQV-Inverter-35-kvt/",
+      "file": "kondicioner-CARRIER-42-NQV-Inverter-35-kvt.html",
+      "title": "Кондиционер CARRIER - 42 NQV Inverter 3.5 квт",
+      "h1": "Кондиционер CARRIER - 42 NQV Inverter",
+      "description": "",
+      "bytes": 47808
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-NQV-Inverter-6-kvt/",
+      "file": "kondicioner-CARRIER-42-NQV-Inverter-6-kvt.html",
+      "title": "Кондиционер CARRIER - 42 NQV Inverter 6 квт",
+      "h1": "Кондиционер CARRIER - 42 NQV Inverter",
+      "description": "",
+      "bytes": 47665
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-NQV-Inverter-25-kvt/",
+      "file": "kondicioner-CARRIER-42-NQV-Inverter-25-kvt.html",
+      "title": "Кондиционер CARRIER - 42 NQV Inverter 2.5 квт",
+      "h1": "Кондиционер CARRIER - 42 NQV Inverter",
+      "description": "",
+      "bytes": 47745
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-13N3KV-ERAS-13N3AV-E/",
+      "file": "kondicioner-Toshiba-invertor-RAS-13N3KV-ERAS-13N3AV-E.html",
+      "title": "Кондиционер Toshiba инвертор RAS-13N3KV-E/RAS-13N3AV-E",
+      "h1": "Кондиционер Toshiba инвертор RAS-13N3KV-E/RAS-13N3AV-E",
+      "description": "",
+      "bytes": 47871
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-10N3KV-ERAS-10N3AV-E/",
+      "file": "kondicioner-Toshiba-invertor-RAS-10N3KV-ERAS-10N3AV-E.html",
+      "title": "Кондиционер Toshiba инвертор RAS-10N3KV-E/RAS-10N3AV-E",
+      "h1": "Кондиционер Toshiba инвертор RAS-10N3KV-E/RAS-10N3AV-E",
+      "description": "",
+      "bytes": 47893
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Toshiba-invertor-RAS-13EKV-EERAS-13EAV-EE/",
+      "file": "kondicioner-Toshiba-invertor-RAS-13EKV-EERAS-13EAV-EE.html",
+      "title": "Кондиционер Toshiba инвертор RAS-13EKV-EE/RAS-13EAV-EE",
+      "h1": "Кондиционер Toshiba инвертор RAS-13EKV-EE/RAS-13EAV-EE",
+      "description": "",
+      "bytes": 47488
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MS11D-24HRDN1-M1011D-24HRDN1/",
+      "file": "kondicioner-Midea-invertor-MS11D-24HRDN1-M1011D-24HRDN1.html",
+      "title": "Кондиционер Midea инвертор MS11D-24HRDN1/ M1011D-24HRDN1",
+      "h1": "Кондиционер Midea инвертор MS11D-24HRDN1/ M1011D-24HRDN1",
+      "description": "",
+      "bytes": 47937
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MS11D-18HRDN1-M1011D-18HRDN1/",
+      "file": "kondicioner-Midea-invertor-MS11D-18HRDN1-M1011D-18HRDN1.html",
+      "title": "Кондиционер Midea инвертор MS11D-18HRDN1/ M1011D-18HRDN1",
+      "h1": "Кондиционер Midea инвертор MS11D-18HRDN1/ M1011D-18HRDN1",
+      "description": "",
+      "bytes": 47953
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MS11D-12HRDN1-M1011D-12HRDN1/",
+      "file": "kondicioner-Midea-invertor-MS11D-12HRDN1-M1011D-12HRDN1.html",
+      "title": "Кондиционер Midea инвертор MS11D-12HRDN1/ M1011D-12HRDN1",
+      "h1": "Кондиционер Midea инвертор MS11D-12HRDN1/ M1011D-12HRDN1",
+      "description": "",
+      "bytes": 47928
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Daikin-invertor-FTXB25CRXB25C/",
+      "file": "kondicioner-Daikin-invertor-FTXB25CRXB25C.html",
+      "title": "Кондиционер Daikin инвертор FTXB25C/RXB25C",
+      "h1": "Кондиционер Daikin  FTXB25C/RXB25C",
+      "description": "",
+      "bytes": 54380
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Midea-invertor-MSMBAU-09HRFN1--MOMBAU-09HRFN1/",
+      "file": "kondicioner-Midea-invertor-MSMBAU-09HRFN1--MOMBAU-09HRFN1.html",
+      "title": "Кондиционер Midea инвертор MSMBAU-09HRFN1 / MOMBAU-09HRFN1",
+      "h1": "Кондиционер Midea  MSMBAU-09HRFN1 / MOBA02-09HFN1",
+      "description": "",
+      "bytes": 55113
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51437
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 46282
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=Toshiba",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45120
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48076
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=Daikin",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48868
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=MIDEA",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47986
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=Axioma",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45366
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/?model=Kentatsu",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47824
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51416
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 46282
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=Toshiba",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45120
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48076
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=Daikin",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48868
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=MIDEA",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47986
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=Axioma",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45366
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/?model=Kentatsu",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47824
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51681
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 46282
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=Toshiba",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45120
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48076
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=Daikin",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 48868
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=MIDEA",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47986
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=Axioma",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45366
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/?model=Kentatsu",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47824
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51029
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 46282
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=Toshiba",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45120
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45125
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=Daikin",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45917
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=MIDEA",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 47986
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=Axioma",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45354
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/?model=Kentatsu",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 44849
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 46059
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 43319
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=Toshiba",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 42163
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45101
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=Daikin",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45917
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=MIDEA",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 45011
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=Axioma",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 42403
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/?model=Kentatsu",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 44849
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-CARRIER-42-UQV-Inverter-35-kvt/",
+      "file": "kondicioner-CARRIER-42-UQV-Inverter-35-kvt.html",
+      "title": "Кондиционер CARRIER - 42 UQV Inverter 3.5 квт",
+      "h1": "Кондиционер CARRIER инвертор - 42UQV035M/ 38UYV035M",
+      "description": "",
+      "bytes": 44700
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGM35HFA1-KSRM35HFA1/",
+      "file": "kondicioner-Kentatsu-KSGM35HFA1-KSRM35HFA1.html",
+      "title": "Кондиционер Kentatsu KSGM35HFA1/ KSRM35HFA1",
+      "h1": "Кондиционер Kentatsu KSGM35HFA1/ KSRM35HFA1",
+      "description": "",
+      "bytes": 45486
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 48477
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47243
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 43869
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=Daikin",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 44950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=Kentatsu",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47055
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=MIDEA",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 45950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47246
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/?model=Axioma",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47169
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 48383
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=Midea%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47243
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=Carrier%20%D0%A1%D0%A8%D0%90",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 43869
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=Daikin",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 44950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=Kentatsu",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47055
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=MIDEA",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 45950
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=Ballu%20%D0%9A%D0%B8%D1%82%D0%B0%D0%B9",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47246
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/?model=Axioma",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 47169
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/akciya2026/",
+      "file": "akciya2026.html",
+      "title": "Акция на установку кондиционера в Калуге",
+      "h1": "Акция 2026",
+      "description": "Только в компании Конди-Калуга акция на установку кондиционера за 10000 рублей.",
+      "bytes": 31574
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/novogodnyaya-akciya/",
+      "file": "novogodnyaya-akciya.html",
+      "title": "НОВОГОДНЯЯ АКЦИЯ!!!",
+      "h1": "НОВОГОДНЯЯ АКЦИЯ!!!",
+      "description": "",
+      "bytes": 31423
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/novinki/",
+      "file": "novinki.html",
+      "title": "Новинки - новые модели кондиционеров",
+      "h1": "Новинки 2026 года!",
+      "description": "",
+      "bytes": 47253
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/novinki/page/2/",
+      "file": "novinki/page/2.html",
+      "title": "Новинки - новые модели кондиционеров",
+      "h1": "Новинки 2026 года!",
+      "description": "",
+      "bytes": 42543
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGU61HZAN1KSRU61HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGU61HZAN1KSRU61HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGU61HZAN1/KSRU61HZAN1",
+      "h1": "Кондиционер Kentatsu KSGU61HZAN1/KSRU61HZAN1",
+      "description": "",
+      "bytes": 48274
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGU50HZAN1KSRU50HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGU50HZAN1KSRU50HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGU50HZAN1/KSRU50HZAN1",
+      "h1": "Кондиционер Kentatsu KSGU50HZAN1/KSRU50HZAN1",
+      "description": "",
+      "bytes": 48262
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGU35HZAN1KSRU35HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGU35HZAN1KSRU35HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGU35HZAN1/KSRU35HZAN1",
+      "h1": "Кондиционер Kentatsu KSGU35HZAN1/KSRU35HZAN1",
+      "description": "",
+      "bytes": 48297
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGU26HZAN1KSRU26HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGU26HZAN1KSRU26HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGU26HZAN1/KSRU26HZAN1",
+      "h1": "Кондиционер Kentatsu KSGU26HZAN1/KSRU26HZAN1",
+      "description": "",
+      "bytes": 48246
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Kentatsu-KSGU21HZAN1KSRU21HZAN1/",
+      "file": "kondicioner-Kentatsu-KSGU21HZAN1KSRU21HZAN1.html",
+      "title": "Кондиционер Kentatsu KSGU21HZAN1/KSRU21HZAN1",
+      "h1": "Кондиционер Kentatsu KSGU21HZAN1/KSRU21HZAN1",
+      "description": "",
+      "bytes": 47073
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Mitsubishi-Heavy-SRK45ZSP-WSRC45ZSP-W/",
+      "file": "kondicioner-Mitsubishi-Heavy-SRK45ZSP-WSRC45ZSP-W.html",
+      "title": "Кондиционер Mitsubishi Heavy SRK45ZSP-W/SRC45ZSP-W",
+      "h1": "Кондиционер Mitsubishi Heavy SRK45ZSP-W/SRC45ZSP-W",
+      "description": "",
+      "bytes": 44705
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/pomosch-v-vybore/",
+      "file": "pomosch-v-vybore.html",
+      "title": "Кондиционеры - помощь в выборе кондиционера",
+      "h1": "Помощь в выборе",
+      "description": "",
+      "bytes": 43452
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/foto-nashih-rabot/",
+      "file": "foto-nashih-rabot.html",
+      "title": "Фото наших работ",
+      "h1": "Фото наших работ",
+      "description": "",
+      "bytes": 39626
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/foto-nashih-rabot/page/2/",
+      "file": "foto-nashih-rabot/page/2.html",
+      "title": "Фото наших работ",
+      "h1": "Фото наших работ",
+      "description": "",
+      "bytes": 38996
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/montazh/",
+      "file": "montazh.html",
+      "title": "Установка (монтаж) кондиционеров в Калуге, купить кондиционер",
+      "h1": "Установка (монтаж) кондиционеров и климатической техники",
+      "description": "Информация о производимых работах при установке кондиционера и другой климатической техники.",
+      "bytes": 42542
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/",
+      "file": "nastennye.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 48620
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/2/",
+      "file": "nastennye/page/2.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51353
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/3/",
+      "file": "nastennye/page/3.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51452
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/4/",
+      "file": "nastennye/page/4.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51464
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/5/",
+      "file": "nastennye/page/5.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51617
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/8/",
+      "file": "nastennye/page/8.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 49162
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/",
+      "file": "kassetnye.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 50079
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/2/",
+      "file": "kassetnye/page/2.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 49801
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kassetnye/page/3/",
+      "file": "kassetnye/page/3.html",
+      "title": "Кассетные кондиционеры",
+      "h1": "Кассетные кондиционеры",
+      "description": "",
+      "bytes": 46598
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/",
+      "file": "invertory.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51247
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/2/",
+      "file": "invertory/page/2.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51437
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/3/",
+      "file": "invertory/page/3.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51416
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/4/",
+      "file": "invertory/page/4.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51681
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/5/",
+      "file": "invertory/page/5.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 51029
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertory/page/6/",
+      "file": "invertory/page/6.html",
+      "title": "Инверторы",
+      "h1": "Инверторы",
+      "description": "",
+      "bytes": 49034
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Mitsubishi-Heavy-SRK25ZSP-WSRC25ZSP-W/",
+      "file": "kondicioner-Mitsubishi-Heavy-SRK25ZSP-WSRC25ZSP-W.html",
+      "title": "Кондиционер Mitsubishi Heavy SRK25ZSP-W/SRC25ZSP-W",
+      "h1": "Кондиционер Mitsubishi Heavy SRK25ZSP-W/SRC25ZSP-W",
+      "description": "",
+      "bytes": 46537
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/kondicioner-Mitsubishi-Heavy-SRK35ZSP-WSRC35ZSP-W/",
+      "file": "kondicioner-Mitsubishi-Heavy-SRK35ZSP-WSRC35ZSP-W.html",
+      "title": "Кондиционер Mitsubishi Heavy SRK35ZSP-W/SRC35ZSP-W",
+      "h1": "Кондиционер Mitsubishi Heavy SRK35ZSP-W/SRC35ZSP-W",
+      "description": "",
+      "bytes": 46745
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/invertor/",
+      "file": "invertor.html",
+      "title": "Инвертор",
+      "h1": "Инвертор",
+      "description": "",
+      "bytes": 43761
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/stoimost/",
+      "file": "stoimost.html",
+      "title": "Стоимость установки кондиционера, кондиционер цена",
+      "h1": "Стоимость установки кондиционера, цена кондиционера",
+      "description": "Информация о ценах на установку кондиционеров.",
+      "bytes": 46840
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/foto-nashih-rabot/",
+      "file": "foto-nashih-rabot.html",
+      "title": "Фото наших работ",
+      "h1": "Фото наших работ",
+      "description": "",
+      "bytes": 39626
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/remont/",
+      "file": "remont.html",
+      "title": "Ремонт кондиционеров",
+      "h1": "Ремонт кондиционеров",
+      "description": "Информация о ремонт кодиционеров и климатической техники нашей компанией.",
+      "bytes": 39115
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/tehnicheskoe-obsluzhivanie/",
+      "file": "tehnicheskoe-obsluzhivanie.html",
+      "title": "Техническое обслуживание кондиционеров Калуга",
+      "h1": "Техническое обслуживание кондиционеров в Калуге",
+      "description": "Информация о проводимом техническом обслуживании кондиционеров и списке работ.",
+      "bytes": 46355
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/garantiya/",
+      "file": "garantiya.html",
+      "title": "Гарантия на кондиционеры",
+      "h1": "Гарантия",
+      "description": "Информация о гарантии и гарантийных случаях.",
+      "bytes": 40468
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/6/",
+      "file": "nastennye/page/6.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51459
+    },
+    {
+      "url": "https://www.kondi-kaluga.ru/nastennye/page/7/",
+      "file": "nastennye/page/7.html",
+      "title": "Кондиционеры в Калуге с установкой - настенные кондиционеры",
+      "h1": "Настенные кондиционеры",
+      "description": "Компания Конди-Калуга быстро и с гарантией установит настенный кондиционер в вашей квартире или доме.",
+      "bytes": 51367
+    }
+  ]
+}

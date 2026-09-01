@@ -1,0 +1,863 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+<meta name="description" content="" />
+<link rel="stylesheet" type="text/css" href="/themes/kandi/css/jquery.selectBox.css" />
+<link rel="stylesheet" type="text/css" href="/assets/c0b504a9/pager.css" />
+<link rel="stylesheet" type="text/css" href="/assets/45f8e5b6/jui/css/base/jquery-ui.css" />
+<script type="text/javascript" src="/assets/45f8e5b6/jquery.min.js"></script>
+<script type="text/javascript" src="/themes/kandi/js/jquery.selectBox.min.js"></script>
+<script type="text/javascript" src="/themes/kandi/js/jquery_cookie.js"></script>
+<script type="text/javascript" src="/js/jcarousellite_1.0.1.pack.js"></script>
+<script type="text/javascript">
+/*<![CDATA[*/
+ $(document).ready(function(){
+ $(".searchSelect").selectBox();
+ $("#reset-widget").click(function(){
+ $("select[name=manufacturer]").val('');
+ $("select[name=mode]").val('');
+ $("select[name=power]").val('');
+ $("select[name=price]").val('');
+ $("select[name=type]").val('');
+ $("#advanced_search_widget form").submit();
+ return false;
+ });
+ });
+
+function sendBasket()
+{
+    if(!$("#name_basket").val()){$("#name_basket").siblings(".error").html("Заполните поле")} else {$("#name_basket").siblings(".error").html("");}
+    if(!$("#phone_basket").val()){$("#phone_basket").siblings(".error").html("Заполните поле")} else {$("#phone_basket").siblings(".error").html("");}
+    if($("#name_basket").val() && $("#phone_basket").val())
+    {
+        $("#basket form").submit();
+    }
+    
+}
+function setCaptcha()
+{
+    $("#captcha1").html("");
+    if ($("#captcha1").length) {
+        $.getScript("https://www.google.com/recaptcha/api.js", function(){});
+        $("#captcha1").html("<div class=\"g-recaptcha\" data-sitekey=\"6Ldu5Q4TAAAAAItJIQ8_2DN1Xp9lHsZ1BxnC-64q\"></div>");
+    }
+}
+function submitMyCapt(obj)
+{
+    var error = false;
+    if(!($("#fio").val()) || !($("#phone").val())){
+        if(!$("#fio").val()){
+            $("#fio").siblings(".error").html("Заполните поле");
+            error = true;
+        } else {
+            $("#fio").siblings(".error").html("");
+        }
+        if(!$("#phone").val()){
+            $("#phone").siblings(".error").html("Заполните поле");
+            error = true;
+        }else{
+            $("#phone").siblings(".error").html("");
+        }
+    }
+    $.post("/?checkCaps=1&call=1", obj.parent().serialize(), function(data) {
+        data = data.split("<!--111-->");
+        data = data[1];
+        if (data == "0") {
+            $("#carror").html("Подтвердите, что вы не робот.");
+            error = true;
+        } else {
+            $("#carror").html("");
+            if (!error) {
+                $.post("/?call=1", obj.parent().serialize(), function(data) {
+                    alert("Заявка на обратный звонок успешно отправлена.");
+                    document.location.href=document.location;
+                });
+            }
+        }
+    });
+    return false;
+}
+$(document).ready(function(){
+        setCaptcha();
+
+        $("#call_order").dialog("close");
+        $("#elseParams").dialog("close");
+        
+        $(".basket_widget a").click(function(){
+            if($(".product_count").html() == "0")
+            {        
+                $("#elseParams").dialog("open");
+                return false;
+            }
+            else
+            {
+            $.ajax({
+                type:"post",
+                data:{
+                basket:true
+                },
+                success:function(data)
+                {
+                    if(data != "")
+                    {
+                    
+                        if (!Array.prototype.hasOwnProperty("indexOf")) { // для IE 8 и ниже
+                            Array.prototype.indexOf = function (value) {
+                                var i;
+                                for (i=0; i<this.length; i++) { if (this[i] == value) { return i; } }
+                                return -1;
+                            }
+                        }                    
+                        
+                        var products = data.split("</div>")[2];
+                        var vote = JSON.parse(products);
+                        var content = "<form method=\"post\">";
+                        var amount = 0;
+                        for(var i=0; i<vote["product"][0].length; i++)
+                        {
+                            content += "<div class=\"product\"><input type=\"hidden\" name=\"product_id["+i+"]\" value=\""+vote["product"][0][i]["pk"]+"\" /><div class=\"title\">"+(i+1)+". "+vote["product"][0][i]["title"]+"</div>";
+                            content += "<a href=\"javascript:void(0)\" class=\"del\"></a>";
+                            content += "<div class=\"count\" id=\"price_"+vote["product"][0][i]["price"]+"\"> Количество: <input type=\"text\" value=\""+vote["product"][0][i]["count"]+"\" name=\"count["+i+"]\" /></div></div>";
+                            amount += parseInt(vote["product"][0][i]["price"]) * parseInt(vote["product"][0][i]["count"]);
+                        }
+                        content += "<div class=\"all\">Общая стоимость: <span class=\"amount_price\">"+amount+"</span> руб.</div>";
+                        content += "<div><label for=\"name\">Ваше имя:</label>";
+                        content += "<input name=\"name\" id=\"name_basket\" type=\"text\" /><div class=\"error\"></div></div>";
+                        content += "<div><label for=\"phone\">Телефон</label>";
+                        content += "<input name=\"phone\" id=\"phone_basket\" type=\"text\" /><div class=\"error\"></div></div>";
+                        content += "<div><label for=\"comments\">Комментарий</label>";
+                        content += "<textarea name=\"comments\" id=\"comments\"></textarea></div>";                        
+                        content += "<input type=\"submit\" name=\"order\" value=\"Отправить\" onclick=\"sendBasket(); return false;\" />";
+                        content += "</form>";
+                        
+                        $("#basket").html(content);
+                        $("#basket").dialog("open");
+                        
+                        
+                        var products = $.cookie("products");
+                        var p_i = products.split(",");
+                        
+                        $(".count input").live("change", function(){
+                            if(isNaN(parseInt($(this).val())))
+                            {
+                                $(this).val(1);
+                            }
+                            if($(this).val() < 1)
+                            {
+                                $(this).val(1);
+                            }                
+                            $(this).val(parseInt($(this).val()));
+                            
+                            var id = parseInt($(this).val());
+                            var prod_id = $(this).parent(".count").siblings("input").val();
+
+                            while(p_i.indexOf(prod_id) != -1)
+                            {
+                                p_i.splice(p_i.indexOf(prod_id), 1);
+                            }
+                            
+                            for(var i=0; i<id; i++)
+                            {
+                                p_i[p_i.length] = prod_id;
+                            }
+                            $(".product_count").html(p_i.length);
+                            var p_str = p_i.join();
+
+                            var amount_price = 0;
+                            $(".count input").each(function(){
+                               amount_price += parseInt($(this).val()) * parseInt($(this).parent().attr("id").substr(6));
+                            });
+                            $(".amount_price").html(amount_price);
+                            $(".amount").html(amount_price);
+                            
+                            $.cookie("products", p_str, { expires: 1, path: "/"});
+                            $.cookie("price", amount_price, { expires: 1, path: "/" });
+                            $.cookie("amount", p_i.length, { expires: 1, path: "/" });                               
+                            
+                        });
+                        
+                        var amount_price = 0;
+                        var products = $.cookie("products");
+                        var p_i = products.split(",");
+                        $(".del").live("click", function(){
+                            var prod_id = $(this).siblings("input").val();
+                            while(p_i.indexOf(prod_id) != -1)
+                            {
+                                p_i.splice(p_i.indexOf(prod_id), 1);
+                            }
+                            $(".product_count").html(p_i.length);
+                            
+                            var p_str = p_i.join();
+
+                            $(".amount").html(amount_price);
+                            
+                            $.cookie("products", p_str, { expires: 1, path: "/"});
+                            
+                            $.cookie("amount", p_i.length, { expires: 1, path: "/" }); 
+                            
+                            if($(this).parent(".product").siblings(".product").html())
+                            {
+                                $(this).parent(".product").remove();
+                                var amount_price = 0;
+                                $(".count input").each(function(){
+                                   amount_price += parseInt($(this).val()) * parseInt($(this).parent().attr("id").substr(6));
+                                });
+                                $(".amount_price").html(amount_price);
+                                $(".amount").html(amount_price);
+                                $.cookie("price", amount_price, { expires: 1, path: "/" });
+                            }
+                            else{
+                                $(this).parent(".product").remove();
+                                var amount_price = 0;
+                                $(".count input").each(function(){
+                                   amount_price += parseInt($(this).val()) * parseInt($(this).parent().attr("id").substr(6));
+                                });
+                                $(".amount_price").html(amount_price);
+                                $(".amount").html(amount_price);
+                                $.cookie("price", amount_price, { expires: 1, path: "/" });                                
+                                $("#basket").dialog("close");
+                            }
+                            
+                        });
+                    }
+                    else{
+                        $("#elseParams").dialog("open");
+                    }
+                }
+            });
+                
+            }
+        });
+        
+        $(".order_call a.call_ord").click(function(){
+            $("#call_order").dialog("open");
+            $("#captcha1").html("");
+            $.getScript("https://www.google.com/recaptcha/api.js", function(){});
+            $("#captcha2").html("<div class=\"g-recaptcha\" data-sitekey=\"6Ldu5Q4TAAAAAItJIQ8_2DN1Xp9lHsZ1BxnC-64q\"></div>");
+        });
+    (function ($) {
+      $.each(["show", "hide"], function (i, ev) {
+        var el = $.fn[ev];
+        $.fn[ev] = function () {
+          this.trigger(ev);
+          return el.apply(this, arguments);
+        };
+      });
+    })(jQuery);
+    $(".ui-dialog").live("hide", function(){
+        setCaptcha();
+    });
+});
+
+    $(document).ready(function(){
+        $('#nav a').click(function(){
+            if ($(this).attr('href') == '#') return false;
+        });
+    });
+ $(document).ready(function(){
+ $("#carousell_5").jCarouselLite({
+ mouseWheel: false,
+ circular: true,
+ auto: 5000,
+ visible: 2,
+ vertical: false,
+ speed: 500,
+ btnGo: [".pt_1", ".pt_2", ".pt_3", ".pt_4" ],
+ afterEnd:
+ function(a, to, btnGo) {
+ if(btnGo.length <= to){
+ to = 0;
+ }
+ $(".goActive").removeClass("goActive");
+ $(btnGo[to]).addClass("goActive");
+ }
+ });
+ });
+ $(document).ready(function(){
+ function check_numeric(elem_id)
+ {
+ var elem = $("#" + elem_id);
+ var new_val = elem.val().replace(/[^0-9]/g, "");
+ elem.val(new_val);
+ }
+ function check_float_numeric(elem_id)
+ {
+ var elem = $("#" + elem_id);
+ var new_val = parseFloat(elem.val()); 
+ if (isNaN(new_val)) new_val = 0;
+ elem.val(new_val);
+ }
+ $("#human, #comp, #tv, #refregerator").bind("change", function(){
+ check_numeric($(this).attr("id"));
+ });
+ $("#square, #height").bind("change", function(){
+ check_float_numeric($(this).attr("id"));
+ });
+ $("#square, #height").bind("keypress", function(event){
+ if ((event.which < 48 || event.which > 57) && event.which != 8 && event.which != 0 && event.which != 46 && !event.ctrlKey) return false;
+ });
+ $("#human, #comp, #tv, #refregerator").bind("keypress", function(event){
+ if ((event.which < 48 || event.which > 57) && event.which != 8 && event.which != 0 && !event.ctrlKey) return false;
+ });
+ $("#calculate").click(function(){
+ var s = parseFloat($("#square").val());
+ if (isNaN(s)) s = 0;
+ var h = parseFloat($("#height").val());
+ if (isNaN(h)) h = 0;
+ var q = $("#side").val();
+ var Q1 = s * h * q / 1000;
+ var koef2 = $("#room").val();
+ var humans = parseInt($("#human").val());
+ if (isNaN(humans)) humans = 0;
+ var Q2 = koef2 * humans;
+ var comps = parseInt($("#comp").val());
+ if (isNaN(comps)) comps = 0;
+ var tvs = parseInt($("#tv").val());
+ if (isNaN(tvs)) tvs = 0;
+ var refs = parseInt($("#refregerator").val());
+ if (isNaN(refs)) refs = 0;
+ var Q3 = 0.3 * comps + 0.2 * tvs + 0.5 * refs;
+ var Q = Q1 + Q2 + Q3;
+ Q *= 1000;
+ $("#result_calculation").html('Оптимальная мощность кондиционера для выбранного помещения - <span>'+Q.toFixed()+' Ватт</span>');
+ });
+ $(".fancySelect").selectBox();
+ });
+/*]]>*/
+</script>
+<title>Инверторы</title>
+                <link rel="stylesheet" type="text/css" href="/themes/kandi/css/style.css" />    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/themes/kandi/css/ie.css" /><![endif]-->
+
+    <link rel="stylesheet" href="/css/mobile.css?v=1788286567" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8">
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(document).bind('resize', function() { sizer(); });
+            sizer();
+            if ($(window).width() < 600) {
+                /*$('.nav__item>a').unbind('click');
+                $('.nav__item>a').bind('click', function(){
+                    if ( $(this).parent().find('.nav__popup').length) {
+                        //$(this).parent().find('.nav__popup').stop().fadeToggle('fast');
+                        $(this).parent().toggleClass('activeer');
+                        return false;
+                    }
+                });*/
+                $('#nav li a').bind('click', function(){
+                    if ($(this).parent().find('ul').length) {
+                        if ($(this).parent().hasClass('show')) {
+                            $(this).parent().removeClass('show');
+                        } else {
+                            $('.show').removeClass('show');
+                            $(this).parent().addClass('show');
+                        }
+                    }
+                });
+            }
+        });
+        function sizer(){
+            if ($(window).width() < 600) {
+                $('meta[name="viewport"]').attr('content','width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no');
+            } else {
+                $('meta[name="viewport"]').attr('content','width=device-width, initial-scale=0.75, maximum-scale=0.75, minimum-scale=0.75, user-scalable=yes');
+            }
+        }
+    </script>
+</head>
+<body>
+<div id="wrapper">
+<div class="top"></div>
+    <div id="main">
+    <div id="header">
+        <div id="logo">
+            <a href="/"></a>
+        </div>
+            
+
+<div class="basket_widget">
+    <h3><a href="javascript:void(0)">Корзина</a></h3>
+    <a href="javascript:void(0)" class="bask_ico"></a>
+    Товаров: <span class="product_count">0</span><br/>
+    На сумму: <span class="amount">0</span> руб.<br/>
+</div>
+
+<div class="order_call">
+    <a class="call_ord" href="javascript:void(0)">Заказать звонок</a>    <span>Skype:</span> <a href="skype:chudnovskiyvv?call">chudnovskiyvv</a></div>
+<div id="elseParams">
+В вашей корзине пусто</div><div id="basket">
+</div><div id="call_order">
+Оставьте заявку на обратный звонок и с вами свяжется наш специалист.<form onSubmit="return submitMyCapt($(this).find(&quot;input[type=submit]&quot;)); return false;" action="/invertory/page/4/" method="POST"><div><label for="fio">Ф.И.О:</label><input id="fio" type="text" value="" name="fio" /><div class='error'></div></div><div><label for="phone">Телефон:</label><input id="phone" type="text" value="" name="phone" /><div class='error'></div><div style="margin-top:10px;" id="captcha2"></div><div style='color: #f74f4f; font-size: 10px; display: block; margin: 0; font-size:11px;' id='carror'></div></div><input name="call" type="submit" value="Перезвонить" /></form></div>            <ul class="menu_id_1" id="nav">
+<li class="menu-items_64"><a href="/"><em></em><span>Главная</span><b></b></a></li><li class="menu-items_90"><a href="/novinki/"><em></em><span>Новинки</span><b></b></a></li><li class="menu-items_69"><a href="#"><em></em><span>Установка и стоимость</span><b></b></a><ul class="hidden"><li class="menu-items_70"><a href="/montazh/"><em></em><span>Установка и монтаж</span><b></b></a></li><li class="menu-items_71"><a href="/stoimost/"><em></em><span>Стоимость установки</span><b></b></a></li><li class="menu-items_76"><a href="/foto-nashih-rabot/"><em></em><span>Фото наших работ</span><b></b></a></li></ul></li><li class="menu-items_80"><a href="#"><em></em><span>Выбор кондиционера</span><b></b></a><ul class="hidden"><li class="menu-items_81"><a href="/pomosch-v-vybore/"><em></em><span>Помощь в выборе</span><b></b></a></li></ul></li><li class="menu-items_72"><a href="#"><em></em><span>Сервис и Ремонт</span><b></b></a><ul class="hidden"><li class="menu-items_75"><a href="/remont/"><em></em><span>Ремонт кондиционера</span><b></b></a></li><li class="menu-items_73"><a href="/tehnicheskoe-obsluzhivanie/"><em></em><span>ТО (техобслуживание)</span><b></b></a></li><li class="menu-items_74"><a href="/garantiya/"><em></em><span>Гарантии компании</span><b></b></a></li></ul></li><li class="menu-items_79"><a href="/about/"><em></em><span>О компании</span><b></b></a></li><li class="menu-items_86"><a href="/vakansii/"><em></em><span>Вакансии</span><b></b></a></li><li class="menu-items_77"><a href="/kontakty/"><em></em><span>Контакты</span><b></b></a></li></ul>
+
+<div class="clear"></div>
+ <div id="ph">
+<div class="tel"><span>+7(4842) </span> 400-998</div>
+<div class="milo"><b><a href=mailto:&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;>&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;</a></b></div>
+</div>    </div><!-- Header -->
+<div class="clear"></div>
+    <div id="slide_show">
+        <div class="lt"></div>
+        <div class="rt"></div>
+        <div class="lb"></div>
+        <div class="rb"></div>
+        <div class="in_slide">
+               <div id="carousell_5"> <ul id="carousellGallery_5">   <li> <img width="900" height="300" src="/uploads/carousell/5/banner_011.jpg" alt="" /> </li>   <li> <img width="900" height="300" src="/uploads/carousell/5/banner_022.jpg" alt="" /> </li>   <li> <img width="900" height="300" src="/uploads/carousell/5/banner_033.jpg" alt="" /> </li>   <li> <img width="940" height="314" src="/uploads/carousell/5/banner_04_02.jpg" alt="" /> </li>  </ul> </div> <div class="clear"></div> <div class="go">  <a class="pt_1 goActive" id="point_1" href="#">&nbsp;</a>  <a class="pt_2  " id="point_2" href="#">&nbsp;</a>  <a class="pt_3  " id="point_3" href="#">&nbsp;</a>  <a class="pt_4   item_last" id="point_4" href="#">&nbsp;</a>  </div>         </div>
+    </div>
+
+
+
+<div class="clear"></div>
+
+<div id="container">
+
+<div id="sidebar">
+
+<div id="catalog"> <h3>Каталог</h3> <ul> <li><a class="cat_ico_46" href="/novinki/"><span>Новинки 2026 года!</span></a></li> <li><a class="cat_ico_36" href="/split-sistemy/"><span>Сплит-системы</span></a><ul><li><a class="cat_ico_38" href="/nastennye/"><span>Настенные кондиционеры</span></a></li> <li><a class="cat_ico_39" href="/kanalnaya/"><span>Канальные кондиционеры</span></a></li> <li><a class="cat_ico_40" href="/kassetnye/"><span>Кассетные кондиционеры</span></a></li> <li><a class="cat_ico_41" href="/napolno-potolochnye/"><span>Напольные кондиционеры</span></a></li> <li><a class="cat_ico_42" href="/kolonnye/"><span>Колонные кондиционеры</span></a></li> </ul></li> <li><a class="cat_ico_34" href="/okonnye_fix/"><span>Оконные кондиционеры</span></a></li> <li><a class="cat_ico_35" href="/mobilnye/"><span>Мобильные кондиционеры</span></a></li> <li><a class="cat_ico_43" href="/multisplit-sistemy/"><span>Мультисплит-системы</span></a></li> <li><a class="cat_ico_44" href="/multizone/"><span>Мультизональные системы</span></a></li> <li class="active"><a class="cat_ico_45" href="/invertory/"><span>Инверторы</span></a></li>  </ul> </div> <div class="clear"></div> <div id="calculator"> <h3>Калькулятор</h3> <div class="calculator_elements"> <div class="calculator_row"><span>Площадь помещения (м<sup>2</sup>)</span> <div class="over_input"><input type="text" id="square" maxlength="100" /></div></div> <div class="calculator_row"><span>Высота помещения (м)</span> <div class="over_input"><input type="text" id="height" maxlength="100" /></div></div> <div class="calculator_row"><span>Количество людей (чел)</span> <div class="over_input"><input type="text" id="human" maxlength="20" /></div></div> <div class="calculator_row"> <div class="over_select"> <select id="side" class="fancySelect"> <option value="40">Солнечная сторона</option> <option value="30">Несолнечная сторона</option> </select> </div> </div> <div class="calculator_row"> <div class="over_select"> <select id="room" class="fancySelect"> <option value="0.1">Спокойное состояние (спальня)</option> <option value="0.13">При лёгком движении (зал)</option> <option value="0.2">При физической нагрузке (магазин)</option> </select> </div> </div> <div class="calculator_row"><span>Компьютер (шт)</span> <div class="over_input"><input type="text" id="comp" maxlength="20" /></div></div> <div class="calculator_row"><span>Телевизор (шт)</span> <div class="over_input"><input type="text" id="tv" maxlength="20" /></div></div> <div class="calculator_row"><span>Холодильник (шт)</span> <div class="over_input"><input type="text" id="refregerator" maxlength="20" /></div></div> <div id="result_calculation"></div> </div> <div class="calculator_footer"><input type="button" id="calculate" value="Расчитать" /></div> </div><p>&nbsp;</p>
+<noindex><center><A HREF="https://www.kondi-kaluga.ru/about/" rel="nofollow"><IMG SRC="https://www.kondi-kaluga.ru/images/baner1.png" WIDTH="250" HEIGHT="100" BORDER="0" ALT=""></A></noindex></center></div>
+
+
+<div id="content">
+
+<div class="category">
+
+<div class="breadcrumbs">
+<a href="/">Главная</a><em></em><span>Инверторы</span></div>
+    <h1 class="catalogue_45"><span>Инверторы</span></h1>
+    
+             
+ 	<div id='advanced_search_widget'> 
+ 	<form id="yw0" action="/advancedsearch/" method="get"> 
+ 	<div class="widget-inner"> 
+ 	<div class="widget-label">Подбор товаров: </div> 
+ 	<div class="widget-reset"><a id="reset-widget" href="#">Очистить фильтр</a></div> 
+ 	<div class="clear" style="height: 5px;"></div> 
+ 	 
+ 	<div class="select-box">
+ 		<select class="searchSelect" name="manufacturer" id="manufacturer">
+<option value="">Производитель</option>
+<option value="Midea Китай">Midea Китай</option>
+<option value="Carrier США">Carrier США</option>
+<option value="Италия Zanussi">Италия Zanussi</option>
+<option value="Electrolux Швеция">Electrolux Швеция</option>
+<option value="Ballu Китай">Ballu Китай</option>
+<option value="Великобритания">Великобритания</option>
+<option value="Toshiba">Toshiba</option>
+<option value="Toshiba ">Toshiba </option>
+<option value="Daikin">Daikin</option>
+<option value="Daikin ">Daikin </option>
+<option value="Kentatsu">Kentatsu</option>
+<option value="MIDEA">MIDEA</option>
+<option value="Axioma">Axioma</option>
+<option value="Mitsubishi Heavy">Mitsubishi Heavy</option>
+</select> 	</div> 
+ 	<div class="select-box">
+ 		<select class="searchSelect" name="mode" id="mode">
+<option value="">Режим работы</option>
+<option value="Холод-Тепло">Холод-Тепло</option>
+<option value="Холод">Холод</option>
+<option value="Холод - Тепло">Холод - Тепло</option>
+<option value="Холод/ Тепло">Холод/ Тепло</option>
+<option value="Холод/Тепло">Холод/Тепло</option>
+</select> 	</div> 
+ 	<div class="select-box-last">
+ 		<select class="searchSelect" name="power" id="power">
+<option value="">Мощность</option>
+<option value="2">2</option>
+<option value="2,5">2,5</option>
+<option value="3,5">3,5</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="22">22</option>
+<option value="4">4</option>
+<option value="10">10</option>
+<option value="12.5">12.5</option>
+<option value="14">14</option>
+<option value="7 ">7 </option>
+<option value="13,5">13,5</option>
+<option value="15">15</option>
+<option value="4,5">4,5</option>
+<option value="8">8</option>
+</select> 	</div>
+	<div class="select-box">
+			<select class="searchSelect" name="price" id="price">
+<option value="">Цена</option>
+<option value="9374">9374.4</option>
+<option value="9714">9714.6</option>
+<option value="11037">11037.6</option>
+<option value="16178">16178.4</option>
+<option value="18900">18900</option>
+<option value="23360">23360.4</option>
+<option value="14666">14666.4</option>
+<option value="16783">16783.2</option>
+<option value="27480">27480.6</option>
+<option value="0">0</option>
+<option value="19429">19429.2</option>
+<option value="22982">22982.4</option>
+<option value="34284">34284.6</option>
+<option value="41428">41428.8</option>
+<option value="" selected="selected"></option>
+<option value="25401">25401.6</option>
+<option value="32470">32470.2</option>
+<option value="46418">46418.4</option>
+<option value="27556">27556.2</option>
+<option value="46909">46909.8</option>
+<option value="53146">53146.8</option>
+<option value="59383">59383.8</option>
+<option value="26082">26082</option>
+<option value="35569">35569.8</option>
+<option value="47250">47250</option>
+<option value="52164">52164</option>
+<option value="61840">61840.8</option>
+<option value="14968">14968.8</option>
+<option value="17463">17463.6</option>
+<option value="23473">23473.8</option>
+<option value="16443">16443</option>
+<option value="18522">18522</option>
+<option value="28350">28350</option>
+<option value="34927">34927.2</option>
+<option value="14855">14855.4</option>
+<option value="16367">16367.4</option>
+<option value="23927">23927.4</option>
+<option value="28576">28576.8</option>
+<option value="19645">19645.2</option>
+<option value="20700">20700.9</option>
+<option value="31487">31487.4</option>
+<option value="33828">33828.3</option>
+<option value="51500">51500</option>
+<option value="52500">52500</option>
+<option value="57500">57500</option>
+<option value="90500">90500</option>
+<option value="94000">94000</option>
+<option value="6577">6577.2</option>
+<option value="7182">7182</option>
+<option value="9601">9601.2</option>
+<option value="15006">15006.6</option>
+<option value="19996">19996.2</option>
+<option value="27367">27367.2</option>
+<option value="8656">8656.2</option>
+<option value="9109">9109.8</option>
+<option value="10659">10659.6</option>
+<option value="15384">15384.6</option>
+<option value="21357">21357</option>
+<option value="14590">14590.8</option>
+<option value="15762">15762.6</option>
+<option value="24494">24494.4</option>
+<option value="30580">30580.2</option>
+<option value="9034">9034.2</option>
+<option value="9639">9639</option>
+<option value="11755">11755.8</option>
+<option value="18711">18711</option>
+<option value="23851">23851.8</option>
+<option value="31714">31714.2</option>
+<option value="7333">7333.2</option>
+<option value="7673">7673.4</option>
+<option value="10281">10281.6</option>
+<option value="16405">16405.2</option>
+<option value="21281">21281.4</option>
+<option value="6199">6199.2</option>
+<option value="6690">6690.6</option>
+<option value="8618">8618.4</option>
+<option value="13986">13986</option>
+<option value="18484">18484.2</option>
+<option value="25212">25212.6</option>
+<option value="10810">10810.8</option>
+<option value="10848">10848.6</option>
+<option value="19250">19250</option>
+<option value="20690">20690</option>
+<option value="27590">27590</option>
+<option value="41500">41500</option>
+<option value="55500">55500</option>
+<option value="12209">12209.4</option>
+<option value="20903">20903.4</option>
+<option value="29030">29030.4</option>
+<option value="37850">37850</option>
+<option value="42550">42550</option>
+<option value="63050">63050</option>
+<option value="31500">31500</option>
+<option value="32500">32500</option>
+<option value="36000">36000</option>
+<option value="58500">58500</option>
+<option value="70000">70000</option>
+</select>	</div> 
+	<div class="select-box">
+		<select class="searchSelect" name="type" id="type">
+<option value="">Тип</option>
+<option value="Настенный">Настенный</option>
+<option value="Колонный">Колонный</option>
+<option value="Мобильный">Мобильный</option>
+<option value="Мультисплит-система">Мультисплит-система</option>
+<option value="Кассетный">Кассетный</option>
+<option value="Канальный">Канальный</option>
+<option value="Напольно-потолочный">Напольно-потолочный</option>
+</select>	</div> 
+	<div class="submit-box"><input type="submit" name="yt0" value="Применить фильтр" /></div> <div class="clear"></div> </div> </form> <div id="widget-footer"></div> </div> <div class="clear"></div>
+
+
+<div class="catalog_products">
+    <div class="models_list">    <a onclick="getProducts(&quot;Carrier США&quot;, &quot;Carrier-ssha&quot;); return false;" class="Carrier-ssha" href="?model=Carrier США">Carrier США</a>        <a onclick="getProducts(&quot;Toshiba&quot;, &quot;Toshiba&quot;); return false;" class="Toshiba" href="?model=Toshiba">Toshiba</a>        <a onclick="getProducts(&quot;Toshiba &quot;, &quot;Toshiba&quot;); return false;" class="Toshiba" href="?model=Toshiba ">Toshiba </a>        <a onclick="getProducts(&quot;Midea Китай&quot;, &quot;Midea-kitay&quot;); return false;" class="Midea-kitay" href="?model=Midea Китай">Midea Китай</a>        <a onclick="getProducts(&quot;Daikin&quot;, &quot;Daikin&quot;); return false;" class="Daikin" href="?model=Daikin">Daikin</a>        <a onclick="getProducts(&quot;Daikin &quot;, &quot;Daikin&quot;); return false;" class="Daikin" href="?model=Daikin ">Daikin </a>        <a onclick="getProducts(&quot;MIDEA&quot;, &quot;MIDEA&quot;); return false;" class="MIDEA" href="?model=MIDEA">MIDEA</a>        <a onclick="getProducts(&quot;Axioma&quot;, &quot;Axioma&quot;); return false;" class="Axioma" href="?model=Axioma">Axioma</a>        <a onclick="getProducts(&quot;Kentatsu&quot;, &quot;Kentatsu&quot;); return false;" class="Kentatsu" href="?model=Kentatsu">Kentatsu</a>    </div>    <div style="padding: 0 0 10px 0; overflow: hidden">
+    <ul id="yw1" class="yiiPager"><li class="first"><a href="/invertory">&lt;&lt;</a></li>
+<li class="previous"><a href="/invertory/page/3">&lt;</a></li>
+<li class="page"><a href="/invertory/page/2">2</a></li>
+<li class="page"><a href="/invertory/page/3">3</a></li>
+<li class="page selected"><a href="/invertory/page/4">4</a></li>
+<li class="page"><a href="/invertory/page/5">5</a></li>
+<li class="page"><a href="/invertory/page/6">6</a></li>
+<li class="next"><a href="/invertory/page/5">&gt;</a></li>
+<li class="last"><a href="/invertory/page/6">&gt;&gt;</a></li></ul>    </div>
+        <ul class='product_list'>    <li>
+        <div class="product_name"><a href="/kondicioner-invertor-Midea-MS11D-09HRDN1-M011D-09HRDN1/">Кондиционер  Midea инвертор MS11D-09HRDN1/ M011D-09HRDN1</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-invertor-Midea-MS11D-09HRDN1-M011D-09HRDN1/"><img src="/uploads/products/Neola__6_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        
+        <div class="product_description" id="product_92">
+            <p><span>Производитель: </span>Midea Китай</p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>2,5 кВт</p>            <p><span>Цена: </span><span class="price">18038.7</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-invertor-Midea-MS11D-09HRDN1-M011D-09HRDN1/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            <li>
+        <div class="product_name"><a href="/kondicioner-Toshiba-invertor-RAS-22N3KV-ERAS-22N3AV-E/">Кондиционер Toshiba инвертор RAS-22N3KV-E/RAS-22N3AV-E</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Toshiba-invertor-RAS-22N3KV-ERAS-22N3AV-E/"><img src="/uploads/products/RAS-10N3KV-E_RAS-10N3AV-E-350x350_3_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        
+        <div class="product_description" id="product_91">
+            <p><span>Производитель: </span>Toshiba </p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>6 кВт</p>            <p><span>Цена: </span><span class="price">42411.6</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Toshiba-invertor-RAS-22N3KV-ERAS-22N3AV-E/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            <li>
+        <div class="product_name"><a href="/kondicioner-Toshiba-invertor-RAS-18N3KV-ERAS-18N3AV-E/">Кондиционер Toshiba инвертор RAS-18N3KV-E/RAS-18N3AV-E</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Toshiba-invertor-RAS-18N3KV-ERAS-18N3AV-E/"><img src="/uploads/products/RAS-10N3KV-E_RAS-10N3AV-E-350x350_2_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        
+        <div class="product_description" id="product_90">
+            <p><span>Производитель: </span>Toshiba</p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>5 кВт</p>            <p><span>Цена: </span><span class="price">34425</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Toshiba-invertor-RAS-18N3KV-ERAS-18N3AV-E/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+    </ul>    <ul class='product_list'>    <li>
+        <div class="product_name"><a href="/kondicioner-Toshiba-invertor-RAS-13N3KV-ERAS-13N3AV-E/">Кондиционер Toshiba инвертор RAS-13N3KV-E/RAS-13N3AV-E</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Toshiba-invertor-RAS-13N3KV-ERAS-13N3AV-E/"><img src="/uploads/products/RAS-10N3KV-E_RAS-10N3AV-E-350x350_1_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        
+        <div class="product_description" id="product_89">
+            <p><span>Производитель: </span>Toshiba</p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>3,5 кВт</p>            <p><span>Цена: </span><span class="price">22491</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Toshiba-invertor-RAS-13N3KV-ERAS-13N3AV-E/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            <li>
+        <div class="product_name"><a href="/kondicioner-Toshiba-invertor-RAS-10N3KV-ERAS-10N3AV-E/">Кондиционер Toshiba инвертор RAS-10N3KV-E/RAS-10N3AV-E</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Toshiba-invertor-RAS-10N3KV-ERAS-10N3AV-E/"><img src="/uploads/products/RAS-10N3KV-E_RAS-10N3AV-E-350x350_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        
+        <div class="product_description" id="product_88">
+            <p><span>Производитель: </span>Toshiba</p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>2,5 кВт</p>            <p><span>Цена: </span><span class="price">19966.5</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Toshiba-invertor-RAS-10N3KV-ERAS-10N3AV-E/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            <li>
+        <div class="product_name"><a href="/kondicioner-Toshiba-invertor-RAS-16EKV-EERAS-16EAV-EE/">Кондиционер Toshiba инвертор RAS-16EKV-EE/RAS-16EAV-EE</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Toshiba-invertor-RAS-16EKV-EERAS-16EAV-EE/"><img src="/uploads/products/1y0JT2YS_2_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        
+        <div class="product_description" id="product_87">
+            <p><span>Производитель: </span>Toshiba</p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>4,5 кВт</p>            <p><span>Цена: </span><span class="price">28503.9</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Toshiba-invertor-RAS-16EKV-EERAS-16EAV-EE/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+    </ul><div class="clear"></div>
+<ul id="yw2" class="yiiPager"><li class="first"><a href="/invertory">&lt;&lt;</a></li>
+<li class="previous"><a href="/invertory/page/3">&lt;</a></li>
+<li class="page"><a href="/invertory/page/2">2</a></li>
+<li class="page"><a href="/invertory/page/3">3</a></li>
+<li class="page selected"><a href="/invertory/page/4">4</a></li>
+<li class="page"><a href="/invertory/page/5">5</a></li>
+<li class="page"><a href="/invertory/page/6">6</a></li>
+<li class="next"><a href="/invertory/page/5">&gt;</a></li>
+<li class="last"><a href="/invertory/page/6">&gt;&gt;</a></li></ul></div>
+
+</div> <div id="last_news"> <h1>Новости</h1> <ul>  <li>  <div class="news_date"><span>04</span><br />02.26</div> <div class="news_title"><a href="/akciya2026/">Акция 2026</a></div> <div class="clear"></div> <div class="news_anons"><p>Монтаж кондиционера в Калуге со скидкой!</p>
+<p>В декабре 2025 и январе 2026 наша компания проводит акцию - монтаж кондиционера 10000!</p>
+<p>Закажите установку у нас и вы получите быстрый и качественный монтаж.</p></div> <div class="clear"></div> <div class="more_link"><a href="/akciya2026/">подробнее</a></div> </li>  <li>  <div class="news_date"><span>10</span><br />12.19</div> <div class="news_title"><a href="/novogodnyaya-akciya/">НОВОГОДНЯЯ АКЦИЯ!!!</a></div> <div class="clear"></div> <div class="news_anons"><p>Монтаж кондиционера в Калуге со скидкой!!!</p>
+<p>В декабре 2019 и январе 2020 наша компания проводит акцию - монтаж кондиционера 5000!!!</p>
+<p>Закажите установку у нас и вы получите быстрый и качественный монтаж.</p></div> <div class="clear"></div> <div class="more_link"><a href="/novogodnyaya-akciya/">подробнее</a></div> </li>  <li>  <div class="news_date"><span>12</span><br />04.17</div> <div class="news_title"><a href="/12042017/">Отложенная установка</a></div> <div class="clear"></div> <div class="news_anons"><p>Весна! Апрель! Теплые солнечные дни - самое время готовиться к  жаркому  лету и подумать о установке кондиционера дома или в офисе.  Прогнозы  синоптиков обещают очень жаркое и засушливое лето!</p></div> <div class="clear"></div> <div class="more_link"><a href="/12042017/">подробнее</a></div> </li>  </ul> </div> <div class="clear"></div></div>
+</div>
+
+<div class="clear"></div>
+<div class="f_p"></div>
+
+
+</div><!-- Main -->
+<div class="clear"></div>
+<div id="footer">
+
+<div class="f_inside">
+
+             <div id="copy">2004-2019 <a href="/">"Конди-Калуга"</a> </div>
+<div id="f_logo">
+<a href="/"></a><br>
+<!-- Yandex.Metrika counter --> <script type="text/javascript" > (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter50995649 = new Ya.Metrika2({ id:50995649, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true, trackHash:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/50995649" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
+<noindex><center>
+<!-- Rating@Mail.ru counter -->
+<script type="text/javascript">
+var _tmr = window._tmr || (window._tmr = []);
+_tmr.push({id: "2227155", type: "pageView", start: (new Date()).getTime()});
+(function (d, w, id) {
+  if (d.getElementById(id)) return;
+  var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+  ts.src = "https://top-fwz1.mail.ru/js/code.js";
+  var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+  if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+})(document, window, "topmailru-code");
+</script><noscript><div>
+<img src="https://top-fwz1.mail.ru/counter?id=2227155;js=na" style="border:0;position:absolute;left:-9999px;" alt="Top.Mail.Ru" />
+</div></noscript>
+<!-- //Rating@Mail.ru counter -->
+<!-- Rating@Mail.ru logo -->
+<a href="https://top.mail.ru/jump?from=2227155">
+<img src="https://top-fwz1.mail.ru/counter?id=2227155;t=501;l=1" style="border:0;" height="31" width="88" alt="Top.Mail.Ru" /></a>
+<!-- //Rating@Mail.ru logo -->
+<br>
+<!-- RedHelper -->
+<script id="rhlpscrtg" type="text/javascript" charset="utf-8" async="async" src="https://web.redhelper.ru/service/main.js?c=kondikaluga">
+</script> 
+<!--/Redhelper -->
+</center>
+</noindex>
+</div> <div class="f1">
+<span>Контакты</span><br />
+<b>Телефон в Калуге:       +7 (4842) 400-998<br />
+E-mail:          <a href=mailto:&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;>&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;</a></b>
+</div> <div class="f2">
+<span>Адрес</span><br />
+<b>Россия, 248000, г. Калуга, переулок Баррикад<br />
+дом 2а, офис 205-2, (просьба перед визитом в офис созвониться)</b>
+</div><ul class="menu_id_3" id="nav">
+<li class="menu-items_83"><a href="/"><em></em><span>Главная</span><b></b></a></li><li class="menu-items_84"><a href="/about/"><em></em><span>О компании</span><b></b></a></li><li class="menu-items_85"><a href="/kontakty/"><em></em><span>Контакты</span><b></b></a></li><li class="menu-items_88"><a href="/karta-sayta/"><em></em><span>Карта сайта</span><b></b></a></li></ul>
+
+<div class="clear"></div>
+
+
+</div>
+
+</div>
+
+</div><!--Wrapper -->
+
+
+<script type="text/javascript" src="/themes/kandi/js/basket.js"></script>
+<script type="text/javascript" src="/assets/45f8e5b6/jui/js/jquery-ui.min.js"></script>
+<script type="text/javascript">
+/*<![CDATA[*/
+
+function getProducts(model, clas)
+{
+        $.ajax({
+        type:"get",
+        data:{
+        model: model
+        },
+        success:function(data)
+        {
+            $(".catalog_products").replaceWith($(".catalog_products", data));
+        },
+        complete: function()
+        {
+            $("."+clas).addClass("active");
+            window.location.hash = model;
+            $(".yiiPager a").each(function(){
+                var link = $(this).attr("href");
+                $(this).attr("href", link+"?model="+decodeURIComponent(model));
+            });
+        }
+        });
+}
+
+function strtr (str, from, to) {
+    if (typeof from === "object") {
+        var cmpStr = "";
+        for (var j=0; j < str.length; j++){
+            cmpStr += "0";
+        }
+        var offset = 0;
+        var find = -1;
+        var addStr = "";
+        for (fr in from) {
+            offset = 0;
+            while ((find = str.indexOf(fr, offset)) != -1){
+                if (parseInt(cmpStr.substr(find, fr.length)) != 0){
+                    offset = find + 1;
+                    continue;
+                }
+                for (var k =0 ; k < from[fr].length; k++){
+                    addStr += "1";
+                }
+                cmpStr = cmpStr.substr(0, find) + addStr + cmpStr.substr(find + fr.length, cmpStr.length - (find + fr.length));
+                str = str.substr(0, find) + from[fr] + str.substr(find + fr.length, str.length - (find + fr.length));
+                offset = find + from[fr].length + 1;
+                addStr = "";
+            }
+        }
+        return str;
+    }
+
+    for(var i = 0; i < from.length; i++) {
+        str = str.replace(new RegExp(from.charAt(i),"g"), to.charAt(i));
+    }
+
+    return str;
+}
+
+function translit(text){var translit = {"А":"a","Б":"b","В":"v","Г":"g", "Д":"d","Е":"e","Ё":"e","Ж":"zh","З":"z","И":"i", "Й":"i","К":"k","Л":"l","М":"m","Н":"n", "О":"o","П":"p","Р":"r","С":"s","Т":"t", "У":"u","Ф":"f","Х":"h","Ц":"c","Ч":"ch", "Ш":"sh","Щ":"sch","Ъ":"","Ы":"y","Ь":"", "Э":"e","Ю":"yu","Я":"ya","а":"a","б":"b", "в":"v","г":"g","д":"d","е":"e","ё":"e","ж":"zh", "з":"z","и":"i","й":"y","к":"k","л":"l", "м":"m","н":"n","о":"o","п":"p","р":"r", "с":"s","т":"t","у":"u","ф":"f","х":"h", "ц":"c","ч":"ch","ш":"sh","щ":"sch","ъ":"", "ы":"y","ь":"","э":"e","ю":"yu","я":"ya", "-":"-","_":"-","--":"-","---":"-","----":"-", "?":"",".":"","\"":"","&quot;":""," ":"-" }; var tire = {"--":"-", "---":"-", "----":"-" }; text = strtr(text,translit); text = strtr(text,tire); return text; }
+
+$(document).ready(function(){
+    if(window.location.hash)
+    {
+        
+        var model = window.location.hash;
+        $(".yiiPager a").each(function(){
+            var link = $(this).attr("href");
+            $(this).attr("href", link+"?model="+model.substr(1));
+        });
+        $("."+translit(model.substr(1))).addClass("active");
+        getProducts(model.substr(1), translit(model.substr(1)));
+    }
+});
+
+
+
+jQuery(function($) {
+jQuery('#elseParams').dialog({'title':'Вы не можете заказать','autoOpen':false,'modal':true,'draggable':false,'resizable':false,'width':526});
+jQuery('#basket').dialog({'title':'Корзина','autoOpen':false,'draggable':false,'resizable':false,'modal':true,'width':526});
+jQuery('#call_order').dialog({'title':'Заказать звонок','autoOpen':false,'modal':true,'width':526,'draggable':false,'resizable':false});
+});
+/*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,998 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+<meta name="description" content="" />
+<link rel="stylesheet" type="text/css" href="/themes/kandi/css/jquery.selectBox.css" />
+<link rel="stylesheet" type="text/css" href="/assets/45f8e5b6/jui/css/base/jquery-ui.css" />
+<script type="text/javascript" src="/assets/45f8e5b6/jquery.min.js"></script>
+<script type="text/javascript" src="/themes/kandi/js/jquery.selectBox.min.js"></script>
+<script type="text/javascript" src="/themes/kandi/js/jquery_cookie.js"></script>
+<script type="text/javascript" src="/js/jcarousellite_1.0.1.pack.js"></script>
+<script type="text/javascript">
+/*<![CDATA[*/
+ $(document).ready(function(){
+ $(".searchSelect").selectBox();
+ $("#reset-widget").click(function(){
+ $("select[name=manufacturer]").val('');
+ $("select[name=mode]").val('');
+ $("select[name=power]").val('');
+ $("select[name=price]").val('');
+ $("select[name=type]").val('');
+ $("#advanced_search_widget form").submit();
+ return false;
+ });
+ });
+
+function sendBasket()
+{
+    if(!$("#name_basket").val()){$("#name_basket").siblings(".error").html("Заполните поле")} else {$("#name_basket").siblings(".error").html("");}
+    if(!$("#phone_basket").val()){$("#phone_basket").siblings(".error").html("Заполните поле")} else {$("#phone_basket").siblings(".error").html("");}
+    if($("#name_basket").val() && $("#phone_basket").val())
+    {
+        $("#basket form").submit();
+    }
+    
+}
+function setCaptcha()
+{
+    $("#captcha1").html("");
+    if ($("#captcha1").length) {
+        $.getScript("https://www.google.com/recaptcha/api.js", function(){});
+        $("#captcha1").html("<div class=\"g-recaptcha\" data-sitekey=\"6Ldu5Q4TAAAAAItJIQ8_2DN1Xp9lHsZ1BxnC-64q\"></div>");
+    }
+}
+function submitMyCapt(obj)
+{
+    var error = false;
+    if(!($("#fio").val()) || !($("#phone").val())){
+        if(!$("#fio").val()){
+            $("#fio").siblings(".error").html("Заполните поле");
+            error = true;
+        } else {
+            $("#fio").siblings(".error").html("");
+        }
+        if(!$("#phone").val()){
+            $("#phone").siblings(".error").html("Заполните поле");
+            error = true;
+        }else{
+            $("#phone").siblings(".error").html("");
+        }
+    }
+    $.post("/?checkCaps=1&call=1", obj.parent().serialize(), function(data) {
+        data = data.split("<!--111-->");
+        data = data[1];
+        if (data == "0") {
+            $("#carror").html("Подтвердите, что вы не робот.");
+            error = true;
+        } else {
+            $("#carror").html("");
+            if (!error) {
+                $.post("/?call=1", obj.parent().serialize(), function(data) {
+                    alert("Заявка на обратный звонок успешно отправлена.");
+                    document.location.href=document.location;
+                });
+            }
+        }
+    });
+    return false;
+}
+$(document).ready(function(){
+        setCaptcha();
+
+        $("#call_order").dialog("close");
+        $("#elseParams").dialog("close");
+        
+        $(".basket_widget a").click(function(){
+            if($(".product_count").html() == "0")
+            {        
+                $("#elseParams").dialog("open");
+                return false;
+            }
+            else
+            {
+            $.ajax({
+                type:"post",
+                data:{
+                basket:true
+                },
+                success:function(data)
+                {
+                    if(data != "")
+                    {
+                    
+                        if (!Array.prototype.hasOwnProperty("indexOf")) { // для IE 8 и ниже
+                            Array.prototype.indexOf = function (value) {
+                                var i;
+                                for (i=0; i<this.length; i++) { if (this[i] == value) { return i; } }
+                                return -1;
+                            }
+                        }                    
+                        
+                        var products = data.split("</div>")[2];
+                        var vote = JSON.parse(products);
+                        var content = "<form method=\"post\">";
+                        var amount = 0;
+                        for(var i=0; i<vote["product"][0].length; i++)
+                        {
+                            content += "<div class=\"product\"><input type=\"hidden\" name=\"product_id["+i+"]\" value=\""+vote["product"][0][i]["pk"]+"\" /><div class=\"title\">"+(i+1)+". "+vote["product"][0][i]["title"]+"</div>";
+                            content += "<a href=\"javascript:void(0)\" class=\"del\"></a>";
+                            content += "<div class=\"count\" id=\"price_"+vote["product"][0][i]["price"]+"\"> Количество: <input type=\"text\" value=\""+vote["product"][0][i]["count"]+"\" name=\"count["+i+"]\" /></div></div>";
+                            amount += parseInt(vote["product"][0][i]["price"]) * parseInt(vote["product"][0][i]["count"]);
+                        }
+                        content += "<div class=\"all\">Общая стоимость: <span class=\"amount_price\">"+amount+"</span> руб.</div>";
+                        content += "<div><label for=\"name\">Ваше имя:</label>";
+                        content += "<input name=\"name\" id=\"name_basket\" type=\"text\" /><div class=\"error\"></div></div>";
+                        content += "<div><label for=\"phone\">Телефон</label>";
+                        content += "<input name=\"phone\" id=\"phone_basket\" type=\"text\" /><div class=\"error\"></div></div>";
+                        content += "<div><label for=\"comments\">Комментарий</label>";
+                        content += "<textarea name=\"comments\" id=\"comments\"></textarea></div>";                        
+                        content += "<input type=\"submit\" name=\"order\" value=\"Отправить\" onclick=\"sendBasket(); return false;\" />";
+                        content += "</form>";
+                        
+                        $("#basket").html(content);
+                        $("#basket").dialog("open");
+                        
+                        
+                        var products = $.cookie("products");
+                        var p_i = products.split(",");
+                        
+                        $(".count input").live("change", function(){
+                            if(isNaN(parseInt($(this).val())))
+                            {
+                                $(this).val(1);
+                            }
+                            if($(this).val() < 1)
+                            {
+                                $(this).val(1);
+                            }                
+                            $(this).val(parseInt($(this).val()));
+                            
+                            var id = parseInt($(this).val());
+                            var prod_id = $(this).parent(".count").siblings("input").val();
+
+                            while(p_i.indexOf(prod_id) != -1)
+                            {
+                                p_i.splice(p_i.indexOf(prod_id), 1);
+                            }
+                            
+                            for(var i=0; i<id; i++)
+                            {
+                                p_i[p_i.length] = prod_id;
+                            }
+                            $(".product_count").html(p_i.length);
+                            var p_str = p_i.join();
+
+                            var amount_price = 0;
+                            $(".count input").each(function(){
+                               amount_price += parseInt($(this).val()) * parseInt($(this).parent().attr("id").substr(6));
+                            });
+                            $(".amount_price").html(amount_price);
+                            $(".amount").html(amount_price);
+                            
+                            $.cookie("products", p_str, { expires: 1, path: "/"});
+                            $.cookie("price", amount_price, { expires: 1, path: "/" });
+                            $.cookie("amount", p_i.length, { expires: 1, path: "/" });                               
+                            
+                        });
+                        
+                        var amount_price = 0;
+                        var products = $.cookie("products");
+                        var p_i = products.split(",");
+                        $(".del").live("click", function(){
+                            var prod_id = $(this).siblings("input").val();
+                            while(p_i.indexOf(prod_id) != -1)
+                            {
+                                p_i.splice(p_i.indexOf(prod_id), 1);
+                            }
+                            $(".product_count").html(p_i.length);
+                            
+                            var p_str = p_i.join();
+
+                            $(".amount").html(amount_price);
+                            
+                            $.cookie("products", p_str, { expires: 1, path: "/"});
+                            
+                            $.cookie("amount", p_i.length, { expires: 1, path: "/" }); 
+                            
+                            if($(this).parent(".product").siblings(".product").html())
+                            {
+                                $(this).parent(".product").remove();
+                                var amount_price = 0;
+                                $(".count input").each(function(){
+                                   amount_price += parseInt($(this).val()) * parseInt($(this).parent().attr("id").substr(6));
+                                });
+                                $(".amount_price").html(amount_price);
+                                $(".amount").html(amount_price);
+                                $.cookie("price", amount_price, { expires: 1, path: "/" });
+                            }
+                            else{
+                                $(this).parent(".product").remove();
+                                var amount_price = 0;
+                                $(".count input").each(function(){
+                                   amount_price += parseInt($(this).val()) * parseInt($(this).parent().attr("id").substr(6));
+                                });
+                                $(".amount_price").html(amount_price);
+                                $(".amount").html(amount_price);
+                                $.cookie("price", amount_price, { expires: 1, path: "/" });                                
+                                $("#basket").dialog("close");
+                            }
+                            
+                        });
+                    }
+                    else{
+                        $("#elseParams").dialog("open");
+                    }
+                }
+            });
+                
+            }
+        });
+        
+        $(".order_call a.call_ord").click(function(){
+            $("#call_order").dialog("open");
+            $("#captcha1").html("");
+            $.getScript("https://www.google.com/recaptcha/api.js", function(){});
+            $("#captcha2").html("<div class=\"g-recaptcha\" data-sitekey=\"6Ldu5Q4TAAAAAItJIQ8_2DN1Xp9lHsZ1BxnC-64q\"></div>");
+        });
+    (function ($) {
+      $.each(["show", "hide"], function (i, ev) {
+        var el = $.fn[ev];
+        $.fn[ev] = function () {
+          this.trigger(ev);
+          return el.apply(this, arguments);
+        };
+      });
+    })(jQuery);
+    $(".ui-dialog").live("hide", function(){
+        setCaptcha();
+    });
+});
+
+    $(document).ready(function(){
+        $('#nav a').click(function(){
+            if ($(this).attr('href') == '#') return false;
+        });
+    });
+ $(document).ready(function(){
+ $("#carousell_5").jCarouselLite({
+ mouseWheel: false,
+ circular: true,
+ auto: 5000,
+ visible: 2,
+ vertical: false,
+ speed: 500,
+ btnGo: [".pt_1", ".pt_2", ".pt_3", ".pt_4" ],
+ afterEnd:
+ function(a, to, btnGo) {
+ if(btnGo.length <= to){
+ to = 0;
+ }
+ $(".goActive").removeClass("goActive");
+ $(btnGo[to]).addClass("goActive");
+ }
+ });
+ });
+ $(document).ready(function(){
+ function check_numeric(elem_id)
+ {
+ var elem = $("#" + elem_id);
+ var new_val = elem.val().replace(/[^0-9]/g, "");
+ elem.val(new_val);
+ }
+ function check_float_numeric(elem_id)
+ {
+ var elem = $("#" + elem_id);
+ var new_val = parseFloat(elem.val()); 
+ if (isNaN(new_val)) new_val = 0;
+ elem.val(new_val);
+ }
+ $("#human, #comp, #tv, #refregerator").bind("change", function(){
+ check_numeric($(this).attr("id"));
+ });
+ $("#square, #height").bind("change", function(){
+ check_float_numeric($(this).attr("id"));
+ });
+ $("#square, #height").bind("keypress", function(event){
+ if ((event.which < 48 || event.which > 57) && event.which != 8 && event.which != 0 && event.which != 46 && !event.ctrlKey) return false;
+ });
+ $("#human, #comp, #tv, #refregerator").bind("keypress", function(event){
+ if ((event.which < 48 || event.which > 57) && event.which != 8 && event.which != 0 && !event.ctrlKey) return false;
+ });
+ $("#calculate").click(function(){
+ var s = parseFloat($("#square").val());
+ if (isNaN(s)) s = 0;
+ var h = parseFloat($("#height").val());
+ if (isNaN(h)) h = 0;
+ var q = $("#side").val();
+ var Q1 = s * h * q / 1000;
+ var koef2 = $("#room").val();
+ var humans = parseInt($("#human").val());
+ if (isNaN(humans)) humans = 0;
+ var Q2 = koef2 * humans;
+ var comps = parseInt($("#comp").val());
+ if (isNaN(comps)) comps = 0;
+ var tvs = parseInt($("#tv").val());
+ if (isNaN(tvs)) tvs = 0;
+ var refs = parseInt($("#refregerator").val());
+ if (isNaN(refs)) refs = 0;
+ var Q3 = 0.3 * comps + 0.2 * tvs + 0.5 * refs;
+ var Q = Q1 + Q2 + Q3;
+ Q *= 1000;
+ $("#result_calculation").html('Оптимальная мощность кондиционера для выбранного помещения - <span>'+Q.toFixed()+' Ватт</span>');
+ });
+ $(".fancySelect").selectBox();
+ });
+/*]]>*/
+</script>
+<title>Кондиционер Kentatsu KSGU61HZAN1/KSRU61HZAN1</title>
+                <link rel="stylesheet" type="text/css" href="/themes/kandi/css/style.css" />    <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/themes/kandi/css/ie.css" /><![endif]-->
+
+    <link rel="stylesheet" href="/css/mobile.css?v=1788286552" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8">
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(document).bind('resize', function() { sizer(); });
+            sizer();
+            if ($(window).width() < 600) {
+                /*$('.nav__item>a').unbind('click');
+                $('.nav__item>a').bind('click', function(){
+                    if ( $(this).parent().find('.nav__popup').length) {
+                        //$(this).parent().find('.nav__popup').stop().fadeToggle('fast');
+                        $(this).parent().toggleClass('activeer');
+                        return false;
+                    }
+                });*/
+                $('#nav li a').bind('click', function(){
+                    if ($(this).parent().find('ul').length) {
+                        if ($(this).parent().hasClass('show')) {
+                            $(this).parent().removeClass('show');
+                        } else {
+                            $('.show').removeClass('show');
+                            $(this).parent().addClass('show');
+                        }
+                    }
+                });
+            }
+        });
+        function sizer(){
+            if ($(window).width() < 600) {
+                $('meta[name="viewport"]').attr('content','width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no');
+            } else {
+                $('meta[name="viewport"]').attr('content','width=device-width, initial-scale=0.75, maximum-scale=0.75, minimum-scale=0.75, user-scalable=yes');
+            }
+        }
+    </script>
+</head>
+<body>
+<div id="wrapper">
+<div class="top"></div>
+    <div id="main">
+    <div id="header">
+        <div id="logo">
+            <a href="/"></a>
+        </div>
+            
+
+<div class="basket_widget">
+    <h3><a href="javascript:void(0)">Корзина</a></h3>
+    <a href="javascript:void(0)" class="bask_ico"></a>
+    Товаров: <span class="product_count">0</span><br/>
+    На сумму: <span class="amount">0</span> руб.<br/>
+</div>
+
+<div class="order_call">
+    <a class="call_ord" href="javascript:void(0)">Заказать звонок</a>    <span>Skype:</span> <a href="skype:chudnovskiyvv?call">chudnovskiyvv</a></div>
+<div id="elseParams">
+В вашей корзине пусто</div><div id="basket">
+</div><div id="call_order">
+Оставьте заявку на обратный звонок и с вами свяжется наш специалист.<form onSubmit="return submitMyCapt($(this).find(&quot;input[type=submit]&quot;)); return false;" action="/kondicioner-Kentatsu-KSGU61HZAN1KSRU61HZAN1/" method="POST"><div><label for="fio">Ф.И.О:</label><input id="fio" type="text" value="" name="fio" /><div class='error'></div></div><div><label for="phone">Телефон:</label><input id="phone" type="text" value="" name="phone" /><div class='error'></div><div style="margin-top:10px;" id="captcha2"></div><div style='color: #f74f4f; font-size: 10px; display: block; margin: 0; font-size:11px;' id='carror'></div></div><input name="call" type="submit" value="Перезвонить" /></form></div>            <ul class="menu_id_1" id="nav">
+<li class="menu-items_64"><a href="/"><em></em><span>Главная</span><b></b></a></li><li class="menu-items_90"><a href="/novinki/"><em></em><span>Новинки</span><b></b></a></li><li class="menu-items_69"><a href="#"><em></em><span>Установка и стоимость</span><b></b></a><ul class="hidden"><li class="menu-items_70"><a href="/montazh/"><em></em><span>Установка и монтаж</span><b></b></a></li><li class="menu-items_71"><a href="/stoimost/"><em></em><span>Стоимость установки</span><b></b></a></li><li class="menu-items_76"><a href="/foto-nashih-rabot/"><em></em><span>Фото наших работ</span><b></b></a></li></ul></li><li class="menu-items_80"><a href="#"><em></em><span>Выбор кондиционера</span><b></b></a><ul class="hidden"><li class="menu-items_81"><a href="/pomosch-v-vybore/"><em></em><span>Помощь в выборе</span><b></b></a></li></ul></li><li class="menu-items_72"><a href="#"><em></em><span>Сервис и Ремонт</span><b></b></a><ul class="hidden"><li class="menu-items_75"><a href="/remont/"><em></em><span>Ремонт кондиционера</span><b></b></a></li><li class="menu-items_73"><a href="/tehnicheskoe-obsluzhivanie/"><em></em><span>ТО (техобслуживание)</span><b></b></a></li><li class="menu-items_74"><a href="/garantiya/"><em></em><span>Гарантии компании</span><b></b></a></li></ul></li><li class="menu-items_79"><a href="/about/"><em></em><span>О компании</span><b></b></a></li><li class="menu-items_86"><a href="/vakansii/"><em></em><span>Вакансии</span><b></b></a></li><li class="menu-items_77"><a href="/kontakty/"><em></em><span>Контакты</span><b></b></a></li></ul>
+
+<div class="clear"></div>
+ <div id="ph">
+<div class="tel"><span>+7(4842) </span> 400-998</div>
+<div class="milo"><b><a href=mailto:&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;>&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;</a></b></div>
+</div>    </div><!-- Header -->
+<div class="clear"></div>
+    <div id="slide_show">
+        <div class="lt"></div>
+        <div class="rt"></div>
+        <div class="lb"></div>
+        <div class="rb"></div>
+        <div class="in_slide">
+               <div id="carousell_5"> <ul id="carousellGallery_5">   <li> <img width="900" height="300" src="/uploads/carousell/5/banner_011.jpg" alt="" /> </li>   <li> <img width="900" height="300" src="/uploads/carousell/5/banner_022.jpg" alt="" /> </li>   <li> <img width="900" height="300" src="/uploads/carousell/5/banner_033.jpg" alt="" /> </li>   <li> <img width="940" height="314" src="/uploads/carousell/5/banner_04_02.jpg" alt="" /> </li>  </ul> </div> <div class="clear"></div> <div class="go">  <a class="pt_1 goActive" id="point_1" href="#">&nbsp;</a>  <a class="pt_2  " id="point_2" href="#">&nbsp;</a>  <a class="pt_3  " id="point_3" href="#">&nbsp;</a>  <a class="pt_4   item_last" id="point_4" href="#">&nbsp;</a>  </div>         </div>
+    </div>
+
+
+
+<div class="clear"></div>
+
+<div id="container">
+
+<div id="sidebar">
+
+<div id="catalog"> <h3>Каталог</h3> <ul> <li><a class="cat_ico_46" href="/novinki/"><span>Новинки 2026 года!</span></a></li> <li><a class="cat_ico_36" href="/split-sistemy/"><span>Сплит-системы</span></a><ul><li><a class="cat_ico_38" href="/nastennye/"><span>Настенные кондиционеры</span></a></li> <li><a class="cat_ico_39" href="/kanalnaya/"><span>Канальные кондиционеры</span></a></li> <li><a class="cat_ico_40" href="/kassetnye/"><span>Кассетные кондиционеры</span></a></li> <li><a class="cat_ico_41" href="/napolno-potolochnye/"><span>Напольные кондиционеры</span></a></li> <li><a class="cat_ico_42" href="/kolonnye/"><span>Колонные кондиционеры</span></a></li> </ul></li> <li><a class="cat_ico_34" href="/okonnye_fix/"><span>Оконные кондиционеры</span></a></li> <li><a class="cat_ico_35" href="/mobilnye/"><span>Мобильные кондиционеры</span></a></li> <li><a class="cat_ico_43" href="/multisplit-sistemy/"><span>Мультисплит-системы</span></a></li> <li><a class="cat_ico_44" href="/multizone/"><span>Мультизональные системы</span></a></li> <li><a class="cat_ico_45" href="/invertory/"><span>Инверторы</span></a></li>  </ul> </div> <div class="clear"></div> <div id="calculator"> <h3>Калькулятор</h3> <div class="calculator_elements"> <div class="calculator_row"><span>Площадь помещения (м<sup>2</sup>)</span> <div class="over_input"><input type="text" id="square" maxlength="100" /></div></div> <div class="calculator_row"><span>Высота помещения (м)</span> <div class="over_input"><input type="text" id="height" maxlength="100" /></div></div> <div class="calculator_row"><span>Количество людей (чел)</span> <div class="over_input"><input type="text" id="human" maxlength="20" /></div></div> <div class="calculator_row"> <div class="over_select"> <select id="side" class="fancySelect"> <option value="40">Солнечная сторона</option> <option value="30">Несолнечная сторона</option> </select> </div> </div> <div class="calculator_row"> <div class="over_select"> <select id="room" class="fancySelect"> <option value="0.1">Спокойное состояние (спальня)</option> <option value="0.13">При лёгком движении (зал)</option> <option value="0.2">При физической нагрузке (магазин)</option> </select> </div> </div> <div class="calculator_row"><span>Компьютер (шт)</span> <div class="over_input"><input type="text" id="comp" maxlength="20" /></div></div> <div class="calculator_row"><span>Телевизор (шт)</span> <div class="over_input"><input type="text" id="tv" maxlength="20" /></div></div> <div class="calculator_row"><span>Холодильник (шт)</span> <div class="over_input"><input type="text" id="refregerator" maxlength="20" /></div></div> <div id="result_calculation"></div> </div> <div class="calculator_footer"><input type="button" id="calculate" value="Расчитать" /></div> </div><p>&nbsp;</p>
+<noindex><center><A HREF="https://www.kondi-kaluga.ru/about/" rel="nofollow"><IMG SRC="https://www.kondi-kaluga.ru/images/baner1.png" WIDTH="250" HEIGHT="100" BORDER="0" ALT=""></A></noindex></center></div>
+
+
+<div id="content">
+
+
+<div class="breadcrumbs">
+<a href="/">Главная</a><em></em><a href="/novinki/">Новинки 2026 года!</a><em></em><span>Кондиционер Kentatsu KSGU61HZAN1/KSRU61HZAN1</span></div>
+<h1>Кондиционер Kentatsu KSGU61HZAN1/KSRU61HZAN1</h1>
+
+             
+ 	<div id='advanced_search_widget'> 
+ 	<form id="yw0" action="/advancedsearch/" method="get"> 
+ 	<div class="widget-inner"> 
+ 	<div class="widget-label">Подбор товаров: </div> 
+ 	<div class="widget-reset"><a id="reset-widget" href="#">Очистить фильтр</a></div> 
+ 	<div class="clear" style="height: 5px;"></div> 
+ 	 
+ 	<div class="select-box">
+ 		<select class="searchSelect" name="manufacturer" id="manufacturer">
+<option value="">Производитель</option>
+<option value="Midea Китай">Midea Китай</option>
+<option value="Carrier США">Carrier США</option>
+<option value="Италия Zanussi">Италия Zanussi</option>
+<option value="Electrolux Швеция">Electrolux Швеция</option>
+<option value="Ballu Китай">Ballu Китай</option>
+<option value="Великобритания">Великобритания</option>
+<option value="Toshiba">Toshiba</option>
+<option value="Toshiba ">Toshiba </option>
+<option value="Daikin">Daikin</option>
+<option value="Daikin ">Daikin </option>
+<option value="Kentatsu">Kentatsu</option>
+<option value="MIDEA">MIDEA</option>
+<option value="Axioma">Axioma</option>
+<option value="Mitsubishi Heavy">Mitsubishi Heavy</option>
+</select> 	</div> 
+ 	<div class="select-box">
+ 		<select class="searchSelect" name="mode" id="mode">
+<option value="">Режим работы</option>
+<option value="Холод-Тепло">Холод-Тепло</option>
+<option value="Холод">Холод</option>
+<option value="Холод - Тепло">Холод - Тепло</option>
+<option value="Холод/ Тепло">Холод/ Тепло</option>
+<option value="Холод/Тепло">Холод/Тепло</option>
+</select> 	</div> 
+ 	<div class="select-box-last">
+ 		<select class="searchSelect" name="power" id="power">
+<option value="">Мощность</option>
+<option value="2">2</option>
+<option value="2,5">2,5</option>
+<option value="3,5">3,5</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="22">22</option>
+<option value="4">4</option>
+<option value="10">10</option>
+<option value="12.5">12.5</option>
+<option value="14">14</option>
+<option value="7 ">7 </option>
+<option value="13,5">13,5</option>
+<option value="15">15</option>
+<option value="4,5">4,5</option>
+<option value="8">8</option>
+</select> 	</div>
+	<div class="select-box">
+			<select class="searchSelect" name="price" id="price">
+<option value="">Цена</option>
+<option value="0">0</option>
+<option value="" selected="selected"></option>
+<option value="51500">51500</option>
+<option value="52500">52500</option>
+<option value="57500">57500</option>
+<option value="90500">90500</option>
+<option value="94000">94000</option>
+<option value="19250">19250</option>
+<option value="20690">20690</option>
+<option value="27590">27590</option>
+<option value="41500">41500</option>
+<option value="55500">55500</option>
+<option value="37850">37850</option>
+<option value="42550">42550</option>
+<option value="63050">63050</option>
+<option value="31500">31500</option>
+<option value="32500">32500</option>
+<option value="36000">36000</option>
+<option value="58500">58500</option>
+<option value="70000">70000</option>
+</select>	</div> 
+	<div class="select-box">
+		<select class="searchSelect" name="type" id="type">
+<option value="">Тип</option>
+<option value="Настенный">Настенный</option>
+<option value="Колонный">Колонный</option>
+<option value="Мобильный">Мобильный</option>
+<option value="Мультисплит-система">Мультисплит-система</option>
+<option value="Кассетный">Кассетный</option>
+<option value="Канальный">Канальный</option>
+<option value="Напольно-потолочный">Напольно-потолочный</option>
+</select>	</div> 
+	<div class="submit-box"><input type="submit" name="yt0" value="Применить фильтр" /></div> <div class="clear"></div> </div> </form> <div id="widget-footer"></div> </div> <div class="clear"></div>
+
+<div class="pc_top"></div>
+<div class="clear"></div>
+<div id="page_content">
+
+<div class="product_title">Кондиционер Kentatsu KSGU61HZAN1/KSRU61HZAN1</div>
+
+<div class="product_big_image">
+<img src="/uploads/products/6b8cc9afa8566a137a2b6125290eecf7_4.jpg?cache=1582811138" alt="" />
+</div>
+
+<div class="product_content">
+            <div class="pdf_files">
+                    </div>
+        <p><span>Производитель: </span>Kentatsu</p>    <p><span>Режим работы: </span>Холод-Тепло</p>    <p><span>Тип: </span>Настенный</p>    <p><span>Мощность: </span>6 кВт</p>    <p><span>Цена: </span>70000 рублей</p>    <p class="descr"><span>Описание:</p> </span><p>&nbsp;</p>
+<p><strong>ПЕРЕДОВЫЕ ТЕХНОЛОГИИ KENTATSU</strong></p>
+<ul>
+<li>БЫСТРЫЙ ВЫХОД НА РЕЖИМ</li>
+<li>ЛОКАЛЬНЫЙ МИКРОКЛИМАТ</li>
+<li>УПРАВЛЕНИЕ СКОРОСТЬЮ ВЕНТИЛЯТОРА</li>
+<li>ТЕПЛЫЙ ПУСК</li>
+<li>АВТОМАТИЧЕСКИЙ ВЫБОР РЕЖИМА</li>
+<li>САМОДИАГНОСТИКА И</li>
+<li>АВТОМАТИЧЕСКАЯ ЗАЩИТА</li>
+<li>АВТОМАТИЧЕСКАЯ ОЧИСТКА ИСПАРИТЕЛЯ</li>
+</ul>
+<p>&nbsp;</p>
+<p><strong>&nbsp;</strong></p>
+<ul>
+<li><strong>ЭНЕРГОЭФФЕКТИВНОСТЬ ОБОРУДОВАНИЯ КЛАССА &laquo;A&raquo;</strong></li>
+</ul>
+<p>Оборудование данного класса потребляет минимум электроэнергии, что отвечает современным требованиям по энергоэффективности.</p>
+<ul>
+<li><strong>ФУНКЦИЯ &laquo;КОМФОРТНЫЙ СОН&raquo;</strong></li>
+</ul>
+<p>Позволяет создать комфортные условия во время сна, также снижает уровень шума и потребление электроэнергии.</p>
+<ul>
+<li><strong>АВТОМАТИЧЕСКИЙ ПЕРЕЗАПУСК</strong></li>
+</ul>
+<p>Обеспечивает автоматический перезапуск работы после сбоев в электросети с параметрами до отключения.</p>
+<ul>
+<li><strong>РАБОТА ПРИ НИЗКИХ ТЕМПЕРАТУРАХ ВОЗДУХА</strong></li>
+</ul>
+<p>В режиме охлаждения и обогрева кондиционер сохраняет работоспособность при температуре наружного воздуха вплоть до -15 &deg;С.</p>
+<ul>
+<li><strong>ОБОГРЕВ ДО 8 &deg;С</strong></li>
+</ul>
+<p>Во время длительного отсутствия людей в холодное время в помещении во избежание его замораживания поддерживается температура около 8 &deg;С.</p>
+<ul>
+<li><strong>ПЛАВНЫЙ ПУСК</strong></li>
+</ul>
+<p>При запуске кондиционера ток не превышает 5 А.</p>
+<ul>
+<li><strong>РАБОТА ПРИ ПОНИЖЕННОМ НАПРЯЖЕНИИ ПИТАНИЯ</strong></li>
+</ul>
+<p>Кондиционер может начать работу и долго стабильно работать при снижении напряжения в электрической сети вплоть до 187 В.</p>
+<p>ИНТЕЛЛЕКТУАЛЬНАЯ РАЗМОРОЗКА</p>
+<p>В режиме обогрева процесс разморозки наружного блока активируется только при необходимости и длится ровно до момента оттаивания, что экономит потребление электроэнергии.</p>
+<p>ИНДИКАЦИЯ ТЕМПЕРАТУРЫ</p>
+<p>Заданная или установившаяся внутри помещения температура может быть отображена на пульте ДУ.</p>
+<table border="1" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td colspan="3" width="260">
+<p>Внутренний блок</p>
+</td>
+<td width="93">
+<p><strong>KSGU61HZAN1</strong></p>
+</td>
+</tr>
+<tr>
+<td colspan="3" width="260">
+<p>Наружный блок</p>
+</td>
+<td width="93">
+<p><strong>KSRU61HZAN1</strong></p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Производительность</p>
+</td>
+<td rowspan="2" width="34">
+<p>кВт</p>
+</td>
+<td width="94">
+<p>Охлаждение</p>
+</td>
+<td width="93">
+<p>6.16(1.75-6.30)</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Нагрев</p>
+</td>
+<td width="93">
+<p>6.20(1.75-6.75)</p>
+</td>
+</tr>
+<tr>
+<td width="132">
+<p>Электропитание</p>
+</td>
+<td width="34">
+<p>В, Гц, Ф</p>
+</td>
+<td width="94">
+<p>Однофазное</p>
+</td>
+<td width="418">
+<p>220-240, 50,1</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Потребляемая мощность</p>
+</td>
+<td rowspan="2" width="34">
+<p>кВт</p>
+</td>
+<td width="94">
+<p>Охлаждение</p>
+</td>
+<td width="93">
+<p>2.00 (0.45-2.20)</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Нагрев</p>
+</td>
+<td width="93">
+<p>1.90 (0.45-2.43)</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Сезонная Энергоэффективность / Класс</p>
+</td>
+<td rowspan="2" width="34">
+<p>-</p>
+</td>
+<td width="94">
+<p>Охлаждение (SEER)</p>
+</td>
+<td width="93">
+<p>6.50/А++</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Нагрев (SCOP)</p>
+</td>
+<td width="93">
+<p>4.00/А+</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Энергоэффективность / Класс</p>
+</td>
+<td width="34">
+<p>&nbsp;</p>
+</td>
+<td width="94">
+<p>Охлаждение (EER)</p>
+</td>
+<td width="93">
+<p>3.08/В</p>
+</td>
+</tr>
+<tr>
+<td width="34">
+<p>&nbsp;</p>
+</td>
+<td width="94">
+<p>Нагрев (СОР)</p>
+</td>
+<td width="93">
+<p>3.26/С</p>
+</td>
+</tr>
+<tr>
+<td width="132">
+<p>Годовое энергопотребление</p>
+</td>
+<td width="34">
+<p>кВт*ч</p>
+</td>
+<td width="94">
+<p>Среднее значение</p>
+</td>
+<td width="93">
+<p>1000</p>
+</td>
+</tr>
+<tr>
+<td width="132">
+<p>&nbsp;Расход воздуха(макс/сред./мин.)</p>
+</td>
+<td width="34">
+<p>м<sup>3</sup>/ч</p>
+</td>
+<td width="94">
+<p>Внутренний блок</p>
+</td>
+<td width="93">
+<p>850/610/520</p>
+</td>
+</tr>
+<tr>
+<td width="132">
+<p>&nbsp;Интенсивность осушки воздуха</p>
+</td>
+<td width="34">
+<p>л/ч</p>
+</td>
+<td width="94">
+<p>Среднее значение</p>
+</td>
+<td width="93">
+<p>2.0</p>
+</td>
+</tr>
+<tr>
+<td width="132">
+<p>Уровень шума (выс. /сред. /низ.)</p>
+</td>
+<td width="34">
+<p>дБА</p>
+</td>
+<td width="94">
+<p>Внутренний блок</p>
+</td>
+<td width="93">
+<p>47/39/34</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Габариты (ШхВхГ)</p>
+</td>
+<td rowspan="2" width="34">
+<p>мм</p>
+</td>
+<td width="94">
+<p>Внутренний блок</p>
+</td>
+<td width="93">
+<p>1017x304x221</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Наружный блок</p>
+</td>
+<td width="93">
+<p>963x700x396</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Вес</p>
+</td>
+<td rowspan="2" width="34">
+<p>кг</p>
+</td>
+<td width="94">
+<p>Внутренний блок</p>
+</td>
+<td width="93">
+<p>14</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Наружный блок</p>
+</td>
+<td width="93">
+<p>46</p>
+</td>
+</tr>
+<tr>
+<td rowspan="4" width="132">
+<p>Трубопровод хладагента</p>
+<p>(R410A)</p>
+</td>
+<td rowspan="2" width="34">
+<p>мм</p>
+</td>
+<td width="94">
+<p>Диаметр для жидкости</p>
+</td>
+<td width="93">
+<p>6.35</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Диаметр для газа</p>
+</td>
+<td width="93">
+<p>15.9</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="34">
+<p>м</p>
+</td>
+<td width="94">
+<p>Длина между блоками</p>
+</td>
+<td width="93">
+<p>25</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Перепад между блоками</p>
+</td>
+<td width="418">
+<p>10</p>
+</td>
+</tr>
+<tr>
+<td rowspan="2" width="132">
+<p>Диапазон рабочих температур</p>
+</td>
+<td rowspan="2" width="34">
+<p>&deg;C</p>
+</td>
+<td width="94">
+<p>Охлаждение</p>
+</td>
+<td width="418">
+<p>-15-43</p>
+</td>
+</tr>
+<tr>
+<td width="94">
+<p>Нагрев</p>
+</td>
+<td width="418">
+<p>-15-24</p>
+</td>
+</tr>
+</tbody>
+</table></div>
+
+</div>
+<div class="clear"></div>
+<div class="pc_bottom"></div>
+
+
+    <ul class='product_list'>
+        
+        <li>
+        <div class="product_name"><a href="/kondicioner-Kentatsu-KSGU50HZAN1KSRU50HZAN1/">Кондиционер Kentatsu KSGU50HZAN1/KSRU50HZAN1</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Kentatsu-KSGU50HZAN1KSRU50HZAN1/"><img src="/uploads/products/6b8cc9afa8566a137a2b6125290eecf7_3_thumb.jpg?cache=1582810917" alt="" /></a>        </div>
+        <div class="product_description" id="product_168">
+            <p><span>Производитель: </span>Kentatsu</p>            <p><span>Режим работы: </span>Холод-Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>5 кВт</p>            <p><span>Цена: </span><span class="price">3276000</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Kentatsu-KSGU50HZAN1KSRU50HZAN1/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            
+        <li>
+        <div class="product_name"><a href="/kondicioner-Mitsubishi-Heavy-SRK45ZSP-WSRC45ZSP-W/">Кондиционер Mitsubishi Heavy SRK45ZSP-W/SRC45ZSP-W</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Mitsubishi-Heavy-SRK45ZSP-WSRC45ZSP-W/"><img src="/uploads/products/mitsubishi-heavy-srk20zs-w--src20zs-s_2_thumb.jpg?cache=1582726207" alt="" /></a>        </div>
+        <div class="product_description" id="product_164">
+            <p><span>Производитель: </span>Mitsubishi Heavy</p>            <p><span>Режим работы: </span>Холод - Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>4,5 кВт</p>            <p><span>Цена: </span><span class="price">3530800</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Mitsubishi-Heavy-SRK45ZSP-WSRC45ZSP-W/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            
+        <li>
+        <div class="product_name"><a href="/kondicioner-Daikin-invertor-FTXB50CRXB50C/">Кондиционер Daikin  FTXB50C/RXB50C</a></div>
+        <div class="product_img">
+            <a href="/kondicioner-Daikin-invertor-FTXB50CRXB50C/"><img src="/uploads/products/ftxb-c-full_2_thumb.jpg?cache=1579028309" alt="" /></a>        </div>
+        <div class="product_description" id="product_103">
+            <p><span>Производитель: </span>Daikin</p>            <p><span>Режим работы: </span>Холод - Тепло</p>            <p><span>Тип: </span>Настенный</p>            <p><span>Мощность: </span>5 кВт</p>            <p><span>Цена: </span><span class="price">5068000</span> рублей</p>            <div class="btns">
+                <div class="more_btn"><a href="/kondicioner-Daikin-invertor-FTXB50CRXB50C/">подробнее</a></div>
+                <div class="order_btn"><a href="javascript:void(0)">заказать</a></div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <div class="product_bottom"></div>
+    </li>
+            </ul>
+ <div id="last_news"> <h1>Новости</h1> <ul>  <li>  <div class="news_date"><span>04</span><br />02.26</div> <div class="news_title"><a href="/akciya2026/">Акция 2026</a></div> <div class="clear"></div> <div class="news_anons"><p>Монтаж кондиционера в Калуге со скидкой!</p>
+<p>В декабре 2025 и январе 2026 наша компания проводит акцию - монтаж кондиционера 10000!</p>
+<p>Закажите установку у нас и вы получите быстрый и качественный монтаж.</p></div> <div class="clear"></div> <div class="more_link"><a href="/akciya2026/">подробнее</a></div> </li>  <li>  <div class="news_date"><span>10</span><br />12.19</div> <div class="news_title"><a href="/novogodnyaya-akciya/">НОВОГОДНЯЯ АКЦИЯ!!!</a></div> <div class="clear"></div> <div class="news_anons"><p>Монтаж кондиционера в Калуге со скидкой!!!</p>
+<p>В декабре 2019 и январе 2020 наша компания проводит акцию - монтаж кондиционера 5000!!!</p>
+<p>Закажите установку у нас и вы получите быстрый и качественный монтаж.</p></div> <div class="clear"></div> <div class="more_link"><a href="/novogodnyaya-akciya/">подробнее</a></div> </li>  <li>  <div class="news_date"><span>12</span><br />04.17</div> <div class="news_title"><a href="/12042017/">Отложенная установка</a></div> <div class="clear"></div> <div class="news_anons"><p>Весна! Апрель! Теплые солнечные дни - самое время готовиться к  жаркому  лету и подумать о установке кондиционера дома или в офисе.  Прогнозы  синоптиков обещают очень жаркое и засушливое лето!</p></div> <div class="clear"></div> <div class="more_link"><a href="/12042017/">подробнее</a></div> </li>  </ul> </div> <div class="clear"></div></div>
+</div>
+
+<div class="clear"></div>
+<div class="f_p"></div>
+
+
+</div><!-- Main -->
+<div class="clear"></div>
+<div id="footer">
+
+<div class="f_inside">
+
+             <div id="copy">2004-2019 <a href="/">"Конди-Калуга"</a> </div>
+<div id="f_logo">
+<a href="/"></a><br>
+<!-- Yandex.Metrika counter --> <script type="text/javascript" > (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter50995649 = new Ya.Metrika2({ id:50995649, clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true, trackHash:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/tag.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks2"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/50995649" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
+<noindex><center>
+<!-- Rating@Mail.ru counter -->
+<script type="text/javascript">
+var _tmr = window._tmr || (window._tmr = []);
+_tmr.push({id: "2227155", type: "pageView", start: (new Date()).getTime()});
+(function (d, w, id) {
+  if (d.getElementById(id)) return;
+  var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+  ts.src = "https://top-fwz1.mail.ru/js/code.js";
+  var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+  if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+})(document, window, "topmailru-code");
+</script><noscript><div>
+<img src="https://top-fwz1.mail.ru/counter?id=2227155;js=na" style="border:0;position:absolute;left:-9999px;" alt="Top.Mail.Ru" />
+</div></noscript>
+<!-- //Rating@Mail.ru counter -->
+<!-- Rating@Mail.ru logo -->
+<a href="https://top.mail.ru/jump?from=2227155">
+<img src="https://top-fwz1.mail.ru/counter?id=2227155;t=501;l=1" style="border:0;" height="31" width="88" alt="Top.Mail.Ru" /></a>
+<!-- //Rating@Mail.ru logo -->
+<br>
+<!-- RedHelper -->
+<script id="rhlpscrtg" type="text/javascript" charset="utf-8" async="async" src="https://web.redhelper.ru/service/main.js?c=kondikaluga">
+</script> 
+<!--/Redhelper -->
+</center>
+</noindex>
+</div> <div class="f1">
+<span>Контакты</span><br />
+<b>Телефон в Калуге:       +7 (4842) 400-998<br />
+E-mail:          <a href=mailto:&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;>&#107;&#111;&#110;&#100;&#105;&#45;&#107;&#97;&#108;&#117;&#103;&#97;&#64;&#109;&#97;&#105;&#108;&#46;&#114;&#117;</a></b>
+</div> <div class="f2">
+<span>Адрес</span><br />
+<b>Россия, 248000, г. Калуга, переулок Баррикад<br />
+дом 2а, офис 205-2, (просьба перед визитом в офис созвониться)</b>
+</div><ul class="menu_id_3" id="nav">
+<li class="menu-items_83"><a href="/"><em></em><span>Главная</span><b></b></a></li><li class="menu-items_84"><a href="/about/"><em></em><span>О компании</span><b></b></a></li><li class="menu-items_85"><a href="/kontakty/"><em></em><span>Контакты</span><b></b></a></li><li class="menu-items_88"><a href="/karta-sayta/"><em></em><span>Карта сайта</span><b></b></a></li></ul>
+
+<div class="clear"></div>
+
+
+</div>
+
+</div>
+
+</div><!--Wrapper -->
+
+
+<script type="text/javascript" src="/themes/kandi/js/basket.js"></script>
+<script type="text/javascript" src="/assets/45f8e5b6/jui/js/jquery-ui.min.js"></script>
+<script type="text/javascript">
+/*<![CDATA[*/
+jQuery(function($) {
+jQuery('#elseParams').dialog({'title':'Вы не можете заказать','autoOpen':false,'modal':true,'draggable':false,'resizable':false,'width':526});
+jQuery('#basket').dialog({'title':'Корзина','autoOpen':false,'draggable':false,'resizable':false,'modal':true,'width':526});
+jQuery('#call_order').dialog({'title':'Заказать звонок','autoOpen':false,'modal':true,'width':526,'draggable':false,'resizable':false});
+});
+/*]]>*/
+</script>
+</body>
+</html>

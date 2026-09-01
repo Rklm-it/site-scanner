@@ -1,0 +1,184 @@
+@media screen and (max-width: 600px) {
+    p, p* { font-size:13px; }
+    .product_description p { font-size:12px; }
+    #wrapper {
+        min-width: 100%;
+        padding: 0px 10px;
+        box-sizing: border-box;
+    }
+
+    #header {
+        width: 100%;
+        height: auto;
+    }
+
+    #main {
+        width: 100%;
+    }
+
+    #logo, #logo a {
+        width: 100%;
+        background-size: contain;
+        left: 0px;
+        position: relative;
+    }
+
+    .basket_widget {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        margin-top: 35px;
+        border-left: 0px;
+        margin-left: 1px;
+        width: 49%;
+        box-sizing: border-box;
+    }
+
+    #header ul#nav {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        float: none;
+        margin-top: 80px;
+        margin-bottom: 20px;
+    }
+
+    .order_call {
+        padding-left: 20px;
+        box-sizing: border-box;
+        top: 0px;
+        margin-top: 100px;
+        left: 49%;
+        width: 50%;
+        border-right: 0px;
+    }
+
+    #ph {
+        left: 0px;
+        right: 0px;
+        top: 160px;
+        padding: 0px 60px;
+    }
+
+    #slide_show {
+        width: 100%;
+        box-sizing: border-box;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        padding: 0px;
+        display: none;
+    }
+
+    #slide_show .lt, #slide_show .rt, #slide_show .lb, #slide_show .rb {
+        display: none;
+    }
+
+    #header ul#nav li {
+        background: none;
+        padding: 0px;
+        margin: 5px;
+        width: 98%;
+        height: auto;
+    }
+
+    #header ul#nav li a, #header ul#nav li a span {
+        width: 100%;
+        padding-left: 0px !important;
+    }
+
+    #header ul#nav li a em, #header ul#nav li a b {
+        display: none !important;
+    }
+
+    #header ul#nav li ul li, #header ul#nav li ul li a {
+        width: 100% !important;
+        margin-left: 0px;
+    }
+
+    #header ul#nav li ul li a span {
+        width: 100%;
+    }
+
+    #header ul#nav li ul {
+        width: 100%;
+        position: relative;
+        z-index: 100;
+        margin-left: 0px;
+        top: 0px;
+        margin-top: 24px;
+    }
+
+    #header ul#nav li.show ul {
+        display: block !important;
+    }
+
+    #header ul#nav li:hover ul, #header ul#nav ul li:hover ul, #header ul#nav li.iehover ul, #header ul#nav ul li.iehover ul {
+        display: none;
+    }
+
+    #header ul#nav li.show > a > span {
+        background: url(/themes/kandi/images/nav.jpg) no-repeat center -25px !important;
+    }
+
+    #header ul#nav li a:hover span {
+        background: url(/themes/kandi/images/nav.jpg) no-repeat center 0;
+    }
+    #container { width:100%; padding: 0px; }
+    #sidebar {
+        width: 280px;
+        float: none;
+        margin: 0 auto;
+    }
+    #content { width:100%; }
+    #advanced_search_widget { width:100%; background:none; }
+    #advanced_search_widget {
+        background: none;
+        border-radius: 10px;
+        border: 1px solid #41a8ff;
+    }
+    #widget-footer { display:none; }
+    #advanced_search_widget form { background:none; }
+    .pc_top, .pc_bottom { display:none; }
+    #page_content {
+        width: 100%;
+        padding: 0px;
+        background: none;
+        margin-top: 15px;
+    }
+    #last_news, #last_news ul { width:100%; }
+    #last_news ul { text-align:center; }
+    #last_news ul li { float: none; margin:0 auto; }
+    .f_inside { width:100%; height:auto; }
+    #copy { margin-top:20px;}
+    .f_p { width:100%; }
+    #footer ul#nav li { float:none; }
+    #footer ul#nav {
+        left: 0px;
+        width: 100%;
+        text-align: center;
+    }
+    .f1 {
+        left: 165px;
+    }
+    .f2 { display:none; }
+    #footer { width:calc(100% - 20px); }
+
+    #page_content > ymaps { width:100% !important; }
+    .page_content {
+        padding: 0px;
+        background: none;
+        width: 100%;
+    }
+    .forms textarea { width:98%; }
+    td { border:0px;}
+    #basket textarea { width:100%; }
+    .ui-dialog { width:100% !important; left:0px !important; }
+    ul.product_list { width:100%; }
+
+    ul.product_list { text-align:center; }
+    ul.product_list li { margin: 0 auto !important; float: none; }
+    #page_content img { max-width:100% }
+    h1 { height:auto; }
+    .product_big_image { width:100%; }
+}
