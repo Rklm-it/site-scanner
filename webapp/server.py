@@ -647,7 +647,7 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
         ssylka = relizy.zalit(reliz, chast)
         job.chasti.append({"name": chast.name, "url": ssylka,
                            "bytes": chast.stat().st_size})
-        log.info("часть %s ушла в релиз", chast.name)
+        _scan_log.info("часть %s ушла в релиз", chast.name)
         return True
 
     def sbros(katalog: Path) -> None:
@@ -729,9 +729,8 @@ def _run_dump(job: DumpJob, req: DumpRequest) -> None:
                                    "url": relizy.zalit(reliz, manifest),
                                    "bytes": manifest.stat().st_size})
                 manifest.unlink()
-            chasti = mirror.pack_chastyami(work, DUMPS_DIR, base, chast_bytes,
-                                           otdat=otdat,
-                                           nachalnyj_nomer=len(job.chasti))
+            mirror.pack_chastyami(work, DUMPS_DIR, base, chast_bytes,
+                                  otdat=otdat, nachalnyj_nomer=len(job.chasti))
             job.archive_bytes = sum(c["bytes"] for c in job.chasti)
             if work.exists():
                 work.rmdir()
