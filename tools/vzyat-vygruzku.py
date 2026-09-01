@@ -21,10 +21,22 @@ manifest.json лежит в релизе отдельным файлом и ве
     # части целиком, в /data/razbor/<тег>
     docker compose exec -T app python - textileopt.ru-2026-08-31-1642 \
         < tools/vzyat-vygruzku.py
+
+    # только нужные файлы: части качаются все, а на диск ложится отобранное
+    docker compose exec -T app python - textileopt.ru-2026-08-31-1642 \
+        --tolko 'index.html' 'contacts*' 'company/*' < tools/vzyat-vygruzku.py
+
+`--tolko` берёт шаблоны в духе оболочки (`fnmatch`) и сверяет их с путём файла
+внутри архива. Нужен он ровно из-за диска: у выгрузки страница весит около
+280 КБ, полторы тысячи страниц — это полгигабайта, а на томе свободно бывает
+меньше. Части при этом качаются все и целиком: какой файл в какой части лежит,
+заранее неизвестно, но каждая часть удаляется сразу после разбора, так что пик
+по диску — одна часть плюс отобранное.
 """
 
 from __future__ import annotations
 
+import fnmatch
 import os
 import sys
 import zipfile
@@ -101,6 +113,17 @@ def main() -> None:
     kuda.mkdir(parents=True, exist_ok=True)
 
     tolko_manifest = "--manifest" in args
+    # Шаблоны идут подряд после --tolko и кончаются на следующем ключе или на
+    # теге релиза: иначе тег, записанный после --tolko, уедет в шаблоны и
+    # совпадёт ни с чем — выгрузка распакуется пустой, а выглядеть это будет
+    # как «в архиве ничего нет».
+    shablony: list[str] = []
+    if "--tolko" in args:
+        for a in args[args.index("--tolko") + 1:]:
+            if a.startswith("--") or a == teg:
+                break
+            shablony.append(a)
+    vsego = 0
     for asset in sorted(reliz.get("assets", []), key=lambda a: a["name"]):
         if tolko_manifest and asset["name"] != "manifest.json":
             continue
@@ -108,12 +131,18 @@ def main() -> None:
         fajl = skachat(asset, kuda)
         if fajl.suffix == ".zip":
             with zipfile.ZipFile(fajl) as zf:
-                zf.extractall(kuda)
+                imena = zf.namelist()
+                if shablony:
+                    imena = [i for i in imena
+                             if any(fnmatch.fnmatch(i, sh) for sh in shablony)]
+                for imya in imena:
+                    zf.extract(imya, kuda)
+                vsego += len(imena)
             # Архив удаляем сразу: держать и его, и распакованное — это ровно та
             # беда с диском, от которой уходили.
             fajl.unlink()
-            print("  распакована и удалена")
-    print(f"готово: {kuda}")
+            print(f"  распакована ({len(imena)} файлов) и удалена")
+    print(f"готово: {kuda}, файлов {vsego}")
 
 
 if __name__ == "__main__":
