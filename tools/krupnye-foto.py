@@ -27,6 +27,18 @@
 
     # или по распакованной папке локально
     python3 tools/krupnye-foto.py clients/домен/full clients/домен/фото --skolko 24
+
+**Если отбор дал ноль — не верь порогам, спроси данные.** Ключ `--pochemu`
+печатает, сколько файлов на чём отсеялось и какие размеры вообще есть в
+выгрузке. Пороги здесь угаданы под сайты, где фотографии крупные, а у магазина
+на Битриксе каталог сплошь из миниатюр 300–500 px, и `--min-shirina 700`
+выбрасывает всё подряд:
+
+    python3 tools/krupnye-foto.py <папка> <куда> --pochemu
+
+Это не отладка на всякий случай: на `mebel-ryazane` строгий порог дважды
+подряд выглядел как «у клиента нет фотографий гардеробных», а был ошибкой
+порога.
 """
 
 from __future__ import annotations
@@ -136,19 +148,47 @@ def main(argv: list[str]) -> int:
 
     kadry = []
     vsego = 0
+    prichiny = {"имя": 0, "заголовок не прочитан": 0, "уже порога": 0,
+                "пропорции": 0}
+    vse_razmery: list[tuple[int, int, int, Path]] = []
     for put in sorted(otkuda.rglob("*")):
         if not put.is_file() or put.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
             continue
         vsego += 1
         if imya_brakovannoe(put.name):
+            prichiny["имя"] += 1
             continue
         w, h = razmer(put)
-        if not w or w < min_shirina:
+        if not w:
+            prichiny["заголовок не прочитан"] += 1
             continue
-        proporcii = w / h
-        if not 0.4 <= proporcii <= 2.6:
+        vse_razmery.append((w * h, w, h, put))
+        if w < min_shirina:
+            prichiny["уже порога"] += 1
+            continue
+        if not 0.4 <= w / h <= 2.6:
+            prichiny["пропорции"] += 1
             continue
         kadry.append((w * h, w, h, put))
+
+    if "--pochemu" in argv:
+        print(f"файлов всего {vsego}, прошло отбор {len(kadry)}")
+        print("отсеялось:")
+        for prichina, skolko_ in prichiny.items():
+            print(f"  {skolko_:5d}  {prichina}")
+        vse_razmery.sort(reverse=True)
+        print(f"\nсамые крупные кадры в выгрузке (порог сейчас {min_shirina} px):")
+        for _, w, h, put in vse_razmery[:15]:
+            print(f"  {w}×{h}  {put.name}")
+        if vse_razmery:
+            shiriny = sorted(w for _, w, _h, _p in vse_razmery)
+            n = len(shiriny)
+            print(f"\nширина: минимум {shiriny[0]}, медиана {shiriny[n // 2]}, "
+                  f"максимум {shiriny[-1]}")
+            print("сколько кадров шире порога:")
+            for porog in (300, 500, 700, 900, 1200, 1600):
+                print(f"  от {porog:5d} px — {sum(1 for w in shiriny if w >= porog)}")
+        return 0
 
     kadry.sort(reverse=True)
     kuda.mkdir(parents=True, exist_ok=True)
