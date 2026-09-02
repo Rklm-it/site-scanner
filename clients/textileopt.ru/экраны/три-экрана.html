@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Текстиль-Сити — три первых экрана</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap');
+
+:root{
+  --fon:#EDE7DA; --tekst:#16181C; --akcent:#6E7A5E; --rasprodazha:#B23A20;
+  --belyj:#FFFFFF;
+  --zag:'Unbounded','Arial Black','Trebuchet MS',sans-serif;
+  --osn:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#c9c3b6;color:var(--tekst);font-family:var(--osn);
+     font-size:18px;line-height:1.55}
+.podpis{max-width:1440px;margin:0 auto;padding:48px 40px 16px;font-family:var(--mono);
+        font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#3b3f36}
+.podpis b{font-family:var(--osn);font-size:20px;letter-spacing:0;text-transform:none;
+          display:block;margin-top:6px;font-weight:600;color:var(--tekst)}
+.podpis span{font-family:var(--osn);font-size:16px;letter-spacing:0;text-transform:none;
+             display:block;margin-top:4px;color:#3b3f36;max-width:80ch}
+
+.ekran{max-width:1440px;margin:0 auto 8px;background:var(--fon);
+       min-height:900px;display:flex;flex-direction:column}
+
+/* ——— шапка, общая для всех трёх ——— */
+.shapka{display:flex;align-items:center;gap:32px;padding:24px 56px;
+        border-bottom:1px solid var(--tekst)}
+.logo{font-family:var(--zag);font-weight:600;font-size:20px;letter-spacing:-.02em;
+      white-space:nowrap}
+.menu{display:flex;gap:24px;font-size:15px;margin-left:24px}
+.shapka .spravа{margin-left:auto;display:flex;align-items:center;gap:20px}
+.tel{font-family:var(--mono);font-size:15px;white-space:nowrap}
+.knopka{background:var(--akcent);color:#fff;border:0;border-radius:2px;
+        padding:12px 22px;font-family:var(--osn);font-size:15px;font-weight:600;
+        cursor:pointer;white-space:nowrap}
+.knopka.pusto{background:transparent;color:var(--tekst);border:1px solid var(--tekst)}
+
+.telo{flex:1;padding:24px 56px;display:flex;flex-direction:column;
+      justify-content:center}
+
+h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
+   margin:0}
+.pod{font-size:18px;margin:16px 0 0;max-width:68ch}
+
+/* ——— линейка ——— */
+.lineika{position:relative;height:46px;margin-top:22px;
+         border-bottom:1px solid var(--tekst)}
+.riska{position:absolute;bottom:0;width:1px;background:var(--tekst)}
+.riska.krupno{height:26px;background:var(--akcent);width:2px}
+.riska.melko{height:9px}
+.riska b{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+         font-family:var(--mono);font-size:13px;font-weight:500;color:var(--akcent)}
+.sm{position:absolute;right:0;bottom:32px;font-family:var(--mono);font-size:13px;
+    color:#5b6052}
+
+/* ——— полосы ширины ——————————————————————————————————————————————
+   Две строки на товар, а не одна: в первой версии название и техстрока стояли
+   в ряд с полосой и уезжали за правый край — у гобелена название с артикулом
+   длиной в полстроки. Теперь текст сверху, полоса под ним, и полоса меряется
+   от того же левого края, что и линейка. */
+.polosy{margin-top:4px}
+.polosa{padding:9px 0 6px;border-bottom:1px solid rgba(22,24,28,.18)}
+.polosa .stroka{display:flex;align-items:baseline;gap:16px}
+.polosa .imya{font-size:16px;overflow:hidden;text-overflow:ellipsis;
+              white-space:nowrap}
+.polosa .shirina{margin-left:auto;font-family:var(--mono);font-size:13px;
+                 color:#3b3f36;white-space:nowrap;flex:none}
+.polosa .plashka{display:block;height:10px;background:var(--tekst);margin-top:8px}
+
+.fakty{display:flex;border-top:1px solid var(--tekst);
+       font-family:var(--mono);font-size:13px;letter-spacing:.04em}
+.fakty div{flex:1;padding:15px 56px 15px 0;border-right:1px solid rgba(22,24,28,.2)}
+.fakty div:last-child{border-right:0}
+.fakty-obertka{padding:0 56px}
+
+/* ——— вариант 2: цветные полосы во весь экран ——— */
+.krupnye{display:flex;flex-direction:column;gap:0;margin-top:auto}
+.krupnaya{position:relative;display:flex;align-items:flex-end;
+          border-top:1px solid var(--tekst)}
+.krupnaya .zaliv{height:100%;position:absolute;left:0;top:0}
+.krupnaya .nadpis{position:relative;padding:14px 0 14px 20px;font-family:var(--mono);
+                  font-size:14px}
+.krupnaya.temnaya .nadpis{color:#F2EEE6}
+.krupnaya.glavnaya{min-height:300px}
+.krupnaya.glavnaya h1{position:relative;padding:32px 20px}
+
+/* ——— вариант 3: складская ведомость ——— */
+.vedomost{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px}
+.vedomost th{text-align:left;font-weight:500;padding:10px 16px 10px 0;
+             border-bottom:1px solid var(--tekst);letter-spacing:.06em;
+             text-transform:uppercase;font-size:12px;color:#3b3f36}
+.vedomost td{padding:12px 16px 12px 0;border-bottom:1px solid rgba(22,24,28,.15)}
+.vedomost tr td:last-child{text-align:right;color:var(--akcent)}
+.vedomost tr.razdel td{border-top:1px solid var(--tekst);padding-top:14px}
+.vedomost tr.razdel ~ tr.razdel td{border-top:0;padding-top:12px}
+.vedomost tr.razdel td:first-child{font-family:var(--osn);font-size:15px}
+.schet{font-family:var(--zag);font-weight:600;font-size:118px;line-height:.92;
+       letter-spacing:-.03em;margin:0}
+.schet small{display:block;font-family:var(--osn);font-size:17px;font-weight:400;
+             line-height:1.5;letter-spacing:0;margin-top:18px;color:#3b3f36;
+             max-width:44ch}
+.dve{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);gap:56px;
+     align-items:start}
+
+@media (max-width:560px){
+  .riska.poslednyaya b{display:none}
+}
+@media (max-width:900px){
+  .menu,.shapka .spravа .tel{display:none}
+  .telo{padding:32px 20px}
+  .shapka{padding:16px 20px}
+  .fakty{flex-direction:column}
+  .fakty-obertka{padding:0 20px}
+  .fakty div{border-right:0;border-bottom:1px solid rgba(22,24,28,.2);padding:14px 0}
+  .dve{grid-template-columns:1fr;gap:28px}
+  .schet{font-size:72px}
+}
+</style></head>
+<body><div class="podpis">Громкое место: заголовок 104 px.<b>Вариант 1 — «Линейка»</b><span>Фирменный приём в чистом виде: измерительная шкала во всю ширину, под ней полосы настоящей ширины рулона. Ни одной фотографии — экран держится на типографике, и его можно показывать уже сегодня.</span></div><section class="ekran"><div class="shapka"><div class="logo">Текстиль-Сити</div><nav class="menu"><a>Каталог</a><a>Услуги</a><a>Оптовикам</a><a>Доставка</a><a>О компании</a><a>Контакты</a></nav><div class="spravа"><span class="tel">+7 (863) 273-23-50</span><button class="knopka">Запросить прайс</button></div></div>
+  <div class="telo">
+    <h1 style="font-size:clamp(40px,7vw,104px)">Всё для швейного<br>и мебельного производства</h1>
+    <p class="pod">Более 55 000 товаров в наличии на складе в Ростове-на-Дону.
+       Отгружаем целыми рулонами и упаковками, минимальный заказ 3 000 ₽.</p>
+    <div class="lineika"><i class="riska melko" style="left:0.000%"></i><i class="riska melko" style="left:3.333%"></i><i class="riska melko" style="left:6.667%"></i><i class="riska melko" style="left:10.000%"></i><i class="riska melko" style="left:13.333%"></i><i class="riska melko" style="left:16.667%"></i><i class="riska melko" style="left:20.000%"></i><i class="riska melko" style="left:23.333%"></i><i class="riska krupno" style="left:26.667%"><b>80</b></i><i class="riska melko" style="left:30.000%"></i><i class="riska melko" style="left:33.333%"></i><i class="riska melko" style="left:36.667%"></i><i class="riska melko" style="left:40.000%"></i><i class="riska melko" style="left:43.333%"></i><i class="riska melko" style="left:46.667%"></i><i class="riska krupno" style="left:50.000%"><b>150</b></i><i class="riska melko" style="left:53.333%"></i><i class="riska melko" style="left:56.667%"></i><i class="riska melko" style="left:60.000%"></i><i class="riska melko" style="left:63.333%"></i><i class="riska melko" style="left:66.667%"></i><i class="riska melko" style="left:70.000%"></i><i class="riska krupno" style="left:73.333%"><b>220</b></i><i class="riska melko" style="left:76.667%"></i><i class="riska melko" style="left:80.000%"></i><i class="riska melko" style="left:83.333%"></i><i class="riska melko" style="left:86.667%"></i><i class="riska melko" style="left:90.000%"></i><i class="riska krupno poslednyaya" style="left:93.333%"><b>280</b></i><i class="riska melko" style="left:96.667%"></i><i class="riska melko" style="left:100.000%"></i><span class="sm">см</span></div>
+    <div class="polosy"><div class="polosa"><div class="stroka"><span class="imya">Ткань Брезент СКПВ</span><span class="shirina">Ш-90 см · пл. 540 г/м²</span></div><span class="plashka" style="width:30.00%"></span></div><div class="polosa"><div class="stroka"><span class="imya">Бязь суровая</span><span class="shirina">Ш-165 см · пл. 120 г/м²</span></div><span class="plashka" style="width:55.00%"></span></div><div class="polosa"><div class="stroka"><span class="imya">ткань Сатин-страйп полоса 3 см, белый</span><span class="shirina">Ш-280 см</span></div><span class="plashka" style="width:93.33%"></span></div></div>
+    <div style="margin-top:22px"><button class="knopka">Запросить прайс</button>
+      <button class="knopka pusto" style="margin-left:12px">Подобрать ткань под изделие</button></div>
+  </div>
+  <div class="fakty-obertka"><div class="fakty"><div>Работаем с 2009 года</div><div>Более 55 000 товаров на складе</div><div>Новое поступление каждую неделю</div><div>Отгружаем во все регионы России</div></div></div>
+</section><div class="podpis">Громкое место: цветные полосы во весь экран.<b>Вариант 2 — «Полосы ткани»</b><span>Тот же приём, но ширина показана заливкой, а не линейкой. Цвета взяты из самого товара — небелёный хлопок, брезент, графит. Заголовок меньше: громким здесь работает цвет.</span></div><section class="ekran"><div class="shapka"><div class="logo">Текстиль-Сити</div><nav class="menu"><a>Каталог</a><a>Услуги</a><a>Оптовикам</a><a>Доставка</a><a>О компании</a><a>Контакты</a></nav><div class="spravа"><span class="tel">+7 (863) 273-23-50</span><button class="knopka">Запросить прайс</button></div></div>
+  <div class="telo" style="padding-bottom:0">
+    <div class="krupnaya glavnaya">
+      <span class="zaliv" style="width:100%;background:#D8CDB6"></span>
+      <h1 style="font-size:clamp(36px,5.6vw,84px)">Всё для швейного<br>и мебельного производства</h1>
+    </div>
+    <div class="krupnaya"><span class="zaliv" style="width:30.00%;background:#D8CDB6"></span><span class="nadpis">Ткань Брезент СКПВ · Ш-90 см</span></div><div class="krupnaya"><span class="zaliv" style="width:55.00%;background:#C3BBA6"></span><span class="nadpis">Бязь суровая · Ш-165 см</span></div><div class="krupnaya"><span class="zaliv" style="width:66.67%;background:#8E8C7E"></span><span class="nadpis">Ткань Гобелен "Дикая орхидея" цв.1 · Ш-200 см</span></div><div class="krupnaya temnaya"><span class="zaliv" style="width:73.33%;background:#6E7A5E"></span><span class="nadpis">П/лён набивной · Ш-220 см</span></div><div class="krupnaya temnaya"><span class="zaliv" style="width:93.33%;background:#3E4038"></span><span class="nadpis">ткань Сатин-страйп полоса 3 см, белый · Ш-280 см</span></div>
+    <p class="pod" style="margin-top:28px">Ширина полосы — настоящая ширина рулона.
+       Более 55 000 товаров на складе в Ростове-на-Дону.</p>
+    <div style="margin:24px 0 32px"><button class="knopka">Запросить прайс</button></div>
+  </div>
+  <div class="fakty-obertka"><div class="fakty"><div>Работаем с 2009 года</div><div>Более 55 000 товаров на складе</div><div>Новое поступление каждую неделю</div><div>Отгружаем во все регионы России</div></div></div>
+</section><div class="podpis">Громкое место: цифра 55 000.<b>Вариант 3 — «Ведомость»</b><span>Экран как складская ведомость: слева одна огромная цифра, справа таблица моноширинным. Ставка на ассортимент, а не на ширину. Подходит, если на созвоне окажется, что клиент продаёт именно охватом.</span></div><section class="ekran"><div class="shapka"><div class="logo">Текстиль-Сити</div><nav class="menu"><a>Каталог</a><a>Услуги</a><a>Оптовикам</a><a>Доставка</a><a>О компании</a><a>Контакты</a></nav><div class="spravа"><span class="tel">+7 (863) 273-23-50</span><button class="knopka">Запросить прайс</button></div></div>
+  <div class="telo">
+    <div class="dve">
+      <div>
+        <p class="schet">55&nbsp;000<small>наименований на складе в Ростове-на-Дону.
+          Девять разделов, 300 подразделов, отгрузка целыми рулонами
+          и упаковками.</small></p>
+        <div style="margin-top:32px"><button class="knopka">Запросить прайс</button></div>
+      </div>
+      <div>
+        <table class="vedomost">
+          <tr><th>Наименование</th><th>Ширина</th><th>Плотность</th><th>Цена</th></tr>
+          <tr><td>Ткань Брезент СКПВ</td><td>Ш-90 см</td><td>пл. 540 г/м²</td><td>цена по запросу</td></tr><tr><td>Бязь суровая</td><td>Ш-165 см</td><td>пл. 120 г/м²</td><td>цена по запросу</td></tr><tr><td>Ткань Гобелен "Дикая орхидея" цв.1</td><td>Ш-200 см</td><td>пл. 325 г/м²</td><td>цена по запросу</td></tr><tr><td>П/лён набивной</td><td>Ш-220 см</td><td>пл. 140 г/м²</td><td>цена по запросу</td></tr><tr><td>ткань Сатин-страйп полоса 3 см, белый</td><td>Ш-280 см</td><td></td><td>цена по запросу</td></tr>
+          <tr class='razdel'><td colspan='2'>Ткани</td><td colspan='2'>153 подраздела</td></tr><tr class='razdel'><td colspan='2'>Швейная фурнитура</td><td colspan='2'>80 подразделов</td></tr><tr class='razdel'><td colspan='2'>Наполнители и утеплители</td><td colspan='2'>15 подразделов</td></tr><tr class='razdel'><td colspan='2'>Комплектующие для матрасов</td><td colspan='2'>11 подразделов</td></tr><tr class='razdel'><td colspan='2'>Домашний текстиль</td><td colspan='2'>8 подразделов</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="fakty-obertka"><div class="fakty"><div>Работаем с 2009 года</div><div>Более 55 000 товаров на складе</div><div>Новое поступление каждую неделю</div><div>Отгружаем во все регионы России</div></div></div>
+</section>
+<div class="podpis" style="padding-bottom:64px">Макет, не сайт<span>
+Собрано по clients/textileopt.ru/DESIGN.md на данных выгрузки от 1 сентября 2026.
+Фотографий нет: они ещё не выгружены, и генерировать «наш склад» нельзя.
+Цены не показаны намеренно — на сайте клиента написано «Актуальные цены
+и наличие по запросу».</span></div>
+</body></html>
