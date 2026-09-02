@@ -115,7 +115,8 @@ def фактура_base64() -> str:
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600&display=swap');
 
 :root{
-  --fon:#EDE7DA; --tekst:#16181C; --akcent:#6E7A5E; --rasprodazha:#B23A20;
+  /* Палитра «Склад» — выбрана владельцем из четырёх (см. палитры.html). */
+  --fon:#F4F4F2; --tekst:#101114; --akcent:#C2410C; --rasprodazha:#8A1B1B;
   --belyj:#FFFFFF;
   --priglush:color-mix(in srgb, var(--tekst) 62%, transparent);
   --liniya:color-mix(in srgb, var(--tekst) 18%, transparent);
@@ -398,10 +399,10 @@ def экран_vedomost() -> str:
 # три предложены, потому что владельцу она не подошла. Каждая держится не на
 # настроении, а на том, что продают: склад, ткань, опт.
 ПАЛИТРЫ: list[tuple[str, str, dict]] = [
-    ("1. Гобелен", "снята по пикселям их фотографий: беж льна, графит, олива гобелена",
+    ("1. Гобелен", "снята по пикселям их фотографий: беж льна, графит, олива гобелена — не подошла",
      {"fon": "#EDE7DA", "tekst": "#16181C", "akcent": "#6E7A5E",
       "rasprodazha": "#B23A20", "belyj": "#FFFFFF"}),
-    ("2. Склад", "белый склад и оранжевый погрузчика: промышленно, читается как каталог",
+    ("2. Склад (выбрана)", "белый склад и оранжевый погрузчика: промышленно, читается как каталог",
      {"fon": "#F4F4F2", "tekst": "#101114", "akcent": "#C2410C",
       "rasprodazha": "#8A1B1B", "belyj": "#FFFFFF"}),
     ("3. Ночная смена", "тёмный фон, светлый текст, латунь: ткань становится единственным цветным пятном",
