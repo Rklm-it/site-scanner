@@ -117,21 +117,24 @@ def фактура_base64() -> str:
 :root{
   --fon:#EDE7DA; --tekst:#16181C; --akcent:#6E7A5E; --rasprodazha:#B23A20;
   --belyj:#FFFFFF;
+  --priglush:color-mix(in srgb, var(--tekst) 62%, transparent);
+  --liniya:color-mix(in srgb, var(--tekst) 18%, transparent);
   --zag:'Unbounded','Arial Black','Trebuchet MS',sans-serif;
   --osn:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
   --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
 }
 *{box-sizing:border-box}
-body{margin:0;background:#c9c3b6;color:var(--tekst);font-family:var(--osn);
+body{margin:0;background:#9a958a;color:var(--tekst);font-family:var(--osn);
      font-size:18px;line-height:1.55}
 .podpis{max-width:1440px;margin:0 auto;padding:48px 40px 16px;font-family:var(--mono);
-        font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#3b3f36}
+        font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--priglush)}
 .podpis b{font-family:var(--osn);font-size:20px;letter-spacing:0;text-transform:none;
           display:block;margin-top:6px;font-weight:600;color:var(--tekst)}
 .podpis span{font-family:var(--osn);font-size:16px;letter-spacing:0;text-transform:none;
-             display:block;margin-top:4px;color:#3b3f36;max-width:80ch}
+             display:block;margin-top:4px;color:var(--priglush);max-width:80ch}
 
 .ekran{max-width:1440px;margin:0 auto 8px;background:var(--fon);
+       color:var(--tekst);
        min-height:900px;display:flex;flex-direction:column}
 
 /* ——— шапка, общая для всех трёх ——— */
@@ -165,7 +168,7 @@ h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
 .riska b{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
          font-family:var(--mono);font-size:13px;font-weight:500;color:var(--akcent)}
 .sm{position:absolute;right:0;bottom:32px;font-family:var(--mono);font-size:13px;
-    color:#5b6052}
+    color:var(--priglush)}
 
 /* ——— полосы ширины ——————————————————————————————————————————————
    Две строки на товар, а не одна: в первой версии название и техстрока стояли
@@ -173,17 +176,17 @@ h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
    длиной в полстроки. Теперь текст сверху, полоса под ним, и полоса меряется
    от того же левого края, что и линейка. */
 .polosy{margin-top:4px}
-.polosa{padding:9px 0 6px;border-bottom:1px solid rgba(22,24,28,.18)}
+.polosa{padding:9px 0 6px;border-bottom:1px solid var(--liniya)}
 .polosa .stroka{display:flex;align-items:baseline;gap:16px}
 .polosa .imya{font-size:16px;overflow:hidden;text-overflow:ellipsis;
               white-space:nowrap}
 .polosa .shirina{margin-left:auto;font-family:var(--mono);font-size:13px;
-                 color:#3b3f36;white-space:nowrap;flex:none}
+                 color:var(--priglush);white-space:nowrap;flex:none}
 .polosa .plashka{display:block;height:10px;background:var(--tekst);margin-top:8px}
 
 .fakty{display:flex;border-top:1px solid var(--tekst);
        font-family:var(--mono);font-size:13px;letter-spacing:.04em}
-.fakty div{flex:1;padding:15px 56px 15px 0;border-right:1px solid rgba(22,24,28,.2)}
+.fakty div{flex:1;padding:15px 56px 15px 0;border-right:1px solid var(--liniya)}
 .fakty div:last-child{border-right:0}
 .fakty-obertka{padding:0 56px}
 
@@ -202,8 +205,8 @@ h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
 .vedomost{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:14px}
 .vedomost th{text-align:left;font-weight:500;padding:10px 16px 10px 0;
              border-bottom:1px solid var(--tekst);letter-spacing:.06em;
-             text-transform:uppercase;font-size:12px;color:#3b3f36}
-.vedomost td{padding:12px 16px 12px 0;border-bottom:1px solid rgba(22,24,28,.15)}
+             text-transform:uppercase;font-size:12px;color:var(--priglush)}
+.vedomost td{padding:12px 16px 12px 0;border-bottom:1px solid var(--liniya)}
 /* Ширина, плотность и «цена по запросу» рвались на две строки, как только
    окно становилось уже 1440. Переносить в ведомости можно только название. */
 .vedomost td+td{white-space:nowrap}
@@ -226,7 +229,7 @@ h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
    одной строкой через весь экран поверх таблицы. Возвращаем перенос явно. */
 .schet small{display:block;white-space:normal;font-family:var(--osn);
              font-size:17px;font-weight:400;line-height:1.5;letter-spacing:0;
-             margin-top:18px;color:#3b3f36;max-width:44ch}
+             margin-top:18px;color:var(--priglush);max-width:44ch}
 .dve{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);gap:56px;
      align-items:start}
 
@@ -259,7 +262,7 @@ h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
 @media (max-width:700px){
   .vedomost tr:first-child{display:none}
   .vedomost tr{display:block;padding:12px 0;
-               border-bottom:1px solid rgba(22,24,28,.15)}
+               border-bottom:1px solid var(--liniya)}
   .vedomost td{display:inline;border:0;padding:0;white-space:normal}
   .vedomost td:first-child{display:block;font-family:var(--osn);font-size:15px;
                            margin-bottom:5px;width:auto}
@@ -276,7 +279,7 @@ h1{font-family:var(--zag);font-weight:600;line-height:.98;letter-spacing:-.02em;
   .shapka{padding:16px 20px}
   .fakty{flex-direction:column}
   .fakty-obertka{padding:0 20px}
-  .fakty div{border-right:0;border-bottom:1px solid rgba(22,24,28,.2);padding:14px 0}
+  .fakty div{border-right:0;border-bottom:1px solid var(--liniya);padding:14px 0}
   .dve{grid-template-columns:1fr;gap:28px}
   .schet{font-size:min(72px,26cqw)}
 }
@@ -391,6 +394,51 @@ def экран_vedomost() -> str:
 </section>"""
 
 
+# Палитры для выбора. Первая — та, что снята по фотографиям клиента; остальные
+# три предложены, потому что владельцу она не подошла. Каждая держится не на
+# настроении, а на том, что продают: склад, ткань, опт.
+ПАЛИТРЫ: list[tuple[str, str, dict]] = [
+    ("1. Гобелен", "снята по пикселям их фотографий: беж льна, графит, олива гобелена",
+     {"fon": "#EDE7DA", "tekst": "#16181C", "akcent": "#6E7A5E",
+      "rasprodazha": "#B23A20", "belyj": "#FFFFFF"}),
+    ("2. Склад", "белый склад и оранжевый погрузчика: промышленно, читается как каталог",
+     {"fon": "#F4F4F2", "tekst": "#101114", "akcent": "#C2410C",
+      "rasprodazha": "#8A1B1B", "belyj": "#FFFFFF"}),
+    ("3. Ночная смена", "тёмный фон, светлый текст, латунь: ткань становится единственным цветным пятном",
+     {"fon": "#14161A", "tekst": "#EDEAE3", "akcent": "#C8A05A",
+      "rasprodazha": "#E4633A", "belyj": "#1D2026"}),
+    ("4. Индиго", "деловой синий: спецодежда, техткани, счёт с НДС — язык опта, а не рукоделия",
+     {"fon": "#F1F2F6", "tekst": "#10131A", "akcent": "#2E4A9E",
+      "rasprodazha": "#B23A20", "belyj": "#FFFFFF"}),
+]
+
+
+def палитры_страница() -> str:
+    """Один и тот же выбранный экран в четырёх палитрах — чтобы выбрать глазами."""
+    kuski = []
+    for nazv, pochemu, p in ПАЛИТРЫ:
+        peremennye = ";".join(f"--{k}:{v}" for k, v in p.items())
+        obrazcy = "".join(
+            f'<i style="background:{v};outline:1px solid rgba(0,0,0,.15)"></i>'
+            for v in p.values())
+        kuski.append(
+            f'<div class="podpis">палитра<b>{nazv}</b>'
+            f'<span>{pochemu}</span><span class="obrazcy">{obrazcy}</span></div>'
+            f'<div style="{peremennye}">{экран_vedomost()}</div>')
+    return f"""<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Текстиль-Сити — четыре палитры</title>
+<style>{СТИЛЬ}
+.obrazcy{{display:flex;gap:6px;margin-top:10px}}
+.obrazcy i{{width:34px;height:34px;display:block}}
+</style></head><body>{''.join(kuski)}
+<div class="podpis" style="padding-bottom:64px">Один экран, четыре палитры<span>
+Экран и текст везде одинаковые — меняются только цвета, чтобы сравнивать было
+что. Выбранную впишем в DESIGN.md и в проект Lovable одним коммитом.</span></div>
+</body></html>"""
+
+
 ОПИСАНИЯ = [
     ("Вариант 1 — «Линейка»", "Громкое место: заголовок 104 px.",
      "Фирменный приём в чистом виде: измерительная шкала во всю ширину, под ней "
@@ -437,9 +485,19 @@ if __name__ == "__main__":
         i = argi.index("--только")
         tolko = int(argi[i + 1])
         argi = argi[:i] + argi[i + 2:]
+    if "--palitry" in sys.argv:
+        # Путь берём только из аргументов без «--», иначе именем файла
+        # становится сам ключ.
+        puti = [a for a in argi if not a.startswith("--")]
+        put = puti[0] if puti else os.path.join(ЗДЕСЬ, "палитры.html")
+        with open(put, "w", encoding="utf-8") as f:
+            f.write(палитры_страница())
+        print(f"готово: {put}")
+        sys.exit(0)
     if tolko:
         ekran = [экран_линейка, экран_polosy, экран_vedomost][tolko - 1]()
-        put = argi[0] if argi else os.path.join(ЗДЕСЬ, f"экран-{tolko}.html")
+        puti = [a for a in argi if not a.startswith("--")]
+        put = puti[0] if puti else os.path.join(ЗДЕСЬ, f"экран-{tolko}.html")
         with open(put, "w", encoding="utf-8") as f:
             f.write(f'<!doctype html><html lang="ru"><head><meta charset="utf-8">'
                     f'<style>{СТИЛЬ}</style></head><body style="background:var(--fon)">'
