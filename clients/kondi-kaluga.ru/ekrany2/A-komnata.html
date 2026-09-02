@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конди-Калуга — направление А «Комната»</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Manrope:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --temno:#14140F; --seryy:#4A463F; --zelen:#1F6F4A; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Manrope',system-ui,sans-serif; color:var(--temno); -webkit-font-smoothing:antialiased; }
+  .ekran { min-height:100vh; display:grid; grid-template-columns:40% 60%; }
+  .levo { background:#fff; padding:32px 56px 40px; display:flex; flex-direction:column; }
+  .shapka { display:flex; justify-content:space-between; font-size:15px; color:var(--seryy); }
+  .shapka a { color:var(--seryy); text-decoration:none; }
+  h1 { font-family:'Cormorant Garamond',Georgia,serif; font-weight:600; font-size:84px; line-height:.95; margin:auto 0 0; }
+  h1 .plus { color:var(--zelen); }
+  .abzac { margin-top:28px; font-size:18px; line-height:1.55; color:var(--seryy); max-width:62ch; }
+  .knopki { margin-top:36px; display:flex; align-items:center; gap:28px; }
+  .knopka { background:var(--zelen); color:#fff; text-decoration:none; font-weight:600; font-size:16px;
+            height:56px; padding:0 32px; border-radius:4px; display:inline-flex; align-items:center; }
+  .zvonok { color:var(--temno); font-size:16px; text-decoration:none; border-bottom:1px solid #CFCBC4; padding-bottom:2px; }
+  .niz { margin-top:auto; padding-top:40px; font-size:15px; color:var(--seryy); }
+  .kadr { background:url(komnata.jpg) center/cover no-repeat; }
+  @media (max-width:900px) {
+    .ekran { grid-template-columns:1fr; }
+    .kadr { min-height:44vh; order:-1; }
+    .levo { padding:20px; }
+    h1 { font-size:40px; margin-top:28px; }
+    .knopki { flex-direction:column; align-items:stretch; gap:16px; }
+    .knopka { justify-content:center; }
+    .zvonok { text-align:center; }
+  }
+</style>
+</head>
+<body>
+<main class="ekran">
+  <div class="levo">
+    <header class="shapka">
+      <span>Конди-Калуга, Калуга</span>
+      <a href="tel:+74842400998">+7 (4842) 400-998</a>
+    </header>
+
+    <h1>Дома <span class="plus">+24</span>,<br>когда за окном<br><span class="plus">+35</span></h1>
+
+    <p class="abzac">Ставим кондиционеры в Калуге и области двадцать первый год.
+      Приезжаем с готовой ценой: стандартный монтаж девятки — 12 000 ₽, всё включено.</p>
+
+    <div class="knopki">
+      <a class="knopka" href="#">Рассчитать монтаж</a>
+      <a class="zvonok" href="tel:+74842400998">Позвонить: 400-998</a>
+    </div>
+
+    <p class="niz">Трасса 5 метров, кронштейны и работа монтажников — в цене.</p>
+  </div>
+  <div class="kadr"></div>
+</main>
+</body>
+</html>

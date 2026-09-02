@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конди-Калуга — направление Б «Плитки»</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ultra:#2340D9; --zheltyy:#FFC93C; --grafit:#14140F; --fon:#F2F2F0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Onest',system-ui,sans-serif; background:var(--fon); color:var(--grafit); -webkit-font-smoothing:antialiased; }
+  .ekran { min-height:100vh; padding:24px; display:grid; gap:16px;
+           grid-template-columns:repeat(4,1fr); grid-template-rows:auto repeat(3,1fr); }
+  .shapka { grid-column:1/-1; display:flex; justify-content:space-between; align-items:baseline; font-size:16px; }
+  .shapka a { color:var(--grafit); text-decoration:none; font-weight:500; }
+  .p { border-radius:16px; padding:32px; display:flex; flex-direction:column; }
+  .glavnaya { grid-column:span 2; grid-row:span 2; background:var(--ultra); color:#fff; }
+  .glavnaya h1 { font-size:64px; font-weight:800; line-height:1.0; letter-spacing:-.02em; }
+  .glavnaya .pod { margin-top:auto; font-weight:400; font-size:18px; opacity:.85; }
+  .cena { background:var(--zheltyy); justify-content:center; }
+  .cena b { font-size:52px; font-weight:800; line-height:1; letter-spacing:-.02em; display:block; white-space:nowrap; }
+  .cena span { font-size:16px; margin-top:12px; display:block; }
+  .foto { padding:0; overflow:hidden; background:url(fasad.jpg) center/cover no-repeat; }
+  .fakty { grid-column:span 2; background:#fff; flex-direction:row; align-items:center; gap:0; }
+  .fakt { flex:1; padding:0 24px; }
+  .fakt + .fakt { border-left:1px solid #E4E4E1; }
+  .fakt b { display:block; font-size:32px; font-weight:800; line-height:1.1; }
+  .fakt span { font-size:15px; color:#5B5B55; }
+  .telefon { background:var(--grafit); color:#fff; justify-content:center; }
+  .telefon a { color:#fff; text-decoration:none; font-size:30px; font-weight:500; letter-spacing:-.01em; }
+  .telefon span { font-size:15px; opacity:.7; margin-top:8px; }
+  .deystvie { background:var(--ultra); color:#fff; justify-content:space-between; text-decoration:none; }
+  .deystvie b { font-size:26px; font-weight:800; line-height:1.1; }
+  .deystvie i { font-style:normal; font-size:32px; align-self:flex-end; }
+  @media (max-width:900px) {
+    .ekran { grid-template-columns:1fr 1fr; grid-template-rows:auto; padding:16px; gap:12px; }
+    .glavnaya { grid-column:1/-1; grid-row:auto; }
+    .glavnaya h1 { font-size:32px; }
+    .fakty { grid-column:1/-1; flex-direction:column; align-items:flex-start; gap:16px; }
+    .fakt + .fakt { border-left:0; }
+    .cena b { font-size:40px; }
+    .foto { min-height:160px; }
+    .p { padding:20px; }
+  }
+</style>
+</head>
+<body>
+<main class="ekran">
+  <header class="shapka">
+    <span><b>Конди-Калуга</b> · Калуга и область</span>
+    <a href="tel:+74842400998">+7 (4842) 400-998</a>
+  </header>
+
+  <section class="p glavnaya">
+    <h1>Поставим кондиционер за один день</h1>
+    <p class="pod">Продажа, монтаж и обслуживание. С 2004 года.</p>
+  </section>
+
+  <section class="p cena">
+    <b>12 000 ₽</b>
+    <span>стандартный монтаж девятки, всё включено</span>
+  </section>
+
+  <section class="p foto"></section>
+
+  <section class="p fakty">
+    <div class="fakt"><b>5 м</b><span>трасса в цене</span></div>
+    <div class="fakt"><b>1 год</b><span>гарантия на монтаж</span></div>
+    <div class="fakt"><b>2004</b><span>работаем с этого года</span></div>
+  </section>
+
+  <section class="p telefon">
+    <a href="tel:+74842400998">+7 (4842) 400-998</a>
+    <span>звоните, посчитаем по телефону</span>
+  </section>
+
+  <a class="p deystvie" href="#">
+    <b>Рассчитать монтаж</b>
+    <i>→</i>
+  </a>
+</main>
+</body>
+</html>

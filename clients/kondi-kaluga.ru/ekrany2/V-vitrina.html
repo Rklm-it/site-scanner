@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конди-Калуга — направление В «Витрина»</title>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --zelen:#123A2E; --korall:#FF5A3C; --ramka:#E6E6E3; --seryy:#6B6B64; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Golos Text',system-ui,sans-serif; background:#fff; color:var(--zelen); -webkit-font-smoothing:antialiased; }
+  .polosa { background:var(--zelen); color:#fff; height:48px; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .shapka { display:flex; align-items:center; gap:40px; padding:20px 48px; border-bottom:1px solid var(--ramka); }
+  .logo { font-weight:700; font-size:20px; }
+  nav { display:flex; gap:28px; margin-right:auto; }
+  nav a { color:var(--zelen); text-decoration:none; font-size:16px; }
+  .tel { font-weight:500; color:var(--zelen); text-decoration:none; }
+  .knopka { background:var(--korall); color:#fff; text-decoration:none; font-weight:500; font-size:15px;
+            padding:12px 20px; border-radius:8px; }
+  .zagolovok { display:flex; align-items:baseline; gap:24px; padding:48px 48px 24px; flex-wrap:wrap; }
+  h1 { font-size:52px; font-weight:700; line-height:1.05; letter-spacing:-.02em; }
+  .zagolovok .melko { font-size:15px; color:var(--seryy); }
+  .ryad { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; padding:0 48px 48px; }
+  .tovar { border:1px solid var(--ramka); border-radius:12px; padding:24px; display:flex; flex-direction:column; }
+  .tovar img { width:100%; height:180px; object-fit:contain; margin-bottom:20px; }
+  .tovar .imya { font-size:18px; font-weight:500; }
+  .tovar .harakt { font-size:15px; color:var(--seryy); margin-top:6px; }
+  .tovar .cena { font-size:28px; font-weight:700; margin-top:16px; }
+  .tovar .montazh { font-size:15px; color:var(--korall); margin-top:4px; }
+  .tovar .vrschet { margin-top:20px; background:var(--korall); color:#fff; text-decoration:none;
+                    text-align:center; padding:14px; border-radius:8px; font-weight:500; font-size:15px; }
+  .esche { padding:0 48px 48px; font-size:15px; color:var(--seryy); }
+  @media (max-width:900px) {
+    .shapka { padding:16px 20px; gap:16px; flex-wrap:wrap; }
+    nav { display:none; }
+    .zagolovok { padding:28px 20px 16px; }
+    h1 { font-size:30px; }
+    .ryad { grid-template-columns:1fr 1fr; gap:16px; padding:0 20px 28px; }
+    .tovar { padding:16px; }
+    .tovar img { height:120px; }
+    .tovar .cena { font-size:22px; }
+    .esche { padding:0 20px 28px; }
+  }
+</style>
+</head>
+<body>
+  <div class="polosa">Монтаж от 12 000 ₽ — трасса 5 метров, кронштейны и работа в цене</div>
+
+  <header class="shapka">
+    <span class="logo">Конди-Калуга</span>
+    <nav>
+      <a href="#">Кондиционеры</a><a href="#">Монтаж</a><a href="#">Обслуживание</a><a href="#">Контакты</a>
+    </nav>
+    <a class="tel" href="tel:+74842400998">+7 (4842) 400-998</a>
+    <a class="knopka" href="#">Подобрать по площади</a>
+  </header>
+
+  <div class="zagolovok">
+    <h1>Кондиционеры в Калуге с установкой</h1>
+    <span class="melko">Цены указаны вместе с монтажом девятки</span>
+  </div>
+
+  <div class="ryad">
+    <article class="tovar">
+      <img src="t1-midea.jpg" alt="Кондиционер Midea MSMA1A-09HRN1">
+      <span class="imya">Midea MSMA1A-09HRN1</span>
+      <span class="harakt">2,5 кВт · холод и тепло</span>
+      <span class="cena">9 317 ₽</span>
+      <span class="montazh">+ монтаж 12 000 ₽</span>
+      <a class="vrschet" href="#">В расчёт</a>
+    </article>
+    <article class="tovar">
+      <img src="t2-ballu.jpg" alt="Кондиционер Ballu BSW-09HN1_15Y">
+      <span class="imya">Ballu BSW-09HN1_15Y</span>
+      <span class="harakt">2,5 кВт · холод и тепло</span>
+      <span class="cena">11 704 ₽</span>
+      <span class="montazh">+ монтаж 12 000 ₽</span>
+      <a class="vrschet" href="#">В расчёт</a>
+    </article>
+    <article class="tovar">
+      <img src="t3-kentatsu.jpg" alt="Кондиционер Kentatsu KSGU26HZAN1">
+      <span class="imya">Kentatsu KSGU26HZAN1</span>
+      <span class="harakt">2,5 кВт · инвертор</span>
+      <span class="cena">32 500 ₽</span>
+      <span class="montazh">+ монтаж 12 000 ₽</span>
+      <a class="vrschet" href="#">В расчёт</a>
+    </article>
+    <article class="tovar">
+      <img src="t4-daikin.jpg" alt="Кондиционер Daikin FTXB25C/RXB25C">
+      <span class="imya">Daikin FTXB25C/RXB25C</span>
+      <span class="harakt">2,5 кВт · инвертор</span>
+      <span class="cena">52 500 ₽</span>
+      <span class="montazh">+ монтаж 12 000 ₽</span>
+      <a class="vrschet" href="#">В расчёт</a>
+    </article>
+  </div>
+
+  <p class="esche">Ещё 118 моделей в каталоге, подберём под площадь комнаты.</p>
+</body>
+</html>
