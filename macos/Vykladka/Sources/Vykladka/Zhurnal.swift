@@ -116,7 +116,12 @@ enum Zhurnal {
               let vremya = obekt["ts"] as? Double,
               let zapros = obekt["request"] as? [String: Any] else { return nil }
 
-        var ip = (zapros["remote_ip"] as? String) ?? ""
+        // Порядок важен. client_ip — это адрес после разбора X-Forwarded-For:
+        // сейчас Caddy смотрит в интернет напрямую и оба поля совпадают, но если
+        // перед ним однажды встанет CDN, remote_ip станет адресом CDN, а
+        // client_ip останется адресом человека. remote_addr — от старых версий.
+        var ip = (zapros["client_ip"] as? String) ?? ""
+        if ip.isEmpty { ip = (zapros["remote_ip"] as? String) ?? "" }
         if ip.isEmpty, let adres = zapros["remote_addr"] as? String {
             // remote_addr приходит как «1.2.3.4:54321»
             ip = adres.split(separator: ":").dropLast().joined(separator: ":")
