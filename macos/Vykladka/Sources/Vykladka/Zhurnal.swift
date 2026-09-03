@@ -88,7 +88,7 @@ enum Zhurnal {
 
     static func ustroystvo(_ ua: String) -> String {
         let n = ua.lowercased()
-        var chto = "неизвестное устройство"
+        var chto: String?
         if n.contains("iphone") { chto = "iPhone" }
         else if n.contains("ipad") { chto = "iPad" }
         else if n.contains("android") { chto = n.contains("mobile") ? "телефон Android" : "планшет Android" }
@@ -96,14 +96,23 @@ enum Zhurnal {
         else if n.contains("windows") { chto = "Windows" }
         else if n.contains("linux") { chto = "Linux" }
 
-        var brauzer = ""
+        var brauzer: String?
         if n.contains("yabrowser") { brauzer = "Яндекс" }
         else if n.contains("edg/") { brauzer = "Edge" }
         else if n.contains("firefox") { brauzer = "Firefox" }
         else if n.contains("chrome") || n.contains("crios") { brauzer = "Chrome" }
         else if n.contains("safari") { brauzer = "Safari" }
 
-        return brauzer.isEmpty ? chto : "\(chto), \(brauzer)"
+        // Ничего не опознали — показываем сам User-Agent, а не «неизвестное
+        // устройство». Строка «неизвестное» не говорит ничего, а по сырому
+        // User-Agent сразу видно, кто это был: чей-то сканер, старый браузер
+        // или незнакомое приложение.
+        if chto == nil && brauzer == nil {
+            let chistyy = ua.trimmingCharacters(in: .whitespaces)
+            if chistyy.isEmpty { return "без User-Agent" }
+            return chistyy.count > 80 ? String(chistyy.prefix(80)) + "…" : chistyy
+        }
+        return [chto, brauzer].compactMap { $0 }.joined(separator: ", ")
     }
 
     // MARK: - Разбор строки лога

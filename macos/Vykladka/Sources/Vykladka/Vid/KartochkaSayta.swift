@@ -88,7 +88,7 @@ struct KartochkaSayta: View {
 
     private var srokSertifikata: String {
         guard let dney = zdorovye?.dneyDoKoncaSertifikata else { return "—" }
-        return "ещё \(dney) дн."
+        return "ещё " + schislom(dney, "день", "дня", "дней")
     }
 
     private var cvetSertifikata: Color {
@@ -196,12 +196,16 @@ struct KartochkaSayta: View {
 
     private var svodka: String {
         let lyudi = vseZahody.filter { $0.vid == .chelovek }
-        guard !lyudi.isEmpty else { return "За \(dney) дней людей не было." }
+        guard !lyudi.isEmpty else {
+            return "За \(schislom(dney, "день", "дня", "дней")) людей не было."
+        }
         let adresov = Set(lyudi.map { $0.ip }).count
         let formatter = RelativeDateTimeFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
         let posledniy = lyudi.map { $0.nachalo }.max() ?? Date()
-        return "\(lyudi.count) заходов с \(adresov) адресов. Последний — \(formatter.localizedString(for: posledniy, relativeTo: Date()))."
+        return schislom(lyudi.count, "заход", "захода", "заходов")
+            + " с " + schislom(adresov, "адреса", "адресов", "адресов")
+            + ". Последний — \(formatter.localizedString(for: posledniy, relativeTo: Date()))."
     }
 }
 
@@ -213,7 +217,9 @@ struct StrokaZahoda: View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(kogda).font(.callout.weight(.medium))
-                Text(dlitelnost).font(.caption).foregroundStyle(.secondary)
+                if let skolko = dlitelnost {
+                    Text(skolko).font(.caption).foregroundStyle(.secondary)
+                }
             }
             .frame(width: 160, alignment: .leading)
 
@@ -231,7 +237,7 @@ struct StrokaZahoda: View {
                 }
             }
             Spacer()
-            Text("\(zahod.zaprosov) запр.")
+            Text(schislom(zahod.zaprosov, "запрос", "запроса", "запросов"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -245,10 +251,13 @@ struct StrokaZahoda: View {
         return formatter.string(from: zahod.nachalo)
     }
 
-    private var dlitelnost: String {
+    /// Заход из одного обращения длится ноль секунд, и «0 сек. на сайте»
+    /// выглядит как поломка. Такому заходу времени просто нет.
+    private var dlitelnost: String? {
         let sekund = Int(zahod.dlitelnost)
-        if sekund < 60 { return "\(sekund) сек. на сайте" }
-        return "\(sekund / 60) мин. на сайте"
+        if sekund < 1 { return nil }
+        if sekund < 60 { return schislom(sekund, "секунда", "секунды", "секунд") + " на сайте" }
+        return schislom(sekund / 60, "минута", "минуты", "минут") + " на сайте"
     }
 
     private var otkuda: String {

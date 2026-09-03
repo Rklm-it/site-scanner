@@ -77,7 +77,7 @@ struct GlavnoeOkno: View {
                 }
             }
         }
-        .overlay(alignment: .bottom) { polosaSostoyaniya }
+        .safeAreaInset(edge: .bottom) { polosaSostoyaniya }
         .onDrop(of: [UTType.fileURL], isTargeted: $navedeno) { postavshchiki in
             prinyat(postavshchiki)
         }
