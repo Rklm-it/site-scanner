@@ -17,6 +17,12 @@ echo "иконок в странице: $(echo "$IKONKI" | tr ',' '\n' | wc -l) 
 mkdir -p fonts
 curl -sS --max-time 40 -A "$UA" -o /tmp/manrope.css \
   "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+# Знака рубля в Manrope нет ни в одном подмножестве Google (в кириллическом
+# лежит гривна, U+20B4, а не U+20BD), и ₽ рисовался системным шрифтом — на
+# странице, где цены и есть главное, это видно. Берём один глиф из Inter и
+# подсовываем его под именем Manrope через unicode-range: 2,2 КБ.
+curl -sS --max-time 40 -A "$UA" -o /tmp/rubl.css \
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400..800&text=%E2%82%BD"
 curl -sS --max-time 40 -A "$UA" -o /tmp/ms.css \
   "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=$IKONKI&display=block"
 
@@ -36,6 +42,12 @@ for name, body in re.findall(r'/\* ([\w-]+) \*/\s*@font-face \{(.*?)\}', css, re
                f"font-display:swap;src:url(fonts/{fn}) format('woff2');unicode-range:{rng};}}")
 # Manrope — переменный шрифт, Google отдаёт один файл на подмножество, а не на
 # начертание: качать пять раз одно и то же незачем.
+rubl = open('/tmp/rubl.css', encoding='utf-8').read()
+url = re.search(r'url\((\S+?)\)', rubl).group(1)
+subprocess.run(['curl', '-sS', '--max-time', '40', '-o', 'fonts/rubl.woff2', url], check=True)
+out.append("@font-face{font-family:'Manrope';font-style:normal;font-weight:400 800;"
+           "font-display:swap;src:url(fonts/rubl.woff2) format('woff2');unicode-range:U+20BD;}")
+
 ms = open('/tmp/ms.css', encoding='utf-8').read()
 url = re.search(r'url\((\S+?)\)', ms).group(1)
 subprocess.run(['curl', '-sS', '--max-time', '40', '-o', 'fonts/material-symbols.woff2', url], check=True)
