@@ -270,6 +270,7 @@ windows-1251: карточка «Дом 1» приезжала как «ﾄ黑 1
 
 | | Сервер сканера | Сервер прототипов |
 |---|---|---|
+| `hostname` | `aqosz` | `sczus.lunarprojects.org` |
 | Что там | сам сканер в docker | сайты клиентов, Caddy |
 | Каталог репозитория | `/root/site-scanner-main` | `/root/site-scanner` |
 | Что ещё | том `site-scanner-main_scanner-data` | `/root/prototypes-static/<клиент>` |
