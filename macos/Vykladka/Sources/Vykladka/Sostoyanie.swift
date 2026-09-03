@@ -27,7 +27,7 @@ final class Sostoyanie: ObservableObject {
         Papki.pochistitVremennoe()
         baza = try? Baza()
         if nastroyki.podklyucheno {
-            try? Klyuchi.vylozhitVFayl()
+            _ = try? Klyuchi.vylozhitVFayl()
         }
     }
 

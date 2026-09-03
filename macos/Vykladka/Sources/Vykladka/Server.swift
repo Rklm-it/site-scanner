@@ -161,9 +161,9 @@ struct Server {
                 // Откатываем блок: сломанный конфиг гасит ВСЕ сайты сразу, а не
                 // только этот. Пусть лучше новый домен не заведётся.
                 if let byloRanshe {
-                    try? ssh.vypolnit("cat > \(Kavychki.odinarnye(blokFayl))", vhod: Data(byloRanshe.utf8))
+                    _ = try? ssh.vypolnit("cat > \(Kavychki.odinarnye(blokFayl))", vhod: Data(byloRanshe.utf8))
                 } else {
-                    try? ssh.vypolnit("rm -f \(Kavychki.odinarnye(blokFayl))")
+                    _ = try? ssh.vypolnit("rm -f \(Kavychki.odinarnye(blokFayl))")
                 }
                 throw Beda.konfigNeSobralsya(proverka.oshibka + proverka.tekst)
             }
