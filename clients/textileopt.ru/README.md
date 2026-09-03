@@ -284,6 +284,12 @@ cd /root/site-scanner/deploy/prototype
 ./sync.sh textileopt https://github.com/Rklm-it/textile-city-essentials.git
 ```
 
+Репозиторий публичный, поэтому ни токена, ни `credential.helper` на сервере
+не нужно — клонируется как есть. Первый раз домен появляется в конфиге Caddy,
+значит контейнер надо пересоздать (`--force-recreate`), а не перечитать:
+в него примонтирован один файл, и `reload` после `git pull` отвечает
+«config is unchanged».
+
 Пересобрать ветку `deploy` после правок в Lovable может пока только сессия:
 `NITRO_PRESET=node-server bun run build`, снять разметку с запущенного
 node-сервера, сложить с `.output/public` и запушить принудительно.
