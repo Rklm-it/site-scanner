@@ -1,0 +1,901 @@
+<!doctype html>
+<!DOCTYPE html><html class="dark" lang="ru"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport">
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style>
+<title>Установка кондиционеров в Калуге — Конди-Калуга</title>
+<meta content="Монтаж сплит-систем в Калуге и области с 2004 года. Стандартный монтаж «девятки» — 12 000 ₽, трасса 5 метров в цене, гарантия 1 год. Цену называем до выезда." name="description">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<link href="/favicon.ico" rel="icon" sizes="any">
+<meta content="website" property="og:type">
+<meta content="ru_RU" property="og:locale">
+<meta content="Установка кондиционеров в Калуге — Конди-Калуга" property="og:title">
+<meta content="Монтаж сплит-систем в Калуге и области с 2004 года. Стандартный монтаж «девятки» — 12 000 ₽, трасса 5 метров в цене, гарантия 1 год. Цену называем до выезда." property="og:description">
+<meta content="/og.jpg" property="og:image">
+<meta content="noindex, nofollow" name="robots">
+<link href="shrifty.css" rel="stylesheet">
+<link href="styles.css" rel="stylesheet"><style>
+html{overflow-x:clip}
+@supports not (overflow:clip){html{overflow-x:hidden}}
+img{max-width:100%}
+</style></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.35)] border-b border-white/10"><div class="h-20 max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase font-bold">КОНДИ-КАЛУГА</span><span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-high text-primary font-label-caps text-label-caps"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Калуга и область</span></div><span class="font-label-caps text-label-caps text-outline tracking-wider uppercase mt-0.5">КЛИМАТИЧЕСКИЕ СИСТЕМЫ • С 2004 ГОДА</span></div></div><nav class="hidden xl:flex items-center gap-space-xs" data-active-classes="bg-surface-container text-primary font-semibold"><a aria-current="page" class="px-3 py-2 rounded transition-colors bg-surface-container text-primary font-semibold" data-path="katalog" href="#">Цены</a><a class="px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="montazh-i-standarty" href="#">Что входит</a><a class="px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="garantiya" href="#">Гарантия</a><a class="px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="kalkulyator" href="#pricing-section">Расчёт</a><a class="px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" data-path="o-kompanii" href="#">Контакты</a></nav><div class="flex items-center gap-space-md shrink-0"><a aria-label="Позвонить" class="md:hidden w-10 h-10 rounded bg-surface-container flex items-center justify-center text-primary" href="tel:+74842400998"><span class="material-symbols-outlined text-[20px]">call</span></a><div class="hidden md:flex flex-col items-end text-right"><a class="font-label-mono-metric text-label-mono-metric text-on-surface hover:text-primary transition-colors tracking-normal" href="tel:+74842400998">+7 (4842) 400-998</a><div class="flex items-center gap-1.5 mt-0.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span><span class="font-label-caps text-label-caps text-on-surface-variant">Калуга и область</span></div></div><button class="px-space-sm py-2 rounded bg-surface-container text-on-surface font-body-sm text-body-sm hover:bg-surface-container-high hover:text-on-surface transition-colors duration-150 hidden md:block" type="button">Обратный звонок</button><div class="w-8 h-8 rounded-full bg-primary items-center justify-center shrink-0 hidden md:flex"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-screen overflow-x-clip"><div class="flex flex-col w-full relative overflow-hidden bg-background select-none">
+<!-- WebGL Live Wind & Thermodynamic Shader Background Layer -->
+<div class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-75 overflow-hidden">
+<canvas id="thermal-wind-canvas" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function(){
+  function pusk(){
+
+(function() {
+  const canvas = document.getElementById('thermal-wind-canvas');
+  if (!canvas) return;
+
+  function syncSize() {
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width || canvas.clientWidth || window.innerWidth || 1360;
+    const h = rect.height || canvas.clientHeight || window.innerHeight || 800;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+  }
+
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+varying vec2 v_texCoord;
+
+float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+}
+
+float fbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    vec2 shift = vec2(100.0);
+    mat2 rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+    for (int i = 0; i < 4; ++i) {
+        v += a * noise(p);
+        p = rot * p * 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
+
+void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+    float aspect = u_resolution.x / u_resolution.y;
+    vec2 p = uv;
+    p.x *= aspect;
+
+    float t = u_time * 0.7;
+    float x = uv.x;
+
+    // Interactive mouse displacement of thermodynamic barrier
+    vec2 mouseNorm = u_mouse / u_resolution;
+    float splitOffset = (mouseNorm.x - 0.5) * 0.18;
+
+    // Fluid thermodynamic turbulence & wind boundary
+    float wave = sin(uv.y * 5.0 + t * 0.9) * 0.045 + cos(uv.y * 8.5 - t * 1.3) * 0.025;
+    float turbulence = (fbm(vec2(uv.x * 3.2 - t * 0.55, uv.y * 3.2 + t * 0.35)) - 0.5) * 0.13;
+    float boundary = 0.5 + splitOffset + wave + turbulence;
+
+    float transitionFactor = smoothstep(0.12, 0.88, x + turbulence * 0.55);
+
+    // PALETTE:
+    // Left (+35°C): Hot ambient front (molten terracotta, deep charcoal ember, intense solar warmth)
+    vec3 hotDeep = vec3(0.06, 0.02, 0.01);
+    vec3 hotMid = vec3(0.28, 0.09, 0.03);
+    vec3 hotGlow = vec3(0.85, 0.32, 0.06);
+    vec3 hotHighlight = vec3(0.98, 0.62, 0.18);
+
+    // Right (+22°C): Crisp arctic cooling laminar flow (deep slate, cyan twilight, conditioning air streams)
+    vec3 coolDeep = vec3(0.02, 0.05, 0.09);
+    vec3 coolMid = vec3(0.03, 0.20, 0.36);
+    vec3 coolGlow = vec3(0.07, 0.56, 0.85);
+    vec3 coolHighlight = vec3(0.35, 0.85, 1.0);
+
+    // Hot front ripples & heat shimmers on the left
+    float heatRipples = fbm(vec2(uv.x * 4.0, uv.y * 5.5 - t * 1.3));
+    vec3 hotSide = mix(hotDeep, hotMid, heatRipples * 0.65 + (1.0 - uv.x) * 0.35);
+    hotSide += hotGlow * pow(heatRipples, 2.6) * (1.0 - smoothstep(0.0, 0.55, uv.x)) * 0.75;
+
+    // Cold laminar wind streamlines on the right (flowing crisp conditioned air)
+    float coldStreams = 0.0;
+    for(int i = 0; i < 5; i++) {
+        float fi = float(i);
+        float lineY = 0.18 + fi * 0.16 + sin(t * 0.85 + fi * 1.1) * 0.045;
+        float dist = abs(uv.y - lineY - fbm(vec2(uv.x * 4.2 - t * (1.4 + fi * 0.22), fi * 2.1)) * 0.04);
+        coldStreams += smoothstep(0.026, 0.002, dist) * smoothstep(0.28, 0.95, uv.x) * 0.38;
+    }
+    vec3 coolSide = mix(coolDeep, coolMid, uv.x * 0.6 + fbm(vec2(uv.x * 2.8 + t * 0.5, uv.y * 2.8)) * 0.3);
+    coolSide += coolGlow * coldStreams;
+    coolSide += coolHighlight * pow(coldStreams, 2.0) * 0.55;
+
+    // Harmonized thermodynamic blend
+    vec3 baseColor = mix(hotSide, coolSide, transitionFactor);
+
+    // Atmospheric micro-particulates floating in air currents
+    float motes = 0.0;
+    vec2 pGrid = vec2(p.x * 9.0, p.y * 9.0 + t * (uv.x < 0.5 ? 0.35 : -0.25));
+    float rnd = hash(floor(pGrid));
+    if (rnd > 0.955) {
+        float d = length(fract(pGrid) - 0.5);
+        motes = smoothstep(0.12, 0.0, d) * (sin(t * 3.2 + rnd * 6.28) * 0.5 + 0.5);
+    }
+    vec3 particleColor = mix(hotHighlight, coolHighlight, uv.x);
+    baseColor += particleColor * motes * 0.45;
+
+    // Vignette for readability of typography
+    float vig = smoothstep(1.35, 0.35, length(uv - 0.5));
+    baseColor = mix(baseColor * 0.5, baseColor, vig);
+
+    gl_FragColor = vec4(baseColor, 1.0);
+}`;
+
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+})();
+
+  }
+  var uzkiy = window.matchMedia('(max-width: 1023px)').matches;
+  var tiho = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (uzkiy || tiho) return;
+  if (document.readyState === 'complete') { setTimeout(pusk, 300); }
+  else { window.addEventListener('load', function(){ setTimeout(pusk, 300); }); }
+})();</script>
+</div>
+<!-- Atmospheric Gradient Lighting Layers -->
+<div class="absolute -top-40 right-1/4 w-[620px] h-[620px] bg-gradient-to-b from-primary/10 via-secondary-container/5 to-transparent rounded-full blur-3xl pointer-events-none z-[1]"></div>
+<div class="absolute bottom-0 -left-20 w-[500px] h-[500px] bg-gradient-to-tr from-surface-container-lowest/80 via-primary-container/5 to-transparent rounded-full blur-3xl pointer-events-none z-[1]"></div>
+<!-- Main Hero Canvas Frame -->
+<div class="relative z-10 w-full max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop py-space-xl lg:py-space-2xl flex flex-col justify-between min-h-[calc(100vh-5rem)]">
+<!-- Master Thermodynamic Temperature Gauge Header (From +35°C Outdoor Heat to +22°C Precision Indoor Comfort) -->
+<div class="w-full bg-surface-container/85 backdrop-blur-xl p-space-md lg:p-space-lg rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-space-sm mb-space-md">
+<div class="grid grid-cols-1 md:grid-cols-12 items-center gap-space-md">
+<!-- Heat Extreme Left: +35°C -->
+<div class="md:col-span-4 flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high border border-error/30 flex items-center justify-center shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-error text-[28px]">thermostat</span>
+</div>
+<div class="flex flex-col text-left">
+<div class="flex items-baseline gap-space-2xs">
+<span class="font-display-hero-mobile lg:font-headline-xl text-error tracking-tight font-extrabold">+35°C</span>
+<span class="font-label-caps text-label-caps text-on-error-container uppercase">УЛИЦА</span>
+</div>
+<span class="font-label-mono-metric text-[12px] text-outline">ЖАРА В КАЛУГЕ</span>
+</div>
+</div>
+<!-- Delta Calculation Core Center -->
+<div class="md:col-span-4 flex flex-col items-center justify-center text-center px-space-xs">
+<span class="font-label-caps text-[11px] text-tertiary-fixed-dim uppercase tracking-wider mb-1">ПЕРЕПАД ТЕМПЕРАТУР</span>
+<div class="inline-flex items-center gap-space-xs px-space-md py-1 bg-surface-container-highest border border-white/10 rounded-full shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+<span class="font-label-mono-metric text-[13px] text-secondary font-bold">Δt = 13°C</span>
+</div>
+<span class="font-body-sm text-[12px] text-outline mt-1">СТАНДАРТНЫЙ МОНТАЖ ОТ 12 000 ₽</span>
+</div>
+<!-- Cold Extreme Right: +22°C -->
+<div class="md:col-span-4 flex items-center justify-start md:justify-end gap-space-md">
+<div class="flex flex-col text-left md:text-right">
+<div class="flex items-baseline md:justify-end gap-space-2xs">
+<span class="font-display-hero-mobile lg:font-headline-xl text-primary tracking-tight font-extrabold">+22°C</span>
+<span class="font-label-caps text-label-caps text-primary uppercase">В ДОМЕ</span>
+</div>
+<span class="font-label-mono-metric text-[12px] text-secondary-fixed-dim">КОМФОРТНАЯ ТЕМПЕРАТУРА</span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 shadow-inner order-first md:order-last">
+<span class="material-symbols-outlined text-primary text-[28px]">ac_unit</span>
+</div>
+</div>
+</div>
+<!-- Interactive Thermal Scale Bar -->
+<div class="relative w-full pt-1 flex flex-col gap-1.5">
+<div class="relative w-full h-2.5 bg-surface-container-lowest rounded-full overflow-hidden shadow-inner p-0.5 border border-white/5">
+<div class="w-full h-full rounded-full bg-gradient-to-r from-error via-amber-400 via-secondary-container to-primary"></div>
+</div>
+<div class="w-full flex justify-between px-1 text-outline font-label-mono-metric text-[11px]">
+<span>+38°C</span>
+<span>+34°C</span>
+<span>+30°C</span>
+<span class="text-on-surface font-bold">ТОЧКА РАВНОВЕСИЯ +26°C</span>
+<span>+24°C</span>
+<span>+22°C</span>
+<span>+18°C</span>
+</div>
+</div>
+</div>
+<!-- Top & Center Split Content Stage -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl lg:gap-space-2xl items-center pt-space-xs lg:pt-space-md">
+<!-- Left Column: Engineering Proposition & Mandatory Value Props (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col items-start space-y-space-lg">
+<!-- Experience & Regional Heritage Indicator -->
+<div class="inline-flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-high/70 backdrop-blur-md border border-white/10 shadow-lg">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#38bdf8]"></span>
+<span class="font-label-caps text-label-caps tracking-widest text-primary uppercase">КАЛУГА И ОБЛАСТЬ • РАБОТАЕМ С 2004 ГОДА</span>
+</div>
+<!-- Master Title (H1) with Strict Industrial Precision -->
+<div class="space-y-space-xs">
+<h1 class="font-display-hero text-headline-xl sm:text-display-hero text-on-surface tracking-tight font-extrabold leading-[1.08] lg:!text-[72px] lg:!leading-[76px]">
+            Инженерный монтаж кондиционеров в&nbsp;Калуге с&nbsp;<span class=" text-primary">фиксацией цены</span> до&nbsp;выезда
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl pt-space-xs leading-relaxed">
+            Продаём, ставим и обслуживаем сплит-системы в Калуге и области с 2004 года. Цену считаем по параметрам и называем до выезда — на объекте она не меняется.
+          </p>
+</div>
+<!-- Single Mandatory Primary Call To Action Area -->
+<div class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center gap-space-md pt-space-xs">
+<button class="group relative px-space-xl py-space-lg rounded-xl bg-gradient-to-r from-surface-container-highest to-surface-container-high hover:from-surface-container-high hover:to-surface-bright text-on-surface font-headline-sm text-headline-sm tracking-wide shadow-[0_0_30px_-5px_rgba(56,189,248,0.35)] transition-colors duration-300 flex items-center justify-center gap-space-sm border border-primary/50 hover:border-primary" id="hero-calc-trigger" type="button">
+<span class="relative z-10 text-on-surface font-semibold group-hover:text-primary transition-colors">Рассчитать монтаж</span>
+<span class="material-symbols-outlined text-primary text-[22px] transition-transform duration-200 group-hover:translate-x-1">arrow_forward</span>
+<div class="absolute inset-0 rounded-xl bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity blur-sm"></div>
+</button>
+<div class="flex items-center gap-space-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">verified_user</span>
+<span class="font-body-sm text-body-sm">Расчёт стоимости без выезда и без спама</span>
+</div>
+</div>
+<!-- Three Mandatory Engineering Fact Cards (Glassmorphism Matrix) -->
+<div class="w-full grid grid-cols-1 sm:grid-cols-3 gap-space-md pt-space-md">
+<!-- Fact Card 1: 12 000 ₽ Standard Package -->
+<div class="group relative p-space-md rounded-xl bg-surface-container-low/75 backdrop-blur-xl border border-white/10 hover:border-primary/40 transition-colors duration-300 shadow-xl flex flex-col justify-between">
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Фикс-тариф</span>
+<span class="material-symbols-outlined text-outline text-[18px]">ac_unit</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold group-hover:text-primary transition-colors">
+                12 000 ₽
+              </div>
+<p class="font-headline-sm text-[15px] font-semibold text-on-surface leading-snug">
+                Стандартный монтаж «девятки»
+              </p>
+</div>
+<p class="font-body-sm text-[13px] text-on-surface-variant mt-2 pt-2 border-t border-white/5 leading-snug">
+              Трасса 5 метров уже в цене: медная труба, межблочный кабель, дренажный шланг, теплоизоляция и комплект кронштейнов.
+            </p>
+</div>
+<!-- Fact Card 2: Price Before Dispatch -->
+<div class="group relative p-space-md rounded-xl bg-surface-container-low/75 backdrop-blur-xl border border-white/10 hover:border-primary/40 transition-colors duration-300 shadow-xl flex flex-col justify-between">
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">Честный расчёт</span>
+<span class="material-symbols-outlined text-outline text-[18px]">gavel</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold group-hover:text-secondary transition-colors">
+                До выезда
+              </div>
+<p class="font-headline-sm text-[15px] font-semibold text-on-surface leading-snug">
+                Цену называем до выезда
+              </p>
+</div>
+<p class="font-body-sm text-[13px] text-on-surface-variant mt-2 pt-2 border-t border-white/5 leading-snug">
+              Стоимость согласуем по параметрам заранее. Никаких внезапных доплат мастерам на месте.
+            </p>
+</div>
+<!-- Fact Card 3: 1 Year Official Warranty -->
+<div class="group relative p-space-md rounded-xl bg-surface-container-low/75 backdrop-blur-xl border border-white/10 hover:border-primary/40 transition-colors duration-300 shadow-xl flex flex-col justify-between">
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-tertiary uppercase tracking-wider">Гарантия</span>
+<span class="material-symbols-outlined text-outline text-[18px]">verified</span>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold group-hover:text-primary-fixed transition-colors">
+                1 год
+              </div>
+<p class="font-headline-sm text-[15px] font-semibold text-on-surface leading-snug">
+                Гарантия на монтаж
+              </p>
+</div>
+<p class="font-body-sm text-[13px] text-on-surface-variant mt-2 pt-2 border-t border-white/5 leading-snug">
+              Гарантия на монтаж — один год. Если что-то пойдёт не так, приедем и разберёмся.
+            </p>
+</div>
+</div>
+</div>
+<!-- Right Column: High-Precision Architectural Split Unit Mockup & Atmospheric Projection (5 Cols) -->
+<div class="lg:col-span-5 relative flex flex-col items-center justify-center mt-space-lg lg:mt-0">
+<!-- Architectural Light Halo -->
+<div class="absolute -top-16 -right-8 w-80 h-80 bg-primary/20 rounded-full blur-[90px] pointer-events-none"></div>
+<!-- Sleek Indoor Unit Construction Container -->
+<div class="relative w-full max-w-[480px] p-space-lg rounded-2xl bg-surface-container/60 backdrop-blur-2xl border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] overflow-visible">
+<!-- Monolithic Architectural Indoor Unit (Pure Structural CSS/SVG Mockup) -->
+<div class="relative w-full h-[140px] rounded-xl bg-gradient-to-b from-[#222730] via-[#181d24] to-[#0f1318] border border-white/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2),0_15px_30px_rgba(0,0,0,0.6)] flex flex-col justify-between p-4 overflow-hidden">
+<!-- Top Panel Reticle & Status Display -->
+<div class="flex items-center justify-between z-10">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-sm bg-primary shadow-[0_0_6px_#38bdf8]"></span>
+<span class="font-label-caps text-[10px] tracking-widest text-outline uppercase">СТАНДАРТНЫЙ МОНТАЖ</span>
+</div>
+<!-- Digital Temperature Display Matrix -->
+<div class="flex items-baseline gap-1 px-2.5 py-1 rounded bg-black/60 border border-primary/30 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
+<span class="font-label-mono-metric text-headline-sm text-primary tracking-tight font-extrabold">12 000</span>
+<span class="font-label-caps text-[10px] text-primary/80">°C</span>
+</div>
+</div>
+<!-- Sleek Architectural Cold Diffuser / Air Louver Slot -->
+<div class="relative mt-auto w-full">
+<!-- Deflector Slot -->
+<div class="w-full h-3.5 rounded-sm bg-[#0a0d12] border border-white/10 flex items-center px-1 shadow-inner relative overflow-hidden">
+<!-- Glowing Cold Louver Core -->
+<div class="w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-90 shadow-[0_0_10px_#38bdf8]"></div>
+<!-- Mechanical Fin Micro-lines -->
+<div class="absolute inset-0 flex justify-around items-center opacity-30 pointer-events-none">
+<span class="w-[1px] h-2 bg-white"></span>
+<span class="w-[1px] h-2 bg-white"></span>
+<span class="w-[1px] h-2 bg-white"></span>
+<span class="w-[1px] h-2 bg-white"></span>
+<span class="w-[1px] h-2 bg-white"></span>
+<span class="w-[1px] h-2 bg-white"></span>
+<span class="w-[1px] h-2 bg-white"></span>
+</div>
+</div>
+<!-- Cold Air Flow Emission Projection Lines (SVG Vector Flow Sweep) -->
+<div class="absolute -bottom-16 -left-12 -right-12 h-24 pointer-events-none overflow-visible">
+<svg class="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 500 120">
+<path d="M 100,0 C 80,60 30,90 0,110" opacity="0.75" stroke="url(#cyan-flow)" stroke-dasharray="4 6" stroke-width="1.5"></path>
+<path d="M 250,0 C 240,50 180,95 100,120" opacity="0.9" stroke="url(#cyan-flow)" stroke-linecap="round" stroke-width="2"></path>
+<path d="M 400,0 C 370,60 300,100 220,120" opacity="0.6" stroke="url(#cyan-flow)" stroke-dasharray="3 5" stroke-width="1.5"></path>
+<defs>
+<linearGradient id="cyan-flow" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9"></stop>
+<stop offset="70%" stop-color="#54d8e8" stop-opacity="0.4"></stop>
+<stop offset="100%" stop-color="#38bdf8" stop-opacity="0"></stop>
+</linearGradient>
+</defs>
+</svg>
+</div>
+</div>
+<!-- Soft Sub-Surface Glow Strip -->
+<div class="absolute -bottom-2 inset-x-8 h-4 bg-primary/25 blur-md pointer-events-none"></div>
+</div>
+<!-- Real-Time Telemetry & Environmental Status Pill (Mandatory Micro-metrics) -->
+<div class="mt-space-md pt-space-xs flex flex-col gap-2.5">
+<div class="flex items-center justify-between text-on-surface-variant font-label-caps text-label-caps uppercase border-b border-white/5 pb-2">
+<span class="flex items-center gap-1.5 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Цена «девятки»
+              </span>
+<span>Калуга, с 2004 года</span>
+</div>
+<div class="grid grid-cols-3 gap-2 text-left">
+<div class="p-2 rounded-lg bg-surface-container-lowest/80 border border-white/5">
+<span class="block font-label-caps text-[10px] text-outline uppercase">Трасса</span>
+<span class="font-label-mono-metric text-[14px] text-on-surface font-bold">5 метров</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-lowest/80 border border-white/5">
+<span class="block font-label-caps text-[10px] text-outline uppercase">Гарантия</span>
+<span class="font-label-mono-metric text-[14px] text-primary font-bold">1 год</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container-lowest/80 border border-white/5">
+<span class="block font-label-caps text-[10px] text-outline uppercase">Штроба</span>
+<span class="font-label-mono-metric text-[14px] text-secondary font-bold">от 900 ₽/м</span>
+</div>
+</div>
+<!-- Clean Installation Badge -->
+<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-container-high/60 border border-white/5">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0">cleaning_services</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">Штроба считается по материалу стены, метраж — по факту</span>
+</div>
+</div>
+</div>
+<!-- Micro Indicator Tag Beneath Unit -->
+<div class="mt-3 flex items-center gap-2 font-label-caps text-[11px] text-outline uppercase tracking-wider">
+<span class="inline-block w-1 h-1 rounded-full bg-outline"></span>
+<span>Продажа, монтаж, обслуживание и ремонт</span>
+</div>
+</div>
+</div>
+<!-- Bottom Engineering Anchor Bar with Direct Contact Line (Mandatory) -->
+<div class="w-full mt-space-2xl pt-space-md border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-space-md bg-surface-container-lowest/60 backdrop-blur-xl p-space-md rounded-2xl shadow-2xl">
+<!-- Left: Phone Contact Node -->
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 border border-primary/40 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+<span class="material-symbols-outlined text-primary text-[24px]">call</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Телефон в Калуге</span>
+<a class="font-headline-md text-headline-md font-bold text-on-surface hover:text-primary transition-colors tracking-tight" href="tel:+74842400998">
+            +7 (4842) 400-998
+          </a>
+</div>
+</div>
+<!-- Center: Physical Operational Dispatch Coordinates -->
+
+<!-- Right: Fast Call Request Trigger -->
+<div class="w-full md:w-auto flex items-center gap-space-sm justify-end">
+<a class="w-full md:w-auto px-space-lg py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-bright text-on-surface font-body-sm font-semibold border border-white/10 hover:border-primary/50 transition-colors text-center flex items-center justify-center gap-2" href="tel:+74842400998">
+<span class="material-symbols-outlined text-[18px] text-primary">phone_in_talk</span>
+<span>Позвонить</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Interactive Modal / Quick Calculation Drawer Layer -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4" id="quick-calc-modal">
+<div class="relative w-full max-w-lg bg-surface-container p-space-xl rounded-2xl border border-primary/30 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transform scale-95 transition-transform duration-300">
+<!-- Close Trigger -->
+<button class="absolute top-4 right-4 text-outline hover:text-on-surface p-1 rounded-md transition-colors" id="close-modal-btn" type="button">
+<span class="material-symbols-outlined text-[24px]">close</span>
+</button>
+<!-- Modal Header -->
+<div class="space-y-1 mb-space-md text-left">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Расчёт без выезда</span>
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">Параметры помещения</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Цену назовём до выезда мастера.</p>
+</div>
+<!-- Parameter Selection Form -->
+<form class="space-y-space-md text-left" id="calc-fast-form" onsubmit="event.preventDefault(); document.getElementById('calc-success-banner').classList.remove('hidden');">
+<div>
+<label class="block font-label-caps text-label-caps text-outline uppercase mb-2">Площадь охлаждения (м²)</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="calc-area-btn active py-2 rounded bg-surface-container-highest border border-primary text-primary font-label-mono-metric text-center" type="button">до 20</button>
+<button class="calc-area-btn py-2 rounded bg-surface-container-low border border-white/10 text-on-surface font-label-mono-metric text-center hover:border-white/30" type="button">до 25</button>
+<button class="calc-area-btn py-2 rounded bg-surface-container-low border border-white/10 text-on-surface font-label-mono-metric text-center hover:border-white/30" type="button">до 35</button>
+<button class="calc-area-btn py-2 rounded bg-surface-container-low border border-white/10 text-on-surface font-label-mono-metric text-center hover:border-white/30" type="button">50+</button>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-outline uppercase mb-2">Длина трассы коммуникаций</label>
+<div class="grid grid-cols-2 gap-2">
+<button class="calc-trace-btn active py-2 px-3 rounded bg-surface-container-highest border border-primary text-primary font-body-sm text-left" type="button">До 5 метров (стандарт)</button>
+<button class="calc-trace-btn py-2 px-3 rounded bg-surface-container-low border border-white/10 text-on-surface font-body-sm text-left hover:border-white/30" type="button">Более 5 метров</button>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-outline uppercase mb-2" for="user-phone-input">Номер телефона</label>
+<input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-white/15 text-on-surface font-label-mono-metric focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors" id="user-phone-input" placeholder="+7 (___) ___-__-__" required="" type="tel" value="+7 (">
+</div>
+<button class="w-full py-3.5 rounded-xl bg-primary text-on-primary font-headline-sm text-[16px] font-bold shadow-[0_0_20px_rgba(56,189,248,0.4)] hover:bg-primary-fixed transition-colors flex items-center justify-center gap-2" type="submit">
+<span>Узнать цену</span>
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</button>
+<!-- Success feedback confirmation -->
+<div class="hidden p-3 rounded-lg bg-surface-container-highest border border-primary/50 text-center" id="calc-success-banner">
+<p class="font-headline-sm text-[14px] text-primary font-bold">Заявка принята</p>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Перезвоним, уточним параметры и назовём цену.</p>
+</div>
+<p class="font-label-caps text-[10px] text-outline text-center">Телефон нужен только чтобы перезвонить. Рассылок не делаем.</p>
+</form>
+</div>
+</div>
+<!-- Inline Micro-Interactions Client-Side Script -->
+<script>
+    (function() {
+      const modal = document.getElementById('quick-calc-modal');
+      const openBtn = document.getElementById('hero-calc-trigger');
+      const closeBtn = document.getElementById('close-modal-btn');
+      
+      if (openBtn && modal) {
+        openBtn.addEventListener('click', () => {
+          modal.classList.remove('hidden');
+          setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('.transform').classList.remove('scale-95');
+            modal.querySelector('.transform').classList.add('scale-100');
+          }, 10);
+        });
+      }
+
+      if (closeBtn && modal) {
+        closeBtn.addEventListener('click', () => {
+          modal.classList.add('opacity-0');
+          modal.querySelector('.transform').classList.remove('scale-100');
+          modal.querySelector('.transform').classList.add('scale-95');
+          setTimeout(() => {
+            modal.classList.add('hidden');
+          }, 300);
+        });
+      }
+
+      // Quick Selector Toggle Interactions inside the calculation modal
+      const setupToggleGroup = (selector) => {
+        const buttons = document.querySelectorAll(selector);
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            buttons.forEach(b => {
+              b.classList.remove('active', 'border-primary', 'text-primary', 'bg-surface-container-highest');
+              b.classList.add('bg-surface-container-low', 'border-white/10', 'text-on-surface');
+            });
+            btn.classList.add('active', 'border-primary', 'text-primary', 'bg-surface-container-highest');
+            btn.classList.remove('bg-surface-container-low', 'border-white/10', 'text-on-surface');
+          });
+        });
+      };
+
+      setupToggleGroup('.calc-area-btn');
+      setupToggleGroup('.calc-trace-btn');
+    })();
+  </script>
+</div>
+<!-- Section: Pricing and Calculation -->
+<section class="relative w-full bg-surface-container-lowest border-t border-white/10 py-space-3xl overflow-x-clip" id="pricing-section">
+<!-- Subtle Atmospheric Accent Glow -->
+<div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="relative z-10 max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop space-y-space-2xl">
+<!-- Header Block -->
+<div class="flex flex-col items-start gap-space-xs max-w-3xl">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-high/70 backdrop-blur-md border border-white/10">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#38bdf8]"></span>
+<span class="font-label-caps text-label-caps tracking-widest text-primary uppercase">Прейскурант и расчёт монтажа</span>
+</div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">
+        Сколько стоит монтаж
+      </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Цены с нашего прайса, без скрытых доплат. Выберите мощность и материал стены — получите сумму до начала работ.
+      </p>
+</div>
+<!-- Interactive Calculator Block -->
+<div class="p-space-lg lg:p-space-xl rounded-2xl bg-surface-container/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<div class="flex items-center justify-between border-b border-white/10 pb-space-sm mb-space-lg">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">calculate</span>
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Интерактивный расчёт монтажа</span>
+</div>
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider hidden sm:inline-block">Мгновенный перерасчёт</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-lg">
+<!-- Field 1: AC Power -->
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider" for="calc-power-select">
+            Мощность кондиционера
+          </label>
+<div class="relative">
+<select class="w-full h-12 px-4 pr-10 rounded-xl bg-surface-container-lowest border border-white/15 text-on-surface font-body-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors appearance-none cursor-pointer" id="calc-power-select">
+<option selected="" value="12000">7 (20), 2.0 кВт — базовая цена 12 000 ₽</option>
+<option value="12000">9 (25), 2.5 кВт — базовая цена 12 000 ₽</option>
+<option value="13000">12 (35), 3.5 кВт — базовая цена 13 000 ₽</option>
+<option value="14000">18 (50), 5.1 кВт — базовая цена 14 000 ₽</option>
+<option value="16000">24 (70), 6.5 кВт — базовая цена 16 000 ₽</option>
+<option value="17000">30 (80), 8.0 кВт — базовая цена 17 000 ₽</option>
+<option value="19000">36 (100), 10.5 кВт — базовая цена 19 000 ₽</option>
+<option value="20000">48 (140), 14.0 кВт — базовая цена 20 000 ₽</option>
+<option value="21500">60 (160), 16.0 кВт — базовая цена 21 500 ₽</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-outline pointer-events-none text-[20px]">expand_more</span>
+</div>
+<span class="font-label-caps text-[11px] text-outline">Стандартный комплект монтажа включён в базовую стоимость</span>
+</div>
+<!-- Field 2: Wall Material -->
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider" for="calc-wall-select">
+            Материал стены
+          </label>
+<div class="relative">
+<select class="w-full h-12 px-4 pr-10 rounded-xl bg-surface-container-lowest border border-white/15 text-on-surface font-body-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors appearance-none cursor-pointer" id="calc-wall-select">
+<option selected="" value="0">Без штробления (0 ₽/м)</option>
+<option value="900">Пеноблок (900 ₽/м)</option>
+<option value="1500">Кирпич (1 500 ₽/м)</option>
+<option value="2000">Бетон (2 000 ₽/м)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-outline pointer-events-none text-[20px]">expand_more</span>
+</div>
+<span class="font-label-caps text-[11px] text-outline">Штроба считается за погонный метр</span>
+</div>
+<!-- Field 3: Strobing Length -->
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider" for="calc-meters-input">
+            Сколько метров штробы
+          </label>
+<div class="flex items-center gap-2">
+<button class="w-12 h-12 rounded-xl bg-surface-container-lowest border border-white/15 hover:border-primary/50 text-on-surface flex items-center justify-center font-headline-sm transition-colors" id="calc-meter-dec" type="button">−</button>
+<input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-white/15 text-on-surface font-label-mono-metric text-center text-headline-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors" id="calc-meters-input" max="100" min="0" type="number" value="0">
+<button class="w-12 h-12 rounded-xl bg-surface-container-lowest border border-white/15 hover:border-primary/50 text-on-surface flex items-center justify-center font-headline-sm transition-colors" id="calc-meter-inc" type="button">+</button>
+</div>
+<span class="font-label-caps text-[11px] text-outline">Укажите метраж штробы в помещении</span>
+</div>
+</div>
+<!-- Result Summary Bar -->
+<div class="mt-space-lg pt-space-lg border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-space-md bg-surface-container-lowest/70 p-space-md rounded-xl">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Итоговая стоимость монтажа</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Итоговая сумма:</span>
+<span class="font-display-hero text-headline-xl text-primary font-extrabold tracking-tight drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]" id="calc-total-display">
+              12 000 ₽
+            </span>
+</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant mt-0.5" id="calc-breakdown-hint">Базовый монтаж: 12 000 ₽ + штробление: 0 ₽</span>
+</div>
+<button class="w-full md:w-auto px-space-xl py-space-md rounded-xl bg-primary hover:bg-primary-fixed text-on-primary font-headline-sm text-[16px] font-bold shadow-[0_0_25px_rgba(56,189,248,0.35)] transition-colors flex items-center justify-center gap-2" id="calc-submit-btn" type="button">
+<span>Рассчитать монтаж</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+<div class="hidden mt-space-md p-space-md rounded-xl bg-surface-container-highest border border-primary/50 text-left flex items-center justify-between flex-wrap gap-space-sm" id="calc-registered-banner">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">verified</span>
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Заявка принята. Перезвоним и договоримся о дате.</span>
+</div>
+<span class="font-label-mono-metric text-primary font-bold" id="calc-registered-price">12 000 ₽</span>
+</div>
+</div>
+<!-- Complete Tables Block: Installation & Strobing Matrix -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+<!-- Installation Pricing Table (8 Cols) -->
+<div class="lg:col-span-8 rounded-2xl bg-surface-container/60 border border-white/10 overflow-hidden shadow-xl flex flex-col">
+<div class="px-space-md py-space-sm border-b border-white/10 bg-surface-container-high/60 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">build</span>
+<span class="font-headline-sm text-[16px] font-semibold text-on-surface">Таблица монтажа</span>
+</div>
+<span class="font-label-caps text-label-caps text-outline uppercase">ПОЛНЫЙ ПРАЙС</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white/10 bg-surface-container-lowest/50 text-outline font-label-caps text-label-caps uppercase tracking-wider">
+<th class="py-3 px-space-md">Мощность кондиционера</th>
+<th class="py-3 px-space-md text-right">Стоимость монтажа</th>
+<th class="py-3 px-space-md text-right">Дополнительный метр</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5 font-body-sm text-[14px]">
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">7 (20), 2.0 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">12 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр 1 700 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">9 (25), 2.5 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">12 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр 1 700 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">12 (35), 3.5 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">13 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр 1 900 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">18 (50), 5.1 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">14 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр 2 200 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">24 (70), 6.5 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">16 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр 2 500 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">30 (80), 8.0 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">17 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр 2 600 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">36 (100), 10.5 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">19 000 ₽</td>
+<td class="py-3 px-space-md text-right text-on-surface-variant font-label-mono-metric">доп. метр от 3 000 ₽</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">48 (140), 14.0 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">20 000 ₽</td>
+<td class="py-3 px-space-md text-right text-outline font-label-mono-metric">доп. метра нет</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="py-3 px-space-md font-medium text-on-surface">60 (160), 16.0 кВт</td>
+<td class="py-3 px-space-md text-right font-label-mono-metric font-bold text-primary">21 500 ₽</td>
+<td class="py-3 px-space-md text-right text-outline font-label-mono-metric">доп. метра нет</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Strobing Pricing Table (4 Cols) -->
+<div class="lg:col-span-4 rounded-2xl bg-surface-container/60 border border-white/10 overflow-hidden shadow-xl flex flex-col justify-between">
+<div>
+<div class="px-space-md py-space-sm border-b border-white/10 bg-surface-container-high/60 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">handyman</span>
+<span class="font-headline-sm text-[16px] font-semibold text-on-surface">Штробление стены</span>
+</div>
+<span class="font-label-caps text-label-caps text-outline uppercase">За метр</span>
+</div>
+<div class="p-space-md flex flex-col gap-3">
+<div class="p-3.5 rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Пеноблок</span>
+<span class="font-label-caps text-[11px] text-outline uppercase">Материал стены</span>
+</div>
+<span class="font-label-mono-metric text-[16px] font-bold text-secondary">900 ₽ за метр</span>
+</div>
+<div class="p-3.5 rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Кирпич</span>
+<span class="font-label-caps text-[11px] text-outline uppercase">Материал стены</span>
+</div>
+<span class="font-label-mono-metric text-[16px] font-bold text-secondary">1 500 ₽ за метр</span>
+</div>
+<div class="p-3.5 rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-[15px] font-semibold text-on-surface">Бетон</span>
+<span class="font-label-caps text-[11px] text-outline uppercase">Материал стены</span>
+</div>
+<span class="font-label-mono-metric text-[16px] font-bold text-secondary">2 000 ₽ за метр</span>
+</div>
+</div>
+</div>
+<div class="p-space-md border-t border-white/5 bg-surface-container-lowest/40">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-[12px]">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0">check_circle</span>
+<span>Штроба нужна не всегда: если трассу можно проложить в коробе, её не считаем.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section class="relative w-full bg-surface border-t border-white/10 py-space-3xl overflow-x-clip" id="included-section"><div class="absolute -top-40 right-1/4 w-[620px] h-[620px] bg-gradient-to-b from-primary/5 via-secondary-container/5 to-transparent rounded-full blur-3xl pointer-events-none z-[1]"></div><div class="relative z-10 max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop space-y-space-2xl"><div class="flex flex-col items-start gap-space-xs max-w-3xl"><div class="inline-flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-high/70 backdrop-blur-md border border-white/10"><span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#38bdf8]"></span><span class="font-label-caps text-label-caps tracking-widest text-primary uppercase">ПРОЗРАЧНЫЙ РЕГЛАМЕНТ РАБОТ</span></div><h2 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">Что входит в стандартный монтаж</h2><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Честная смета без скрытых доплат на объекте. Клиент точно знает границы стандартной установки и стоимость любых дополнительных задач до начала работ.</p><div class="mt-space-sm w-full p-space-md rounded-xl bg-surface-container-low/80 backdrop-blur-md border border-primary/30 flex items-center gap-space-sm shadow-[0_0_20px_rgba(56,189,248,0.15)]"><span class="material-symbols-outlined text-primary text-[24px] shrink-0">verified_user</span><p class="font-headline-sm text-[15px] font-semibold text-on-surface"><span class="text-primary font-bold">Принцип прозрачности:</span> итоговая цена утверждается до выезда бригады и не меняется в процессе монтажа.</p></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg"><div class="rounded-2xl bg-surface-container/70 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col justify-between overflow-hidden"><div class="p-space-lg lg:p-space-xl"><div class="flex items-center justify-between border-b border-white/10 pb-space-sm mb-space-lg"><div class="space-y-1"><div class="inline-flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_6px_#38bdf8]"></span><span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">БАЗОВЫЙ КОМПЛЕКТ БЕЗ ДОПЛАТ</span></div><h3 class="font-headline-md text-headline-md text-on-surface font-bold">Включено в стандартный монтаж</h3></div><span class="font-label-mono-metric text-[14px] px-3 py-1 rounded bg-primary/10 text-primary border border-primary/30 font-bold shrink-0">Тариф «Базовый»</span></div><div class="space-y-space-md"><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 hover:border-primary/40 transition-colors"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_12px_rgba(56,189,248,0.2)]"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"></path><path d="M3 9h18"></path><path d="M9 21V9"></path><path d="m13 13 4 4"></path><path d="m17 13-4 4"></path></svg></div><div class="space-y-1 text-left"><span class="font-headline-sm text-[16px] font-semibold text-on-surface block">Подбор кондиционера</span><p class="font-body-sm text-[13px] text-on-surface-variant leading-relaxed">Подбираем модель по площади помещения и по тому, как оно нагревается.</p></div></div><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 hover:border-primary/40 transition-colors"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_12px_rgba(56,189,248,0.2)]"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div><div class="space-y-1 text-left"><span class="font-headline-sm text-[16px] font-semibold text-on-surface block">Работа монтажников</span><p class="font-body-sm text-[13px] text-on-surface-variant leading-relaxed">Отверстие в стене, крепление обоих блоков, соединение трассы и пробный пуск.</p></div></div><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 hover:border-primary/40 transition-colors"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_12px_rgba(56,189,248,0.2)]"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M2 12h5a3 3 0 0 1 3 3v2a3 3 0 0 0 3 3h9"></path><path d="M19 17l3 3-3 3"></path><circle cx="4" cy="12" r="2"></circle></svg></div><div class="space-y-1 text-left"><span class="font-headline-sm text-[16px] font-semibold text-on-surface block">Трасса длиной 5 метров</span><p class="font-body-sm text-[13px] text-on-surface-variant leading-relaxed">Полный комплект коммуникаций: медная труба, межблочный кабель, дренажный шланг, теплоизоляция.</p></div></div><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 hover:border-primary/40 transition-colors"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_12px_rgba(56,189,248,0.2)]"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4v16h16"></path><path d="m4 14 10-10"></path><path d="M10 20l10-10"></path></svg></div><div class="space-y-1 text-left"><span class="font-headline-sm text-[16px] font-semibold text-on-surface block">Комплект кронштейнов</span><p class="font-body-sm text-[13px] text-on-surface-variant leading-relaxed">Кронштейны для наружного блока и крепёж.</p></div></div></div></div><div class="p-space-md border-t border-white/5 bg-surface-container-lowest/60 flex items-center justify-between text-on-surface-variant font-body-sm text-[12px]"><span class="flex items-center gap-1.5 text-primary font-medium"><span class="material-symbols-outlined text-[16px]">check_circle</span>Гарантия на монтаж — 1 год</span><span class="text-outline">Фикс-цена от 12 000 ₽</span></div></div><div class="rounded-2xl bg-surface-container/70 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col justify-between overflow-hidden"><div class="p-space-lg lg:p-space-xl"><div class="flex items-center justify-between border-b border-white/10 pb-space-sm mb-space-lg"><div class="space-y-1"><div class="inline-flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_6px_#54d8e8]"></span><span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">ТОЛЬКО ПРИ НЕОБХОДИМОСТИ ПО ПРАЙСУ</span></div><h3 class="font-headline-md text-headline-md text-on-surface font-bold">Считается отдельно</h3></div><span class="font-label-mono-metric text-[14px] px-3 py-1 rounded bg-secondary-container/20 text-secondary border border-secondary/30 font-bold shrink-0">Доп. работы</span></div><div class="space-y-3"><div class="p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-start justify-between gap-space-sm hover:border-secondary/40 transition-colors"><div class="space-y-0.5 text-left"><span class="font-headline-sm text-[15px] font-semibold text-on-surface block">Дополнительное отверстие в стене</span><span class="font-body-sm text-[12px] text-on-surface-variant">например, проходка через балкон или перегородку</span></div><span class="font-label-mono-metric text-[15px] font-bold text-secondary shrink-0 pt-0.5">1 000 ₽</span></div><div class="p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-start justify-between gap-space-sm hover:border-secondary/40 transition-colors"><div class="space-y-0.5 text-left"><span class="font-headline-sm text-[15px] font-semibold text-on-surface block">Защитный козырёк</span><span class="font-body-sm text-[12px] text-on-surface-variant">защита наружного блока от падения наледи и осадков</span></div><span class="font-label-mono-metric text-[15px] font-bold text-secondary shrink-0 pt-0.5">2 000 ₽</span></div><div class="p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-start justify-between gap-space-sm hover:border-secondary/40 transition-colors"><div class="space-y-0.5 text-left"><span class="font-headline-sm text-[15px] font-semibold text-on-surface block">Защитная решётка</span><span class="font-body-sm text-[12px] text-on-surface-variant">антивандальная защита наружного блока на нижних этажах</span></div><span class="font-label-mono-metric text-[15px] font-bold text-secondary shrink-0 pt-0.5">2 000 ₽</span></div><div class="p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-start justify-between gap-space-sm hover:border-secondary/40 transition-colors"><div class="space-y-0.5 text-left"><span class="font-headline-sm text-[15px] font-semibold text-on-surface block">Монтаж в два этапа</span><span class="font-body-sm text-[12px] text-on-surface-variant">закладка трассы на стадии чернового ремонта и навеска блоков после чистовой отделки</span></div><span class="font-label-mono-metric text-[15px] font-bold text-secondary shrink-0 pt-0.5">4 000 ₽</span></div><div class="p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-start justify-between gap-space-sm hover:border-secondary/40 transition-colors"><div class="space-y-0.5 text-left"><span class="font-headline-sm text-[15px] font-semibold text-on-surface block">Автовышка</span><span class="font-body-sm text-[12px] text-on-surface-variant">при высоте и сложности фасада</span></div><span class="font-label-mono-metric text-[15px] font-bold text-secondary shrink-0 pt-0.5 text-right">от 2 000 до 3 000 ₽/час<br><span class="font-label-caps text-[10px] text-outline uppercase font-normal">мин. 2 часа</span></span></div><div class="p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5 flex items-start justify-between gap-space-sm hover:border-secondary/40 transition-colors"><div class="space-y-0.5 text-left"><span class="font-headline-sm text-[15px] font-semibold text-on-surface block">Услуги альпиниста</span><span class="font-body-sm text-[12px] text-on-surface-variant">промышленный альпинизм при высотном монтаже без автовышки</span></div><span class="font-label-mono-metric text-[15px] font-bold text-secondary shrink-0 pt-0.5">от 7 000 ₽</span></div></div></div><div class="p-space-md border-t border-white/5 bg-surface-container-lowest/60 flex items-center justify-between text-on-surface-variant font-body-sm text-[12px]"><span class="flex items-center gap-1.5 text-secondary font-medium"><span class="material-symbols-outlined text-[16px]">info</span>Согласовывается и фиксируется до выезда</span><span class="text-outline">По прайсу</span></div></div></div></div></section>
+<!-- Calculator Instant Recalculation Logic -->
+<script>
+  (function() {
+    const powerSelect = document.getElementById('calc-power-select');
+    const wallSelect = document.getElementById('calc-wall-select');
+    const metersInput = document.getElementById('calc-meters-input');
+    const totalDisplay = document.getElementById('calc-total-display');
+    const breakdownHint = document.getElementById('calc-breakdown-hint');
+    const meterDec = document.getElementById('calc-meter-dec');
+    const meterInc = document.getElementById('calc-meter-inc');
+    const submitBtn = document.getElementById('calc-submit-btn');
+    const registeredBanner = document.getElementById('calc-registered-banner');
+    const registeredPrice = document.getElementById('calc-registered-price');
+
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    function recalculate() {
+      if (!powerSelect || !wallSelect || !metersInput || !totalDisplay) return;
+      const basePrice = parseInt(powerSelect.value, 10) || 0;
+      const wallPricePerMeter = parseInt(wallSelect.value, 10) || 0;
+      let meters = parseInt(metersInput.value, 10);
+      if (isNaN(meters) || meters < 0) {
+        meters = 0;
+      }
+      const strobCost = wallPricePerMeter * meters;
+      const total = basePrice + strobCost;
+
+      totalDisplay.textContent = formatNumber(total) + ' ₽';
+      if (breakdownHint) {
+        breakdownHint.textContent = 'Базовый монтаж: ' + formatNumber(basePrice) + ' ₽ + штробление: ' + formatNumber(strobCost) + ' ₽';
+      }
+      if (registeredPrice) {
+        registeredPrice.textContent = formatNumber(total) + ' ₽';
+      }
+    }
+
+    if (powerSelect) powerSelect.addEventListener('change', recalculate);
+    if (wallSelect) wallSelect.addEventListener('change', recalculate);
+    if (metersInput) {
+      metersInput.addEventListener('input', recalculate);
+      metersInput.addEventListener('change', recalculate);
+    }
+
+    if (meterDec && metersInput) {
+      meterDec.addEventListener('click', () => {
+        let val = parseInt(metersInput.value, 10) || 0;
+        if (val > 0) {
+          metersInput.value = val - 1;
+          recalculate();
+        }
+      });
+    }
+
+    if (meterInc && metersInput) {
+      meterInc.addEventListener('click', () => {
+        let val = parseInt(metersInput.value, 10) || 0;
+        metersInput.value = val + 1;
+        recalculate();
+      });
+    }
+
+    if (submitBtn && registeredBanner) {
+      submitBtn.addEventListener('click', () => {
+        recalculate();
+        registeredBanner.classList.remove('hidden');
+      });
+    }
+
+    recalculate();
+  })();
+</script>
+</main>
+<section class="w-full bg-surface py-space-3xl lg:py-space-4xl border-t border-white/5 overflow-x-clip" id="raboty-section">
+  <div class="max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop">
+    <span class="font-label-caps text-label-caps text-primary uppercase">НАШИ РАБОТЫ</span>
+    <h2 class="font-headline-xl text-headline-xl-mobile lg:text-headline-xl text-on-surface mt-space-sm">Что мы уже поставили</h2>
+    <p class="font-body-lg text-body-lg text-on-surface-variant mt-space-md max-w-[62ch]">Квартиры, офисы и магазины в Калуге и области. Снимки с наших объектов, не из каталога производителя.</p>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-space-md mt-space-xl">
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Наружный блок на фасаде жилого дома в Калуге" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/rabota-1.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Внутренний блок сплит-системы над окном" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/rabota-2.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Монтаж наружного блока на кронштейнах" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/rabota-4.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Кондиционер в жилой комнате после монтажа" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/komnata.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Трасса кондиционера, убранная в короб" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/rabota-6.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Наружные блоки на фасаде здания" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/fasad.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Внутренний блок в офисном помещении" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/rabota-7.jpg" width="640">
+      </figure>
+      <figure class="m-0 overflow-hidden rounded-xl border border-white/10 bg-surface-container">
+        <img alt="Наружный блок на балконе" class="block w-full h-full object-cover aspect-[4/3]" decoding="async" height="480" loading="lazy" src="img/rabota-8.jpg" width="640">
+      </figure>
+    </div>
+  </div>
+</section><section class="relative w-full bg-surface-container-lowest border-t border-white/10 py-space-3xl overflow-x-clip" id="order-section"><div class="absolute -top-40 left-1/4 w-[620px] h-[620px] bg-primary/5 rounded-full blur-3xl pointer-events-none z-[1]"></div><div class="relative z-10 max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop space-y-space-2xl"><div class="flex flex-col items-start gap-space-xs max-w-3xl"><div class="inline-flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-high/70 backdrop-blur-md border border-white/10"><span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#38bdf8]"></span><span class="font-label-caps text-label-caps tracking-widest text-primary uppercase">Без спама и навязывания услуг</span></div><h2 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">Фиксация сметы и заявка на монтаж</h2><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Заполните два поля. Перезвоним, уточним параметры и назовём цену до выезда мастера.</p></div><div class="p-space-lg lg:p-space-xl rounded-2xl bg-surface-container/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-w-3xl"><form class="space-y-space-md text-left" onsubmit="event.preventDefault(); document.getElementById('order-success-status').classList.remove('hidden');"><div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md"><div><label class="block font-label-caps text-label-caps text-outline uppercase mb-2" for="client-name-input">Ваше имя</label><input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-white/15 text-on-surface font-body-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors" id="client-name-input" placeholder="Константин" required="" type="text"></div><div><label class="block font-label-caps text-label-caps text-outline uppercase mb-2" for="client-phone-input">Номер телефона</label><input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-white/15 text-on-surface font-label-mono-metric focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-colors" id="client-phone-input" placeholder="+7 (___) ___-__-__" required="" type="tel" value="+7 ("></div></div><button class="w-full py-3.5 rounded-xl bg-primary text-on-primary font-headline-sm text-[16px] font-bold shadow-[0_0_25px_rgba(56,189,248,0.35)] hover:bg-primary-fixed transition-colors flex items-center justify-center gap-2" type="submit"><span>Отправить заявку</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span></button><div class="hidden p-3 rounded-lg bg-surface-container-highest border border-primary/50 text-center" id="order-success-status"><p class="font-headline-sm text-[14px] text-primary font-bold">Заявка принята в работу</p><p class="font-body-sm text-[12px] text-on-surface-variant">Перезвоним, уточним параметры и назовём цену.</p></div><div class="mt-space-sm p-space-md rounded-xl bg-surface-container-lowest/80 border border-primary/30 flex items-center gap-space-sm"><span class="material-symbols-outlined text-primary text-[22px] shrink-0">timer</span><p class="font-body-sm text-[13px] text-on-surface-variant leading-snug"><span class="text-primary font-semibold">Как это работает:</span> Перезвоним, уточним параметры и назовём цену до выезда мастера.</p></div></form></div></div></section><section class="relative w-full bg-surface border-t border-white/10 py-space-3xl overflow-x-clip" id="contacts-section"><div class="absolute -top-16 -right-8 w-80 h-80 bg-primary/10 rounded-full blur-[90px] pointer-events-none"></div><div class="relative z-10 max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop space-y-space-2xl"><div class="flex flex-col items-start gap-space-xs max-w-3xl"><div class="inline-flex items-center gap-space-xs px-space-sm py-1.5 rounded-full bg-surface-container-high/70 backdrop-blur-md border border-white/10"><span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#38bdf8]"></span><span class="font-label-caps text-label-caps tracking-widest text-primary uppercase">Где нас найти</span></div><h2 class="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">Контакты</h2><p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Офис в Калуге. Звоните по любым вопросам — монтаж, обслуживание, ремонт, подбор оборудования.</p></div><div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-stretch"><div class="lg:col-span-5 rounded-2xl bg-surface-container/70 border border-white/10 backdrop-blur-xl p-space-lg lg:p-space-xl flex flex-col justify-between shadow-2xl space-y-space-lg"><div class="space-y-space-md"><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_12px_rgba(56,189,248,0.2)]"><span class="material-symbols-outlined text-[20px]">location_on</span></div><div class="space-y-0.5 text-left"><span class="font-label-caps text-label-caps text-outline uppercase">Адрес</span><p class="font-headline-sm text-[16px] font-semibold text-on-surface">г. Калуга, переулок Баррикад, дом 2а, офис 205-2</p></div></div><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-primary shadow-[0_0_12px_rgba(56,189,248,0.2)]"><span class="material-symbols-outlined text-[20px]">call</span></div><div class="space-y-0.5 text-left"><span class="font-label-caps text-label-caps text-outline uppercase">Телефон</span><a class="font-headline-md text-headline-md font-bold text-primary block tracking-tight hover:text-primary-fixed transition-colors" href="tel:+74842400998">+7 (4842) 400-998</a><span class="font-body-sm text-[12px] text-on-surface-variant">Звоните по любым вопросам</span></div></div><div class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/80 border border-white/5"><div class="w-10 h-10 rounded-lg bg-surface-container-high border border-primary/30 flex items-center justify-center shrink-0 text-secondary shadow-[0_0_12px_rgba(84,216,232,0.2)]"><span class="material-symbols-outlined text-[20px]">verified</span></div><div class="space-y-0.5 text-left"><span class="font-label-caps text-label-caps text-outline uppercase">Что делаем</span><p class="font-headline-sm text-[15px] font-semibold text-on-surface">Монтаж, обслуживание и ремонт кондиционеров</p><span class="font-body-sm text-[12px] text-on-surface-variant">Калуга и Калужская область, с 2004 года</span></div></div></div><div class="p-space-md border-t border-white/5 bg-surface-container-lowest/60 rounded-xl flex items-center justify-between text-on-surface-variant font-body-sm text-[12px]"><span class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-[16px]">domain</span>Конди-Калуга</span><span class="text-outline">г. Калуга</span></div></div><div class="lg:col-span-7 rounded-2xl bg-surface-container-lowest/80 border border-white/10 overflow-hidden shadow-2xl relative min-h-[350px] flex flex-col justify-between p-space-md"><div class="absolute inset-0 bg-[#0a0d12] opacity-95"><svg class="w-full h-full opacity-35" preserveAspectRatio="none" viewBox="0 0 800 500"><defs><pattern height="40" id="map-grid-pattern" patternUnits="userSpaceOnUse" width="40"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#38bdf8" stroke-opacity="0.12" stroke-width="1"></path></pattern></defs><rect fill="url(#map-grid-pattern)" height="100%" width="100%"></rect><path d="M 0 160 Q 240 140 430 180 T 800 130" fill="none" opacity="0.5" stroke="#32353b" stroke-width="16"></path><path d="M 140 0 Q 180 200 220 500" fill="none" opacity="0.5" stroke="#32353b" stroke-width="12"></path><path d="M 510 0 Q 470 230 450 500" fill="none" opacity="0.5" stroke="#32353b" stroke-width="14"></path><path d="M 0 340 Q 380 320 800 370" fill="none" opacity="0.5" stroke="#32353b" stroke-width="12"></path><path d="M 280 170 L 600 260" fill="none" opacity="0.7" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="6"></path><path d="M 380 130 L 470 380" fill="none" opacity="0.7" stroke="#38bdf8" stroke-opacity="0.35" stroke-width="5"></path><text fill="#87929a" font-family="Manrope" font-size="12" letter-spacing="2" opacity="0.6" x="60" y="150">УЛ. ЛЕНИНА</text><text fill="#87929a" font-family="Manrope" font-size="12" letter-spacing="2" opacity="0.6" x="530" y="120">УЛ. МОСКОВСКАЯ</text><text fill="#87929a" font-family="Manrope" font-size="12" letter-spacing="2" opacity="0.6" x="190" y="460">УЛ. КИРОВА</text><text fill="#38bdf8" font-family="Manrope" font-size="12" font-weight="bold" letter-spacing="2" opacity="0.85" x="330" y="215">ПЕР. БАРРИКАД</text></svg></div><div class="relative z-10 flex items-center justify-between"><div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container/90 backdrop-blur-md border border-white/10 shadow-lg"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">Как доехать</span></div><span class="font-label-mono-metric text-[12px] text-outline">КАЛУГА</span></div><div class="relative z-10 my-auto flex flex-col items-center justify-center py-6"><div class="relative flex flex-col items-center"><div class="px-4 py-2 rounded-xl bg-surface-container-high/90 backdrop-blur-md border border-primary/50 text-center shadow-[0_0_20px_rgba(56,189,248,0.35)] mb-2"><span class="font-headline-sm text-[14px] font-bold text-on-surface block">Конди-Калуга</span><span class="font-label-caps text-[11px] text-primary uppercase tracking-wider">пер. Баррикад, 2а, оф. 205-2</span></div><div class="relative flex items-center justify-center"><span class="w-8 h-8 rounded-full bg-primary/20 absolute"></span><span class="w-5 h-5 rounded-full bg-primary shadow-[0_0_12px_#38bdf8] flex items-center justify-center text-on-primary"><span class="material-symbols-outlined text-[14px]">apartment</span></span></div></div></div><div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 rounded-xl bg-surface-container/90 backdrop-blur-md border border-white/10"><div class="flex items-center gap-2 text-on-surface font-body-sm text-[13px]"><span class="material-symbols-outlined text-primary text-[18px]">directions_car</span><span>Переулок Баррикад, дом 2а — офис 205-2</span></div><span class="font-label-caps text-[11px] text-outline uppercase">Офис 205-2</span></div></div></div></div></section><footer class="w-full bg-surface-container-lowest py-space-3xl border-t border-white/10"><div class="max-w-[1360px] mx-auto px-gutter-mobile lg:px-gutter-desktop"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl pb-space-2xl"><div class="flex flex-col gap-space-xs md:col-span-1"><span class="font-headline-sm text-headline-sm text-on-surface tracking-wide uppercase font-bold">КОНДИ-КАЛУГА</span><p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Продажа, монтаж, обслуживание и ремонт кондиционеров в Калуге и Калужской области. Работаем с 2004 года.</p></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-primary uppercase">Направления</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="katalog" href="#">Инверторные сплит-системы</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="montazh-i-standarty" href="#">Мульти-сплит системы</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="kalkulyator" href="#pricing-section">Ремонт кондиционеров</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="garantiya" href="#">Сервисное обслуживание</a></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-primary uppercase">Как мы работаем</span><div class="font-body-sm text-body-sm text-on-surface-variant flex flex-col gap-1"><span>Цена известна до выезда</span><span>Трасса 5 метров уже в цене</span><span>Гарантия на монтаж — 1 год</span><span>Работаем с 2004 года</span></div></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-primary uppercase">Контакты</span><span class="font-label-mono-metric text-label-mono-metric text-on-surface">+7 (4842) 400-998</span><span class="font-body-sm text-body-sm text-on-surface-variant">г. Калуга, пер. Баррикад, 2а, оф. 205-2</span></div></div><div class="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-outline border-t border-white/5"><p>© 2026 «Конди-Калуга». Продажа и монтаж кондиционеров в Калуге.</p><div class="flex items-center gap-space-md"><span class="text-on-surface-variant">Калуга и Калужская область</span><span>•</span><span>ПОЛНЫЙ ПРАЙС</span></div></div></div></footer></body></html>

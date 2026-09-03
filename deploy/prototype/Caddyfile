@@ -246,12 +246,17 @@ mebel-review.nexus-flow.ru {
 # kondi-kaluga.ru — «Конди-Калуга», установка кондиционеров, Калуга. Прототип к
 # звонку.
 #
-# Выкладка готовой сборкой из ветки `deploy`:
+# Собирается не в конструкторе: макет пришёл из Stitch, страница собирается
+# скриптом в репозитории сканера, поэтому `sync.sh` здесь не нужен — файлы
+# кладутся прямо в /root/prototypes-static/kondi-kaluga:
 #
-#   ./sync.sh kondi-kaluga https://github.com/Rklm-it/kondi-kaluga-fresh-air.git
+#   cd /root/site-scanner
+#   git fetch origin
+#   git checkout -B claude/new-client-export-9woxq8 origin/claude/new-client-export-9woxq8
+#   rsync -a --delete clients/kondi-kaluga.ru/maket/site/ /root/prototypes-static/kondi-kaluga/
 #
-# Проект собран в Lovable, репозиторий приватный — на сервере нужен токен с
-# правами Contents: Read (см. README, раздел про credential.helper).
+# Прототип закрыт от индексации (robots.txt + meta robots): проиндексированный,
+# он начнёт конкурировать с настоящим сайтом клиента за его же запросы.
 kondi-review.nexus-flow.ru {
 	encode gzip
 
@@ -266,7 +271,7 @@ kondi-review.nexus-flow.ru {
 
 	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
 	# Разбор беды — в блоке mebel-review выше.
-	@fayly path /assets/* /favicon.ico /og.jpg /robots.txt /sitemap.xml
+	@fayly path /assets/* /fonts/* /img/* /*.css /favicon.ico /og.jpg /robots.txt /sitemap.xml
 	handle @fayly {
 		file_server
 	}
@@ -276,17 +281,16 @@ kondi-review.nexus-flow.ru {
 		file_server
 	}
 
-	# Бандл именован с хешем — кэшируется надолго. Фотографии работ лежат в
-	# корне отдельными файлами и будут заменены, когда клиент пришлёт свежую
-	# съёмку: им неделя, а не месяц. `file` в матчере обязателен, иначе метка
-	# вешается и на 404.
+	# Шрифты подмножеством и собранный CSS меняются только вместе со сборкой,
+	# фотографии работ — когда клиент пришлёт свежую съёмку: им неделя, а не
+	# месяц. `file` в матчере обязателен, иначе метка вешается и на 404.
 	@static {
-		path /assets/*
+		path /assets/* /fonts/*
 		file
 	}
 	header @static Cache-Control "public, max-age=2592000, immutable"
 	@foto {
-		path /komnata.jpg /fasad.jpg /rabota-*.jpg /og.jpg
+		path /img/*.jpg /og.jpg /*.css
 		file
 	}
 	header @foto Cache-Control "public, max-age=604800"
