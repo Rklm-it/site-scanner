@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_THREEJS_START:ANIMATION_7 class="fixed inset-0 w-full h-full bg-transparent" -->
+<div class="fixed inset-0 w-full h-full bg-transparent" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_7" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_7');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const width = container.clientWidth || window.innerWidth || 800;
+const height = container.clientHeight || window.innerHeight || 600;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+camera.position.set(0, 0, 16);
+
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setSize(width, height);
+container.appendChild(renderer.domElement);
+
+// Engineering blueprint group
+const acGroup = new THREE.Group();
+scene.add(acGroup);
+
+// Colors: Blueprint tech palette
+const wireColor = 0x38bdf8;       // Accent cyan
+const frameColor = 0x64748b;      // Muted technical slate
+const glowColor = 0x0284c7;       // Deep blueprint blue
+const highlightColor = 0x38bdf8;  // Pure cyan highlight
+const copperColor = 0xf59e0b;     // Heat exchanger / copper lines
+const fanColor = 0x0ea5e9;
+
+// Helper to create wireframe / line meshes
+function createBoxEdges(w, h, d, color = wireColor, opacity = 0.85) {
+  const geom = new THREE.BoxGeometry(w, h, d);
+  const edges = new THREE.EdgesGeometry(geom);
+  const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity });
+  return new THREE.LineSegments(edges, mat);
+}
+
+// 1. Layer: Outer Casing (Face panel + Chassis)
+const casingLayer = new THREE.Group();
+const outerEdges = createBoxEdges(8.4, 2.8, 2.2, wireColor, 0.95);
+casingLayer.add(outerEdges);
+
+// Air intake grille lines on top
+const intakeGroup = new THREE.Group();
+for (let i = -3.8; i <= 3.8; i += 0.35) {
+  const pts = [
+    new THREE.Vector3(i, 1.4, -0.9),
+    new THREE.Vector3(i, 1.4, 0.9)
+  ];
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: frameColor, transparent: true, opacity: 0.6 }));
+  intakeGroup.add(line);
+}
+casingLayer.add(intakeGroup);
+
+// Bottom air deflector louver (swing flap)
+const louverGeom = new THREE.BoxGeometry(7.8, 0.08, 0.6);
+const louverEdges = new THREE.EdgesGeometry(louverGeom);
+const louverMesh = new THREE.LineSegments(louverEdges, new THREE.LineBasicMaterial({ color: highlightColor, transparent: true, opacity: 0.9 }));
+louverMesh.position.set(0, -1.35, 0.5);
+casingLayer.add(louverMesh);
+
+// Digital temperature display frame (21.0 °C)
+const dispGeom = new THREE.BoxGeometry(1.2, 0.45, 0.05);
+const dispEdges = new THREE.EdgesGeometry(dispGeom);
+const dispMesh = new THREE.LineSegments(dispEdges, new THREE.LineBasicMaterial({ color: highlightColor, transparent: true, opacity: 0.95 }));
+dispMesh.position.set(2.8, 0.4, 1.12);
+casingLayer.add(dispMesh);
+
+// 2. Layer: Air Filter Mesh (disassembles forwards/upwards)
+const filterLayer = new THREE.Group();
+for (let f = -1; f <= 1; f += 2) {
+  const filterFrame = createBoxEdges(3.6, 2.2, 0.1, 0x0284c7, 0.75);
+  filterFrame.position.set(f * 1.9, 0.2, 0.7);
+  filterLayer.add(filterFrame);
+  
+  // Filter internal grid lines
+  for (let y = -0.9; y <= 0.9; y += 0.3) {
+    const pts = [new THREE.Vector3(f * 1.9 - 1.7, 0.2 + y, 0.7), new THREE.Vector3(f * 1.9 + 1.7, 0.2 + y, 0.7)];
+    const g = new THREE.BufferGeometry().setFromPoints(pts);
+    filterLayer.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0x0369a1, transparent: true, opacity: 0.5 })));
+  }
+}
+
+// 3. Layer: Heat Exchanger (Evaporator coils + copper hairpin bends)
+const coilLayer = new THREE.Group();
+const coilCore = createBoxEdges(7.6, 2.2, 1.2, wireColor, 0.5);
+coilCore.position.set(0, 0.1, 0);
+coilLayer.add(coilCore);
+
+// Internal fin rows
+for (let x = -3.5; x <= 3.5; x += 0.25) {
+  const pts = [
+    new THREE.Vector3(x, -0.9, -0.5),
+    new THREE.Vector3(x, 1.0, -0.5),
+    new THREE.Vector3(x, 0.6, 0.5),
+    new THREE.Vector3(x, -0.9, 0.5)
+  ];
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  const fin = new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.25 }));
+  coilLayer.add(fin);
+}
+
+// Copper U-bends on the side (engineering signature)
+for (let y = -0.7; y <= 0.8; y += 0.38) {
+  const curve = new THREE.EllipseCurve(-3.85, y, 0.18, 0.14, Math.PI / 2, -Math.PI / 2, false);
+  const pts = curve.getPoints(12).map(p => new THREE.Vector3(p.x, p.y, 0));
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  const bend = new THREE.Line(g, new THREE.LineBasicMaterial({ color: copperColor, transparent: true, opacity: 0.9 }));
+  coilLayer.add(bend);
+}
+
+// 4. Layer: Cross-flow fan (cylindrical blower inside)
+const fanLayer = new THREE.Group();
+const fanLength = 7.2;
+const fanRadius = 0.55;
+const fanGeom = new THREE.CylinderGeometry(fanRadius, fanRadius, fanLength, 18, 1, true);
+const fanEdges = new THREE.EdgesGeometry(fanGeom);
+const fanMesh = new THREE.LineSegments(fanEdges, new THREE.LineBasicMaterial({ color: fanColor, transparent: true, opacity: 0.7 }));
+fanMesh.rotation.z = Math.PI / 2;
+fanMesh.position.set(0, -0.4, -0.15);
+fanLayer.add(fanMesh);
+
+// 5. Layer: Wall Mounting Plate (Back frame)
+const backLayer = new THREE.Group();
+const plateGeom = new THREE.BoxGeometry(8.0, 2.5, 0.08);
+const plateEdges = new THREE.EdgesGeometry(plateGeom);
+const plateMesh = new THREE.LineSegments(plateEdges, new THREE.LineBasicMaterial({ color: frameColor, transparent: true, opacity: 0.6 }));
+plateMesh.position.set(0, 0, -1.15);
+backLayer.add(plateMesh);
+
+// Assemble parts into main group
+acGroup.add(backLayer);
+acGroup.add(coilLayer);
+acGroup.add(fanLayer);
+acGroup.add(filterLayer);
+acGroup.add(casingLayer);
+
+// Technical measurement dimension lines (CAD style)
+const cadLayer = new THREE.Group();
+// Dimension line under the unit: 840 mm
+const dPts = [
+  new THREE.Vector3(-4.2, -2.0, 0),
+  new THREE.Vector3(4.2, -2.0, 0)
+];
+const dGeom = new THREE.BufferGeometry().setFromPoints(dPts);
+const dLine = new THREE.Line(dGeom, new THREE.LineBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.5 }));
+cadLayer.add(dLine);
+// Arrow ticks
+[-4.2, 4.2].forEach(x => {
+  const tickGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x, -1.8, 0), new THREE.Vector3(x, -2.2, 0)]);
+  cadLayer.add(new THREE.Line(tickGeom, new THREE.LineBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.5 })));
+});
+acGroup.add(cadLayer);
+
+// Isometric angle orientation
+acGroup.rotation.y = -0.45;
+acGroup.rotation.x = 0.22;
+
+let mouseX = 0;
+let mouseY = 0;
+window.addEventListener('mousemove', (e) => {
+  const rect = container.getBoundingClientRect();
+  if (rect.width && rect.height) {
+    mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+  }
+});
+
+function onResize() {
+  const w = container.clientWidth || window.innerWidth;
+  const h = container.clientHeight || window.innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+
+let clock = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  clock += 0.012;
+
+  // Slow continuous engineering turntable rotation with subtle mouse parallax
+  acGroup.rotation.y = -0.38 + Math.sin(clock * 0.4) * 0.45 + mouseX * 0.25;
+  acGroup.rotation.x = 0.18 + Math.cos(clock * 0.3) * 0.12 - mouseY * 0.2;
+
+  // Exploded view disassembly cycle: smoothly separating components into layers
+  // 0 -> 1 -> 0 cyclical explosion
+  const explodeCycle = (Math.sin(clock * 0.5 - Math.PI / 2) + 1) * 0.5; // 0 to 1
+  const explodeFactor = Math.pow(explodeCycle, 1.5); // smoother stay at closed state
+
+  // Casing moves forward
+  casingLayer.position.z = explodeFactor * 1.6;
+  // Filters move forward and slightly up
+  filterLayer.position.z = explodeFactor * 1.0;
+  filterLayer.position.y = explodeFactor * 0.4;
+  // Fan rotates internally
+  fanMesh.rotation.x += 0.05;
+  // Wall plate moves backward
+  backLayer.position.z = -explodeFactor * 1.2;
+
+  renderer.render(scene, camera);
+}
+animate();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_7 -->
+</body>
+</html>
