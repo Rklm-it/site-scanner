@@ -1,52 +1,96 @@
 import Foundation
 import Security
 
-/// Ключ для входа на сервер: заводится один раз, лежит в Связке ключей macOS.
+/// Ключ для входа на сервер: заводится один раз, лежит файлом с правами 600 в
+/// ~/.vykladka — ровно там же и так же, как ssh хранит собственные ключи.
 ///
-/// Почему не пароль. Пароль от VPS — это root, и хранить его на ноутбуке
+/// Почему не пароль. Пароль от VPS — это root, и держать его на ноутбуке
 /// незачем: он нужен ровно один раз, чтобы положить на сервер публичную
-/// половину ключа. Дальше работает ключ, а пароль на сервере можно вообще
-/// выключить — в логах видно, что в root по паролю круглосуточно ломятся боты.
+/// половину ключа. Дальше работает ключ, а вход по паролю на сервере можно
+/// выключить совсем.
 ///
-/// Приватная половина лежит в Связке (защищена входом в мак), а ssh умеет
-/// читать ключ только из файла — поэтому на время работы приложения ключ
-/// выкладывается во временный файл с правами 600 и убирается при выходе.
+/// Почему не Связка ключей, хотя сначала было именно так. Связка привязывает
+/// доступ к подписи программы, а приложение подписывается «для себя» и подпись
+/// меняется при КАЖДОЙ пересборке. Для Связки после `./sobrat.sh` это другая
+/// программа: ключ не отдаётся, файл не создаётся, и наружу это выходит
+/// невнятным «Permission denied (publickey)» при первой же команде — на живом
+/// запуске так и случилось. Файл 600 в домашней папке даёт ту же защиту, что и
+/// ~/.ssh/id_ed25519, и не ломается от пересборки.
 enum Klyuchi {
 
     private static let sluzhba = "ru.nexusflow.vykladka"
     private static let uchet = "ssh-private-key"
 
     enum Beda: LocalizedError {
-        case svyazka(OSStatus)
         case netKlyucha
+        case neSozdalsya(String)
 
         var errorDescription: String? {
             switch self {
-            case let .svyazka(status):
-                let tekst = SecCopyErrorMessageString(status, nil) as String? ?? "код \(status)"
-                return "Связка ключей: \(tekst)"
             case .netKlyucha:
-                return "Ключ не найден. Подключите сервер заново в настройках."
+                return "Ключ для входа не найден. Подключите сервер заново в настройках — понадобится пароль, один раз."
+            case let .neSozdalsya(prichina):
+                return "Не удалось завести ключ: \(prichina)"
             }
         }
     }
 
-    // MARK: - Связка ключей
-
-    static func sohranit(privatnyy: Data) throws {
-        udalit()
-        let zapros: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: sluzhba,
-            kSecAttrAccount as String: uchet,
-            kSecValueData as String: privatnyy,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlocked
-        ]
-        let status = SecItemAdd(zapros as CFDictionary, nil)
-        guard status == errSecSuccess else { throw Beda.svyazka(status) }
+    static var estKlyuch: Bool {
+        FileManager.default.fileExists(atPath: Papki.klyuchFayl.path)
     }
 
-    static func privatnyy() -> Data? {
+    static func publichnyyTekst() -> String? {
+        try? String(contentsOf: Papki.publichnyyKlyuch, encoding: .utf8)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Создать новую пару ed25519 прямо в рабочем месте. Возвращает публичную
+    /// половину — её и надо положить на сервер.
+    static func sozdatParu(kommentariy: String) throws -> String {
+        let fm = FileManager.default
+        try? fm.removeItem(at: Papki.klyuchFayl)
+        try? fm.removeItem(at: Papki.publichnyyKlyuch)
+
+        let rezultat = try Zapusk.zapustit("/usr/bin/ssh-keygen", [
+            "-t", "ed25519",
+            "-N", "",                       // без парольной фразы: ключ и так лежит только у хозяина
+            "-C", kommentariy,
+            "-f", Papki.klyuchFayl.path
+        ])
+        guard rezultat.udalos, estKlyuch else {
+            throw Beda.neSozdalsya(rezultat.oshibka.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
+
+        // ssh-keygen и так ставит 600, но проверять права — его дело, а не наше
+        // предположение: ssh откажется работать с ключом, доступным другим.
+        try? fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: Papki.klyuchFayl.path)
+
+        guard let publichnyy = publichnyyTekst() else { throw Beda.netKlyucha }
+        return publichnyy
+    }
+
+    static func udalit() {
+        let fm = FileManager.default
+        try? fm.removeItem(at: Papki.klyuchFayl)
+        try? fm.removeItem(at: Papki.publichnyyKlyuch)
+        udalitIzSvyazki()
+    }
+
+    // MARK: - Переезд со Связки
+
+    /// Ранние сборки держали ключ в Связке. Если он там есть, а файла нет —
+    /// переносим и из Связки убираем. Связка может при этом спросить
+    /// разрешение; отказ не страшен, тогда ключ просто заводится заново.
+    static func perenestiIzSvyazki() {
+        guard !estKlyuch, let dannye = izSvyazki() else { return }
+        let fm = FileManager.default
+        if fm.createFile(atPath: Papki.klyuchFayl.path, contents: dannye,
+                         attributes: [.posixPermissions: 0o600]) {
+            udalitIzSvyazki()
+        }
+    }
+
+    private static func izSvyazki() -> Data? {
         let zapros: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: sluzhba,
@@ -55,74 +99,16 @@ enum Klyuchi {
             kSecMatchLimit as String: kSecMatchLimitOne
         ]
         var nayden: CFTypeRef?
-        let status = SecItemCopyMatching(zapros as CFDictionary, &nayden)
-        guard status == errSecSuccess else { return nil }
+        guard SecItemCopyMatching(zapros as CFDictionary, &nayden) == errSecSuccess else { return nil }
         return nayden as? Data
     }
 
-    static func udalit() {
+    private static func udalitIzSvyazki() {
         let zapros: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: sluzhba,
             kSecAttrAccount as String: uchet
         ]
         SecItemDelete(zapros as CFDictionary)
-    }
-
-    static var estKlyuch: Bool { privatnyy() != nil }
-
-    // MARK: - Файл для ssh
-
-    /// Достать ключ из Связки в файл с правами 600. Возвращает путь.
-    @discardableResult
-    static func vylozhitVFayl() throws -> URL {
-        guard let dannye = privatnyy() else { throw Beda.netKlyucha }
-        let put = Papki.klyuchFayl
-        let fm = FileManager.default
-        try? fm.removeItem(at: put)
-        // Права выставляем при создании, а не после: между записью и chmod
-        // файл иначе успевает полежать доступным для чтения.
-        guard fm.createFile(atPath: put.path, contents: dannye,
-                            attributes: [.posixPermissions: 0o600]) else {
-            throw Beda.netKlyucha
-        }
-        return put
-    }
-
-    /// Убрать файл с ключом. Вызывается при выходе из приложения.
-    static func ubratFayl() {
-        try? FileManager.default.removeItem(at: Papki.klyuchFayl)
-    }
-
-    // MARK: - Создание пары
-
-    /// Создать новую пару ed25519. Приватная половина уезжает в Связку,
-    /// публичная возвращается строкой — её и надо положить на сервер.
-    static func sozdatParu(kommentariy: String) throws -> String {
-        let vremennaya = Papki.vremennaya.appendingPathComponent("klyuch-\(UUID().uuidString)")
-        defer {
-            try? FileManager.default.removeItem(at: vremennaya)
-            try? FileManager.default.removeItem(at: vremennaya.appendingPathExtension("pub"))
-        }
-
-        try Zapusk.objazatelno("/usr/bin/ssh-keygen", [
-            "-t", "ed25519",
-            "-N", "",                       // без парольной фразы: её роль играет Связка
-            "-C", kommentariy,
-            "-f", vremennaya.path
-        ])
-
-        let privatnyy = try Data(contentsOf: vremennaya)
-        let publichnyy = try String(contentsOf: vremennaya.appendingPathExtension("pub"), encoding: .utf8)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-
-        try sohranit(privatnyy: privatnyy)
-        try publichnyy.write(to: Papki.publichnyyKlyuch, atomically: true, encoding: .utf8)
-        return publichnyy
-    }
-
-    static func publichnyyTekst() -> String? {
-        try? String(contentsOf: Papki.publichnyyKlyuch, encoding: .utf8)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

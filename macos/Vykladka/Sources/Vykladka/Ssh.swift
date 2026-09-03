@@ -69,6 +69,7 @@ struct Ssh {
     @discardableResult
     func vypolnit(_ komanda: String, vhodFayl: URL? = nil, vhod: Data? = nil) throws -> Zapusk.Rezultat {
         guard !nastroyki.host.isEmpty else { throw Beda.netPodklyucheniya }
+        guard Klyuchi.estKlyuch else { throw Klyuchi.Beda.netKlyucha }
         let argumenty = bazovyeOpcii + opciiKlyucha + [adres, komanda]
         let rezultat = try Zapusk.zapustit("/usr/bin/ssh", argumenty, vhod: vhod, vhodFayl: vhodFayl)
         guard rezultat.udalos else {
@@ -81,6 +82,7 @@ struct Ssh {
     /// Нужно там, где «нет такого файла» — нормальный ответ.
     func poprobovat(_ komanda: String) throws -> Zapusk.Rezultat {
         guard !nastroyki.host.isEmpty else { throw Beda.netPodklyucheniya }
+        guard Klyuchi.estKlyuch else { throw Klyuchi.Beda.netKlyucha }
         let argumenty = bazovyeOpcii + opciiKlyucha + [adres, komanda]
         return try Zapusk.zapustit("/usr/bin/ssh", argumenty)
     }

@@ -26,8 +26,17 @@ final class Sostoyanie: ObservableObject {
         nastroyki = Nastroyki.prochitat()
         Papki.pochistitVremennoe()
         baza = try? Baza()
-        if nastroyki.podklyucheno {
-            _ = try? Klyuchi.vylozhitVFayl()
+
+        // Ранние сборки держали ключ в Связке — если он там остался, забираем.
+        Klyuchi.perenestiIzSvyazki()
+
+        // Ключ мог пропасть: переустановили систему, вычистили домашнюю папку,
+        // перенесли приложение на другой мак. Лучше сказать об этом сразу, чем
+        // отдать невнятное «Permission denied» при первой же команде.
+        if nastroyki.podklyucheno && !Klyuchi.estKlyuch {
+            nastroyki.podklyucheno = false
+            nastroyki.zapisat()
+            oshibka = "Ключ для входа не найден — подключите сервер заново. Понадобится пароль, один раз."
         }
     }
 
@@ -198,7 +207,7 @@ final class Sostoyanie: ObservableObject {
             nastroyki.otpechatokServera = otpechatki.first ?? ""
 
             let publichnyy: String
-            if let est = Klyuchi.publichnyyTekst(), Klyuchi.estKlyuch {
+            if Klyuchi.estKlyuch, let est = Klyuchi.publichnyyTekst() {
                 publichnyy = est
             } else {
                 let imyaMaka = Host.current().localizedName ?? "mac"
@@ -209,8 +218,6 @@ final class Sostoyanie: ObservableObject {
             try await vFone {
                 try Ssh.postavitKlyuchPoParolyu(nastroyki: kopiyaNastroek, parol: parol, publichnyyKlyuch: publichnyy)
             }
-            try Klyuchi.vylozhitVFayl()
-
             let proverka = try await vFone { try Ssh(nastroyki: kopiyaNastroek).proverit() }
             guard proverka else {
                 throw NSError(domain: "Vykladka", code: 2, userInfo: [
@@ -231,7 +238,6 @@ final class Sostoyanie: ObservableObject {
 
     func otklyuchit() {
         Klyuchi.udalit()
-        Klyuchi.ubratFayl()
         nastroyki.podklyucheno = false
         sohranitNastroyki()
         sayty = []

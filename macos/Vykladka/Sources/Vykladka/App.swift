@@ -20,11 +20,10 @@ struct VykladkaApp: App {
     }
 }
 
-/// Ключ лежит в Связке, а ssh умеет читать его только из файла. Файл живёт
-/// ровно столько, сколько открыто приложение, — при выходе убираем.
 final class Delegat: NSObject, NSApplicationDelegate {
+    /// Ключ при выходе не трогаем — он постоянный, как ~/.ssh/id_ed25519.
+    /// А распакованные архивы за собой убираем: они большие и не нужны.
     func applicationWillTerminate(_ uvedomlenie: Notification) {
-        Klyuchi.ubratFayl()
         Papki.pochistitVremennoe()
     }
 
