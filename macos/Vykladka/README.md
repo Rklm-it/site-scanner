@@ -55,8 +55,14 @@ macOS — `/usr/bin/ssh`, `ssh-keygen`, `tar`.
 
 Если сервер уже настроен на «только ключи», третий шаг не пройдёт — пароль
 там просто не примут. Тогда положите публичный ключ в `authorized_keys`
-руками: он лежит в
-`~/Library/Application Support/Vykladka/id_ed25519.pub`.
+руками: он лежит в `~/.vykladka/id_ed25519.pub`.
+
+Ключ и `known_hosts` лежат отдельно от остальных данных приложения, в пути
+**без пробелов**, и это не придирка: значение `UserKnownHostsFile` ssh
+разбирает как список файлов через пробел, поэтому путь внутри
+«Application Support» распадается надвое и ssh отвечает «No ED25519 host key
+is known … Host key verification failed» — при том что файл записан и лежит на
+месте.
 
 **Связка спросит разрешение** при первом обращении после каждой пересборки
 приложения — потому что подпись «для себя» меняется с каждым билдом. Жмите
@@ -140,7 +146,8 @@ WhatsApp или Telegram — их робот открывает её через 
 
 | | |
 |---|---|
-| настройки, ключ, база посещений | `~/Library/Application Support/Vykladka/` |
+| настройки, база посещений, база стран | `~/Library/Application Support/Vykladka/` |
+| ключ и known_hosts | `~/.vykladka/` |
 | сайты на сервере | `/root/prototypes-static/<имя>` |
 | предыдущая версия | `/root/prototypes-static/<имя>.staroe` |
 | блоки Caddy | `/root/caddy-sites/<имя>.caddy` |

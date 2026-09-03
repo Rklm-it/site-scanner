@@ -36,7 +36,7 @@ struct Ssh {
     private var bazovyeOpcii: [String] {
         [
             "-o", "StrictHostKeyChecking=yes",
-            "-o", "UserKnownHostsFile=\(Papki.izvestnyeHosty.path)",
+            "-o", "UserKnownHostsFile=\(Ssh.putDlyaOpcii(Papki.izvestnyeHosty.path))",
             "-o", "ConnectTimeout=10",
             "-o", "ServerAliveInterval=15",
             "-o", "ServerAliveCountMax=4",
@@ -53,6 +53,14 @@ struct Ssh {
     }
 
     private var adres: String { "\(nastroyki.polzovatel)@\(nastroyki.host)" }
+
+    /// Путь в значении -o. Пробел там означает «следующий файл», поэтому путь
+    /// с пробелом надо брать в кавычки — ssh их снимает при разборе. Свои
+    /// файлы мы держим в пути без пробелов (см. Papki.sshPapka), но домашняя
+    /// папка пользователя может называться как угодно.
+    static func putDlyaOpcii(_ put: String) -> String {
+        put.rangeOfCharacter(from: .whitespaces) == nil ? put : "\"\(put)\""
+    }
 
     // MARK: - Выполнение
 
@@ -157,7 +165,7 @@ struct Ssh {
 
         let argumenty = [
             "-o", "StrictHostKeyChecking=yes",
-            "-o", "UserKnownHostsFile=\(Papki.izvestnyeHosty.path)",
+            "-o", "UserKnownHostsFile=\(Ssh.putDlyaOpcii(Papki.izvestnyeHosty.path))",
             "-o", "ConnectTimeout=15",
             "-o", "BatchMode=no",
             "-o", "PubkeyAuthentication=no",

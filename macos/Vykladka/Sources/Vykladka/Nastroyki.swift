@@ -14,10 +14,26 @@ enum Papki {
 
     static var nastroykiFayl: URL { korn.appendingPathComponent("nastroyki.json") }
     static var baza: URL { korn.appendingPathComponent("poseshcheniya.sqlite") }
-    static var izvestnyeHosty: URL { korn.appendingPathComponent("known_hosts") }
-    static var klyuchFayl: URL { korn.appendingPathComponent("id_ed25519") }
-    static var publichnyyKlyuch: URL { korn.appendingPathComponent("id_ed25519.pub") }
     static var geoBaza: URL { korn.appendingPathComponent("geo-strany.csv") }
+
+    /// Файлы, которые читает сам ssh, — в домашней папке, а не в Application
+    /// Support. Причина не в аккуратности: значение `UserKnownHostsFile` ssh
+    /// разбирает как СПИСОК файлов через пробел, поэтому путь
+    /// «…/Application Support/Vykladka/known_hosts» распадается на два куска.
+    /// Ни один из них не существует, ssh считает ключ сервера неизвестным и
+    /// отвечает «No ED25519 host key is known … Host key verification failed» —
+    /// при том что файл записан и лежит на месте. Здесь пробелов нет.
+    static var sshPapka: URL {
+        let dom = FileManager.default.homeDirectoryForCurrentUser
+        let papka = dom.appendingPathComponent(".vykladka", isDirectory: true)
+        try? FileManager.default.createDirectory(at: papka, withIntermediateDirectories: true,
+                                                attributes: [.posixPermissions: 0o700])
+        return papka
+    }
+
+    static var izvestnyeHosty: URL { sshPapka.appendingPathComponent("known_hosts") }
+    static var klyuchFayl: URL { sshPapka.appendingPathComponent("id_ed25519") }
+    static var publichnyyKlyuch: URL { sshPapka.appendingPathComponent("id_ed25519.pub") }
 
     /// Временная папка приложения: распаковка архивов, файл с паролем на один
     /// вызов. Чистится при каждом запуске — мусор с прошлого раза не нужен.
