@@ -1,0 +1,47 @@
+# vykladka: name=reklamabataysk domain=reklamabataysk.nexus-flow.ru created=2026-09-03
+#
+# reklamabataysk.ru — рекламное агентство «ПОКОТИЛОВ», Батайск. Прототип к звонку.
+# Страница собрана кодом и лежит в этом же репозитории, ветки `deploy` и сборки нет:
+#   ./sync-local.sh reklamabataysk clients/reklamabataysk.ru/prototype
+
+reklamabataysk.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/reklamabataysk.log {
+			roll_size 5MiB
+			roll_keep 3
+		}
+		format json
+	}
+
+	root * /srv/reklamabataysk
+
+	# Без `file` намеренно — промах должен стать честным 404.
+	@fayly path /images/* /fonts/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	# Фотографии щитов и шрифты именами не хешируются, но и не меняются:
+	# кэшируем на неделю, а не на месяц, чтобы замена фотографии доехала до
+	# клиента, которому уже показывали ссылку.
+	@static {
+		path /images/* /fonts/*
+		file
+	}
+	header @static Cache-Control "public, max-age=604800"
+	header /index.html Cache-Control "no-cache"
+}

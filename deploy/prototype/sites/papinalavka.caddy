@@ -1,0 +1,46 @@
+# vykladka: name=papinalavka domain=lavka-review.nexus-flow.ru created=2026-09-03
+#
+# papinalavka.ru — «Папина лавка», Воронеж. Макет главной к разговору с
+# хозяином: клиенту четыре года делает сайт другая фирма, и он его до сих пор
+# не видел. Ссылка нужна именно поэтому — показать можно с любого телефона.
+#
+# Здесь одна страница целиком: картинки и шрифты вшиты в неё base64, отдельного
+# каталога assets нет. Собирается скриптом clients/papinalavka.ru/макет/собрать.py
+# прямо в /root/prototypes-static/papinalavka — sync.sh тут не нужен, репозитория
+# у этого макета нет.
+
+lavka-review.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/papinalavka.log {
+			roll_size 5MiB
+			roll_keep 3
+		}
+		format json
+	}
+
+	root * /srv/papinalavka
+
+	# Без `file` намеренно — промах должен стать честным 404.
+	@fayly path /img/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	# Кэшировать нечего: вся страница — один файл, и он меняется с каждой
+	# правкой макета. Показ идёт живьём, устаревшая версия дороже трафика.
+	header Cache-Control "no-cache"
+}

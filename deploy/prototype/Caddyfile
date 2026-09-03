@@ -1,244 +1,28 @@
-# Caddy для сервера прототипов. К сканеру отношения не имеет — у того свой
-# Caddyfile в корне репозитория, с паролем и другим доменом.
+# Базовый конфиг сервера прототипов. Блоков клиентов здесь БОЛЬШЕ НЕТ — они
+# лежат по файлу на сайт в /root/caddy-sites и подключаются строкой import ниже.
 #
-# По блоку на клиента. Пароля здесь нет намеренно: ссылку открывает клиент, и
-# упираться в окно авторизации он не должен. В блоке сканера пароль обязателен,
-# там телефоны, ключи и почта; здесь — публичная страница с фотографиями домов.
+# Почему так, а не одним файлом, как было раньше. Файл лежал в git и был
+# примонтирован в контейнер поштучно, из чего выросли две грабли:
 #
-# X-Frame-Options не ставим: прототип иногда удобно показать во фрейме.
+#  1. Добавить клиента можно было только правкой файла в репозитории. Править
+#     на сервере нельзя — дерево становится грязным, и следующий git pull
+#     упирается в unstaged changes. То есть выкладка нового домена требовала
+#     коммита, пуша и pull на сервере.
+#  2. При монтировании ОДНОГО ФАЙЛА git pull подменяет его новым — меняется
+#     inode, а bind-mount продолжает отдавать старое содержимое. `caddy reload`
+#     при этом отвечает «config is unchanged» и выглядит успешным, хотя домена
+#     в конфиге нет. Лечилось только пересозданием контейнера.
 #
-# Отдаём статику, а не проксируем: страница собирается вне сервера, и здесь
-# нужен только раздатчик файлов. Ни node, ни контейнера на клиента, ни
-# перезагрузки Caddy при обновлении — файлы читаются на каждый запрос.
+# Монтируется КАТАЛОГ — обе беды снимаются разом: приложение «Выкладка»
+# (macos/Vykladka) кладёт туда <имя>.caddy по SSH и делает reload, git к этому
+# каталогу отношения не имеет, inode примонтированного каталога не меняется.
 #
-# Папка приходит из sync.sh в /root/prototypes-static/<имя>, внутрь
-# контейнера смонтирована как /srv/<имя>.
-#
-# Править этот файл — только здесь, в репозитории: на сервере ручная правка
-# сделает дерево «грязным», и следующий git pull упрётся в unstaged changes.
+# Этот файл — по-прежнему часть репозитория и правится только здесь.
+# Файлы клиентов в /root/caddy-sites — наоборот, в git не хранятся: их пишет
+# приложение, и стартовый набор кладётся туда один раз скриптом install-sites.sh.
 
-# projekt-doma.ru — Андрей Гординский, прототип к звонку
-projekt-review.nexus-flow.ru {
-	encode gzip
+# Глобальных опций нет намеренно: пароля на прототипах не ставим (ссылку
+# открывает клиент), админ-эндпоинт Caddy слушает localhost внутри контейнера —
+# наружу не торчит, и через него работает `caddy reload`.
 
-	header {
-		Strict-Transport-Security "max-age=31536000"
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-		-Server
-	}
-
-	root * /srv/projekt-doma
-
-	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
-	# Разбор беды — в блоке mebel-review ниже.
-	@fayly path /assets/* /projects/* /fonts/* /favicon.ico /og.png /robots.txt
-	handle @fayly {
-		file_server
-	}
-
-	# Одностраничник: любой неизвестный путь отдаём index.html, чтобы
-	# ссылка с «хвостом» не приводила на 404.
-	handle {
-		try_files {path} {path}/ /index.html
-		file_server
-	}
-
-	# Картинки, бандл и шрифты именованы с хешем либо неизменны, их можно
-	# кэшировать надолго. Саму разметку — нет: она меняется на каждом
-	# обновлении прототипа.
-	@static path /assets/* /projects/* /fonts/*
-	header @static Cache-Control "public, max-age=2592000, immutable"
-
-	# Разметку кэшировать нельзя: она меняется на каждом обновлении и тянет
-	# за собой новые имена бандла. Матчер обязан включать «/» — раньше здесь
-	# стояло только `/index.html`, а браузер запрашивает корень, под правило
-	# не попадал и держал старую страницу со ссылками на старый бандл.
-	# Снаружи выглядело так, будто выкладка не сработала: curl показывал
-	# новое, браузер — старое.
-	@html path / /index.html
-	header @html Cache-Control "no-cache"
-}
-
-# rgz61.ru — ООО «РГЗ», Ростовский гибочный завод. Прототип к согласованию.
-#
-# Выкладка как у projekt-doma, готовой сборкой из ветки `deploy`:
-#
-#   ./sync.sh rgz61 https://github.com/Rklm-it/rostov-steel-forge.git
-#
-# Проект собран в Lovable, репозиторий Rklm-it/rostov-steel-forge. Содержимое
-# для него собрано вручную из скриншотов и карточки лида: сайт клиента стоит
-# на конструкторе «Пульс цен» и выгрузке не поддаётся — см.
-# clients/rgz61.ru/README.md.
-rgz61.nexus-flow.ru {
-	encode gzip
-
-	header {
-		Strict-Transport-Security "max-age=31536000"
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-		-Server
-	}
-
-	root * /srv/rgz61
-
-	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
-	# Разбор беды — в блоке mebel-review ниже.
-	@fayly path /assets/* /favicon.ico /og.png /robots.txt
-	handle @fayly {
-		file_server
-	}
-
-	handle {
-		try_files {path} {path}/ /index.html
-		file_server
-	}
-
-	# Бандл именован с хешем — кэшируется надолго; разметка меняется на каждом
-	# обновлении прототипа, её кэшировать нельзя.
-	@static path /assets/*
-	header @static Cache-Control "public, max-age=2592000, immutable"
-
-	# «/» обязателен в матчере — см. пояснение в блоке projekt-doma.
-	@html path / /index.html
-	header @html Cache-Control "no-cache"
-}
-
-# papinalavka.ru — «Папина лавка», Воронеж. Макет главной к разговору с
-# хозяином: клиенту четыре года делает сайт другая фирма, и он его до сих пор
-# не видел. Ссылка нужна именно поэтому — показать можно с любого телефона.
-#
-# Здесь одна страница целиком: картинки и шрифты вшиты в неё base64, отдельного
-# каталога assets нет. Собирается скриптом clients/papinalavka.ru/макет/собрать.py
-# прямо в /root/prototypes-static/papinalavka — sync.sh тут не нужен, репозитория
-# у этого макета нет.
-lavka-review.nexus-flow.ru {
-	encode gzip
-
-	header {
-		Strict-Transport-Security "max-age=31536000"
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-		-Server
-	}
-
-	root * /srv/papinalavka
-
-	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
-	# Разбор беды — в блоке mebel-review ниже.
-	@fayly path /img/* /favicon.ico /og.png /robots.txt
-	handle @fayly {
-		file_server
-	}
-
-	handle {
-		try_files {path} {path}/ /index.html
-		file_server
-	}
-
-	# Кэшировать нечего: вся страница — один файл, и он меняется с каждой
-	# правкой макета. Показ идёт живьём, устаревшая версия дороже трафика.
-	header Cache-Control "no-cache"
-}
-
-# reklamabataysk.ru — рекламное агентство «ПОКОТИЛОВ», Батайск. Прототип к звонку.
-#
-# Выкладка не как у соседей: страница собрана кодом и лежит в этом же
-# репозитории, ветки `deploy` и сборки нет вовсе.
-#
-#   ./sync-local.sh reklamabataysk clients/reklamabataysk.ru/prototype
-reklamabataysk.nexus-flow.ru {
-	encode gzip
-
-	header {
-		Strict-Transport-Security "max-age=31536000"
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-		-Server
-	}
-
-	root * /srv/reklamabataysk
-
-	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
-	# Разбор беды — в блоке mebel-review ниже.
-	@fayly path /images/* /fonts/* /favicon.ico /og.png /robots.txt
-	handle @fayly {
-		file_server
-	}
-
-	handle {
-		try_files {path} {path}/ /index.html
-		file_server
-	}
-
-	# Фотографии щитов и шрифты именами не хешируются, но и не меняются:
-	# кэшируем на неделю, а не на месяц, чтобы замена фотографии доехала до
-	# клиента, которому уже показывали ссылку.
-	@static {
-		path /images/* /fonts/*
-		file
-	}
-	header @static Cache-Control "public, max-age=604800"
-	header /index.html Cache-Control "no-cache"
-}
-
-# mebel-ryazane.ru — ИП Недорезов, мебельный цех в Рязани. Прототип к звонку.
-#
-# Выкладка готовой сборкой из ветки `deploy`:
-#
-#   ./sync.sh mebel-ryazane https://github.com/Rklm-it/project-ab16b9fc-3661-4638-b332-fc0eab64dce7.git
-#
-# Проект собран в Lovable, репозиторий приватный — на сервере нужен токен с
-# правами Contents: Read (см. README, раздел про credential.helper).
-mebel-review.nexus-flow.ru {
-	encode gzip
-
-	header {
-		Strict-Transport-Security "max-age=31536000"
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-		-Server
-	}
-
-	root * /srv/mebel-ryazane
-
-	# Файлы отдаются как файлы, и только остальное — одностраничником.
-	#
-	# Раньше здесь стоял общий `try_files {path} {path}/ /index.html`, и он
-	# ловил в том числе `/images/*.jpg`. Пока фотографий в сборке не было,
-	# каждый запрос картинки получал **index.html с кодом 200**, а правило
-	# `@foto` ниже штамповало на него «кэшировать неделю». Браузер сложил
-	# разметку под адреса всех шестнадцати картинок и держал её неделю: после
-	# выкладки фотографий на странице по-прежнему не было ни одной, и выглядело
-	# это как несработавшая выкладка.
-	#
-	# Теперь ненайденный файл — честный 404, который браузер не кэширует.
-	@fayly path /assets/* /images/* /favicon.ico /og.png /robots.txt
-	handle @fayly {
-		file_server
-	}
-
-	handle {
-		try_files {path} {path}/ /index.html
-		file_server
-	}
-
-	# Бандл именован с хешем — кэшируется надолго. Фотографии работ приедут
-	# позже и будут заменяться по ходу показа, поэтому им неделя, а не месяц.
-	# `file` в матчере обязателен: без него метка «кэшировать неделю»
-	# вешалась и на ответ 404, то есть браузер запоминал промах.
-	@static {
-		path /assets/*
-		file
-	}
-	header @static Cache-Control "public, max-age=2592000, immutable"
-	@foto {
-		path /images/*
-		file
-	}
-	header @foto Cache-Control "public, max-age=604800"
-
-	# «/» обязателен в матчере — см. пояснение в блоке projekt-doma.
-	@html path / /index.html
-	header @html Cache-Control "no-cache"
-}
+import /etc/caddy/sites/*.caddy

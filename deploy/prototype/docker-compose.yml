@@ -6,11 +6,13 @@
 # базой лидов вредно и без этого: упавший по памяти хост уронит и панель.
 #
 # Здесь только Caddy, и больше ничего не нужно: прототипы статические.
-# Собранные файлы приносит deploy/prototype/sync.sh в /root/prototypes-static,
-# оттуда Caddy их и отдаёт. Ни node, ни контейнера на клиента.
+# Собранные файлы приносит deploy/prototype/sync.sh в /root/prototypes-static
+# либо приложение «Выкладка» (macos/Vykladka) по SSH — оттуда Caddy их и
+# отдаёт. Ни node, ни контейнера на клиента.
 #
 # Запуск:
-#   cd deploy/prototype && docker compose up -d
+#   cd /root/site-scanner/deploy/prototype && docker compose up -d
+
 name: prototypes
 
 services:
@@ -21,9 +23,28 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      # Базовый конфиг — из репозитория. Он монтируется ОДНИМ ФАЙЛОМ, значит
+      # после git pull его подхватит только `docker compose up -d
+      # --force-recreate caddy`: git заменяет файл новым, inode меняется, а
+      # bind-mount продолжает отдавать старое содержимое, и `caddy reload`
+      # отвечает «config is unchanged». Меняется он редко — блоки клиентов
+      # переехали в каталог ниже именно поэтому.
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+      # Блоки сайтов, по файлу на сайт. Каталог, а не файл: приложение кладёт
+      # сюда новый .caddy по SSH и делает `caddy reload`, и всё подхватывается
+      # без пересоздания контейнера. В git не хранится — стартовый набор
+      # раскладывает install-sites.sh.
+      - /root/caddy-sites:/etc/caddy/sites:ro
+
       # Собранные прототипы: подпапка на клиента, только чтение
       - /root/prototypes-static:/srv:ro
+
+      # Логи посещений, по файлу на сайт, с ротацией (roll_size в блоке сайта).
+      # Отсюда их дочитывает приложение — на сервере ничего не разбирается.
+      # Не :ro — сюда Caddy пишет.
+      - /root/caddy-logs:/var/log/caddy
+
       - caddy-data:/data      # сертификаты; потеряете — Let's Encrypt упрётся в лимит
       - caddy-config:/config
 

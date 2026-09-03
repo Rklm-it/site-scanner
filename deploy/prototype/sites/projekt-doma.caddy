@@ -1,0 +1,65 @@
+# vykladka: name=projekt-doma domain=projekt-review.nexus-flow.ru created=2026-09-03
+#
+# projekt-doma.ru — Андрей Гординский, прототип к звонку.
+# Выкладка готовой сборкой из ветки `deploy`:
+#   ./sync.sh projekt-doma https://github.com/Rklm-it/project-house-design.git
+
+projekt-review.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	# Лог посещений: кто, когда, откуда и что открывал. Читает его приложение
+	# «Выкладка» — дочитывает хвост по SSH и складывает к себе. Ротация по
+	# размеру обязательна: без неё лог растёт до отказа диска.
+	log {
+		output file /var/log/caddy/projekt-doma.log {
+			roll_size 5MiB
+			roll_keep 3
+		}
+		format json
+	}
+
+	root * /srv/projekt-doma
+
+	# Файлы отдаются как файлы: ненайденный — честный 404, а не index.html.
+	# Матчер здесь БЕЗ `file` намеренно: именно промах должен дойти до
+	# file_server и получить 404. Разбор беды — в блоке mebel-ryazane.
+	@fayly path /assets/* /projects/* /fonts/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	# Одностраничник: любой неизвестный путь отдаём index.html, чтобы
+	# ссылка с «хвостом» не приводила на 404.
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	# Картинки, бандл и шрифты именованы с хешем либо неизменны, их можно
+	# кэшировать надолго. Саму разметку — нет: она меняется на каждом
+	# обновлении прототипа.
+	#
+	# `file` в матчере обязателен: без него метка «кэшировать месяц» вешается
+	# и на ответ 404, то есть браузер запоминает промах.
+	@static {
+		path /assets/* /projects/* /fonts/*
+		file
+	}
+	header @static Cache-Control "public, max-age=2592000, immutable"
+
+	# Разметку кэшировать нельзя: она меняется на каждом обновлении и тянет
+	# за собой новые имена бандла. Матчер обязан включать «/» — раньше здесь
+	# стояло только `/index.html`, а браузер запрашивает корень, под правило
+	# не попадал и держал старую страницу со ссылками на старый бандл.
+	# Снаружи выглядело так, будто выкладка не сработала: curl показывал
+	# новое, браузер — старое.
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+}

@@ -1,0 +1,71 @@
+# vykladka: name=mebel-ryazane domain=mebel-review.nexus-flow.ru created=2026-09-03
+#
+# mebel-ryazane.ru — ИП Недорезов, мебельный цех в Рязани. Прототип к звонку.
+# Выкладка готовой сборкой из ветки `deploy`:
+#   ./sync.sh mebel-ryazane https://github.com/Rklm-it/project-ab16b9fc-3661-4638-b332-fc0eab64dce7.git
+#
+# Репозиторий приватный — на сервере нужен токен с правами Contents: Read
+# (см. README, раздел про credential.helper).
+
+mebel-review.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/mebel-ryazane.log {
+			roll_size 5MiB
+			roll_keep 3
+		}
+		format json
+	}
+
+	root * /srv/mebel-ryazane
+
+	# Файлы отдаются как файлы, и только остальное — одностраничником.
+	#
+	# Раньше здесь стоял общий `try_files {path} {path}/ /index.html`, и он
+	# ловил в том числе `/images/*.jpg`. Пока фотографий в сборке не было,
+	# каждый запрос картинки получал **index.html с кодом 200**, а правило
+	# `@foto` ниже штамповало на него «кэшировать неделю». Браузер сложил
+	# разметку под адреса всех шестнадцати картинок и держал её неделю: после
+	# выкладки фотографий на странице по-прежнему не было ни одной, и выглядело
+	# это как несработавшая выкладка.
+	#
+	# Теперь ненайденный файл — честный 404, который браузер не кэширует.
+	# Поэтому `file` в этом матчере не ставится: промах обязан дойти до
+	# file_server, а не провалиться в одностраничник ниже.
+	@fayly path /assets/* /images/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	# Бандл именован с хешем — кэшируется надолго. Фотографии работ приедут
+	# позже и будут заменяться по ходу показа, поэтому им неделя, а не месяц.
+	# `file` в матчере обязателен: без него метка «кэшировать неделю»
+	# вешалась и на ответ 404, то есть браузер запоминал промах.
+	@static {
+		path /assets/*
+		file
+	}
+	header @static Cache-Control "public, max-age=2592000, immutable"
+	@foto {
+		path /images/*
+		file
+	}
+	header @foto Cache-Control "public, max-age=604800"
+
+	# «/» обязателен в матчере — см. пояснение в projekt-doma.caddy.
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+}

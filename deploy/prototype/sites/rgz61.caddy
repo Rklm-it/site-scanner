@@ -1,0 +1,53 @@
+# vykladka: name=rgz61 domain=rgz61.nexus-flow.ru created=2026-09-03
+#
+# rgz61.ru — ООО «РГЗ», Ростовский гибочный завод. Прототип к согласованию.
+# Выкладка готовой сборкой из ветки `deploy`:
+#   ./sync.sh rgz61 https://github.com/Rklm-it/rostov-steel-forge.git
+#
+# Содержимое собрано вручную из скриншотов и карточки лида: сайт клиента стоит
+# на конструкторе «Пульс цен» и выгрузке не поддаётся — см. clients/rgz61.ru/README.md.
+
+rgz61.nexus-flow.ru {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/rgz61.log {
+			roll_size 5MiB
+			roll_keep 3
+		}
+		format json
+	}
+
+	root * /srv/rgz61
+
+	# Без `file` намеренно — промах должен стать честным 404.
+	@fayly path /assets/* /favicon.ico /og.png /robots.txt
+	handle @fayly {
+		file_server
+	}
+
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+
+	# Бандл именован с хешем — кэшируется надолго; разметка меняется на каждом
+	# обновлении прототипа, её кэшировать нельзя. `file` обязателен, иначе
+	# метка вешается и на 404.
+	@static {
+		path /assets/*
+		file
+	}
+	header @static Cache-Control "public, max-age=2592000, immutable"
+
+	# «/» обязателен в матчере — см. пояснение в projekt-doma.caddy.
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+}
