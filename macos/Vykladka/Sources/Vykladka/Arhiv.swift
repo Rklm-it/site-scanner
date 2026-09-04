@@ -47,27 +47,30 @@ enum Arhiv {
 
     // MARK: - Распаковка
 
-    static func razobrat(_ istochnik: URL) throws -> Razbor {
-        var vremennaya: URL?
-        let raspakovano: URL
-
+    /// Распаковать архив во временную папку либо взять папку как есть.
+    /// Отдельным шагом, потому что содержимое надо посмотреть до разбора: там
+    /// может лежать не сайт, а пара макетов Stitch, которые сначала склеиваются.
+    static func raspakovatVoVremennuyu(_ istochnik: URL) throws -> (korn: URL, vremennaya: URL?) {
         var eto_papka: ObjCBool = false
         FileManager.default.fileExists(atPath: istochnik.path, isDirectory: &eto_papka)
+        if eto_papka.boolValue { return (istochnik, nil) }
 
-        if eto_papka.boolValue {
-            raspakovano = istochnik
-        } else {
-            let kuda = Papki.vremennaya.appendingPathComponent("raspakovka-\(UUID().uuidString)", isDirectory: true)
-            try FileManager.default.createDirectory(at: kuda, withIntermediateDirectories: true)
-            vremennaya = kuda
-            try raspakovat(istochnik, v: kuda)
-            raspakovano = kuda
-        }
+        let kuda = Papki.vremennaya.appendingPathComponent("raspakovka-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: kuda, withIntermediateDirectories: true)
+        try raspakovat(istochnik, v: kuda)
+        return (kuda, kuda)
+    }
 
-        guard let korn = naytiKoren(raspakovano) else {
-            if let vremennaya { try? FileManager.default.removeItem(at: vremennaya) }
-            throw Beda.netIndexa
-        }
+    static func razobrat(_ istochnik: URL) throws -> Razbor {
+        let (raspakovano, vremennaya) = try raspakovatVoVremennuyu(istochnik)
+        return try razobrat(raspakovano: raspakovano, vremennaya: vremennaya)
+    }
+
+    static func razobrat(raspakovano: URL, vremennaya: URL?) throws -> Razbor {
+        // Распакованное при неудаче НЕ удаляем: вызывающий смотрит, не пара ли
+        // это макетов Stitch, которую надо сначала склеить. Мусор подчистится
+        // при следующем запуске.
+        guard let korn = naytiKoren(raspakovano) else { throw Beda.netIndexa }
 
         let papki = papkiVerhnegoUrovnya(korn)
         let (faylov, razmer) = posschitat(korn)

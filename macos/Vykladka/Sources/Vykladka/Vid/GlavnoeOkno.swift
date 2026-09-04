@@ -6,6 +6,7 @@ struct GlavnoeOkno: View {
 
     @EnvironmentObject var sostoyanie: Sostoyanie
     @State private var razbor: Arhiv.Razbor?
+    @State private var paraMaketov: ParaMaketov?
     @State private var razborIdet = false
     @State private var pokazatNastroyki = false
     @State private var navedeno = false
@@ -21,6 +22,12 @@ struct GlavnoeOkno: View {
         .sheet(item: $razbor) { razbor in
             NovayaVykladka(razbor: razbor)
                 .environmentObject(sostoyanie)
+        }
+        .sheet(item: $paraMaketov) { para in
+            SkleykaMaketov(nachalnaya: para) { itog, ishodnaya in
+                prinyatSkleyku(itog, ishodnaya: ishodnaya)
+            }
+            .environmentObject(sostoyanie)
         }
         .sheet(isPresented: $pokazatNastroyki) {
             NastroykiVid().environmentObject(sostoyanie)
@@ -58,6 +65,14 @@ struct GlavnoeOkno: View {
                     vybratArhivRuchkoy()
                 } label: {
                     Label("Положить архив", systemImage: "arrow.up.doc")
+                }
+                .disabled(sostoyanie.zanyat || razborIdet)
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    vybratPapkuMaketov()
+                } label: {
+                    Label("Склеить макеты", systemImage: "rectangle.on.rectangle")
                 }
                 .disabled(sostoyanie.zanyat || razborIdet)
             }
@@ -138,8 +153,68 @@ struct GlavnoeOkno: View {
         razborIdet = true
         Task {
             do {
-                let rezultat = try await vFone { try Arhiv.razobrat(adres) }
-                razbor = rezultat
+                let (korn, vremennaya) = try await vFone { try Arhiv.raspakovatVoVremennuyu(adres) }
+                do {
+                    razbor = try await vFone { try Arhiv.razobrat(raspakovano: korn, vremennaya: vremennaya) }
+                } catch {
+                    // index.html не нашёлся. Прежде чем ругаться, смотрим, не пара
+                    // ли это макетов Stitch: у него в выгрузке два code.html и
+                    // ни одного index.html — сам по себе такой архив не сайт.
+                    if let para = Makety.naytiParu(v: korn) {
+                        paraMaketov = ParaMaketov(para: para, vremennaya: vremennaya)
+                    } else {
+                        if let vremennaya { try? FileManager.default.removeItem(at: vremennaya) }
+                        sostoyanie.oshibka = error.localizedDescription
+                    }
+                }
+            } catch {
+                sostoyanie.oshibka = error.localizedDescription
+            }
+            razborIdet = false
+        }
+    }
+
+    private func vybratPapkuMaketov() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = true
+        panel.message = "Папка с выгрузкой Stitch (две версии) или архив с ней"
+        guard panel.runModal() == .OK, let adres = panel.url else { return }
+        razborIdet = true
+        Task {
+            do {
+                let (korn, vremennaya) = try await vFone { try Arhiv.raspakovatVoVremennuyu(adres) }
+                if let para = Makety.naytiParu(v: korn) {
+                    paraMaketov = ParaMaketov(para: para, vremennaya: vremennaya)
+                } else {
+                    sostoyanie.oshibka = "В этой папке не нашлось ровно двух HTML-макетов. Склеивать нечего."
+                }
+            } catch {
+                sostoyanie.oshibka = error.localizedDescription
+            }
+            razborIdet = false
+        }
+    }
+
+    /// Принять склеенное и отдать в обычную выкладку.
+    private func prinyatSkleyku(_ itog: Makety.Itog, ishodnaya: URL?) {
+        if let ishodnaya { try? FileManager.default.removeItem(at: ishodnaya) }
+        razborIdet = true
+        Task {
+            do {
+                razbor = try await vFone {
+                    try Arhiv.razobrat(raspakovano: itog.papka, vremennaya: itog.papka)
+                }
+                var otchet = "Склеено."
+                if itog.kartinokSkachano > 0 {
+                    otchet += " Картинок забрано к себе: \(itog.kartinokSkachano)."
+                }
+                if itog.kartinokNeVzyalos > 0 {
+                    otchet += " Не забралось: \(itog.kartinokNeVzyalos) — они остались ссылками на Stitch и однажды пропадут."
+                }
+                if itog.tailwindMestnyy { otchet += " Tailwind лежит рядом, чужой CDN не нужен." }
+                sostoyanie.soobshchenie = otchet
             } catch {
                 sostoyanie.oshibka = error.localizedDescription
             }
